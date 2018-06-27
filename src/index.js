@@ -1,9 +1,9 @@
-const DashcoreLib = require('@dashevo/dashcore-lib');
+const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
 const KeyChain = require('./KeyChain');
 
-const { Registration, TopUp } = DashcoreLib.Transaction.SubscriptionTransactions;
-const { Transaction, PrivateKey } = DashcoreLib;
+const { Registration, TopUp } = Dashcore.Transaction.SubscriptionTransactions;
+const { Transaction, PrivateKey } = Dashcore;
 
 class Wallet {
   /**
