@@ -1,0 +1,12 @@
+sudo: required
+dist: trusty
+language: node_js
+
+node_js:
+- 'node'
+
+before_install:
+- echo -e "machine github.com\n  login ${GH_TOKEN}" >> ~/.netrc
+
+install:
+- npm install
