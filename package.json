@@ -4,6 +4,8 @@
   "description": "Light wallet library for Dash",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "test"
   },
   "repository": {
