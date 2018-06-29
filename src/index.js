@@ -1,9 +1,10 @@
+const Mnemonic = require('@dashevo/dashcore-mnemonic');
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
 const KeyChain = require('./KeyChain');
 
 const { Registration, TopUp } = Dashcore.Transaction.SubscriptionTransactions;
-const { Transaction, PrivateKey } = Dashcore;
+const { Transaction, PrivateKey, HDPrivateKey } = Dashcore;
 
 const EVENT_CONSTANTS = {
   SYNCED: 'SYNCED',
@@ -12,15 +13,21 @@ const EVENT_CONSTANTS = {
 /**
  * Returns a new wallet object.
  * @param {DAPIClient} DAPIClient
- * @param {string} [privateHDKey]
+ * @param {string|privateHDKey} seed
  * @return {Wallet} - new wallet object
  */
-const createWallet = (DAPIClient, privateHDKey) => ({
-  DAPIClient,
-  events: new EventEmitter(),
-  privateHDKey,
-  synced: false,
-});
+const createWallet = (DAPIClient, seed) => {
+  const privateHDKey = (seed.constructor.name === 'HDPrivateKey')
+    ? seed
+    : new HDPrivateKey.fromSeed(new Mnemonic(seed).toSeed());
+
+  return {
+    DAPIClient,
+    events: new EventEmitter(),
+    privateHDKey,
+    synced: false,
+  };
+};
 
 /**
  * Returns a new synchronized wallet object.
