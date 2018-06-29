@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { DAPIClient } = require('@dashevo/dapi-sdk');
-const { HDPrivateKey } = require('@dashevo/dashcore-lib');
-const { createWallet, getNewAddress } = require('../src/index');
+const { HDPrivateKey, Script } = require('@dashevo/dashcore-lib');
+const { createWallet, createTransaction, getNewAddress } = require('../src/index');
 const Mnemonic = require('@dashevo/dashcore-mnemonic');
 
 const mnemonic1 = 'knife easily prosper input concert merge prepare autumn pen blood glance toilet';
@@ -11,13 +11,15 @@ const privateHDKey = new HDPrivateKey.fromSeed(mnemonic);
 
 describe('Wallet', () => {
   it('should create a wallet from a privateHDKey', () => {
-    const wallet = createWallet(dapiClient, privateHDKey);
+    const wallet = createWallet(dapiClient, privateHDKey, 'testnet');
 
     expect(wallet).to.be.a('object');
     expect(wallet.DAPIClient).to.equal(dapiClient);
     expect(wallet.privateHDKey).to.equal(privateHDKey);
     expect(wallet.synced).to.equal(false);
     expect(wallet).to.have.property('events');
+    expect(wallet.network).to.equal('testnet');
+
   });
   it('should create a wallet from a mnemonic', () => {
     const wallet = createWallet(dapiClient, mnemonic1);
@@ -27,10 +29,32 @@ describe('Wallet', () => {
     expect(wallet.synced).to.equal(false);
     expect(wallet).to.have.property('privateHDKey');
     expect(wallet).to.have.property('events');
+    expect(wallet.network).to.equal('livenet');
   });
 
   it('should generate an address', () => {
-    const wallet = createWallet(dapiClient, privateHDKey);
-    const address = getNewAddress(wallet);
+    // const wallet = createWallet(dapiClient, privateHDKey);
+    // const address = getNewAddress(wallet);
+  });
+  it('should create a transaction', () => {
+    const wallet = createWallet(dapiClient, mnemonic1, 'testnet');
+    const options = {
+      utxos: [{
+        address: 'yf6qYQzQoCzpF7gJYAa7s3n5rBK89RoaCQ',
+        txId: 'e66474bfe8ae3d91b2784864fc09e0bd615cbfbf4a2164e46b970bcc488a938f',
+        outputIndex: 0,
+        scriptPubKey: '76a914ce07ed014c455640a41e516ad4cc40fbc7fe435c88ac',
+        satoshis: 5000000000,
+      }],
+      change: 'yf6qYQzQoCzpF7gJYAa7s3n5rBK89RoaCQ',
+      to: 'yf6qYQzQoCzpF7gJYAa7s3n5rBK89RoaCQ',
+      keys: [privateHDKey.privateKey],
+      amount: 10000,
+      fee: 9000,
+    };
+
+    const transaction = createTransaction(wallet, options);
+
+    expect(transaction).to.equal('01000000018f938a48cc0b976be464214abfbf5c61bde009fc644878b2913daee8bf7464e60000000000ffffffff0210270000000000001976a914ce07ed014c455640a41e516ad4cc40fbc7fe435c88acc8a7052a010000001976a914ce07ed014c455640a41e516ad4cc40fbc7fe435c88ac00000000');
   });
 });

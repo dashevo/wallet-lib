@@ -14,18 +14,20 @@ const EVENT_CONSTANTS = {
  * Returns a new wallet object.
  * @param {DAPIClient} DAPIClient
  * @param {string|privateHDKey} seed
+ * @param {string} network
  * @return {Wallet} - new wallet object
  */
-const createWallet = (DAPIClient, seed) => {
+const createWallet = (DAPIClient, seed, network = 'livenet') => {
   const privateHDKey = (seed.constructor.name === 'HDPrivateKey')
     ? seed
-    : new HDPrivateKey.fromSeed(new Mnemonic(seed).toSeed());
+    : new HDPrivateKey.fromSeed(new Mnemonic(seed).toSeed(), network);
 
   return {
     DAPIClient,
     events: new EventEmitter(),
     privateHDKey,
     synced: false,
+    network,
   };
 };
 
@@ -47,6 +49,23 @@ const getPrivateKeyForSigning = wallet => KeyChain.getNewPrivateKey(wallet.priva
  * @return {Array<object>} - list of unspent outputs for the wallet
  */
 const getUTXO = async (wallet) => { throw new Error('Not Implemented'); };
+
+/**
+ * @param {Wallet} wallet
+ * @param {object} options of the transaction
+ * @returns {string} - rawTx
+ */
+const createTransaction = (wallet, opts) => {
+
+  const transaction = new Transaction()
+    .from(opts.utxos)
+    .to(opts.to, opts.amount)
+    .feePerKb(opts.fee)
+    .change(opts.change)
+    .sign(opts.keys);
+
+  return transaction.toString();
+};
 
 /**
  * @param {Wallet} wallet
@@ -145,6 +164,7 @@ module.exports = {
   sendTransaction,
   signTransaction,
   createRegistration,
+  createTransaction,
   registerUser,
   topUpUserCredits,
   signStateTransitionHeader,
