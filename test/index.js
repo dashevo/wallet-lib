@@ -1,10 +1,12 @@
 const { expect } = require('chai');
+const { DAPIClient } = require('@dashevo/dapi-sdk');
+const { HDPrivateKey } = require('@dashevo/dashcore-lib');
 const { createWallet } = require('../src/index');
 
 describe('Wallet', () => {
   it('should create a wallet', () => {
-    const dapiClient = 'placeholder';
-    const privateHDKey = 'placeholder';
+    const dapiClient = new DAPIClient({ port: 3010 });
+    const privateHDKey = new HDPrivateKey();
     const wallet = createWallet(dapiClient, privateHDKey);
 
     expect(wallet).to.be.a('object');
