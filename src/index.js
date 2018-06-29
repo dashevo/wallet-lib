@@ -62,7 +62,6 @@ const createTransaction = (wallet, opts) => {
     .to(opts.to, opts.amount)
     .feePerKb(opts.fee)
     .change(opts.change)
-    .sign(opts.keys);
 
   return transaction.toString();
 };

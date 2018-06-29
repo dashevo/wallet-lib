@@ -1,7 +1,9 @@
 const { expect } = require('chai');
 const { DAPIClient } = require('@dashevo/dapi-sdk');
 const { HDPrivateKey, Script } = require('@dashevo/dashcore-lib');
-const { createWallet, createTransaction, getNewAddress } = require('../src/index');
+const {
+  createWallet, createTransaction, getNewAddress, sendTransaction, signTransaction
+} = require('../src/index');
 const Mnemonic = require('@dashevo/dashcore-mnemonic');
 
 const mnemonic1 = 'knife easily prosper input concert merge prepare autumn pen blood glance toilet';
@@ -9,9 +11,11 @@ const dapiClient = new DAPIClient({ port: 3010 });
 const mnemonic = new Mnemonic(mnemonic1).toSeed();
 const privateHDKey = new HDPrivateKey.fromSeed(mnemonic);
 
+let wallet,
+  rawTransaction = null;
 describe('Wallet', () => {
   it('should create a wallet from a privateHDKey', () => {
-    const wallet = createWallet(dapiClient, privateHDKey, 'testnet');
+    wallet = createWallet(dapiClient, privateHDKey, 'testnet');
 
     expect(wallet).to.be.a('object');
     expect(wallet.DAPIClient).to.equal(dapiClient);
@@ -19,10 +23,9 @@ describe('Wallet', () => {
     expect(wallet.synced).to.equal(false);
     expect(wallet).to.have.property('events');
     expect(wallet.network).to.equal('testnet');
-
   });
   it('should create a wallet from a mnemonic', () => {
-    const wallet = createWallet(dapiClient, mnemonic1);
+    wallet = createWallet(dapiClient, mnemonic1);
 
     expect(wallet).to.be.a('object');
     expect(wallet.DAPIClient).to.equal(dapiClient);
@@ -33,11 +36,10 @@ describe('Wallet', () => {
   });
 
   it('should generate an address', () => {
-    // const wallet = createWallet(dapiClient, privateHDKey);
-    // const address = getNewAddress(wallet);
+    wallet = createWallet(dapiClient, mnemonic1, 'testnet');
+    const address = getNewAddress(wallet);
   });
   it('should create a transaction', () => {
-    const wallet = createWallet(dapiClient, mnemonic1, 'testnet');
     const options = {
       utxos: [{
         address: 'yf6qYQzQoCzpF7gJYAa7s3n5rBK89RoaCQ',
@@ -53,8 +55,17 @@ describe('Wallet', () => {
       fee: 9000,
     };
 
-    const transaction = createTransaction(wallet, options);
+    rawTransaction = createTransaction(wallet, options);
 
-    expect(transaction).to.equal('01000000018f938a48cc0b976be464214abfbf5c61bde009fc644878b2913daee8bf7464e60000000000ffffffff0210270000000000001976a914ce07ed014c455640a41e516ad4cc40fbc7fe435c88acc8a7052a010000001976a914ce07ed014c455640a41e516ad4cc40fbc7fe435c88ac00000000');
+    expect(rawTransaction).to.equal('01000000018f938a48cc0b976be464214abfbf5c61bde009fc644878b2913daee8bf7464e60000000000ffffffff0210270000000000001976a914ce07ed014c455640a41e516ad4cc40fbc7fe435c88acc8a7052a010000001976a914ce07ed014c455640a41e516ad4cc40fbc7fe435c88ac00000000');
+  });
+  it('should sign a transaction', () => {
+    const signedRawTransaction = signTransaction(wallet, rawTransaction);
+    // expect(signedRawTransaction).to.equal('01000000018f938a48cc0b976be464214abfbf5c61bde009fc644878b2913daee8bf7464e60000000000ffffffff0210270000000000001976a914ce07ed014c455640a41e516ad4cc40fbc7fe435c88acc8a7052a010000001976a914ce07ed014c455640a41e516ad4cc40fbc7fe435c88ac00000000');
+  });
+  it('should broadcast a transaction', () => {
+    // const rawTx = '01000000018f938a48cc0b976be464214abfbf5c61bde009fc644878b2913daee8bf7464e60000000000ffffffff0210270000000000001976a914ce07ed014c455640a41e516ad4cc40fbc7fe435c88acc8a7052a010000001976a914ce07ed014c455640a41e516ad4cc40fbc7fe435c88ac00000000';
+    // expect(sendTransaction(wallet, rawTx)).to.throw(new Error('toto'));
   });
 });
+
