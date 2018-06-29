@@ -68,9 +68,10 @@ const createTransaction = (wallet, opts) => {
 
 /**
  * @param {Wallet} wallet
+ * @param {string} derivationPath
  * @return {string} - new change address
  */
-const getNewAddress = (wallet, derivationPath) => {
+const getNewAddress = (wallet, derivationPath = 'm/1') => {
   const newKey = KeyChain.getNewPrivateKey(wallet.privateHDKey, derivationPath);
   return String(newKey.publicKey.toAddress());
 };

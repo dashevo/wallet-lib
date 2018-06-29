@@ -38,6 +38,8 @@ describe('Wallet', () => {
   it('should generate an address', () => {
     wallet = createWallet(dapiClient, mnemonic1, 'testnet');
     const address = getNewAddress(wallet);
+    expect(address).to.equal('yaWEePY8BnKmFGSD6cSjmdiByyV37RsivK');
+    expect(getNewAddress(wallet, "m/44'/1'/0'/0/0")).to.equal('yRdxQQpXYh9Xkd91peJ7FJxpEzoRb6droH');
   });
   it('should create a transaction', () => {
     const options = {
