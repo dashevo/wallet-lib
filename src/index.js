@@ -72,7 +72,7 @@ const createTransaction = (wallet, opts) => {
  */
 const getNewAddress = (wallet, derivationPath) => {
   const newKey = KeyChain.getNewPrivateKey(wallet.privateHDKey, derivationPath);
-  return String(newKey.toAddress());
+  return String(newKey.publicKey.toAddress());
 };
 
 /**
