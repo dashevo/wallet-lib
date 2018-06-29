@@ -45,8 +45,8 @@ const getUTXO = async (wallet) => { throw new Error('Not Implemented'); };
  * @param {Wallet} wallet
  * @return {string} - new change address
  */
-const getNewAddress = (wallet) => {
-  const newKey = KeyChain.getNewPrivateKey(wallet.privateHDKey);
+const getNewAddress = (wallet, derivationPath) => {
+  const newKey = KeyChain.getNewPrivateKey(wallet.privateHDKey, derivationPath);
   return String(newKey.toAddress());
 };
 
