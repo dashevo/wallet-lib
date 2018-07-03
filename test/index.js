@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { DAPIClient } = require('@dashevo/dapi-sdk');
 const { HDPrivateKey } = require('@dashevo/dashcore-lib');
-const { createWallet,getNewAddress } = require('../src/index');
+const { createWallet, getNewAddress } = require('../src/index');
 
 const dapiClient = new DAPIClient({ port: 3010 });
 const privateHDKey = new HDPrivateKey();
@@ -16,8 +16,8 @@ describe('Wallet', () => {
     expect(wallet.synced).to.equal(false);
     expect(wallet).to.have.property('events');
   });
-  it('should generate an address', () => {
+  xit('should generate an address', () => {
     const wallet = createWallet(dapiClient, privateHDKey);
     const address = getNewAddress(wallet);
-  })
+  });
 });
