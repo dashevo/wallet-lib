@@ -2,6 +2,7 @@ const Mnemonic = require('@dashevo/dashcore-mnemonic');
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
 const KeyChain = require('./KeyChain');
+const BloomFilter = require('bloom-filter');
 
 const { Registration, TopUp } = Dashcore.Transaction.SubscriptionTransactions;
 const { Transaction, PrivateKey, HDPrivateKey } = Dashcore;
@@ -43,6 +44,20 @@ const syncWallet = (wallet) => {
 
 // TODO: Do we need this, or can we export KeyChain as a separate bundled library?
 const getPrivateKeyForSigning = wallet => KeyChain.getNewPrivateKey(wallet.privateHDKey);
+
+/**
+ * @param {Wallet} wallet
+ * @return {Array<object>} - TODO
+ */
+const getBloomFilter = (privKeys, fpRate) => {
+  const filter = BloomFilter.create(privKeys.length, fpRate, 0, BloomFilter.BLOOM_UPDATE_ALL)
+
+  privKeys.forEach(key => {
+    filter.insert(new Dashcore.PrivateKey(key).toPublicKey())
+  })
+
+  return filter;
+}
 
 /**
  * @param {Wallet} wallet
