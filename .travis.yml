@@ -3,14 +3,14 @@ dist: trusty
 language: node_js
 
 node_js:
-- 'node'
+  - 'node'
 
 before_install:
-- echo -e "machine github.com\n  login ${GH_TOKEN}" >> ~/.netrc
-- echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+  - echo -e "machine github.com\n  login ${GH_TOKEN}" >> ~/.netrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
 
 install:
-- npm install
+  - npm install
 
-after_install:
-- npm lint
+before_script:
+  - npm run lint
