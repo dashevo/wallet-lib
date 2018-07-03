@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "test"
+    "test": "mocha test/"
   },
   "repository": {
     "type": "git",
@@ -24,14 +24,17 @@
   },
   "homepage": "https://github.com/dashevo/dash-wallet-lib#readme",
   "dependencies": {
+    "@dashevo/dapi-sdk": "^1.0.0",
     "@dashevo/dashcore-lib": "git+ssh://git@github.com/dashevo/bitcore-lib-dash-private.git#develop",
     "@dashevo/dashcore-mnemonic": "^1.5.0"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^17.0.0",
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
-    "eslint-plugin-react": "^7.10.0"
+    "eslint-plugin-react": "^7.10.0",
+    "mocha": "^5.2.0"
   }
 }
