@@ -13,7 +13,7 @@ const privateHDKey = new HDPrivateKey.fromSeed(mnemonic);
 
 let wallet,
   rawTransaction = null;
-describe('Wallet', () => {
+xdescribe('Wallet', () => {
   it('should create a wallet from a privateHDKey', () => {
     wallet = createWallet(dapiClient, privateHDKey, 'testnet');
 
@@ -38,6 +38,8 @@ describe('Wallet', () => {
   it('should generate an address', () => {
     wallet = createWallet(dapiClient, mnemonic1, 'testnet');
     const address = getNewAddress(wallet);
+    expect(address).to.equal('yaWEePY8BnKmFGSD6cSjmdiByyV37RsivK');
+    expect(getNewAddress(wallet, "m/44'/1'/0'/0/0")).to.equal('yRdxQQpXYh9Xkd91peJ7FJxpEzoRb6droH');
   });
   it('should create a transaction', () => {
     const options = {
@@ -68,4 +70,3 @@ describe('Wallet', () => {
     // expect(sendTransaction(wallet, rawTx)).to.throw(new Error('toto'));
   });
 });
-
