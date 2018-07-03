@@ -56,12 +56,11 @@ const getUTXO = async (wallet) => { throw new Error('Not Implemented'); };
  * @returns {string} - rawTx
  */
 const createTransaction = (wallet, opts) => {
-
   const transaction = new Transaction()
     .from(opts.utxos)
     .to(opts.to, opts.amount)
     .feePerKb(opts.fee)
-    .change(opts.change)
+    .change(opts.change);
 
   return transaction.toString();
 };
