@@ -10,7 +10,7 @@ const { getBloomFilter } = require('../src/index');
 privateHDKey.derive('m/1');
 
 describe('Bloom Fiters', () => {
-  it('shoud...', (done) => {
+  it('should...', (done) => {
     const noElements = 10;
     const privKeySeeds = [];
 
