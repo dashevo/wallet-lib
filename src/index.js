@@ -1,8 +1,8 @@
 const Mnemonic = require('@dashevo/dashcore-mnemonic');
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
-const KeyChain = require('./KeyChain');
 const BloomFilter = require('bloom-filter');
+const KeyChain = require('./KeyChain');
 
 const { Registration, TopUp } = Dashcore.Transaction.SubscriptionTransactions;
 const { Transaction, PrivateKey, HDPrivateKey } = Dashcore;
@@ -50,14 +50,14 @@ const getPrivateKeyForSigning = wallet => KeyChain.getNewPrivateKey(wallet.priva
  * @return {Array<object>} - TODO
  */
 const getBloomFilter = (privKeys, fpRate) => {
-  const filter = BloomFilter.create(privKeys.length, fpRate, 0, BloomFilter.BLOOM_UPDATE_ALL)
+  const filter = BloomFilter.create(privKeys.length, fpRate, 0, BloomFilter.BLOOM_UPDATE_ALL);
 
-  privKeys.forEach(key => {
-    filter.insert(new Dashcore.PrivateKey(key).toPublicKey())
-  })
+  privKeys.forEach((key) => {
+    filter.insert(new Dashcore.PrivateKey(key).toPublicKey());
+  });
 
   return filter;
-}
+};
 
 /**
  * @param {Wallet} wallet
@@ -71,12 +71,11 @@ const getUTXO = async (wallet) => { throw new Error('Not Implemented'); };
  * @returns {string} - rawTx
  */
 const createTransaction = (wallet, opts) => {
-
   const transaction = new Transaction()
     .from(opts.utxos)
     .to(opts.to, opts.amount)
     .feePerKb(opts.fee)
-    .change(opts.change)
+    .change(opts.change);
 
   return transaction.toString();
 };
@@ -186,4 +185,5 @@ module.exports = {
   registerUser,
   topUpUserCredits,
   signStateTransitionHeader,
+  getBloomFilter,
 };
