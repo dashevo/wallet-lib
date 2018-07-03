@@ -46,13 +46,14 @@ const syncWallet = (wallet) => {
 const getPrivateKeyForSigning = wallet => KeyChain.getNewPrivateKey(wallet.privateHDKey);
 
 /**
- * @param {Wallet} wallet
- * @return {Array<object>} - TODO
+ * @param {Array<string>} - Array of private key seeds
+ * @param {number} - Flase positive rate between 0.0 and 1.0
+ * @return {BloomFilter} - A Bloomfilter containing pubkeys derrived from seedss
  */
-const getBloomFilter = (privKeys, fpRate) => {
-  const filter = BloomFilter.create(privKeys.length, fpRate, 0, BloomFilter.BLOOM_UPDATE_ALL);
+const getBloomFilter = (privKeySeeds, fpRate) => {
+  const filter = BloomFilter.create(privKeySeeds.length, fpRate, 0, BloomFilter.BLOOM_UPDATE_ALL);
 
-  privKeys.forEach((key) => {
+  privKeySeeds.forEach((key) => {
     filter.insert(new Dashcore.PrivateKey(key).toPublicKey());
   });
 
