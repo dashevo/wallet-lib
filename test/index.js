@@ -15,7 +15,9 @@ const Mnemonic = require('@dashevo/dashcore-mnemonic');
 // const mnemonic = new Mnemonic(mnemonic1).toSeed();
 // const privateHDKey = new HDPrivateKey.fromSeed(mnemonic);
 
-xdescribe('Wallet', () => {
+let wallet,
+  rawTransaction = null;
+describe('Wallet', () => {
   it('should create a wallet from a privateHDKey', () => {
     const wallet = createWallet(dapiClient, privateHDKey, 'testnet');
 

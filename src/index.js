@@ -1,6 +1,7 @@
 const Mnemonic = require('@dashevo/dashcore-mnemonic');
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
+const BloomFilter = require('bloom-filter');
 const KeyChain = require('./KeyChain');
 
 const { Registration, TopUp } = Dashcore.Transaction.SubscriptionTransactions;
@@ -44,6 +45,21 @@ const syncWallet = (wallet) => {
 const getPrivateKeyForSigning = wallet => KeyChain.getNewPrivateKey(wallet.privateHDKey);
 
 /**
+ * @param {Array<string>} - Array of private key seeds
+ * @param {number} - Flase positive rate between 0.0 and 1.0
+ * @return {BloomFilter} - A Bloomfilter containing pubkeys derrived from seedss
+ */
+const getBloomFilter = (privKeySeeds, fpRate) => {
+  const filter = BloomFilter.create(privKeySeeds.length, fpRate, 0, BloomFilter.BLOOM_UPDATE_ALL);
+
+  privKeySeeds.forEach((key) => {
+    filter.insert(new Dashcore.PrivateKey(key).toPublicKey());
+  });
+
+  return filter;
+};
+
+/**
  * @param {Wallet} wallet
  * @return {Array<object>} - list of unspent outputs for the wallet
  */
@@ -67,11 +83,14 @@ const createTransaction = (wallet, opts) => {
 
 /**
  * @param {Wallet} wallet
- * @param {string} derivationPath
  * @return {string} - new change address
  */
-const getNewAddress = (wallet, derivationPath) => {
-  const newKey = KeyChain.getNewPrivateKey(wallet.privateHDKey, derivationPath);
+const getNewAddress = (wallet) => {
+  if (wallet.privateHDKey) {
+    const newKey = KeyChain.getNewPrivateKey(wallet.privateHDKey);
+    return String(newKey.toAddress());
+  }
+  const newKey = KeyChain.getNewPrivateKey(wallet);
   return String(newKey.toAddress());
 };
 
@@ -167,4 +186,5 @@ module.exports = {
   registerUser,
   topUpUserCredits,
   signStateTransitionHeader,
+  getBloomFilter,
 };
