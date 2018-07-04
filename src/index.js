@@ -19,9 +19,8 @@ const EVENT_CONSTANTS = {
  * @return {Wallet} - new wallet object
  */
 const createWallet = (DAPIClient, seed, network = 'livenet') => {
-  const privateHDKey = (seed.constructor.name === 'HDPrivateKey')
-    ? seed
-    : new HDPrivateKey.fromSeed(new Mnemonic(seed).toSeed(), network);
+  const privateHDKey = seed.fromSeed
+    ? seed : HDPrivateKey.fromSeed(new Mnemonic(seed).toSeed(), network);
 
   return {
     DAPIClient,
@@ -64,7 +63,8 @@ const getBloomFilter = (privKeySeeds, fpRate) => {
  * @param {Wallet} wallet
  * @return {Array<object>} - list of unspent outputs for the wallet
  */
-const getUTXO = async (wallet) => { throw new Error('Not Implemented'); };
+// TODO: Uncomment when ready to implement
+// const getUTXO = async (wallet) => { throw new Error('Not Implemented'); };
 
 /**
  * @param {Wallet} wallet
@@ -153,7 +153,7 @@ const registerUser = async (wallet, rawRegistration, funding = 0) => {
  * @return {Promise<string>} - tx id
  */
 const topUpUserCredits = async (wallet, userId, amount) => {
-  const inputs = await getUTXO(wallet);
+  const inputs = null; // await getUTXO(wallet); TODO: Uncomment when ready to implement
   const subTx = new TopUp();
   const newAddress = getNewAddress(wallet);
   subTx.fund(userId, amount, inputs, newAddress);
@@ -177,7 +177,7 @@ module.exports = {
   createWallet,
   syncWallet,
   getPrivateKeyForSigning,
-  getUTXO,
+  // getUTXO, TODO: Uncomment when ready to implement
   getNewAddress,
   sendTransaction,
   signTransaction,

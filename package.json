@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/dashevo/dash-wallet-lib#readme",
   "dependencies": {
+    "@dashevo/dapi-sdk": "^1.0.0",
     "@dashevo/dashcore-lib": "git+ssh://git@github.com/dashevo/bitcore-lib-dash-private.git#develop",
     "@dashevo/dashcore-mnemonic": "^1.5.0",
     "bloom-filter": "^0.2.0"
