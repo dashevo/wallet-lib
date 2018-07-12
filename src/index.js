@@ -14,7 +14,7 @@ const EVENT_CONSTANTS = {
 /**
  * Returns a new wallet object.
  * @param {DAPIClient} DAPIClient
- * @param {string|privateHDKey} seed
+ * @param {string|HDPrivateKey} seed
  * @param {string} network
  * @return {Wallet} - new wallet object
  */
