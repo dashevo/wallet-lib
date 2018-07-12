@@ -14,5 +14,18 @@ describe('Wallet Library', () => {
       const actual = getMasterKeyFromMnemonic('kings play cards on friday generally speaking');
       assert.equal(actual, expected);
     });
+    it('should return an empty string given an unexpected type as a mnemonic', () => {
+      const expected = '';
+      const actual1 = getMasterKeyFromMnemonic();
+      const actual2 = getMasterKeyFromMnemonic(null);
+      const actual3 = getMasterKeyFromMnemonic('');
+      const actual4 = getMasterKeyFromMnemonic({});
+      const actual5 = getMasterKeyFromMnemonic([]);
+      assert.equal(actual1, expected);
+      assert.equal(actual2, expected);
+      assert.equal(actual3, expected);
+      assert.equal(actual4, expected);
+      assert.equal(actual5, expected);
+    });
   });
 });
