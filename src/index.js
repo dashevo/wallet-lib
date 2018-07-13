@@ -14,7 +14,7 @@ const EVENT_CONSTANTS = {
 /**
  * Returns a new wallet object.
  * @param {DAPIClient} DAPIClient
- * @param {string|privateHDKey} seed
+ * @param {string|HDPrivateKey} seed
  * @param {string} network
  * @return {Wallet} - new wallet object
  */
@@ -173,6 +173,20 @@ const signStateTransitionHeader = async (wallet, rawHeader) => {
   return ts.serialize();
 };
 
+/**
+ * Given a BIP39 compliant mnemonic, returns the associated master key.
+ * @param {string} mnemonic
+ * @returns {string}
+ */
+const getMasterKeyFromMnemonic = (mnemonic) => {
+  if (!Mnemonic.isValid(mnemonic)) {
+    return '';
+  }
+  const privateKey = new Mnemonic(mnemonic).toHDPrivateKey();
+  const privateKeyString = String(privateKey);
+  return privateKeyString;
+};
+
 module.exports = {
   createWallet,
   syncWallet,
@@ -187,4 +201,5 @@ module.exports = {
   topUpUserCredits,
   signStateTransitionHeader,
   getBloomFilter,
+  getMasterKeyFromMnemonic,
 };
