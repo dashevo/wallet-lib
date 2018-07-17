@@ -5,9 +5,9 @@ const Constants = {
   // BIP44ADDRGAP:20,
   BIP44_ADDRESS_GAP: 1,
   // Livenet is 5 for Dash.
-  BIP44_LIVENET_ROOT_PATH: "m/44'/5'/0'",
+  BIP44_LIVENET_ROOT_PATH: "m/44'/5'",
   // All testnet coins are 1's
-  BIP44_TESTNET_ROOT_PATH: "m/44'/1'/0'",
+  BIP44_TESTNET_ROOT_PATH: "m/44'/1'",
   // The max amount of an UTXO to be considered too big to be used in the tx before exploring
   // smaller alternatives (proportinal to tx amount).
   UTXO_SELECTION_MAX_SINGLE_UTXO_FACTOR: 2,

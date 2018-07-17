@@ -23,14 +23,15 @@ Miscellaneous :
 - [ ] Persistance interface
     - [ ] In-mem support
     - [ ] DB support
-- [ ] HDWallet : Create a wallet / generate a new mnemonic
-- [ ] HDWallet : Validate mnemonic (BIP39)
-- [ ] HDWallet : Create an account
+- [x] HDWallet : Create a wallet / generate a new mnemonic
+- [x] HDWallet : Validate mnemonic (BIP39)
+- [x] HDWallet : Create an account
 - [ ] HDWallet : Address Derivation and Discovery
-- [ ] HDWallet : Encrypt/Decrypt PrivKey (BIP38)
-- [ ] HDWallet : Pin Protection
-- [ ] HDWallet : Passphrase Protection
-- [ ] HDWallet : Export / Import
+- [x] HDWallet : Encrypt PrivKey (BIP38) - Passphrase Protection
+- [x] HDWallet : Import (Mnemonic, HDPrivKey)
+- [x] HDWallet : Export (Mnemonic, HDPrivKey)
+- [ ] Discovery : Discover existing account
+- [ ] Discovery : Discover existing address / change
 - [ ] Transaction : Create transaction (rawtx)
 - [ ] Transaction : Broadcast transaction
 - [ ] Transaction : History fetching / Balance
@@ -38,3 +39,17 @@ Miscellaneous :
 - [ ] UTXO Optimisation / Control
 - [ ] Fee estimation
 - [ ] Bloomfilters
+
+Transports :
+
+- [ ] DAPI-Client
+- [ ] Dash-P2P
+
+Adapters (help from community welcomed) :
+
+- [ ] LocalStorage
+- [ ] SecureStorage
+- [ ] LevelDB
+- [ ] MongoDB
+- [ ] BerkeleyDB
+- [ ] LowDB

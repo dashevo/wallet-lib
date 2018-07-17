@@ -1,27 +1,43 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
 const { BIP44_LIVENET_ROOT_PATH, BIP44_TESTNET_ROOT_PATH } = require('./Constants');
+const { is } = require('./utils');
 
 class Account {
-  constructor(wallet) {
+  constructor(wallet, opts = {}) {
     this.events = new EventEmitter();
 
     if (!wallet || wallet.constructor.name !== 'Wallet') throw new Error('Expected wallet to be created and passed as param');
 
-    const accountId = wallet.accounts.length;
+    const accountIndex = (opts.accountIndex) ? opts.accountIndex : wallet.accounts.length;
+    this.accountIndex = accountIndex;
 
     this.BIP44PATH = (wallet.network === Dashcore.Networks.livenet)
-      ? `${BIP44_LIVENET_ROOT_PATH}/${accountId}`
-      : `${BIP44_TESTNET_ROOT_PATH}/${accountId}`;
+      ? `${BIP44_LIVENET_ROOT_PATH}/${accountIndex}'`
+      : `${BIP44_TESTNET_ROOT_PATH}/${accountIndex}'`;
 
     this.RootHDPrivateKey = wallet.HDPrivateKey;
 
     this.addresses = {
-      external: [], // receive addr
-      internal: [], // change addr
+      external: {}, // receive addr
+      internal: {}, // change addr
     };
+    this.label = (opts && opts.label && is.string(opts.label)) ? opts.label : null;
 
-    wallet.accounts.push(this);
+    this.adapter = wallet.adapter;
+    this.transport = wallet.transport;
+
+    const self = this;
+
+    const existAlready = wallet.accounts.filter(function(el){
+      return el.accountIndex === self.accountIndex;
+    }).length > 0;
+    if(!existAlready) {
+      wallet.accounts.push(this);
+    }else {
+      console.warn('trying to recreate', self.accountIndex)
+    }
+
 
     // As per BIP44, we ideally should continue the discovery based on used/unused
     // this.generateMultipleAddressPair(20);
@@ -30,16 +46,42 @@ class Account {
   /**
    * @return {Array<object>} - list of unspent outputs for the wallet
    */
-  // async getUTXO() {
-  //   throw new Error('Not Implemented');
-  // }
+  async getUTXO(amount) {
+    throw new Error('Not Implemented');
+  }
 
-  // generateAddress(type = 'external') {
-  //   if (type === 'external') {
-  //     const external = this.addresses.external;
-  //   }
-  //   return null;
-  // }
+  getAddresses(external = true) {
+    const type = (external) ? 'external' : 'internal';
+    return this.addresses[type];
+  }
+
+  getAddress(index = 0, external = true) {
+    const type = (external) ? 'external' : 'internal';
+    const path = (external) ? `${this.BIP44PATH}/0/${index}` : `${this.BIP44PATH}/1/${index}`;
+    const addressType = this.addresses[type];
+    return (addressType[path]) ? addressType[path] : this.generateAddress(path);
+  }
+
+  generateAddress(path) {
+    if (!path) throw new Error('Expected path to generate an address');
+    const index = path.split('/')[5];
+    const type = (path.split('/')[4] === '0') ? 'external' : 'internal';
+
+    const privateKey = this.RootHDPrivateKey.derive(path);
+    const address = new Dashcore.Address(privateKey.publicKey).toString();
+    const addressData = {
+      path,
+      index,
+      address,
+      privateKey,
+      transactions: [],
+      balance: 0,
+      utxos: [],
+      fetchedTimes: 0,
+    };
+    this.addresses[type][path] = addressData;
+    return addressData;
+  }
 
   // createTransaction() {
   //   const tx = new Dashcore.Transaction();
