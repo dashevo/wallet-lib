@@ -26,7 +26,7 @@ Miscellaneous :
 - [x] HDWallet : Create a wallet / generate a new mnemonic
 - [x] HDWallet : Validate mnemonic (BIP39)
 - [x] HDWallet : Create an account
-- [ ] HDWallet : Address Derivation and Discovery
+- [x] HDWallet : Address Derivation
 - [x] HDWallet : Encrypt PrivKey (BIP38) - Passphrase Protection
 - [x] HDWallet : Import (Mnemonic, HDPrivKey)
 - [x] HDWallet : Export (Mnemonic, HDPrivKey)

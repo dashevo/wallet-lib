@@ -2,7 +2,7 @@ const DashcoreLib = require('@dashevo/dashcore-lib');
 const Mnemonic = require('@dashevo/dashcore-mnemonic');
 const { EventEmitter } = require('events');
 
-const { Registration, TopUp } = DashcoreLib.Transaction.SubscriptionTransactions;
+// const { Registration, TopUp } = DashcoreLib.Transaction.SubscriptionTransactions;
 const {
   generateNewMnemonic,
   mnemonicToSeed,
