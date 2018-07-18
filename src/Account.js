@@ -92,6 +92,11 @@ class Account {
     throw new Error('Not Implemented');
   }
 
+  calculateFee(transaction) {
+    const fee = 0;
+    return transaction.fee(fee);
+  }
+
   getAddresses(external = true) {
     const type = (external) ? 'external' : 'internal';
     return this.addresses[type];
@@ -125,10 +130,11 @@ class Account {
     return addressData;
   }
 
-  // createTransaction() {
-  //   const tx = new Dashcore.Transaction();
-  //   return tx;
-  // }
+  createTransaction() {
+    let tx = new Dashcore.Transaction();
+    tx = this.calculateFee(tx);
+    return tx;
+  }
 
   // signTransaction(transaction = null) {
   //   transaction.sign(null);
