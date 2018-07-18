@@ -44,7 +44,7 @@ class Account {
     }
 
     if (this.transport !== null) {
-      this.startSynchronization();
+      // this.startSynchronization();
     }
   }
 
@@ -73,29 +73,30 @@ class Account {
   /**
    * Start the process of synchronisation process if the transport layer is passed
    */
-  startSynchronization() {
-    // Start pre-fetch using transport layer
+  // startSynchronization() {
+  // Start pre-fetch using transport layer
 
-    // We also should continue the discovery based on used/unused (as per BIP44 always have 20+ addr)
+  // We also should continue the discovery
+  // based on used/unused (as per BIP44 always have 20+ addr)
 
-    // Start Address Discovery
+  // Start Address Discovery
 
-    // Start Address listening
+  // Start Address listening
 
-    // Setup bloomfilter
-  }
+  // Setup bloomfilter
+  // }
 
   /**
    * @return {Array<object>} - list of unspent outputs for the wallet
    */
-  async getUTXO(amount) {
-    throw new Error('Not Implemented');
-  }
+  // async getUTXO(amount) {
+  //   throw new Error('Not Implemented');
+  // }
 
-  calculateFee(transaction) {
-    const fee = 0;
-    return transaction.fee(fee);
-  }
+  // calculateFee(transaction) {
+  //   const fee = 0;
+  //   return transaction.fee(fee);
+  // }
 
   getAddresses(external = true) {
     const type = (external) ? 'external' : 'internal';
@@ -200,7 +201,8 @@ class Account {
   //
   // /**
   //  * @param {string} rawRegistration - hex string representing user registration data
-  //  * @param {number} [funding] - default funding for the account in duffs. Optional. If left empty,
+  //  * @param {number} [funding] - default funding for the account in duffs. Optional.
+  // If left empty,
   //  * funding will be 0.
   //  * @return {string} - user id
   //  */

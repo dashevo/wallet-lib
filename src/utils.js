@@ -45,7 +45,7 @@ const is = {
   arr: arr => Array.isArray(arr) || arr.constructor.name === 'Array',
   num: num => !Number.isNaN(num) && typeof num === 'number',
   float: (float => is.num(float) && Math.floor(float) !== float),
-  int: int => Number.isInteger(int) || (int => is.num(int) && Math.floor(int) === int),
+  int: int => Number.isInteger(int) || (is.num(int) && Math.floor(int) === int),
   hex: h => parseInt(h.toLowerCase(), 16).toString(16) === h.toLowerCase(),
   string: str => typeof str === 'string',
   bool: b => b === true || b === false,

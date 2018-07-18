@@ -1,16 +1,12 @@
 const DashcoreLib = require('@dashevo/dashcore-lib');
-const Mnemonic = require('@dashevo/dashcore-mnemonic');
-const { EventEmitter } = require('events');
 
 // const { Registration, TopUp } = DashcoreLib.Transaction.SubscriptionTransactions;
 const {
   generateNewMnemonic,
   mnemonicToSeed,
-  HDPrivateKeyToMnemonic,
   is,
 } = require('./utils');
 
-const { Transaction, PrivateKey } = DashcoreLib;
 const Account = require('./Account');
 
 const defaultOptions = {
@@ -28,16 +24,19 @@ class Wallet {
    * @param config
    */
   constructor(opts = defaultOptions) {
-    let HDPrivateKey,
-      passphrase,
-      mnemonic = null;
+    let HDPrivateKey = null;
+    let passphrase = null;
+    let mnemonic = null;
 
     if (!(opts.network && is.network(opts.network))) throw new Error('Expected a valid network (typeof Network or String');
     this.network = DashcoreLib.Networks[opts.network];
+    // eslint-disable-next-line prefer-destructuring
     if (opts.passphrase) passphrase = opts.passphrase;
+
 
     if (opts.mnemonic) {
       if (!is.mnemonic(opts.mnemonic)) throw new Error('Expected a valid mnemonic (typeof String or Mnemonic)');
+      // eslint-disable-next-line prefer-destructuring
       mnemonic = opts.mnemonic;
       HDPrivateKey = mnemonicToSeed(opts.mnemonic, this.network, passphrase);
     } else if (opts.seed) {
@@ -45,7 +44,6 @@ class Wallet {
       HDPrivateKey = opts.seed;
       mnemonic = null; // todo : verify if possible to change from HDPrivateKey to Mnemonic back
     } else {
-      console.warn('No seed nor mnemonic provided, generating a new one');
       mnemonic = generateNewMnemonic();
       HDPrivateKey = mnemonicToSeed(mnemonic, this.network, passphrase);
     }

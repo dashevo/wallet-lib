@@ -34,7 +34,7 @@ class DAPIClient {
         return axios
           .post(url, { rawtx })
           .then(res => res.data).catch((err) => {
-            console.error('err', err);
+            throw new Error(err);
           });
       },
     };

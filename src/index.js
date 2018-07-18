@@ -4,4 +4,4 @@ const Account = require('./Account');
 module.exports = {
   Wallet,
   Account,
-}
+};

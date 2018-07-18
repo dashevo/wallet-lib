@@ -1,6 +1,4 @@
 const { expect } = require('chai');
-const Dashcore = require('@dashevo/dashcore-lib');
-const Mnemonic = require('@dashevo/dashcore-mnemonic');
 const { Wallet } = require('../src/index');
 const { mnemonicString1, mnemonicString2 } = require('./fixtures.json');
 
@@ -29,6 +27,7 @@ const walletFakeTransport = new Wallet(walletConfigs.fakeTransport);
 describe('Account', () => {
   it('should create an account using testnet network', () => {
     const accountTestnet = walletTestnet.createAccount({ mode: 'light' }); // Should derivate
+    // eslint-disable-next-line no-unused-expressions
     expect(accountTestnet).to.exist;
     expect(accountTestnet).to.be.a('object');
     expect(accountTestnet.constructor.name).to.equal('Account');
@@ -36,6 +35,7 @@ describe('Account', () => {
   });
   it('should create an account using livenet network', () => {
     const accountLivenet = walletLivenet.createAccount({ mode: 'light' }); // Should derivate
+    // eslint-disable-next-line no-unused-expressions
     expect(accountLivenet).to.exist;
     expect(accountLivenet).to.be.a('object');
     expect(accountLivenet.constructor.name).to.equal('Account');
@@ -53,7 +53,7 @@ describe('Account', () => {
     const account = walletFakeTransport.createAccount();
     const addressData = account.getAddress(0, true);
     expect(addressData).to.have.property('address');
-    const address = addressData.address;
+    const { address } = addressData;
     expect(address).to.equal('XyNAHe1cY94kZZet7haRUB4gNZvS7KdMVn');
 
     const addressDataInternal = account.getAddress(0, false);
@@ -63,15 +63,15 @@ describe('Account', () => {
     expect(addressDataExternal.address).to.equal('Xe2HTMia56Wf15SzbMUVLRFte1R7MwW9Hn');
   });
   it('should be able to get all address', () => {
-    const account = walletFakeTransport.getAccount(0);
-    const addressesExternalData = account.getAddresses();
+    // const account = walletFakeTransport.getAccount(0);
+    // const addressesExternalData = account.getAddresses();
     // console.log(addressesExternalData);
 
-    const addressesInternalData = account.getAddresses(false);
+    // const addressesInternalData = account.getAddresses(false);
     // console.log(addressesInternalData);
   });
   it('should be able to fetch UTXO from an amount', () => {
-    const account = walletFakeTransport.createAccount();
+    // const account = walletFakeTransport.createAccount();
     // const utxos = account.getUTXO();
     // expect(utxos).to.equal({});
   });

@@ -1,10 +1,10 @@
-const { expect } = require('chai');
-const Mnemonic = require('@dashevo/dashcore-mnemonic');
-const { HDPrivateKey } = require('@dashevo/dashcore-lib');
+// const { expect } = require('chai');
+// const Mnemonic = require('@dashevo/dashcore-mnemonic');
+// const { HDPrivateKey } = require('@dashevo/dashcore-lib');
 
-const passphase = 'knife easily prosper input concert merge prepare autumn pen blood glance toilet';
-const mnemonic = new Mnemonic(passphase).toSeed();
-const privateHDKey = new HDPrivateKey.fromSeed(mnemonic);
+// const passphase = require('./fixtures').mnemonicString1;
+// const mnemonic = new Mnemonic(passphase).toSeed();
+// const privateHDKey = new HDPrivateKey.fromSeed(mnemonic);
 // const { getBloomFilter } = require('../src/index');
 
 // privateHDKey.derive('m/1');

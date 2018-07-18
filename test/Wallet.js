@@ -20,7 +20,7 @@ describe('Wallet', () => {
       network,
     };
     const wallet = new Wallet(config);
-
+    // eslint-disable-next-line no-unused-expressions
     expect(wallet).to.exist;
     expect(wallet).to.be.a('object');
     expect(wallet.constructor.name).to.equal('Wallet');
@@ -36,6 +36,7 @@ describe('Wallet', () => {
     };
     const wallet = new Wallet(config);
     const hdKey = mnemonic1.toHDPrivateKey('', network);
+    // eslint-disable-next-line no-unused-expressions
     expect(wallet).to.exist;
     expect(wallet).to.be.a('object');
     expect(wallet.constructor.name).to.equal('Wallet');
@@ -51,7 +52,7 @@ describe('Wallet', () => {
     };
     const wallet = new Wallet(config);
     const hdKey = mnemonic1.toHDPrivateKey('', network);
-
+    // eslint-disable-next-line no-unused-expressions
     expect(wallet).to.exist;
     expect(wallet).to.be.a('object');
     expect(wallet.constructor.name).to.equal('Wallet');
@@ -70,6 +71,7 @@ describe('Wallet', () => {
     const acc3 = wallet.createAccount({ mode: 'light' });
 
     [acc1, acc2, acc3].forEach((el, i) => {
+      // eslint-disable-next-line no-unused-expressions
       expect(el).to.exist;
       expect(el).to.be.a('object');
       expect(el.constructor.name).to.equal('Account');
@@ -122,6 +124,8 @@ describe('Wallet', () => {
   });
   it('should be able to create an account at a specific index', () => {
     const account = walletTestnet.createAccount();
+    // eslint-disable-next-line no-unused-expressions
+    expect(account).to.exist;
     const accountSpecificIndex = walletTestnet.createAccount({ accountIndex: 42 });
     expect(accountSpecificIndex.BIP44PATH.split('/')[3]).to.equal('42\'');
     expect(accountSpecificIndex.accountIndex).to.equal(42);
