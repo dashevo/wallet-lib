@@ -4,6 +4,7 @@ const Constants = {
   DUFFS_PER_DASH: 100000000,
   // BIP44ADDRGAP:20,
   BIP44_ADDRESS_GAP: 1,
+  BIP32__ROOT_PATH: 'm',
   // Livenet is 5 for Dash.
   BIP44_LIVENET_ROOT_PATH: "m/44'/5'",
   // All testnet coins are 1's
