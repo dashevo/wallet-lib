@@ -3,8 +3,11 @@ const { EventEmitter } = require('events');
 const { BIP44_LIVENET_ROOT_PATH, BIP44_TESTNET_ROOT_PATH } = require('./Constants');
 const { is } = require('./utils');
 
+const defaultOptions = {
+  mode: 'full',
+};
 class Account {
-  constructor(wallet, opts = {}) {
+  constructor(wallet, opts = defaultOptions) {
     this.events = new EventEmitter();
 
     if (!wallet || wallet.constructor.name !== 'Wallet') throw new Error('Expected wallet to be created and passed as param');
@@ -25,22 +28,61 @@ class Account {
     this.label = (opts && opts.label && is.string(opts.label)) ? opts.label : null;
 
     this.adapter = wallet.adapter;
+    // If transport is null, we won't try to fetch anything
     this.transport = wallet.transport;
 
-    const self = this;
+    this.addAccountToWallet(wallet);
 
-    const existAlready = wallet.accounts.filter(function(el){
-      return el.accountIndex === self.accountIndex;
-    }).length > 0;
-    if(!existAlready) {
-      wallet.accounts.push(this);
-    }else {
-      console.warn('trying to recreate', self.accountIndex)
+    this.synced = false;
+    this.eventConstants = {
+      synced: 'synced',
+    };
+
+    // As per BIP44, we prefetch 20 address
+    if (opts && opts.mode === 'full') {
+      this.prefetchFirstAddresses(20);
     }
 
+    if (this.transport !== null) {
+      this.startSynchronization();
+    }
+  }
 
-    // As per BIP44, we ideally should continue the discovery based on used/unused
-    // this.generateMultipleAddressPair(20);
+  prefetchFirstAddresses(nbAddress = 20) {
+    for (let index = 0; index < nbAddress; index += 1) {
+      // External
+      const externalPath = `${this.BIP44PATH}/0/${index}`;
+      this.generateAddress(externalPath);
+
+      // Internal
+      const internalPath = `${this.BIP44PATH}/1/${index}`;
+      this.generateAddress(internalPath);
+    }
+  }
+
+  addAccountToWallet(wallet) {
+    const self = this;
+    const { accounts } = wallet;
+
+    const existAlready = accounts.filter(el => el.accountIndex === self.accountIndex).length > 0;
+    if (!existAlready) {
+      wallet.accounts.push(this);
+    }
+  }
+
+  /**
+   * Start the process of synchronisation process if the transport layer is passed
+   */
+  startSynchronization() {
+    // Start pre-fetch using transport layer
+
+    // We also should continue the discovery based on used/unused (as per BIP44 always have 20+ addr)
+
+    // Start Address Discovery
+
+    // Start Address listening
+
+    // Setup bloomfilter
   }
 
   /**

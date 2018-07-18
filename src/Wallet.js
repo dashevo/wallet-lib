@@ -13,7 +13,7 @@ const {
 const { Transaction, PrivateKey } = DashcoreLib;
 const Account = require('./Account');
 
-const defaultConfig = {
+const defaultOptions = {
   network: 'testnet',
 };
 
@@ -27,23 +27,22 @@ class Wallet {
    *
    * @param config
    */
-  constructor(config = defaultConfig) {
+  constructor(opts = defaultOptions) {
     let HDPrivateKey,
       passphrase,
       mnemonic = null;
 
+    if (!(opts.network && is.network(opts.network))) throw new Error('Expected a valid network (typeof Network or String');
+    this.network = DashcoreLib.Networks[opts.network];
+    if (opts.passphrase) passphrase = opts.passphrase;
 
-    if (!(config.network && is.network(config.network))) throw new Error('Expected a valid network (typeof Network or String');
-    this.network = DashcoreLib.Networks[config.network];
-    if (config.passphrase) passphrase = config.passphrase;
-
-    if (config.mnemonic) {
-      if (!is.mnemonic(config.mnemonic)) throw new Error('Expected a valid mnemonic (typeof String or Mnemonic)');
-      mnemonic = config.mnemonic;
-      HDPrivateKey = mnemonicToSeed(config.mnemonic, this.network, passphrase);
-    } else if (config.seed) {
-      if (!is.seed(config.seed)) throw new Error('Expected a valid seed (typeof HDPrivateKey or String');
-      HDPrivateKey = config.seed;
+    if (opts.mnemonic) {
+      if (!is.mnemonic(opts.mnemonic)) throw new Error('Expected a valid mnemonic (typeof String or Mnemonic)');
+      mnemonic = opts.mnemonic;
+      HDPrivateKey = mnemonicToSeed(opts.mnemonic, this.network, passphrase);
+    } else if (opts.seed) {
+      if (!is.seed(opts.seed)) throw new Error('Expected a valid seed (typeof HDPrivateKey or String');
+      HDPrivateKey = opts.seed;
       mnemonic = null; // todo : verify if possible to change from HDPrivateKey to Mnemonic back
     } else {
       console.warn('No seed nor mnemonic provided, generating a new one');
@@ -51,25 +50,20 @@ class Wallet {
       HDPrivateKey = mnemonicToSeed(mnemonic, this.network, passphrase);
     }
 
-    this.adapter = (config.adapter) ? config.adapter : null;
-    this.transport = (config.transport) ? config.transport : null;
+    this.adapter = (opts.adapter) ? opts.adapter : null;
+    // If transport is null, we won't try to fetch anything
+    this.transport = (opts.transport) ? opts.transport : null;
 
     this.accounts = [];
     this.HDPrivateKey = HDPrivateKey;
     this.mnemonic = mnemonic; // We keep it only for the export function..
-    this.interface = config.interface;
-    this.synced = false;
-    this.events = new EventEmitter();
-    this.eventConstants = {
-      synced: 'synced',
-    };
-
-    // this.synchronize();
+    this.interface = opts.interface;
+    this.savedBackup = false; // When true, we delete mnemonic from internals
   }
 
   /**
    * Will derivate to a new account.
-   * @param {object} - account options
+   * @param {object} account options
    * @return {account} - account object
    */
   createAccount(accountOpts) {

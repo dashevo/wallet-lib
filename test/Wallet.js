@@ -26,8 +26,6 @@ describe('Wallet', () => {
     expect(wallet.constructor.name).to.equal('Wallet');
     expect(wallet.transport).to.equal(dapiClient);
     expect(wallet.HDPrivateKey.toString()).to.equal(privateHDKey1.toString());
-    expect(wallet.synced).to.equal(false);
-    expect(wallet).to.have.property('events');
   });
   it('should create a wallet from a mnemonic string', () => {
     const network = Dashcore.Networks.testnet;
@@ -43,8 +41,6 @@ describe('Wallet', () => {
     expect(wallet.constructor.name).to.equal('Wallet');
     expect(wallet.transport).to.equal(dapiClient);
     expect(wallet.HDPrivateKey.toString()).to.equal(hdKey.toString());
-    expect(wallet.synced).to.equal(false);
-    expect(wallet).to.have.property('events');
   });
   it('should create a wallet from a mnemonic object', () => {
     const network = Dashcore.Networks.testnet;
@@ -61,8 +57,6 @@ describe('Wallet', () => {
     expect(wallet.constructor.name).to.equal('Wallet');
     expect(wallet.transport).to.equal(dapiClient);
     expect(wallet.HDPrivateKey.toString()).to.equal(hdKey.toString());
-    expect(wallet.synced).to.equal(false);
-    expect(wallet).to.have.property('events');
   });
   it('should be able to create a wallet', () => {
     const wallet = new Wallet({
@@ -71,9 +65,9 @@ describe('Wallet', () => {
       network: Dashcore.Networks.testnet,
     });
 
-    const acc1 = wallet.createAccount();
-    const acc2 = wallet.createAccount();
-    const acc3 = wallet.createAccount();
+    const acc1 = wallet.createAccount({ mode: 'light' });
+    const acc2 = wallet.createAccount({ mode: 'light' });
+    const acc3 = wallet.createAccount({ mode: 'light' });
 
     [acc1, acc2, acc3].forEach((el, i) => {
       expect(el).to.exist;
@@ -134,11 +128,11 @@ describe('Wallet', () => {
   });
   it('should be able to get an account at a specific index', () => {
     const account = walletTestnet.getAccount();
-    expect(account.accountIndex).to.equal(0)
+    expect(account.accountIndex).to.equal(0);
 
     const nonAlreadyCreatedAccount = walletTestnet.getAccount(41);
 
-    expect(nonAlreadyCreatedAccount.accountIndex).to.equal(41)
+    expect(nonAlreadyCreatedAccount.accountIndex).to.equal(41);
 
     const accountSpecific = walletTestnet.getAccount(42);
     expect(accountSpecific.accountIndex).to.equal(42);
