@@ -20,5 +20,12 @@ const Constants = {
   // when fees are significant (proportional to how much we would pay for using that big input only)
   UTXO_SELECTION_MAX_FEE_VS_SINGLE_UTXO_FEE_FACTOR: 5,
   UTXO_MAX_INOPUTS_PER_TX: 25,
+  FEES: {
+    // Fee for IS are 0.0001 * INPUTS
+    INSTANT_FEE_PER_INPUTS: 10000,
+    // Todo : Ensure value.
+    // Need to be multiplied by a multiplier (*1.5 / *2) to higher the priority
+    FEE_PER_KB: 1000,
+  },
 };
 module.exports = Constants;

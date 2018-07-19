@@ -39,6 +39,8 @@ Miscellaneous :
 - [ ] UTXO Optimisation / Control
 - [ ] Fee estimation
 - [ ] Bloomfilters
+- [ ] Compatibility with old format (BIP32)
+- [ ] Paper-sweep wallet
 
 Transports :
 
