@@ -28,7 +28,7 @@ class Account {
     this.label = (opts && opts.label && is.string(opts.label)) ? opts.label : null;
 
     this.adapter = wallet.adapter;
-    // If transport is null, we won't try to fetch anything
+    // If transport is null or invalid, we won't try to fetch anything
     this.transport = wallet.transport;
 
     this.addAccountToWallet(wallet);

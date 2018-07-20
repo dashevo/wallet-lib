@@ -1,21 +1,18 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
 const Mnemonic = require('@dashevo/dashcore-mnemonic');
-const DAPIClient = require('@dashevo/dapi-sdk').Api;
 const { Wallet } = require('../src/index');
 const { mnemonicString1, invalidMnemonicString1 } = require('./fixtures.json');
 
 const mnemonic1 = new Mnemonic(mnemonicString1);
 const privateHDKey1 = mnemonic1.toHDPrivateKey('', 'testnet');
 
-const dapiClient = new DAPIClient();
 let walletTestnet = null;
 
 describe('Wallet', () => {
   it('should create a wallet from a HDPrivateKey', () => {
     const network = 'testnet';
     const config = {
-      transport: dapiClient,
       seed: privateHDKey1,
       network,
     };
@@ -24,13 +21,12 @@ describe('Wallet', () => {
     expect(wallet).to.exist;
     expect(wallet).to.be.a('object');
     expect(wallet.constructor.name).to.equal('Wallet');
-    expect(wallet.transport).to.equal(dapiClient);
+    expect(wallet.transport).to.equal(null);
     expect(wallet.HDPrivateKey.toString()).to.equal(privateHDKey1.toString());
   });
   it('should create a wallet from a mnemonic string', () => {
     const network = Dashcore.Networks.testnet;
     const config = {
-      transport: dapiClient,
       mnemonic: mnemonicString1,
       network,
     };
@@ -40,13 +36,12 @@ describe('Wallet', () => {
     expect(wallet).to.exist;
     expect(wallet).to.be.a('object');
     expect(wallet.constructor.name).to.equal('Wallet');
-    expect(wallet.transport).to.equal(dapiClient);
+    expect(wallet.transport).to.equal(null);
     expect(wallet.HDPrivateKey.toString()).to.equal(hdKey.toString());
   });
   it('should create a wallet from a mnemonic object', () => {
     const network = Dashcore.Networks.testnet;
     const config = {
-      transport: dapiClient,
       mnemonic: mnemonic1,
       network,
     };
@@ -56,12 +51,11 @@ describe('Wallet', () => {
     expect(wallet).to.exist;
     expect(wallet).to.be.a('object');
     expect(wallet.constructor.name).to.equal('Wallet');
-    expect(wallet.transport).to.equal(dapiClient);
+    expect(wallet.transport).to.equal(null);
     expect(wallet.HDPrivateKey.toString()).to.equal(hdKey.toString());
   });
   it('should be able to create a wallet', () => {
     const wallet = new Wallet({
-      transport: dapiClient,
       mnemonic: mnemonicString1,
       network: Dashcore.Networks.testnet,
     });
@@ -80,7 +74,6 @@ describe('Wallet', () => {
   });
   it('should reject invalid mnemonic', () => {
     const conf = {
-      transport: dapiClient,
       mnemonic: invalidMnemonicString1,
       network: Dashcore.Networks.testnet,
     };
@@ -89,7 +82,6 @@ describe('Wallet', () => {
   it('should be able to export to a HDPrivKey', () => {
     const network = Dashcore.Networks.testnet;
     const config = {
-      transport: dapiClient,
       mnemonic: mnemonic1,
       network,
     };
@@ -100,7 +92,6 @@ describe('Wallet', () => {
   it('should be able to export a mnemonic', () => {
     const network = Dashcore.Networks.testnet;
     const config = {
-      transport: dapiClient,
       mnemonic: mnemonic1,
       network,
     };
@@ -112,7 +103,6 @@ describe('Wallet', () => {
     const network = Dashcore.Networks.testnet;
     const passphrase = 'Evolution';
     const config = {
-      transport: dapiClient,
       mnemonic: mnemonic1,
       passphrase,
       network,
