@@ -19,8 +19,8 @@ class Account {
       ? `${BIP44_LIVENET_ROOT_PATH}/${accountIndex}'`
       : `${BIP44_TESTNET_ROOT_PATH}/${accountIndex}'`;
 
+    this.network = wallet.network;
     this.RootHDPrivateKey = wallet.HDPrivateKey;
-
     this.addresses = {
       external: {}, // receive addr
       internal: {}, // change addr
@@ -116,7 +116,7 @@ class Account {
     const type = (path.split('/')[4] === '0') ? 'external' : 'internal';
 
     const privateKey = this.RootHDPrivateKey.derive(path);
-    const address = new Dashcore.Address(privateKey.publicKey).toString();
+    const address = new Dashcore.Address(privateKey.publicKey, this.network).toString();
     const addressData = {
       path,
       index,

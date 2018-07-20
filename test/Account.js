@@ -15,14 +15,19 @@ const walletConfigs = {
     network: 'livenet',
     mnemonic: mnemonicString1,
   },
-  fakeTransport: {
+  fakeTransportTestnet: {
     network: 'testnet',
+    mnemonic: mnemonicString2,
+  },
+  fakeTransportLivenet: {
+    network: 'livenet',
     mnemonic: mnemonicString2,
   },
 };
 const walletTestnet = new Wallet(walletConfigs.testnet);
 const walletLivenet = new Wallet(walletConfigs.livenet);
-const walletFakeTransport = new Wallet(walletConfigs.fakeTransport);
+const walletFakeTransportTestnet = new Wallet(walletConfigs.fakeTransportTestnet);
+const walletFakeTransportLivenet = new Wallet(walletConfigs.fakeTransportLivenet);
 
 describe('Account', () => {
   it('should create an account using testnet network', () => {
@@ -49,19 +54,32 @@ describe('Account', () => {
     expect(account.label).to.equal(label);
   });
 
-  it('should be able to derivate an address', () => {
-    const account = walletFakeTransport.createAccount();
-    const addressData = account.getAddress(0, true);
+  it('should be able to derivate an address for testnet', () => {
+    const accountTestnet = walletFakeTransportTestnet.createAccount();
+    const addressData = accountTestnet.getAddress(0, true);
     expect(addressData).to.have.property('address');
     const { address } = addressData;
-    expect(address).to.equal('XyNAHe1cY94kZZet7haRUB4gNZvS7KdMVn');
+    expect(address).to.equal('yizmJb63ygipuJaRgYtpWCV2erQodmaZt8');
 
-    const addressDataInternal = account.getAddress(0, false);
-    expect(addressDataInternal.address).to.equal('Xyp7ug4D4jMrAF235o5KF9vBZ56ujqLGdX');
+    const addressDataInternal = accountTestnet.getAddress(0, false);
+    expect(addressDataInternal.address).to.equal('yjSivd8eWH1vVywaeePiHBLXqMbHFXxxXE');
 
-    const addressDataExternal = account.getAddress(10);
-    expect(addressDataExternal.address).to.equal('Xe2HTMia56Wf15SzbMUVLRFte1R7MwW9Hn');
+    const addressDataExternal = accountTestnet.getAddress(10);
+    expect(addressDataExternal.address).to.equal('yPetUJo1WeAjLpNYACntNSgEvHuUu3p1a8');
   });
+  it('should be able to derivate an address for livenet', () => {
+    const accountLivenet = walletFakeTransportLivenet.createAccount();
+    const addressData = accountLivenet.getAddress(0, true);
+    expect(addressData).to.have.property('address');
+    const { address } = addressData;
+    expect(address).to.equal('Xc1u8mcXcRm7GAHtFvYXYnPR8L6cqVkoyp');
+
+    const addressDataInternal = accountLivenet.getAddress(0, false);
+    expect(addressDataInternal.address).to.equal('XcqD6TFCcQ7jvcNiuohFFxBmwP2n71tANy');
+
+    const addressDataExternal = accountLivenet.getAddress(10);
+    expect(addressDataExternal.address).to.equal('XfPKRskw2vDXKpJ11oZZdQBjSMocJ5jmes');
+  })
   it('should be able to get all address', () => {
     // const account = walletFakeTransport.getAccount(0);
     // const addressesExternalData = account.getAddresses();
