@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "mocha test/*"
+    "test": "mocha --recursive test/*"
   },
   "repository": {
     "type": "git",
