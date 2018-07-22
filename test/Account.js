@@ -58,8 +58,9 @@ describe('Account', () => {
     const accountTestnet = walletFakeTransportTestnet.createAccount();
     const addressData = accountTestnet.getAddress(0, true);
     expect(addressData).to.have.property('address');
-    const { address } = addressData;
+    const { address, path } = addressData;
     expect(address).to.equal('yizmJb63ygipuJaRgYtpWCV2erQodmaZt8');
+    expect(path).to.equal('m/44\'/1\'/0\'/0/0');
 
     const addressDataInternal = accountTestnet.getAddress(0, false);
     expect(addressDataInternal.address).to.equal('yjSivd8eWH1vVywaeePiHBLXqMbHFXxxXE');
@@ -81,12 +82,14 @@ describe('Account', () => {
     expect(addressDataExternal.address).to.equal('XfPKRskw2vDXKpJ11oZZdQBjSMocJ5jmes');
   });
   it('should be able to get all address', () => {
-    // const account = walletFakeTransport.getAccount(0);
-    // const addressesExternalData = account.getAddresses();
-    // console.log(addressesExternalData);
+    const account = walletFakeTransportTestnet.getAccount(0);
+    const addressesExternalData = account.getAddresses();
+    const externalDataKeys = Object.keys(addressesExternalData);
+    expect(externalDataKeys.length).to.equal(20);
 
-    // const addressesInternalData = account.getAddresses(false);
-    // console.log(addressesInternalData);
+    const addressesInternalData = account.getAddresses(false);
+    const internalDataKeys = Object.keys(addressesInternalData);
+    expect(internalDataKeys.length).to.equal(20);
   });
   it('should be able to fetch UTXO from an amount', () => {
     // const account = walletFakeTransport.createAccount();

@@ -1,6 +1,6 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
-const { BIP44_LIVENET_ROOT_PATH, BIP44_TESTNET_ROOT_PATH } = require('./Constants');
+const { BIP44_LIVENET_ROOT_PATH, BIP44_TESTNET_ROOT_PATH, BIP44_ADDRESS_GAP } = require('./Constants');
 const { is } = require('./utils');
 
 const defaultOptions = {
@@ -44,7 +44,7 @@ class Account {
     }
 
     if (this.transport !== null) {
-      // this.startSynchronization();
+      this.startSynchronization();
     }
   }
 
@@ -73,10 +73,22 @@ class Account {
   /**
    * Start the process of synchronisation process if the transport layer is passed
    */
-  // startSynchronization() {
-  // Start pre-fetch using transport layer
+  startSynchronization() {
+    // Start fetching address info using transport layer
+    const self = this;
+    const { transport } = this;
+    const startTs = Date.now();
+    console.log(`${startTs} - Pre-fetch using ${transport.type}`);
 
-  // We also should continue the discovery
+    this
+      .fetchAddressesInfo()
+      .then(() => {
+        self.events.emit('fetched');
+      });
+
+    //
+
+    // We also should continue the discovery
   // based on used/unused (as per BIP44 always have 20+ addr)
 
   // Start Address Discovery
@@ -84,8 +96,34 @@ class Account {
   // Start Address listening
 
   // Setup bloomfilter
-  // }
+  }
 
+  async fetchAddressesInfo() {
+    const self = this;
+    async function fetcher(addressId, addressType = 'external') {
+      const keys = Object.keys(self.addresses[addressType]);
+
+      const { address, path } = self.addresses[addressType][keys[addressId]];
+      const sum = await self.transport.getAddressSummary(address);
+      const { balance, transactions } = sum;
+      self.addresses[addressType][path].balance = balance;
+      self.addresses[addressType][path].transactions = transactions;
+      self.addresses[addressType][path].fetchedTimes += 1;
+    }
+
+    await fetcher(0, 'external');
+    await fetcher(0, 'internal');
+    // let unusedAddr = 0;
+    //
+    // if (unusedAddr < BIP44_ADDRESS_GAP) {
+    //   unusedAddr += 1;
+    //   console.log(unusedAddr)
+    //
+    // }
+    // this.addresses.external.(function (el) {
+    //   console.log(el);
+    // })
+  }
   /**
    * @return {Array<object>} - list of unspent outputs for the wallet
    */
