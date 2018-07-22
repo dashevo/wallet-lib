@@ -8,6 +8,7 @@ const {
 } = require('./utils');
 
 const Account = require('./Account');
+const Transporter = require('./transports/Transporter');
 
 const defaultOptions = {
   network: 'testnet',
@@ -50,7 +51,7 @@ class Wallet {
 
     this.adapter = (opts.adapter) ? opts.adapter : null;
     // If transport is null, we won't try to fetch anything
-    this.transport = (opts.transport) ? opts.transport : null;
+    this.transport = (opts.transport) ? new Transporter(opts.transport) : null;
 
     this.accounts = [];
     this.HDPrivateKey = HDPrivateKey;
