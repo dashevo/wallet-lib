@@ -2,7 +2,7 @@ const Constants = {
   BIP45: 'BIP45',
   BIP44: 'BIP44',
   DUFFS_PER_DASH: 100000000,
-  BIP44_ADDRESS_GAP: 4,
+  BIP44_ADDRESS_GAP: 20,
   BIP32__ROOT_PATH: 'm',
   // Livenet is 5 for Dash.
   BIP44_LIVENET_ROOT_PATH: "m/44'/5'",

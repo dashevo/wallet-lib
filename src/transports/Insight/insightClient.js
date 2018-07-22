@@ -13,8 +13,8 @@ const fakeReq = {
 class InsightClient {
   constructor() {
     this.type = this.constructor.name;
-    this.uri = 'https://testnet-insight.dashevo.org/insight-api-dash/';
-    // this.uri = 'http://localhost:3001/insight-api/';
+    // this.uri = 'https://testnet-insight.dashevo.org/insight-api-dash';
+    this.uri = 'http://localhost:3001/insight-api';
   }
 
   async getAddressSummary(address) {

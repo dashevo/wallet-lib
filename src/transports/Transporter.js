@@ -14,13 +14,17 @@ class Transporter {
 
   async getAddressSummary(address) {
     if (!is.address(address)) throw new Error('Received an invalid address to fetch');
-    const data = await this.transport.getAddressSummary(address);
+    const data = await this.transport.getAddressSummary(address).catch((err) => {
+      throw new Error(err);
+    });
     return data;
   }
 
   async getUTXO(address) {
     if (!is.address(address)) throw new Error('Received an invalid address to fetch');
-    const data = await this.transport.getUTXO(address);
+    const data = await this.transport.getUTXO(address).catch((err) => {
+      throw new Error(err);
+    });
     return data;
   }
 }

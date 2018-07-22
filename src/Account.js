@@ -76,9 +76,9 @@ class Account {
   startSynchronization() {
     // Start fetching address info using transport layer
     const self = this;
-    const { transport } = this;
-    const startTs = Date.now();
-    console.log(`${startTs} - Pre-fetch using ${transport.type}`);
+    // const { transport } = this;
+    // const startTs = Date.now();
+    // console.log(`${startTs} - Pre-fetch using ${transport.type}`);
 
     this
       .fetchAddressesInfo()
@@ -101,7 +101,6 @@ class Account {
   async fetchAddressesInfo() {
     const self = this;
     async function fetcher(addressId, addressType = 'external') {
-      console.log('Will fetch', addressId, addressType);
       const keys = Object.keys(self.addresses[addressType]);
 
       const { address, path } = self.addresses[addressType][keys[addressId]];
@@ -128,26 +127,27 @@ class Account {
     }
 
     // Process in parallel the 20 first item (as per BIP44 GAP rules)
-    await processMultipleFetch(0, 3, 'external');
+    await processMultipleFetch(0, BIP44_ADDRESS_GAP, 'external');
+    await processMultipleFetch(0, BIP44_ADDRESS_GAP, 'internal');
 
-    // await processMultipleFetch(0, 19, 'internal');
+    let unusedAddress = 0;
 
-    // let unusedAddr = 0;
+    Object.keys(self.addresses.external).forEach((k) => {
+      const el = self.addresses.external[k];
+      if (el.used === false) unusedAddress += 1;
+    });
 
-    // self.addresses.external.filter((el) => {
-    //   if (el.used === false) unusedAddr += 1;
-    // });
-    // console.log(`Miss`)
+    if (BIP44_ADDRESS_GAP > unusedAddress) {
+      const missingAddressNb = BIP44_ADDRESS_GAP - unusedAddress;
+      const addressKeys = Object.keys(this.addresses.external);
+      const lastElem = this.addresses.external[addressKeys[addressKeys.length - 1]];
+      const addressIndex = parseInt(lastElem.index, 10);
 
-    //
-    // if (unusedAddr < BIP44_ADDRESS_GAP) {
-    //   unusedAddr += 1;
-    //   console.log(unusedAddr)
-    //
-    // }
-    // this.addresses.external.(function (el) {
-    //   console.log(el);
-    // })
+      for (let i = addressIndex + 1; i < addressIndex + 1 + missingAddressNb; i += 1) {
+        this.getAddress(i);
+        this.getAddress(i, false);
+      }
+    }
   }
   /**
    * @return {Array<object>} - list of unspent outputs for the wallet
