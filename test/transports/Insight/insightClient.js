@@ -8,7 +8,7 @@ let wallet = null;
 let account = null;
 
 describe('Transport : Insight Client', function suite() {
-  this.timeout(20000);
+  this.timeout(60000);
   before((done) => {
     const config = {
       transport: new InsightClient(),
@@ -17,7 +17,7 @@ describe('Transport : Insight Client', function suite() {
     };
     wallet = new Wallet(config);
     account = wallet.createAccount();
-    account.events.on('fetched', () => {
+    account.events.on('prefetched', () => {
       done();
     });
   });

@@ -76,26 +76,40 @@ class Account {
   startSynchronization() {
     // Start fetching address info using transport layer
     const self = this;
-    // const { transport } = this;
-    // const startTs = Date.now();
-    // console.log(`${startTs} - Pre-fetch using ${transport.type}`);
-
     this
       .fetchAddressesInfo()
       .then(() => {
-        self.events.emit('fetched');
+        self.events.emit('prefetched');
+      })
+
+      .then(this.startSelfDiscoveryWorker.bind(this))
+      .then(this.startAddressListener.bind(this))
+      .then(this.startAddressBloomfilter.bind(this))
+      .then(() => {
+        self.events.emit('discovery_started');
+      })
+      .catch((err) => {
+        throw new Error(err);
       });
+  }
 
-    //
+  async startAddressBloomfilter() {
+    // TODO : Setup bloomfilter
+    this.synced = true;
+    return true;
+  }
 
-    // We also should continue the discovery
-  // based on used/unused (as per BIP44 always have 20+ addr)
+  async startAddressListener() {
+    // TODO : Start Address listening
+    this.synced = true;
+    return true;
+  }
 
-  // Start Address Discovery
-
-  // Start Address listening
-
-  // Setup bloomfilter
+  async startSelfDiscoveryWorker() {
+    // TODO : We also should continue the discovery
+    // based on used/unused (as per BIP44 always have 20+ addr)
+    this.synced = true;
+    return true;
   }
 
   async fetchAddressesInfo() {
