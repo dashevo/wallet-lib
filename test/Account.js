@@ -81,19 +81,7 @@ describe('Account', () => {
     const addressDataExternal = accountLivenet.getAddress(10);
     expect(addressDataExternal.address).to.equal('XfPKRskw2vDXKpJ11oZZdQBjSMocJ5jmes');
   });
-  it('should be able to derivate an address for livenet', () => {
-    const accountLivenet = walletFakeTransportLivenet.createAccount();
-    const addressData = accountLivenet.getAddress(0, true);
-    expect(addressData).to.have.property('address');
-    const { address } = addressData;
-    expect(address).to.equal('Xc1u8mcXcRm7GAHtFvYXYnPR8L6cqVkoyp');
 
-    const addressDataInternal = accountLivenet.getAddress(0, false);
-    expect(addressDataInternal.address).to.equal('XcqD6TFCcQ7jvcNiuohFFxBmwP2n71tANy');
-
-    const addressDataExternal = accountLivenet.getAddress(10);
-    expect(addressDataExternal.address).to.equal('XfPKRskw2vDXKpJ11oZZdQBjSMocJ5jmes');
-  })
   it('should be able to get all address', () => {
     const account = walletFakeTransportTestnet.getAccount(0);
     const addressesExternalData = account.getAddresses();
