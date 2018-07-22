@@ -25,12 +25,12 @@ class InsightClient {
     return fakeReq.addr[address];// throw new Error(address);
   }
 
-  async getUTXOS(address) {
-    if (!fakeReq.addr[address]) {
-      const res = await axios.get(`${this.uri}/addr/${address}`);
-      fakeReq.addr[address] = res.data;
+  async getUTXO(address) {
+    if (!fakeReq.utxos[address]) {
+      const res = await axios.get(`${this.uri}/addr/${address}/utxo`);
+      fakeReq.utxos[address] = res.data;
     }
-    return fakeReq.addr[address];// throw new Error(address);
+    return fakeReq.utxos[address];// throw new Error(address);
   }
 
   async sendRawTransaction(rawTx, isIs = false) {

@@ -101,19 +101,44 @@ class Account {
   async fetchAddressesInfo() {
     const self = this;
     async function fetcher(addressId, addressType = 'external') {
+      console.log('Will fetch', addressId, addressType);
       const keys = Object.keys(self.addresses[addressType]);
 
       const { address, path } = self.addresses[addressType][keys[addressId]];
       const sum = await self.transport.getAddressSummary(address);
       const { balance, transactions } = sum;
+
+      // We do not need to fetch UTXO if we don't have any money there :)
+      const utxo = (balance > 0) ? await self.transport.getUTXO(address) : [];
+
       self.addresses[addressType][path].balance = balance;
       self.addresses[addressType][path].transactions = transactions;
       self.addresses[addressType][path].fetchedTimes += 1;
+      self.addresses[addressType][path].utxos = utxo;
+
+      if (transactions.length > 0) self.addresses[addressType][path].used = true;
+    }
+    async function processMultipleFetch(startValue, numberOfElements, addressType) {
+      const tasks = [];
+      for (let i = startValue; i < startValue + numberOfElements; i += 1) {
+        tasks.push(() => fetcher(i, addressType));
+      }
+      const promises = tasks.map(task => task());
+      await Promise.all(promises);
     }
 
-    await fetcher(0, 'external');
-    await fetcher(0, 'internal');
+    // Process in parallel the 20 first item (as per BIP44 GAP rules)
+    await processMultipleFetch(0, 3, 'external');
+
+    // await processMultipleFetch(0, 19, 'internal');
+
     // let unusedAddr = 0;
+
+    // self.addresses.external.filter((el) => {
+    //   if (el.used === false) unusedAddr += 1;
+    // });
+    // console.log(`Miss`)
+
     //
     // if (unusedAddr < BIP44_ADDRESS_GAP) {
     //   unusedAddr += 1;
@@ -164,6 +189,7 @@ class Account {
       balance: 0,
       utxos: [],
       fetchedTimes: 0,
+      used: false,
     };
     this.addresses[type][path] = addressData;
     return addressData;

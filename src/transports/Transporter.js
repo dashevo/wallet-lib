@@ -17,5 +17,11 @@ class Transporter {
     const data = await this.transport.getAddressSummary(address);
     return data;
   }
+
+  async getUTXO(address) {
+    if (!is.address(address)) throw new Error('Received an invalid address to fetch');
+    const data = await this.transport.getUTXO(address);
+    return data;
+  }
 }
 module.exports = Transporter;
