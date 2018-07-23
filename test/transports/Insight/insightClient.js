@@ -57,4 +57,9 @@ describe('Transport : Insight Client', function suite() {
     expect(addressesExternalData[path].utxos[0].txid).to.equal('e66474bfe8ae3d91b2784864fc09e0bd615cbfbf4a2164e46b970bcc488a938f');
     expect(addressesExternalData[path].balance).to.equal(50);
   });
+  it('should be able to get the total balance of an account', () => {
+    const balance = account.getBalance();
+    const expectedBalance = 99.9999;
+    expect(balance).to.equal(expectedBalance);
+  })
 });

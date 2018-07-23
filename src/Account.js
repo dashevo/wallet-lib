@@ -225,6 +225,21 @@ class Account {
   createTransaction() {
     let tx = new Dashcore.Transaction();
     tx = this.calculateFee(tx);
+  /**
+   * Return the total balance of an account.
+   * Ezpect paralel fetching/discovery to be activated.
+   * @return {number} Balance in duffs
+   */
+  getBalance() {
+    let balance = 0;
+    Object.keys(this.addresses.external).forEach((key) => {
+      balance += this.addresses.external[key].balance;
+    });
+    Object.keys(this.addresses.internal).forEach((key) => {
+      balance += this.addresses.internal[key].balance;
+    });
+    return balance;
+  }
     return tx;
   }
 
