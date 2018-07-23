@@ -92,6 +92,13 @@ describe('Account', () => {
     const internalDataKeys = Object.keys(addressesInternalData);
     expect(internalDataKeys.length).to.equal(20);
   });
+  it('should be able to get a unused address', () => {
+    const account = walletFakeTransportTestnet.getAccount(0);
+    const unusedAddress = account.getUnusedAddress();
+    expect(unusedAddress.path).to.equal('m/44\'/1\'/0\'/0/0');
+    expect(unusedAddress.index).to.equal('0');//TODO : why would index even be a string...
+    expect(unusedAddress.address).to.equal('yizmJb63ygipuJaRgYtpWCV2erQodmaZt8');
+  })
   it('should be able to fetch UTXO from an amount', () => {
     // const account = walletFakeTransport.createAccount();
     // const utxos = account.getUTXO();

@@ -187,6 +187,19 @@ class Account {
     return (addressType[path]) ? addressType[path] : this.generateAddress(path);
   }
 
+  getUnusedAddress(external = true) {
+    const type = (external) ? 'external' : 'internal';
+    let unused = null;
+    for (const key in this.addresses[type]) {
+      const el = (this.addresses[type][key]);
+      if (!el.used) {
+        unused = el;
+        break;
+      }
+    }
+    return unused;
+  }
+
   generateAddress(path) {
     if (!path) throw new Error('Expected path to generate an address');
     const index = path.split('/')[5];
