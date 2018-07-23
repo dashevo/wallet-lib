@@ -240,6 +240,51 @@ class Account {
     });
     return balance;
   }
+
+  /**
+   * Will select the optimized UTXO for a specified amount
+   * @param amount - Desired amount to match
+   * @param strategy - Desired strategy for selecting the UTXO
+   * @return {Array}
+   */
+  selectBestUtxosForAmount(amount, strategy = 'FIFO') {
+    // Some good exemple might be there : https://github.com/bitcoinjs/coinselect
+    const possibleStrategy = ['lessSize', 'FIFO'];
+    let utxos = [];
+
+    const { internal, external } = this.addresses;
+
+    // Fetch External
+    const extKeys = Object.keys(external);
+    extKeys.forEach((key) => {
+      if (external[key].utxos) {
+        const utxo = external[key].utxos;
+        // utxo.path = key;
+
+        utxos = utxos.concat(utxo);
+      }
+    });
+
+    // Fetch internal (change)
+    const intKeys = Object.keys(internal);
+    intKeys.forEach((key) => {
+      if (internal[key].utxos) {
+        const utxo = internal[key].utxos;
+        // utxo.path = key;
+        utxos = utxos.concat(utxo);
+      }
+    });
+
+    // Order by size
+    utxos = utxos.sort((a, b) => a.amount - b.amount);
+
+    if (utxos[0].amount > amount) {
+      return utxos[0];
+    }
+    // Max Number of UTXOS Accepted = 2
+    return utxos;
+  }
+
     return tx;
   }
 
