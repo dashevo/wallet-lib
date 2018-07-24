@@ -1,9 +1,7 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
 const { BIP44_LIVENET_ROOT_PATH, BIP44_TESTNET_ROOT_PATH, BIP44_ADDRESS_GAP } = require('./Constants');
-const {
-  coinSelection, feeCalculation, is, dashToDuffs,
-} = require('./utils/');
+const { feeCalculation, is, dashToDuffs } = require('./utils/');
 
 const defaultOptions = {
   mode: 'full',
@@ -127,8 +125,9 @@ class Account {
       // We do not need to fetch UTXO if we don't have any money there :)
       function parseUTXO(utxos) {
         return utxos.filter((utxo) => {
-          delete utxo.confirmations;
-          return utxo;
+          const utxoRes = utxo;
+          delete utxoRes.confirmations;
+          return utxoRes;
         });
       }
       const utxo = (balance > 0) ? parseUTXO(await self.transport.getUTXO(address)) : [];
@@ -190,16 +189,18 @@ class Account {
     const type = (external) ? 'external' : 'internal';
     let unused = null;
     let skipped = 0;
-    for (const key in this.addresses[type]) {
+    const keys = Object.keys(this.addresses[type]);
+    // eslint-disable-next-line array-callback-return
+    keys.some((key) => {
       const el = (this.addresses[type][key]);
-      if (!el.used ) {
-        if(skipped === skip){
+      if (!el.used) {
+        if (skipped === skip) {
           unused = el;
-          break;
         }
         skipped += 1;
       }
-    }
+    });
+
     return unused;
   }
 
@@ -244,18 +245,21 @@ class Account {
   getUTXOS(onlyAvailable = true) {
     let utxos = [];
 
-    for (const subwallet in this.addresses) {
-      for (const path in this.addresses[subwallet]) {
-        const address = this.addresses[subwallet][path];
+    const self = this;
+    const subwallets = Object.keys(this.addresses);
+    subwallets.forEach((subwallet) => {
+      const paths = Object.keys(self.addresses[subwallet]);
+      paths.forEach((path) => {
+        const address = self.addresses[subwallet][path];
         if (address.utxos) {
-          if (onlyAvailable) {
-            if (address.locked) continue;
+          if (!(onlyAvailable && address.locked)) {
+            const utxo = address.utxos;
+            utxos = utxos.concat(utxo);
           }
-          const utxo = address.utxos;
-          utxos = utxos.concat(utxo);
         }
-      }
-    }
+      });
+    });
+
     return utxos;
   }
 
@@ -271,13 +275,13 @@ class Account {
     const tx = new Dashcore.Transaction();
     tx.from(inputs);
 
-    let satoshis = (opts.amount && !opts.satoshis) ? dashToDuffs(opts.amount) : opts.satoshis;
+    const satoshis = (opts.amount && !opts.satoshis) ? dashToDuffs(opts.amount) : opts.satoshis;
     // console.log(opts);
 
     const outputs = [{ address: opts.to, satoshis }];
     tx.to(outputs);
 
-    const  addressChange  = this.getUnusedAddress(false,1).address;
+    const addressChange = this.getUnusedAddress(false, 1).address;
     tx.change(addressChange);
 
     const feeRate = (opts.isInstantSend) ? feeCalculation('instantSend') : feeCalculation();
@@ -285,8 +289,8 @@ class Account {
       tx.feePerKb(feeRate.value / 100);
     }
     if (feeRate.type === 'perInputs') {
-      let fee = inputs.length * feeRate.value;
-      tx.fee(inputs.length * feeRate.value);
+      const fee = inputs.length * feeRate.value;
+      tx.fee(fee);
     }
 
 
@@ -303,64 +307,20 @@ class Account {
   getPrivateKeys(addressList) {
     let privKeys = [];
 
-    for (const subwallet in this.addresses) {
-      for (const path in this.addresses[subwallet]) {
-        const address = this.addresses[subwallet][path];
+    const self = this;
+    const subwallets = Object.keys(this.addresses);
+    subwallets.forEach((subwallet) => {
+      const paths = Object.keys(self.addresses[subwallet]);
+      paths.forEach((path) => {
+        const address = self.addresses[subwallet][path];
         if (addressList.includes(address.address)) {
           privKeys = privKeys.concat([address.privateKey.privateKey]);
         }
-      }
-    }
+      });
+    });
+
     return privKeys;
   }
-  // signTransaction(transaction = null) {
-  //   transaction.sign(null);
-  //   return true;
-  // }
-
-  // selectUTXO() {
-  //   return true;
-  // }
-
-  // broadcastTransaction() {
-  //
-  // }
-
-  // updateAddressData() {
-  //   const id = 1;
-  //   const path = `${this.BIP44PATH}${id}`;
-  //   const balance = 0;
-  //   const addr = 'addr';
-  //   const transactions = [];
-  //   const utxos = [];
-  //   return {
-  //     path,
-  //     addr,
-  //     balance,
-  //     transactions,
-  //     utxos,
-  //   };
-  // }
-
-  // /**
-  //  * Broadcasts transaction to the network
-  //  * @param {string} rawTransaction
-  //  */
-  // sendTransaction(rawTransaction) {
-  //   return this.DAPIClient.sendRawTransaction(rawTransaction);
-  // }
-
-
-  // /**
-  //  * Signs transaction
-  //  * @param {string} rawTx - hex string representing transaction to sign
-  //  * @return {string} - hex string representing signed transaction
-  //  */
-  // signTransaction(rawTx) {
-  //   const tx = new Transaction(rawTx);
-  //   tx.sign(this.getPrivateKeyForSigning());
-  //   return tx.serialize();
-  // }
 
   /*
  * Evo L1 stuff

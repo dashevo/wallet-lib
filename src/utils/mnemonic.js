@@ -30,5 +30,5 @@ function mnemonicToSeed(mnemonic, network, passphrase = '') {
 module.exports = {
   generateNewMnemonic,
   HDPrivateKeyToMnemonic,
-  mnemonicToSeed
-}
+  mnemonicToSeed,
+};

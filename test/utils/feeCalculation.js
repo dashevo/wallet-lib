@@ -1,5 +1,5 @@
-const feeCalculation = require('../../src/utils/feeCalculation');
 const { expect } = require('chai');
+const feeCalculation = require('../../src/utils/feeCalculation');
 
 describe('Utils - feeCalculation', () => {
   it('should get feeRate for an instantSend transaction', () => {
