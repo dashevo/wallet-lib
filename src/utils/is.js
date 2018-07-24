@@ -22,5 +22,6 @@ const is = {
   network: network => is.string(network) || is.type(network, 'Network'),
   seed: seed => is.string(seed) || is.type(seed, 'HDPrivateKey'),
   address: addr => is.string(addr) || is.type(addr, 'Address'),
+  feeRate: feeRate => is.obj(feeRate) && is.string(feeRate.type) && is.int(feeRate.value),
 };
 module.exports = is;
