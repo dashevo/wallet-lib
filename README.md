@@ -44,8 +44,10 @@ Miscellaneous :
 
 Transports :
 
-- [ ] DAPI-Client
-- [ ] Dash-P2P
+- [ ] DAPI-Client : [https://github.com/dashevo/dapi-client]
+- [ ] Insight- Client : [src/transports/Insight/insightClient.js]
+- [ ] Dash-P2P : [src/transports/Protocol/protocolClient.js]
+- [ ] DashcoreRPC : [src/transports/RPC/rpcClient.js]
 
 Adapters (help from community welcomed) :
 
