@@ -41,14 +41,5 @@ class InsightClient {
         throw new Error(err);
       });
   }
-  // sendRawTransaction: async (rawtx, isIx = false) => {
-  //   const url = (isIx) ? `${uri}tx/sendix` : `${uri}tx/send`;
-  //   return axios
-  //     .post(url, { rawtx })
-  //     .then(res => res.data).catch((err) => {
-  //       throw new Error(err);
-  //     });
-  // },
-  // }
 }
 module.exports = InsightClient;

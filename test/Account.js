@@ -96,13 +96,16 @@ describe('Account', () => {
     const account = walletFakeTransportTestnet.getAccount(0);
     const unusedAddress = account.getUnusedAddress();
     expect(unusedAddress.path).to.equal('m/44\'/1\'/0\'/0/0');
-    expect(unusedAddress.index).to.equal('0');//TODO : why would index even be a string...
+    expect(unusedAddress.index).to.equal('0');// TODO : why would index even be a string...
     expect(unusedAddress.address).to.equal('yizmJb63ygipuJaRgYtpWCV2erQodmaZt8');
-  })
+  });
   it('should be able to fetch UTXO from an amount', () => {
-    // const account = walletFakeTransport.createAccount();
-    // const utxos = account.getUTXO();
-    // expect(utxos).to.equal({});
+    const account = walletFakeTransportTestnet.createAccount();
+    const utxos = account.getUTXOS();
+    expect(utxos).to.deep.equal([]);
+    // Fetch also unavailable utxos
+    const allUtxos = account.getUTXOS(false);
+    expect(allUtxos).to.deep.equal([]);
   });
   it('should be able to prepare a transaction', () => {
 

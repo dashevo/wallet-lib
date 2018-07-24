@@ -1,7 +1,9 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
 const { BIP44_LIVENET_ROOT_PATH, BIP44_TESTNET_ROOT_PATH, BIP44_ADDRESS_GAP } = require('./Constants');
-const { is } = require('./utils');
+const {
+  coinSelection, feeCalculation, is, dashToDuffs,
+} = require('./utils/');
 
 const defaultOptions = {
   mode: 'full',
@@ -114,6 +116,7 @@ class Account {
 
   async fetchAddressesInfo() {
     const self = this;
+
     async function fetcher(addressId, addressType = 'external') {
       const keys = Object.keys(self.addresses[addressType]);
 
@@ -122,7 +125,13 @@ class Account {
       const { balance, transactions } = sum;
 
       // We do not need to fetch UTXO if we don't have any money there :)
-      const utxo = (balance > 0) ? await self.transport.getUTXO(address) : [];
+      function parseUTXO(utxos) {
+        return utxos.filter((utxo) => {
+          delete utxo.confirmations;
+          return utxo;
+        });
+      }
+      const utxo = (balance > 0) ? parseUTXO(await self.transport.getUTXO(address)) : [];
 
       self.addresses[addressType][path].balance = balance;
       self.addresses[addressType][path].transactions = transactions;
@@ -131,6 +140,7 @@ class Account {
 
       if (transactions.length > 0) self.addresses[addressType][path].used = true;
     }
+
     async function processMultipleFetch(startValue, numberOfElements, addressType) {
       const tasks = [];
       for (let i = startValue; i < startValue + numberOfElements; i += 1) {
@@ -163,17 +173,6 @@ class Account {
       }
     }
   }
-  /**
-   * @return {Array<object>} - list of unspent outputs for the wallet
-   */
-  // async getUTXO(amount) {
-  //   throw new Error('Not Implemented');
-  // }
-
-  // calculateFee(transaction) {
-  //   const fee = 0;
-  //   return transaction.fee(fee);
-  // }
 
   getAddresses(external = true) {
     const type = (external) ? 'external' : 'internal';
@@ -187,14 +186,18 @@ class Account {
     return (addressType[path]) ? addressType[path] : this.generateAddress(path);
   }
 
-  getUnusedAddress(external = true) {
+  getUnusedAddress(external = true, skip = 0) {
     const type = (external) ? 'external' : 'internal';
     let unused = null;
+    let skipped = 0;
     for (const key in this.addresses[type]) {
       const el = (this.addresses[type][key]);
-      if (!el.used) {
-        unused = el;
-        break;
+      if (!el.used ) {
+        if(skipped === skip){
+          unused = el;
+          break;
+        }
+        skipped += 1;
       }
     }
     return unused;
@@ -222,9 +225,6 @@ class Account {
     return addressData;
   }
 
-  createTransaction() {
-    let tx = new Dashcore.Transaction();
-    tx = this.calculateFee(tx);
   /**
    * Return the total balance of an account.
    * Ezpect paralel fetching/discovery to be activated.
@@ -241,53 +241,78 @@ class Account {
     return balance;
   }
 
-  /**
-   * Will select the optimized UTXO for a specified amount
-   * @param amount - Desired amount to match
-   * @param strategy - Desired strategy for selecting the UTXO
-   * @return {Array}
-   */
-  selectBestUtxosForAmount(amount, strategy = 'FIFO') {
-    // Some good exemple might be there : https://github.com/bitcoinjs/coinselect
-    const possibleStrategy = ['lessSize', 'FIFO'];
+  getUTXOS(onlyAvailable = true) {
     let utxos = [];
 
-    const { internal, external } = this.addresses;
-
-    // Fetch External
-    const extKeys = Object.keys(external);
-    extKeys.forEach((key) => {
-      if (external[key].utxos) {
-        const utxo = external[key].utxos;
-        // utxo.path = key;
-
-        utxos = utxos.concat(utxo);
+    for (const subwallet in this.addresses) {
+      for (const path in this.addresses[subwallet]) {
+        const address = this.addresses[subwallet][path];
+        if (address.utxos) {
+          if (onlyAvailable) {
+            if (address.locked) continue;
+          }
+          const utxo = address.utxos;
+          utxos = utxos.concat(utxo);
+        }
       }
-    });
-
-    // Fetch internal (change)
-    const intKeys = Object.keys(internal);
-    intKeys.forEach((key) => {
-      if (internal[key].utxos) {
-        const utxo = internal[key].utxos;
-        // utxo.path = key;
-        utxos = utxos.concat(utxo);
-      }
-    });
-
-    // Order by size
-    utxos = utxos.sort((a, b) => a.amount - b.amount);
-
-    if (utxos[0].amount > amount) {
-      return utxos[0];
     }
-    // Max Number of UTXOS Accepted = 2
     return utxos;
   }
 
-    return tx;
+  createTransaction(opts) {
+    if (!opts || (!opts.amount && !opts.satoshis)) {
+      throw new Error('An amount in dash or in satoshis is expected to create a transaction');
+    }
+    if (!opts || (!opts.to)) {
+      throw new Error('A recipient is expected to create a transaction');
+    }
+    const utxos = this.getUTXOS();
+    const inputs = [utxos[0]];
+    const tx = new Dashcore.Transaction();
+    tx.from(inputs);
+
+    let satoshis = (opts.amount && !opts.satoshis) ? dashToDuffs(opts.amount) : opts.satoshis;
+    // console.log(opts);
+
+    const outputs = [{ address: opts.to, satoshis }];
+    tx.to(outputs);
+
+    const  addressChange  = this.getUnusedAddress(false,1).address;
+    tx.change(addressChange);
+
+    const feeRate = (opts.isInstantSend) ? feeCalculation('instantSend') : feeCalculation();
+    if (feeRate.type === 'perBytes') {
+      tx.feePerKb(feeRate.value / 100);
+    }
+    if (feeRate.type === 'perInputs') {
+      let fee = inputs.length * feeRate.value;
+      tx.fee(inputs.length * feeRate.value);
+    }
+
+
+    const privateKeys = this.getPrivateKeys(utxos.map(el => ((el.address))));
+
+    tx.sign(privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
+
+    if (!tx.isFullySigned()) {
+      throw new Error('Not fully signed transaction');
+    }
+    return tx.toString();
   }
 
+  getPrivateKeys(addressList) {
+    let privKeys = [];
+
+    for (const subwallet in this.addresses) {
+      for (const path in this.addresses[subwallet]) {
+        const address = this.addresses[subwallet][path];
+        if (addressList.includes(address.address)) {
+          privKeys = privKeys.concat([address.privateKey.privateKey]);
+        }
+      }
+    }
+    return privKeys;
+  }
   // signTransaction(transaction = null) {
   //   transaction.sign(null);
   //   return true;

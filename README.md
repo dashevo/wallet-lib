@@ -1,4 +1,19 @@
-# Dash Wallet Library
+# Wallet Library
+=====================
+
+[![NPM Package](https://img.shields.io/npm/v/@dashevo/dash-wallet-lib.svg?style=flat-square)](https://www.npmjs.org/package/@dashevo/dash-wallet--lib)
+[![Build Status](https://img.shields.io/travis/dashevo/dash-wallet-lib.svg?branch=master&style=flat-square)](https://travis-ci.org/dashevo/dash-wallet-lib)
+[![Coverage Status](https://img.shields.io/coveralls/dashevo/dash-wallet-lib.svg?style=flat-square)](https://coveralls.io/github/dashevo/dash-wallet-lib?branch=master)
+
+A pure and powerful Wallet Library for Dash - Layer 1
+
+See also : Layer 2 DAP-SDK
+## Principles
+
+Dash is a powerful new peer-to-peer platform for the next generation of financial technology. The decentralized nature of the Dash network allows for highly resilient Dash infrastructure, and the developer community needs reliable, open-source tools to implement Dash apps and services.
+
+## Usage
+
 
 ## Features
 

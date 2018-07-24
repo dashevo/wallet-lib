@@ -12,4 +12,4 @@ function duffsToDash(duffs) {
   }
   return duffs / DUFFS_PER_DASH;
 }
-module.export = { dashToDuffs, duffsToDash };
+module.exports = { dashToDuffs, duffsToDash };
