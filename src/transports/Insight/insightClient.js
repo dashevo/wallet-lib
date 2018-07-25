@@ -33,11 +33,13 @@ class InsightClient {
     return fakeReq.utxos[address];// throw new Error(address);
   }
 
-  async sendRawTransaction(rawTx, isIs = false) {
-    const url = (isIs) ? `${this.uri}tx/sendix` : `${this.uri}tx/send`;
+  async sendRawTransaction(rawtx, isIs = false) {
+    const url = (isIs) ? `${this.uri}/tx/sendix` : `${this.uri}/tx/send`;
     return axios
-      .post(url, { rawTx })
-      .then(res => res.data).catch((err) => {
+      .post(url, { rawtx })
+      .then(res => res.data)
+      .catch((err) => {
+        // console.log(err)
         throw new Error(err);
       });
   }

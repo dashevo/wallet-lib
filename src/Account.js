@@ -88,9 +88,12 @@ class Account {
       .then(() => {
         self.events.emit('discovery_started');
       })
-      .catch((err) => {
-        throw new Error(err);
+      .then(() => {
+        self.events.emit('ready');
       });
+    // .catch((err) => {
+    //   throw new Error(err);
+    // });
   }
 
   async startAddressBloomfilter() {
@@ -112,11 +115,20 @@ class Account {
     return true;
   }
 
+  async broadcastTransaction(rawtx, isIs = false) {
+    const txid = await this.transport.transport.sendRawTransaction(rawtx, isIs);
+    return txid;
+  }
+
   async fetchAddressesInfo() {
     const self = this;
 
     async function fetcher(addressId, addressType = 'external') {
       const keys = Object.keys(self.addresses[addressType]);
+      if (keys.length < 1) {
+        self.getAddress(addressId, addressType);
+        return null;
+      }
 
       const { address, path } = self.addresses[addressType][keys[addressId]];
       const sum = await self.transport.getAddressSummary(address);
@@ -138,6 +150,8 @@ class Account {
       self.addresses[addressType][path].utxos = utxo;
 
       if (transactions.length > 0) self.addresses[addressType][path].used = true;
+
+      return self.addresses[addressType][path];
     }
 
     async function processMultipleFetch(startValue, numberOfElements, addressType) {
@@ -264,6 +278,8 @@ class Account {
   }
 
   createTransaction(opts) {
+    const tx = new Dashcore.Transaction();
+
     if (!opts || (!opts.amount && !opts.satoshis)) {
       throw new Error('An amount in dash or in satoshis is expected to create a transaction');
     }
@@ -271,8 +287,11 @@ class Account {
       throw new Error('A recipient is expected to create a transaction');
     }
     const utxos = this.getUTXOS();
+    if (!utxos || utxos.length === 0) return tx;
+
     const inputs = [utxos[0]];
-    const tx = new Dashcore.Transaction();
+
+    if (!inputs) return tx;
     tx.from(inputs);
 
     const satoshis = (opts.amount && !opts.satoshis) ? dashToDuffs(opts.amount) : opts.satoshis;
@@ -286,13 +305,14 @@ class Account {
 
     const feeRate = (opts.isInstantSend) ? feeCalculation('instantSend') : feeCalculation();
     if (feeRate.type === 'perBytes') {
-      tx.feePerKb(feeRate.value / 100);
+      // console.log(feeRate.value * tx.size)
+      // tx.feePerKb(feeRate.value * 10);
+      tx.fee(10000);
     }
     if (feeRate.type === 'perInputs') {
       const fee = inputs.length * feeRate.value;
       tx.fee(fee);
     }
-
 
     const privateKeys = this.getPrivateKeys(utxos.map(el => ((el.address))));
 
