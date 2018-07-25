@@ -315,13 +315,24 @@ class Account {
     }
 
     const privateKeys = this.getPrivateKeys(utxos.map(el => ((el.address))));
+    const signedTx = this.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
 
-    tx.sign(privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
+    return signedTx.toString();
+  }
 
-    if (!tx.isFullySigned()) {
+  // eslint-disable-next-line class-methods-use-this
+  sign(object, privateKeys, sigType) {
+    const handledTypes = ['Transaction', 'SubTxRegistrationPayload'];
+    if (!privateKeys) throw new Error('Require one or multiple privateKeys to sign');
+    if (!object) throw new Error('Nothing to sign');
+    if (!handledTypes.includes(object.constructor.name)) {
+      throw new Error(`Unhandled object of type ${object.constructor.name}`);
+    }
+    const obj = object.sign(privateKeys, sigType);
+    if (!obj.isFullySigned()) {
       throw new Error('Not fully signed transaction');
     }
-    return tx.toString();
+    return obj;
   }
 
   getPrivateKeys(addressList) {
