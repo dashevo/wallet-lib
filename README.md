@@ -1,9 +1,9 @@
 # Wallet Library
 =====================
 
-[![NPM Package](https://img.shields.io/npm/v/@dashevo/dash-wallet-lib.svg?style=flat-square)](https://www.npmjs.org/package/@dashevo/dash-wallet--lib)
-[![Build Status](https://img.shields.io/travis/dashevo/dash-wallet-lib.svg?branch=master&style=flat-square)](https://travis-ci.org/dashevo/dash-wallet-lib)
-[![Coverage Status](https://img.shields.io/coveralls/dashevo/dash-wallet-lib.svg?style=flat-square)](https://coveralls.io/github/dashevo/dash-wallet-lib?branch=master)
+[![NPM Package](https://img.shields.io/npm/v/@dashevo/wallet-lib.svg?style=flat-square)](https://www.npmjs.org/package/@dashevo/wallet--lib)
+[![Build Status](https://img.shields.io/travis/dashevo/wallet-lib.svg?branch=master&style=flat-square)](https://travis-ci.org/dashevo/wallet-lib)
+[![Coverage Status](https://img.shields.io/coveralls/dashevo/wallet-lib.svg?style=flat-square)](https://coveralls.io/github/dashevo/wallet-lib?branch=master)
 
 A pure and powerful Wallet Library for Dash - Layer 1
 
