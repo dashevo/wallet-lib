@@ -1,0 +1,27 @@
+const is = {
+  // Primitives
+  arr: arr => Array.isArray(arr) || arr.constructor.name === 'Array',
+  num: num => !Number.isNaN(num) && typeof num === 'number',
+  float: (float => is.num(float) && Math.floor(float) !== float),
+  int: int => Number.isInteger(int) || (is.num(int) && Math.floor(int) === int),
+  hex: h => parseInt(h.toLowerCase(), 16).toString(16) === h.toLowerCase(),
+  string: str => typeof str === 'string',
+  bool: b => b === true || b === false,
+  obj: obj => obj && (obj.constructor === Object || obj.constructor === undefined),
+  fn: fn => typeof fn === 'function',
+  type(val, type) { return val.constructor.name === type; },
+  def: val => val !== undefined,
+  undef: val => val === undefined,
+  null: val => val === null,
+  promise: fn => fn && is.fn(fn.then) && is.fn(fn.catch),
+  obs: obs => is.fn(obs) && is.fn(obs.set),
+  event: ev => is.fn(ev.listen) && is.fn(ev.broadcast),
+  JSON(val) { try { JSON.stringify(val); return true; } catch (e) { return false; } },
+  stringified(val) { try { JSON.parse(val); return true; } catch (e) { return false; } },
+  mnemonic: mnemonic => is.string(mnemonic) || is.type(mnemonic, 'Mnemonic'),
+  network: network => is.string(network) || is.type(network, 'Network'),
+  seed: seed => is.string(seed) || is.type(seed, 'HDPrivateKey'),
+  address: addr => is.string(addr) || is.type(addr, 'Address'),
+  feeRate: feeRate => is.obj(feeRate) && is.string(feeRate.type) && is.int(feeRate.value),
+};
+module.exports = is;

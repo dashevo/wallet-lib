@@ -1,4 +1,4 @@
-const { is } = require('../utils');
+const { is } = require('../utils/index');
 
 function isValidTransport(transport) {
   return !!(transport);

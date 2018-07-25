@@ -1,7 +1,7 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
 const { BIP44_LIVENET_ROOT_PATH, BIP44_TESTNET_ROOT_PATH, BIP44_ADDRESS_GAP } = require('./Constants');
-const { is } = require('./utils');
+const { feeCalculation, is, dashToDuffs } = require('./utils/');
 
 const defaultOptions = {
   mode: 'full',
@@ -88,9 +88,12 @@ class Account {
       .then(() => {
         self.events.emit('discovery_started');
       })
-      .catch((err) => {
-        throw new Error(err);
+      .then(() => {
+        self.events.emit('ready');
       });
+    // .catch((err) => {
+    //   throw new Error(err);
+    // });
   }
 
   async startAddressBloomfilter() {
@@ -112,17 +115,34 @@ class Account {
     return true;
   }
 
+  async broadcastTransaction(rawtx, isIs = false) {
+    const txid = await this.transport.transport.sendRawTransaction(rawtx, isIs);
+    return txid;
+  }
+
   async fetchAddressesInfo() {
     const self = this;
+
     async function fetcher(addressId, addressType = 'external') {
       const keys = Object.keys(self.addresses[addressType]);
+      if (keys.length < 1) {
+        self.getAddress(addressId, addressType);
+        return null;
+      }
 
       const { address, path } = self.addresses[addressType][keys[addressId]];
       const sum = await self.transport.getAddressSummary(address);
       const { balance, transactions } = sum;
 
       // We do not need to fetch UTXO if we don't have any money there :)
-      const utxo = (balance > 0) ? await self.transport.getUTXO(address) : [];
+      function parseUTXO(utxos) {
+        return utxos.filter((utxo) => {
+          const utxoRes = utxo;
+          delete utxoRes.confirmations;
+          return utxoRes;
+        });
+      }
+      const utxo = (balance > 0) ? parseUTXO(await self.transport.getUTXO(address)) : [];
 
       self.addresses[addressType][path].balance = balance;
       self.addresses[addressType][path].transactions = transactions;
@@ -130,7 +150,10 @@ class Account {
       self.addresses[addressType][path].utxos = utxo;
 
       if (transactions.length > 0) self.addresses[addressType][path].used = true;
+
+      return self.addresses[addressType][path];
     }
+
     async function processMultipleFetch(startValue, numberOfElements, addressType) {
       const tasks = [];
       for (let i = startValue; i < startValue + numberOfElements; i += 1) {
@@ -163,17 +186,6 @@ class Account {
       }
     }
   }
-  /**
-   * @return {Array<object>} - list of unspent outputs for the wallet
-   */
-  // async getUTXO(amount) {
-  //   throw new Error('Not Implemented');
-  // }
-
-  // calculateFee(transaction) {
-  //   const fee = 0;
-  //   return transaction.fee(fee);
-  // }
 
   getAddresses(external = true) {
     const type = (external) ? 'external' : 'internal';
@@ -185,6 +197,25 @@ class Account {
     const path = (external) ? `${this.BIP44PATH}/0/${index}` : `${this.BIP44PATH}/1/${index}`;
     const addressType = this.addresses[type];
     return (addressType[path]) ? addressType[path] : this.generateAddress(path);
+  }
+
+  getUnusedAddress(external = true, skip = 0) {
+    const type = (external) ? 'external' : 'internal';
+    let unused = null;
+    let skipped = 0;
+    const keys = Object.keys(this.addresses[type]);
+    // eslint-disable-next-line array-callback-return
+    keys.some((key) => {
+      const el = (this.addresses[type][key]);
+      if (!el.used) {
+        if (skipped === skip) {
+          unused = el;
+        }
+        skipped += 1;
+      }
+    });
+
+    return unused;
   }
 
   generateAddress(path) {
@@ -209,60 +240,107 @@ class Account {
     return addressData;
   }
 
-  createTransaction() {
-    let tx = new Dashcore.Transaction();
-    tx = this.calculateFee(tx);
-    return tx;
+  /**
+   * Return the total balance of an account.
+   * Ezpect paralel fetching/discovery to be activated.
+   * @return {number} Balance in duffs
+   */
+  getBalance() {
+    let balance = 0;
+    Object.keys(this.addresses.external).forEach((key) => {
+      balance += this.addresses.external[key].balance;
+    });
+    Object.keys(this.addresses.internal).forEach((key) => {
+      balance += this.addresses.internal[key].balance;
+    });
+    return balance;
   }
 
-  // signTransaction(transaction = null) {
-  //   transaction.sign(null);
-  //   return true;
-  // }
+  getUTXOS(onlyAvailable = true) {
+    let utxos = [];
 
-  // selectUTXO() {
-  //   return true;
-  // }
+    const self = this;
+    const subwallets = Object.keys(this.addresses);
+    subwallets.forEach((subwallet) => {
+      const paths = Object.keys(self.addresses[subwallet]);
+      paths.forEach((path) => {
+        const address = self.addresses[subwallet][path];
+        if (address.utxos) {
+          if (!(onlyAvailable && address.locked)) {
+            const utxo = address.utxos;
+            utxos = utxos.concat(utxo);
+          }
+        }
+      });
+    });
 
-  // broadcastTransaction() {
-  //
-  // }
+    return utxos;
+  }
 
-  // updateAddressData() {
-  //   const id = 1;
-  //   const path = `${this.BIP44PATH}${id}`;
-  //   const balance = 0;
-  //   const addr = 'addr';
-  //   const transactions = [];
-  //   const utxos = [];
-  //   return {
-  //     path,
-  //     addr,
-  //     balance,
-  //     transactions,
-  //     utxos,
-  //   };
-  // }
+  createTransaction(opts) {
+    const tx = new Dashcore.Transaction();
 
-  // /**
-  //  * Broadcasts transaction to the network
-  //  * @param {string} rawTransaction
-  //  */
-  // sendTransaction(rawTransaction) {
-  //   return this.DAPIClient.sendRawTransaction(rawTransaction);
-  // }
+    if (!opts || (!opts.amount && !opts.satoshis)) {
+      throw new Error('An amount in dash or in satoshis is expected to create a transaction');
+    }
+    if (!opts || (!opts.to)) {
+      throw new Error('A recipient is expected to create a transaction');
+    }
+    const utxos = this.getUTXOS();
+    if (!utxos || utxos.length === 0) return tx;
 
+    const inputs = [utxos[0]];
 
-  // /**
-  //  * Signs transaction
-  //  * @param {string} rawTx - hex string representing transaction to sign
-  //  * @return {string} - hex string representing signed transaction
-  //  */
-  // signTransaction(rawTx) {
-  //   const tx = new Transaction(rawTx);
-  //   tx.sign(this.getPrivateKeyForSigning());
-  //   return tx.serialize();
-  // }
+    if (!inputs) return tx;
+    tx.from(inputs);
+
+    const satoshis = (opts.amount && !opts.satoshis) ? dashToDuffs(opts.amount) : opts.satoshis;
+    // console.log(opts);
+
+    const outputs = [{ address: opts.to, satoshis }];
+    tx.to(outputs);
+
+    const addressChange = this.getUnusedAddress(false, 1).address;
+    tx.change(addressChange);
+
+    const feeRate = (opts.isInstantSend) ? feeCalculation('instantSend') : feeCalculation();
+    if (feeRate.type === 'perBytes') {
+      // console.log(feeRate.value * tx.size)
+      // tx.feePerKb(feeRate.value * 10);
+      tx.fee(10000);
+    }
+    if (feeRate.type === 'perInputs') {
+      const fee = inputs.length * feeRate.value;
+      tx.fee(fee);
+    }
+
+    const privateKeys = this.getPrivateKeys(utxos.map(el => ((el.address))));
+
+    tx.sign(privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
+
+    if (!tx.isFullySigned()) {
+      throw new Error('Not fully signed transaction');
+    }
+    return tx.toString();
+  }
+
+  getPrivateKeys(addressList) {
+    let privKeys = [];
+
+    const self = this;
+    const subwallets = Object.keys(this.addresses);
+    subwallets.forEach((subwallet) => {
+      const paths = Object.keys(self.addresses[subwallet]);
+      paths.forEach((path) => {
+        const address = self.addresses[subwallet][path];
+        if (addressList.includes(address.address)) {
+          privKeys = privKeys.concat([address.privateKey.privateKey]);
+        }
+      });
+    });
+
+    return privKeys;
+  }
 
   /*
  * Evo L1 stuff

@@ -5,8 +5,8 @@ const {
   duffsToDash,
   generateNewMnemonic,
   mnemonicToSeed,
-} = require('../src/utils');
-const { mnemonicString1, HDPrivateKey1Testnet } = require('./fixtures');
+} = require('../../src/utils/index');
+const { mnemonicString1, HDPrivateKey1Testnet } = require('../fixtures');
 
 describe('Utils', () => {
   it('should handle dash2Duff', () => {
