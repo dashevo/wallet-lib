@@ -57,4 +57,57 @@ describe('Transport : Insight Client', function suite() {
     expect(addressesExternalData[path].utxos[0].txid).to.equal('e66474bfe8ae3d91b2784864fc09e0bd615cbfbf4a2164e46b970bcc488a938f');
     expect(addressesExternalData[path].balance).to.equal(50);
   });
+  it('should be able to get the total balance of an account', () => {
+    const balance = account.getBalance();
+    const expectedBalance = 99.9999;
+    expect(balance).to.equal(expectedBalance);
+  });
+  it('should be able to get a valid UTXO', () => {
+    const expectedUTXOS = [{
+      address: 'yf6qYQzQoCzpF7gJYAa7s3n5rBK89RoaCQ',
+      txid: 'e66474bfe8ae3d91b2784864fc09e0bd615cbfbf4a2164e46b970bcc488a938f',
+      vout: 0,
+      scriptPubKey: '76a914ce07ed014c455640a41e516ad4cc40fbc7fe435c88ac',
+      amount: 50,
+      satoshis: 5000000000,
+      height: 142810,
+    },
+    {
+      address: 'yeuLv2E9FGF4D9o8vphsaC2Vxoa8ZA7Efp',
+      txid: 'e66474bfe8ae3d91b2784864fc09e0bd615cbfbf4a2164e46b970bcc488a938f',
+      vout: 1,
+      scriptPubKey: '76a914cbdb740680e713c141e9fb32e92c7d90a3f3297588ac',
+      amount: 49.9999,
+      satoshis: 4999990000,
+      height: 142810,
+    }];
+    const UTXOS = account.getUTXOS();
+    expect(UTXOS).to.deep.equal(expectedUTXOS);
+  });
+
+  it('should be able to create a transaction', () => {
+    const { address } = account.getUnusedAddress();
+
+    expect(address).to.equal('yRwh2qqnSgWKSaE7Vob35JY4wprvx8ujPZ');
+
+    const txOpts = { amount: 15, to: address };
+    const txOptsSatoshis = { satoshis: 1500000000, to: address };
+
+    const expectedRawTx = '03000000018f938a48cc0b976be464214abfbf5c61bde009fc644878b2913daee8bf7464e6000000006b483045022100c9d45a90e7a514d160cc6b18c4039560571aeed9ae6fb22f197305139400e51602206437c508706d6219915e9cd2be663d5016d55fa0bce232bc733c56b86e9adbb60121029f883b2c3ec3a4804bcc1f66687a65ef265ce15b7f86c9a6e35ef86ca9ceced2ffffffff02002f6859000000001976a9143db3717b49fba213b0d0f988c3f6bca23e65815888acf09b9dd0000000001976a914d2ad4b21655c7e019077cdf759cd4c2a0b6682e988ac00000000';
+    const rawTxFromAmount = account.createTransaction(txOpts);
+    const rawTxFromSatoshisAmount = account.createTransaction(txOptsSatoshis);
+    expect(rawTxFromAmount).to.equal(expectedRawTx);
+    expect(rawTxFromSatoshisAmount).to.equal(expectedRawTx);
+  });
+  it('should bve able to create an instantSend transactions', () => {
+    const { address } = account.getUnusedAddress();
+    const txOptsInstant = {
+      amount: 10,
+      to: address,
+      isInstantSend: true,
+    };
+    const expectedRawTx = '03000000018f938a48cc0b976be464214abfbf5c61bde009fc644878b2913daee8bf7464e6000000006a47304402203ac209efce9d8b231cc4e2ce557fc48a693cd22412a0aece05a19f183427e93102200d06ebb4e6520e8bd7167735527fa73e60933dfeab9ed1045e05c89dfaccc4720121029f883b2c3ec3a4804bcc1f66687a65ef265ce15b7f86c9a6e35ef86ca9ceced2ffffffff0200ca9a3b000000001976a9143db3717b49fba213b0d0f988c3f6bca23e65815888acf0006bee000000001976a914d2ad4b21655c7e019077cdf759cd4c2a0b6682e988ac00000000';
+    const rawTx = account.createTransaction(txOptsInstant);
+    expect(rawTx).to.equal(expectedRawTx);
+  });
 });

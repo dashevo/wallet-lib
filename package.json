@@ -1,5 +1,5 @@
 {
-  "name": "dash-wallet-lib",
+  "name": "@dashevo/wallet-lib",
   "version": "1.0.0",
   "description": "Light wallet library for Dash",
   "main": "index.js",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dashevo/dash-wallet-lib.git"
+    "url": "git+https://github.com/dashevo/wallet-lib.git"
   },
   "keywords": [
     "cryptocurrency",
@@ -20,11 +20,11 @@
   "author": "Dash Core Team",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dashevo/dash-wallet-lib/issues"
+    "url": "https://github.com/dashevo/wallet-lib/issues"
   },
-  "homepage": "https://github.com/dashevo/dash-wallet-lib#readme",
+  "homepage": "https://github.com/dashevo/wallet-lib#readme",
   "dependencies": {
-    "@dashevo/dapi-sdk": "git+ssh://git@github.com/dashevo/dapi-sdk.git#develop",
+    "@dashevo/dapi-sdk": "git+https://github.com/dashevo/dapi-client.git",
     "@dashevo/dashcore-lib": "git+ssh://git@github.com/dashevo/dashcore-lib.git#evo",
     "@dashevo/dashcore-mnemonic": "^1.5.0",
     "axios": "^0.18.0"

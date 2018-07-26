@@ -5,7 +5,7 @@ const {
   generateNewMnemonic,
   mnemonicToSeed,
   is,
-} = require('./utils');
+} = require('./utils/index');
 
 const Account = require('./Account');
 const Transporter = require('./transports/Transporter');
