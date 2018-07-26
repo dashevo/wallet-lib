@@ -1,4 +1,3 @@
-const EventEmitter = require('events');
 const { expect } = require('chai');
 const { Networks } = require('@dashevo/dashcore-lib');
 const {
