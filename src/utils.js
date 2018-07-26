@@ -49,7 +49,7 @@ const is = {
   hex: h => parseInt(h.toLowerCase(), 16).toString(16) === h.toLowerCase(),
   string: str => typeof str === 'string',
   bool: b => b === true || b === false,
-  obj: obj => obj && (obj.constructor === Object || obj.constructor === undefined),
+  obj: obj => obj && obj === Object(obj),
   fn: fn => typeof fn === 'function',
   type(val, type) { return val.constructor.name === type; },
   def: val => val !== undefined,
