@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const { Wallet } = require('../src/index');
+const { Account } = require('../src/index');
 const { mnemonicString1, mnemonicString2 } = require('./fixtures.json');
 
 // const seed1 = new Mnemonic(mnemonic1).toSeed();
@@ -45,6 +46,14 @@ describe('Account', () => {
     expect(accountLivenet).to.be.a('object');
     expect(accountLivenet.constructor.name).to.equal('Account');
     expect(accountLivenet.BIP44PATH).to.equal('m/44\'/5\'/0\'');
+  });
+  it('should be able to create an account with wallet', () => {
+    const accountTestnet = new Account(walletTestnet, { mode: 'light' });
+    // eslint-disable-next-line no-unused-expressions
+    expect(accountTestnet).to.exist;
+    expect(accountTestnet).to.be.a('object');
+    expect(accountTestnet.constructor.name).to.equal('Account');
+    expect(accountTestnet.BIP44PATH).to.equal('m/44\'/1\'/1\'');
   });
   it('should be able to setup a label', () => {
     const label = 'MyUberLabel';
@@ -109,6 +118,13 @@ describe('Account', () => {
   });
   it('should be able to prepare a transaction', () => {
 
+  });
+  it('should not be able to create an account without wallet', () => {
+    expect(() => new Account()).to.throw('Expected wallet to be created and passed as param');
+  });
+  it('should not be able to generate an address without path', () => {
+    const accountTestnet = new Account(walletTestnet, { mode: 'light' });
+    expect(() => accountTestnet.generateAddress()).to.throw('Expected path to generate an address');
   });
 });
 // let hdPrivKey = this.state.config.rootPrivKey.derive(walletPath);

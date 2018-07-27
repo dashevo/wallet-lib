@@ -29,19 +29,19 @@ class Wallet {
     let passphrase = null;
     let mnemonic = null;
 
-    if (!(opts.network && is.network(opts.network))) throw new Error('Expected a valid network (typeof Network or String');
+    if (!(opts.network && is.network(opts.network))) throw new Error('Expected a valid network (typeof Network or String)');
     this.network = DashcoreLib.Networks[opts.network];
     // eslint-disable-next-line prefer-destructuring
     if (opts.passphrase) passphrase = opts.passphrase;
 
 
-    if (opts.mnemonic) {
+    if ('mnemonic' in opts) {
       if (!is.mnemonic(opts.mnemonic)) throw new Error('Expected a valid mnemonic (typeof String or Mnemonic)');
       // eslint-disable-next-line prefer-destructuring
       mnemonic = opts.mnemonic;
       HDPrivateKey = mnemonicToSeed(opts.mnemonic, this.network, passphrase);
-    } else if (opts.seed) {
-      if (!is.seed(opts.seed)) throw new Error('Expected a valid seed (typeof HDPrivateKey or String');
+    } else if ('seed' in opts) {
+      if (!is.seed(opts.seed)) throw new Error('Expected a valid seed (typeof HDPrivateKey or String)');
       HDPrivateKey = opts.seed;
       mnemonic = null; // todo : verify if possible to change from HDPrivateKey to Mnemonic back
     } else {

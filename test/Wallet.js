@@ -54,6 +54,19 @@ describe('Wallet', () => {
     expect(wallet.transport).to.equal(null);
     expect(wallet.HDPrivateKey.toString()).to.equal(hdKey.toString());
   });
+  it('should create a wallet when mnemonic not set', () => {
+    const network = Dashcore.Networks.testnet;
+    const config = {
+      network,
+    };
+    const wallet = new Wallet(config);
+    // eslint-disable-next-line no-unused-expressions
+    expect(wallet).to.exist;
+    expect(wallet).to.be.a('object');
+    expect(wallet.constructor.name).to.equal('Wallet');
+    expect(wallet.transport).to.equal(null);
+    expect(wallet.mnemonic).to.be.an.instanceof(Mnemonic);
+  });
   it('should be able to create a wallet', () => {
     const wallet = new Wallet({
       mnemonic: mnemonicString1,
@@ -72,6 +85,59 @@ describe('Wallet', () => {
       expect(el.BIP44PATH).to.equal(`m/44'/1'/${i}'`);
     });
   });
+  it('should reject without network', () => {
+    const conf = {
+      mnemonic: mnemonic1,
+    };
+    expect(() => new Wallet(conf)).to.throw('Expected a valid network (typeof Network or String');
+  });
+  it('should reject with invalid mnemonic: true', () => {
+    const conf = {
+      mnemonic: true,
+      network: Dashcore.Networks.testnet,
+    };
+    expect(() => new Wallet(conf)).to.throw('Expected a valid mnemonic (typeof String or Mnemonic)');
+  });
+  it('should reject with invalid mnemonic: false', () => {
+    const conf = {
+      mnemonic: false,
+      network: Dashcore.Networks.testnet,
+    };
+    expect(() => new Wallet(conf)).to.throw('Expected a valid mnemonic (typeof String or Mnemonic)');
+  });
+  it('should reject with invalid mnemonic: 0', () => {
+    const conf = {
+      mnemonic: false,
+      network: Dashcore.Networks.testnet,
+    };
+    expect(() => new Wallet(conf)).to.throw('Expected a valid mnemonic (typeof String or Mnemonic)');
+  });
+  it('should reject with invalid seed: true', () => {
+    const network = 'testnet';
+    const conf = {
+      seed: true,
+      network,
+    };
+    expect(() => new Wallet(conf)).to.throw('Expected a valid seed (typeof HDPrivateKey or String)');
+  });
+  it('should reject with invalid seed: false', () => {
+    const network = 'testnet';
+    const conf = {
+      seed: false,
+      network,
+    };
+    expect(() => new Wallet(conf)).to.throw('Expected a valid seed (typeof HDPrivateKey or String)');
+  });
+  it('should reject with invalid seed: 0', () => {
+    const network = 'testnet';
+    const conf = {
+      seed: 0,
+      network,
+    };
+    expect(() => new Wallet(conf)).to.throw('Expected a valid seed (typeof HDPrivateKey or String)');
+  });
+
+
   it('should reject invalid mnemonic', () => {
     const conf = {
       mnemonic: invalidMnemonicString1,
@@ -98,6 +164,25 @@ describe('Wallet', () => {
     walletTestnet = new Wallet(config);
     const exported = walletTestnet.exportWallet();
     expect(exported).to.equal(mnemonicString1);
+  });
+  it('should be able to export to a HDPrivKey with seed', () => {
+    const network = 'testnet';
+    const config = {
+      seed: privateHDKey1,
+      network,
+    };
+    walletTestnet = new Wallet(config);
+    const exported = walletTestnet.exportWallet(true);
+    expect(exported).to.deep.equal(privateHDKey1);
+  });
+  it('should not be able to export with seed', () => {
+    const network = 'testnet';
+    const config = {
+      seed: privateHDKey1,
+      network,
+    };
+    walletTestnet = new Wallet(config);
+    expect(() => walletTestnet.exportWallet()).to.throw('Wallet was not initiated with a mnemonic, can\'t export it');
   });
   it('should encrypt wallet with a passphrase', () => {
     const network = Dashcore.Networks.testnet;
