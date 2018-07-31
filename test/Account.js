@@ -126,5 +126,52 @@ describe('Account', () => {
     const accountTestnet = new Account(walletTestnet, { mode: 'light' });
     expect(() => accountTestnet.generateAddress()).to.throw('Expected path to generate an address');
   });
+
+  it('should not be able to broadcast Transaction without transport', () => {
+    const account = walletFakeTransportTestnet.createAccount();
+    const options = {
+      to: 'yizmJb63ygipuJaRgYtpWCV2erQodmaZt1',
+      satoshis: 100000,
+      isInstantSend: false,
+    };
+    const rawtx = account.createTransaction(options);
+    return account.broadcastTransaction(rawtx).then(
+      () => Promise.reject(new Error('Expected method to reject.')),
+      err => expect(err).to.be.a('Error').with.property('message', 'Cannot read property \'transport\' of null'),
+    );
+  });
+
+  it('should not be able to broadcast Transaction with invalid transport', () => {
+    const account = walletFakeTransportTestnet.createAccount();
+    const options = {
+      to: 'yizmJb63ygipuJaRgYtpWCV2erQodmaZt1',
+      satoshis: 100000,
+      isInstantSend: false,
+      transport: 'fake',
+    };
+    const rawtx = account.createTransaction(options);
+    return account.broadcastTransaction(rawtx).then(
+      () => Promise.reject(new Error('Expected method to reject.')),
+      err => expect(err).to.be.a('Error').with.property('message', 'Cannot read property \'transport\' of null'),
+    );
+  });
+  it('should not be able to sign without parameters', () => {
+    const account = walletFakeTransportTestnet.createAccount();
+    expect(() => account.sign()).to.throw('Require one or multiple privateKeys to sign');
+  });
+
+  it('should not be able to sign when nothing to sign', () => {
+    const account = walletFakeTransportTestnet.createAccount();
+    const privateKeys = account.getPrivateKeys(account.getUTXOS().map(el => ((el.address))));
+    expect(() => account.sign('', privateKeys)).to.throw('Nothing to sign');
+  });
+
+  it('should not be able to sign when invalid object type', () => {
+    const account = walletFakeTransportTestnet.createAccount();
+    const privateKeys = account.getPrivateKeys(account.getUTXOS().map(el => ((el.address))));
+    expect(() => account.sign([1, 1, 2], privateKeys)).to.throw('nhandled object of type Array');
+  });
+
 });
+
 // let hdPrivKey = this.state.config.rootPrivKey.derive(walletPath);
