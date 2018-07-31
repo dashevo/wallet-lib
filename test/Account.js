@@ -171,7 +171,6 @@ describe('Account', () => {
     const privateKeys = account.getPrivateKeys(account.getUTXOS().map(el => ((el.address))));
     expect(() => account.sign([1, 1, 2], privateKeys)).to.throw('nhandled object of type Array');
   });
-
 });
 
 // let hdPrivKey = this.state.config.rootPrivKey.derive(walletPath);
