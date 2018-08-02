@@ -4,9 +4,19 @@ function isValidTransport(transport) {
   return !!(transport);
 }
 
+const transportList = {
+  Insight: require('../transports/Insight/insightClient'),
+  DAPIClient: require('../transports/DAPI/DapiClient'),
+};
+
 class Transporter {
-  constructor(transport) {
-    this.valid = isValidTransport(transport);
+  constructor(transportArg) {
+    this.valid = isValidTransport(transportArg);
+
+    let transport = transportArg;
+    if (is.string(transportArg) && Object.keys(transportList).includes(transportArg)) {
+      transport = transportList[transportArg];
+    }
     this.type = transport.type || transport.constructor.name;
     if (!this.valid) throw new Error(`Invalid transport of type ${this.type}`);
     this.transport = transport;
