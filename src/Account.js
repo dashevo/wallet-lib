@@ -39,7 +39,7 @@ class Account {
     };
 
     // As per BIP44, we prefetch 20 address
-    if (opts && opts.mode === 'full') {
+    if (opts && (!opts.mode || opts.mode === 'full')) {
       this.prefetchFirstAddresses(20);
     }
 

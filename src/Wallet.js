@@ -65,7 +65,7 @@ class Wallet {
    * @param {object} account options
    * @return {account} - account object
    */
-  createAccount(accountOpts) {
+  createAccount(accountOpts = {}) {
     // if(this.accounts[])
     // Auto-populate this.accounts, probably not what we want ?
     return new Account(this, accountOpts);

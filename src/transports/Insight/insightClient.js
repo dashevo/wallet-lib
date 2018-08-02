@@ -6,15 +6,16 @@ const fakeReq = {
   addr: {},
   utxos: {},
 };
-
+const defaultOpts = {
+  uri: 'https://testnet-insight.dashevo.org/insight-api-dash'
+}
 /**
  * Temporary class to perform request on insight instead of DAPI
  */
 class InsightClient {
-  constructor() {
+  constructor(opts = defaultOpts) {
     this.type = this.constructor.name;
-    this.uri = 'https://testnet-insight.dashevo.org/insight-api-dash';
-    // this.uri = 'http://localhost:3001/insight-api';
+    this.uri = (opts.uri) ? opts.uri : defaultOpts.uri;
   }
 
   async getAddressSummary(address) {
