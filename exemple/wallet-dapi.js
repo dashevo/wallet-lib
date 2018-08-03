@@ -1,4 +1,4 @@
-const DAPIClient = require('@dashevo/dapi-client');
+const DAPIClient = require('@dashevo/dapi-sdk');
 const Wallet = require('../src/Wallet');
 
 const wallet = new Wallet({
