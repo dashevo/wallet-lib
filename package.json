@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "mocha --recursive test/*"
+    "test": "nyc --check-coverage --reporter=html --reporter=text mocha --recursive test/*"
   },
   "repository": {
     "type": "git",
@@ -36,6 +36,7 @@
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.10.0",
+    "nyc": "^11.9.0",
     "mocha": "^5.2.0"
   }
 }

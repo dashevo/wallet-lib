@@ -99,7 +99,7 @@ describe('Transport : Insight Client', function suite() {
     expect(rawTxFromAmount).to.equal(expectedRawTx);
     expect(rawTxFromSatoshisAmount).to.equal(expectedRawTx);
   });
-  it('should bve able to create an instantSend transactions', () => {
+  it('should be able to create an instantSend transactions', () => {
     const { address } = account.getUnusedAddress();
     const txOptsInstant = {
       amount: 10,
@@ -109,5 +109,111 @@ describe('Transport : Insight Client', function suite() {
     const expectedRawTx = '03000000018f938a48cc0b976be464214abfbf5c61bde009fc644878b2913daee8bf7464e6000000006a47304402203ac209efce9d8b231cc4e2ce557fc48a693cd22412a0aece05a19f183427e93102200d06ebb4e6520e8bd7167735527fa73e60933dfeab9ed1045e05c89dfaccc4720121029f883b2c3ec3a4804bcc1f66687a65ef265ce15b7f86c9a6e35ef86ca9ceced2ffffffff0200ca9a3b000000001976a9143db3717b49fba213b0d0f988c3f6bca23e65815888acf0006bee000000001976a914d2ad4b21655c7e019077cdf759cd4c2a0b6682e988ac00000000';
     const rawTx = account.createTransaction(txOptsInstant);
     expect(rawTx).to.equal(expectedRawTx);
+  });
+  it('should not be able to create an instantSend transactions without opts', () => {
+    expect(() => account.createTransaction()).to.throw('An amount in dash or in satoshis is expected to create a transaction');
+  });
+  it('should not be able to create an instantSend transactions without amount', () => {
+    const { address } = account.getUnusedAddress();
+    const txOptsInstant = {
+      to: address,
+      isInstantSend: true,
+    };
+    expect(() => account.createTransaction(txOptsInstant)).to.throw('An amount in dash or in satoshis is expected to create a transaction');
+  });
+  it('should not be able to create an instantSend transactions without to', () => {
+    const txOptsInstant = {
+      amount: 10,
+      isInstantSend: true,
+    };
+    expect(() => account.createTransaction(txOptsInstant)).to.throw('A recipient is expected to create a transaction');
+  });
+  it('should be able to create an instantSend transactions with satoshis', () => {
+    const { address } = account.getUnusedAddress();
+    const txOptsInstant = {
+      satoshis: 11,
+      to: address,
+      isInstantSend: true,
+    };
+    const expectedRawTx = '03000000018f938a48cc0b976be464214abfbf5c61bde009fc644878b2913daee8bf7464e6000000006a47304402205e0f93ccd8e0577a587dbfd1b0cfa8d5d23aca04455005c2b9a3de537829c426022000c8fa6a2760823fa50de447b69e2c057e4ccd533a473e99dbb9b0c1c8cf8d230121029f883b2c3ec3a4804bcc1f66687a65ef265ce15b7f86c9a6e35ef86ca9ceced2ffffffff020b000000000000001976a9143db3717b49fba213b0d0f988c3f6bca23e65815888ace5ca052a010000001976a914d2ad4b21655c7e019077cdf759cd4c2a0b6682e988ac00000000';
+    const rawTx = account.createTransaction(txOptsInstant);
+    expect(rawTx).to.equal(expectedRawTx);
+  });
+
+  it('should be able to create an instantSend transactions with satoshis and amount. Ammount is ignored?', () => {
+    const { address } = account.getUnusedAddress();
+    const txOptsInstant = {
+      amount: 10,
+      satoshis: 11,
+      to: address,
+      isInstantSend: true,
+    };
+    const expectedRawTx = '03000000018f938a48cc0b976be464214abfbf5c61bde009fc644878b2913daee8bf7464e6000000006a47304402205e0f93ccd8e0577a587dbfd1b0cfa8d5d23aca04455005c2b9a3de537829c426022000c8fa6a2760823fa50de447b69e2c057e4ccd533a473e99dbb9b0c1c8cf8d230121029f883b2c3ec3a4804bcc1f66687a65ef265ce15b7f86c9a6e35ef86ca9ceced2ffffffff020b000000000000001976a9143db3717b49fba213b0d0f988c3f6bca23e65815888ace5ca052a010000001976a914d2ad4b21655c7e019077cdf759cd4c2a0b6682e988ac00000000';
+    const rawTx = account.createTransaction(txOptsInstant);
+    expect(rawTx).to.equal(expectedRawTx);
+  });
+
+  it('should be able to create a wallet without transport', () => {
+    const wallet2 = new Wallet({
+      mnemonic: 'wisdom claim quote stadium input danger planet angry crucial cargo struggle medal',
+      network: 'testnet',
+    });
+    expect(wallet2.transport).to.be.equal(null);
+    const acc1 = wallet2.createAccount({ mode: 'light' });
+    const acc2 = wallet2.createAccount({ mode: 'light' });
+    const acc3 = wallet2.createAccount({ mode: 'light' });
+
+
+    [acc1, acc2, acc3].forEach((el, i) => {
+      // eslint-disable-next-line no-unused-expressions
+      expect(el).to.exist;
+      expect(el).to.be.a('object');
+      expect(el.constructor.name).to.equal('Account');
+      expect(el.BIP44PATH).to.equal(`m/44'/1'/${i}'`);
+    });
+  });
+
+  it('should be able to create a wallet and account with invalid transport', () => {
+    const wallet3 = new Wallet({
+      mnemonic: 'wisdom claim quote stadium input danger planet angry crucial cargo struggle medal',
+      network: 'testnet',
+      transport: 'haha',
+
+    });
+    expect(wallet3.transport).to.not.equal(null);
+    expect(wallet3.transport.type).to.equal('String');
+
+    const acc1 = wallet3.createAccount({ mode: 'light' });
+    const acc2 = wallet3.createAccount({ mode: 'light' });
+    const acc3 = wallet3.createAccount({ mode: 'light' });
+    [acc1, acc2, acc3].forEach((el, i) => {
+      // eslint-disable-next-line no-unused-expressions
+      expect(el).to.exist;
+      expect(el).to.be.a('object');
+      expect(el.constructor.name).to.equal('Account');
+      expect(el.BIP44PATH).to.equal(`m/44'/1'/${i}'`);
+    });
+    expect(acc1.transport).to.not.equal(null);
+    expect(acc1.transport.type).to.equal('String');
+  });
+
+  it('should not be able to getAddressSummary by invalid vale ', () => {
+    const transport = new InsightClient();
+    return transport.getAddressSummary('address').then(
+      () => Promise.reject(new Error('Expected method to reject.')),
+      err => expect(err).to.be.a('Error').with.property('message', 'Request failed with status code 400'),
+    );
+  });
+  it('should be able to broadcast transaction', () => {
+    const { address } = account.getUnusedAddress();
+    const txOptsInstant = {
+      amount: 10,
+      to: address,
+      isInstantSend: true,
+    };
+    return account.broadcastTransaction(txOptsInstant).then(
+      () => Promise.reject(new Error('Expected method to reject.')),
+      err => expect(err).to.be.a('Error').with.property('message', 'Error: Request failed with status code 400'),
+    );
   });
 });

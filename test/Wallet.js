@@ -85,6 +85,47 @@ describe('Wallet', () => {
       expect(el.BIP44PATH).to.equal(`m/44'/1'/${i}'`);
     });
   });
+
+  it('should not be able to getAddressSummary with fake transport', () => {
+    const network = 'testnet';
+    const config = {
+      seed: privateHDKey1,
+      network,
+      transport: 'fake',
+    };
+    const wallet = new Wallet(config);
+    // eslint-disable-next-line no-unused-expressions
+    expect(wallet).to.exist;
+    expect(wallet).to.be.a('object');
+    expect(wallet.constructor.name).to.equal('Wallet');
+    expect(wallet.transport).to.be.a('object');
+    expect(wallet.HDPrivateKey.toString()).to.equal(privateHDKey1.toString());
+    return wallet.transport.getAddressSummary('fake').then(
+      () => Promise.reject(new Error('Expected method to reject.')),
+      err => expect(err).to.be.a('Error').with.property('message', 'this.transport.getAddressSummary is not a function'),
+    );
+  });
+
+  it('should not be able to getAddressSummary with invalid address', () => {
+    const network = 'testnet';
+    const config = {
+      seed: privateHDKey1,
+      network,
+      transport: 'fake',
+    };
+    const wallet = new Wallet(config);
+    // eslint-disable-next-line no-unused-expressions
+    expect(wallet).to.exist;
+    expect(wallet).to.be.a('object');
+    expect(wallet.constructor.name).to.equal('Wallet');
+    expect(wallet.transport).to.be.a('object');
+    expect(wallet.HDPrivateKey.toString()).to.equal(privateHDKey1.toString());
+    return wallet.transport.getAddressSummary(123).then(
+      () => Promise.reject(new Error('Expected method to reject.')),
+      err => expect(err).to.be.a('Error').with.property('message', 'Received an invalid address to fetch'),
+    );
+  });
+
   it('should reject without network', () => {
     const conf = {
       mnemonic: mnemonic1,
