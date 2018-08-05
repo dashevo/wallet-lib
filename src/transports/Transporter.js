@@ -30,6 +30,14 @@ class Transporter {
     return data;
   }
 
+  async getTransaction(txid) {
+    if (!is.transactionId(txid)) throw new Error('Received an invalid txid to fetch');
+    const data = await this.transport.getTransaction(txid).catch((err) => {
+      throw new Error(err);
+    });
+    return data;
+  }
+
   async getUTXO(address) {
     if (!is.address(address)) throw new Error('Received an invalid address to fetch');
     const data = await this.transport.getUTXO(address).catch((err) => {

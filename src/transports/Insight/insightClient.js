@@ -5,6 +5,7 @@ const axios = require('axios');
 const fakeReq = {
   addr: {},
   utxos: {},
+  transaction: {},
 };
 const defaultOpts = {
   uri: 'https://testnet-insight.dashevo.org/insight-api-dash'
@@ -26,6 +27,14 @@ class InsightClient {
     return fakeReq.addr[address];// throw new Error(address);
   }
 
+  async getTransaction(transaction){
+    if (!fakeReq.transaction[transaction]) {
+      const res = await axios.get(`${this.uri}/tx/${transaction}`);
+      fakeReq.transaction[transaction] = res.data;
+    }
+    return fakeReq.transaction[transaction];// throw new Error(address);
+  }
+
   async getUTXO(address) {
     if (!fakeReq.utxos[address]) {
       const res = await axios.get(`${this.uri}/addr/${address}/utxo`);
@@ -40,7 +49,7 @@ class InsightClient {
       .post(url, { rawtx })
       .then(res => res.data)
       .catch((err) => {
-        // console.log(err)
+        console.log(err)
         throw new Error(err);
       });
   }

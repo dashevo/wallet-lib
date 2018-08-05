@@ -5,11 +5,9 @@ const wallet = new Wallet({
   mnemonic: 'wisdom claim quote stadium input danger planet angry crucial cargo struggle medal',
   network: 'testnet',
   transport: new InsightClient(),
-
 });
 
 const account = wallet.createAccount();
-
 
 account.events.on('prefetched', () => {
   console.log('prefetched');
@@ -18,6 +16,7 @@ account.events.on('discovery_started', () => {
   console.log('discovery_started');
 });
 account.events.on('ready', async () => {
+  // console.log(account.addresses)
   console.log('Funding address', account.getAddress(0, true).address);
   console.log('---');
   console.log('Balance', account.getBalance());
