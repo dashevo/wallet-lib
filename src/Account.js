@@ -5,6 +5,7 @@ const { feeCalculation, is, dashToDuffs } = require('./utils/');
 
 const defaultOptions = {
   mode: 'full',
+  cacheTx: true,
 };
 class Account {
   constructor(wallet, opts = defaultOptions) {
@@ -38,8 +39,12 @@ class Account {
       synced: 'synced',
     };
 
+    this.mode = (opts.mode) ? opts.mode : defaultOptions.mode;
+    this.cacheTx = (opts.cacheTx) ? opts.cacheTx : defaultOptions.cacheTx;
+    this.transactions = {};
+
     // As per BIP44, we prefetch 20 address
-    if (opts && (!opts.mode || opts.mode === 'full')) {
+    if (opts.mode === 'full') {
       this.prefetchFirstAddresses(20);
     }
 
@@ -76,6 +81,8 @@ class Account {
   startSynchronization() {
     // Start fetching address info using transport layer
     const self = this;
+    self.events.emit('started');
+
     this
       .fetchAddressesInfo()
       .then(() => {
@@ -115,19 +122,49 @@ class Account {
     return true;
   }
 
+
   async broadcastTransaction(rawtx, isIs = false) {
     const txid = await this.transport.transport.sendRawTransaction(rawtx, isIs);
     return txid;
   }
 
+  async fetchTransactionInfo(tx) {
+    const self = this;
+    const {
+      txid, blockhash, blockheight, blocktime, fees, size, txlock, valueIn, valueOut, vin, vout,
+    } = await self.transport.getTransaction(tx);
+
+    this.transactions[txid] = {
+      txid,
+      blockhash,
+      blockheight,
+      blocktime,
+      fees,
+      size,
+      txlock,
+    };
+  }
+
   async fetchAddressesInfo() {
     const self = this;
 
+    async function handleTransactions(transactions) {
+      // If we have cacheTx, then we will check if we know this transactions
+      if (transactions.length > 0 && self.cacheTx) {
+        transactions.forEach(async (tx) => {
+          const knownTx = Object.keys(self.transactions);
+          if (!knownTx.includes(tx)) {
+            await self.fetchTransactionInfo(tx);
+          }
+        });
+      }
+
+      return true;
+    }
     async function fetcher(addressId, addressType = 'external') {
       const keys = Object.keys(self.addresses[addressType]);
-      if (keys.length < 1) {
-        self.getAddress(addressId, addressType);
-        return null;
+      if (keys.length <= addressId) {
+        return self.getAddress(addressId, addressType);
       }
 
       const { address, path } = self.addresses[addressType][keys[addressId]];
@@ -143,7 +180,7 @@ class Account {
         });
       }
       const utxo = (balance > 0) ? parseUTXO(await self.transport.getUTXO(address)) : [];
-
+      handleTransactions(transactions);
       self.addresses[addressType][path].balance = balance;
       self.addresses[addressType][path].transactions = transactions;
       self.addresses[addressType][path].fetchedTimes += 1;
@@ -218,13 +255,44 @@ class Account {
     return unused;
   }
 
+  async getTransactionHistory() {
+    let txs = [];
+    const self = this;
+    Object.keys(this.addresses.external).forEach((key) => {
+      const el = this.addresses.external[key];
+      if (el.transactions && el.transactions.length > 0) {
+        txs = txs.concat(el.transactions);
+      }
+    });
+    Object.keys(this.addresses.internal).forEach((key) => {
+      const el = this.addresses.internal[key];
+      if (el.transactions && el.transactions.length > 0) {
+        txs = txs.concat(el.transactions);
+      }
+    });
+
+    txs = txs.filter((item, pos, self) => self.indexOf(item) === pos);
+
+    const p = [];
+    txs.filter(el => ({ tx: p.push(self.getTransaction(el)) }));
+    const history = await Promise.all(p);
+    return history;
+  }
+
+  async getTransaction(id = null) {
+    const self = this;
+    return (id !== null && self.transport) ? (self.transport.getTransaction(id)) : [];
+  }
+
   generateAddress(path) {
     if (!path) throw new Error('Expected path to generate an address');
     const index = path.split('/')[5];
     const type = (path.split('/')[4] === '0') ? 'external' : 'internal';
 
     const privateKey = this.RootHDPrivateKey.derive(path);
-    const address = new Dashcore.Address(privateKey.publicKey, this.network).toString();
+
+    const address = new Dashcore.Address(privateKey.publicKey.toAddress(), this.network).toString();
+
     const addressData = {
       path,
       index,
