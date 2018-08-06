@@ -1,12 +1,14 @@
 const { is } = require('../utils/index');
+const InsightClient = require('../transports/Insight/insightClient');
+const DAPIClient = require('../transports/DAPI/DapiClient');
 
 function isValidTransport(transport) {
   return !!(transport);
 }
 
 const transportList = {
-  Insight: require('../transports/Insight/insightClient'),
-  DAPIClient: require('../transports/DAPI/DapiClient'),
+  Insight: InsightClient,
+  DAPIClient,
 };
 
 class Transporter {
@@ -44,6 +46,11 @@ class Transporter {
       throw new Error(err);
     });
     return data;
+  }
+
+  async subscribeToAddress(address, cb) {
+    if (!is.address(address)) throw new Error('Received an invalid address to fetch');
+    return this.transport.subscribeToAddress(address, cb);
   }
 }
 module.exports = Transporter;

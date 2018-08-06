@@ -1,11 +1,14 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
-const { BIP44_LIVENET_ROOT_PATH, BIP44_TESTNET_ROOT_PATH, BIP44_ADDRESS_GAP } = require('./Constants');
+const { BIP44_LIVENET_ROOT_PATH, BIP44_TESTNET_ROOT_PATH } = require('./Constants');
 const { feeCalculation, is, dashToDuffs } = require('./utils/');
+const SyncWorker = require('./plugins/SyncWorker');
+const BIP44Worker = require('./plugins/BIP44Worker');
 
 const defaultOptions = {
   mode: 'full',
   cacheTx: true,
+  subscribe: true,
 };
 class Account {
   constructor(wallet, opts = defaultOptions) {
@@ -21,48 +24,53 @@ class Account {
       : `${BIP44_TESTNET_ROOT_PATH}/${accountIndex}'`;
 
     this.network = wallet.network;
-    this.RootHDPrivateKey = wallet.HDPrivateKey;
-    this.addresses = {
-      external: {}, // receive addr
-      internal: {}, // change addr
-    };
+
+    this.transactions = {};
+
     this.label = (opts && opts.label && is.string(opts.label)) ? opts.label : null;
 
-    this.adapter = wallet.adapter;
     // If transport is null or invalid, we won't try to fetch anything
     this.transport = wallet.transport;
 
     this.addAccountToWallet(wallet);
 
-    this.synced = false;
-    this.eventConstants = {
-      synced: 'synced',
-    };
+    this.store = wallet.storage.store;
+    this.storage = wallet.storage;
+    this.storage.importAccount({
+      label: this.label,
+      path: this.BIP44PATH,
+      network: this.network,
+    });
+    this.keychain = wallet.keychain;
 
     this.mode = (opts.mode) ? opts.mode : defaultOptions.mode;
     this.cacheTx = (opts.cacheTx) ? opts.cacheTx : defaultOptions.cacheTx;
-    this.transactions = {};
+    this.workers = {};
 
     // As per BIP44, we prefetch 20 address
     if (opts.mode === 'full') {
-      this.prefetchFirstAddresses(20);
+      this.workers.bip44 = new BIP44Worker({
+        storage: this.storage,
+        getAddress: this.getAddress.bind(this),
+      });
+      this.workers.bip44.startWorker();
     }
 
     if (this.transport !== null) {
-      this.startSynchronization();
+      this.workers.sync = new SyncWorker({
+        events: this.events,
+        storage: this.storage,
+        fetchAddressInfo: this.fetchAddressInfo.bind(this),
+        transport: this.transport,
+      });
+      this.workers.sync.startWorker();
     }
-  }
 
-  prefetchFirstAddresses(nbAddress = 20) {
-    for (let index = 0; index < nbAddress; index += 1) {
-      // External
-      const externalPath = `${this.BIP44PATH}/0/${index}`;
-      this.generateAddress(externalPath);
-
-      // Internal
-      const internalPath = `${this.BIP44PATH}/1/${index}`;
-      this.generateAddress(internalPath);
-    }
+    const self = this;
+    self.events.emit('started');
+    setTimeout(() => {
+      self.events.emit('ready');
+    }, 1000);
   }
 
   addAccountToWallet(wallet) {
@@ -75,66 +83,19 @@ class Account {
     }
   }
 
-  /**
-   * Start the process of synchronisation process if the transport layer is passed
-   */
-  startSynchronization() {
-    // Start fetching address info using transport layer
-    const self = this;
-    self.events.emit('started');
-
-    this
-      .fetchAddressesInfo()
-      .then(() => {
-        self.events.emit('prefetched');
-      })
-
-      .then(this.startSelfDiscoveryWorker.bind(this))
-      .then(this.startAddressListener.bind(this))
-      .then(this.startAddressBloomfilter.bind(this))
-      .then(() => {
-        self.events.emit('discovery_started');
-      })
-      .then(() => {
-        self.events.emit('ready');
-      });
-    // .catch((err) => {
-    //   throw new Error(err);
-    // });
-  }
-
-  async startAddressBloomfilter() {
-    // TODO : Setup bloomfilter
-    this.synced = true;
-    return true;
-  }
-
-  async startAddressListener() {
-    // TODO : Start Address listening
-    this.synced = true;
-    return true;
-  }
-
-  async startSelfDiscoveryWorker() {
-    // TODO : We also should continue the discovery
-    // based on used/unused (as per BIP44 always have 20+ addr)
-    this.synced = true;
-    return true;
-  }
-
-
   async broadcastTransaction(rawtx, isIs = false) {
     const txid = await this.transport.transport.sendRawTransaction(rawtx, isIs);
     return txid;
   }
 
-  async fetchTransactionInfo(tx) {
-    const self = this;
-    const {
-      txid, blockhash, blockheight, blocktime, fees, size, txlock, valueIn, valueOut, vin, vout,
-    } = await self.transport.getTransaction(tx);
 
-    this.transactions[txid] = {
+  async fetchTransactionInfo(tx) {
+    // valueIn, valueOut, vin, vout,
+    const {
+      txid, blockhash, blockheight, blocktime, fees, size, txlock,
+    } = await this.transport.getTransaction(tx);
+
+    return {
       txid,
       blockhash,
       blockheight,
@@ -145,83 +106,47 @@ class Account {
     };
   }
 
-  async fetchAddressesInfo() {
+  async fetchAddressInfo(addressObj, fetchUtxo = true) {
     const self = this;
+    const { address, path } = addressObj;
+    const { balance, transactions } = await this.transport.getAddressSummary(address);
+    const addrInfo = {
+      address,
+      path,
+      balance,
+      transactions,
+      fetchedLast: +new Date(),
+    };
 
-    async function handleTransactions(transactions) {
+    if (transactions.length > 0) {
+      addrInfo.used = true;
+
       // If we have cacheTx, then we will check if we know this transactions
-      if (transactions.length > 0 && self.cacheTx) {
+      if (self.cacheTx) {
         transactions.forEach(async (tx) => {
-          const knownTx = Object.keys(self.transactions);
+          const knownTx = Object.keys(self.store.transactions);
           if (!knownTx.includes(tx)) {
-            await self.fetchTransactionInfo(tx);
+            const txInfo = await self.fetchTransactionInfo(tx);
+            await self.storage.importTransactions(txInfo);
           }
         });
       }
-
-      return true;
     }
-    async function fetcher(addressId, addressType = 'external') {
-      const keys = Object.keys(self.addresses[addressType]);
-      if (keys.length <= addressId) {
-        return self.getAddress(addressId, addressType);
-      }
 
-      const { address, path } = self.addresses[addressType][keys[addressId]];
-      const sum = await self.transport.getAddressSummary(address);
-      const { balance, transactions } = sum;
-
-      // We do not need to fetch UTXO if we don't have any money there :)
-      function parseUTXO(utxos) {
-        return utxos.filter((utxo) => {
-          const utxoRes = utxo;
-          delete utxoRes.confirmations;
-          return utxoRes;
-        });
-      }
+    // We do not need to fetch UTXO if we don't have any money there :)
+    function parseUTXO(utxos) {
+      return utxos.filter((utxo) => {
+        const utxoRes = utxo;
+        delete utxoRes.confirmations;
+        return utxoRes;
+      });
+    }
+    if (fetchUtxo) {
       const utxo = (balance > 0) ? parseUTXO(await self.transport.getUTXO(address)) : [];
-      handleTransactions(transactions);
-      self.addresses[addressType][path].balance = balance;
-      self.addresses[addressType][path].transactions = transactions;
-      self.addresses[addressType][path].fetchedTimes += 1;
-      self.addresses[addressType][path].utxos = utxo;
-
-      if (transactions.length > 0) self.addresses[addressType][path].used = true;
-
-      return self.addresses[addressType][path];
+      addrInfo.utxos = utxo;
     }
-
-    async function processMultipleFetch(startValue, numberOfElements, addressType) {
-      const tasks = [];
-      for (let i = startValue; i < startValue + numberOfElements; i += 1) {
-        tasks.push(() => fetcher(i, addressType));
-      }
-      const promises = tasks.map(task => task());
-      await Promise.all(promises);
-    }
-
-    // Process in parallel the 20 first item (as per BIP44 GAP rules)
-    await processMultipleFetch(0, BIP44_ADDRESS_GAP, 'external');
-    await processMultipleFetch(0, BIP44_ADDRESS_GAP, 'internal');
-
-    let unusedAddress = 0;
-
-    Object.keys(self.addresses.external).forEach((k) => {
-      const el = self.addresses.external[k];
-      if (el.used === false) unusedAddress += 1;
-    });
-
-    if (BIP44_ADDRESS_GAP > unusedAddress) {
-      const missingAddressNb = BIP44_ADDRESS_GAP - unusedAddress;
-      const addressKeys = Object.keys(this.addresses.external);
-      const lastElem = this.addresses.external[addressKeys[addressKeys.length - 1]];
-      const addressIndex = parseInt(lastElem.index, 10);
-
-      for (let i = addressIndex + 1; i < addressIndex + 1 + missingAddressNb; i += 1) {
-        this.getAddress(i);
-        this.getAddress(i, false);
-      }
-    }
+    console.log(addrInfo);
+    return addrInfo;
   }
 
   getAddresses(external = true) {
@@ -232,7 +157,7 @@ class Account {
   getAddress(index = 0, external = true) {
     const type = (external) ? 'external' : 'internal';
     const path = (external) ? `${this.BIP44PATH}/0/${index}` : `${this.BIP44PATH}/1/${index}`;
-    const addressType = this.addresses[type];
+    const addressType = this.store.addresses[type];
     return (addressType[path]) ? addressType[path] : this.generateAddress(path);
   }
 
@@ -240,10 +165,10 @@ class Account {
     const type = (external) ? 'external' : 'internal';
     let unused = null;
     let skipped = 0;
-    const keys = Object.keys(this.addresses[type]);
+    const keys = Object.keys(this.store.addresses[type]);
     // eslint-disable-next-line array-callback-return
     keys.some((key) => {
-      const el = (this.addresses[type][key]);
+      const el = (this.store.addresses[type][key]);
       if (!el.used) {
         if (skipped === skip) {
           unused = el;
@@ -257,15 +182,14 @@ class Account {
 
   async getTransactionHistory() {
     let txs = [];
-    const self = this;
-    Object.keys(this.addresses.external).forEach((key) => {
-      const el = this.addresses.external[key];
+    Object.keys(this.store.addresses.external).forEach((key) => {
+      const el = this.store.addresses.external[key];
       if (el.transactions && el.transactions.length > 0) {
         txs = txs.concat(el.transactions);
       }
     });
-    Object.keys(this.addresses.internal).forEach((key) => {
-      const el = this.addresses.internal[key];
+    Object.keys(this.store.addresses.internal).forEach((key) => {
+      const el = this.store.addresses.internal[key];
       if (el.transactions && el.transactions.length > 0) {
         txs = txs.concat(el.transactions);
       }
@@ -274,6 +198,7 @@ class Account {
     txs = txs.filter((item, pos, self) => self.indexOf(item) === pos);
 
     const p = [];
+    const self = this;
     txs.filter(el => ({ tx: p.push(self.getTransaction(el)) }));
     const history = await Promise.all(p);
     return history;
@@ -287,9 +212,7 @@ class Account {
   generateAddress(path) {
     if (!path) throw new Error('Expected path to generate an address');
     const index = path.split('/')[5];
-    const type = (path.split('/')[4] === '0') ? 'external' : 'internal';
-
-    const privateKey = this.RootHDPrivateKey.derive(path);
+    const privateKey = this.keychain.getKeyForPath(path);
 
     const address = new Dashcore.Address(privateKey.publicKey.toAddress(), this.network).toString();
 
@@ -297,14 +220,14 @@ class Account {
       path,
       index,
       address,
-      privateKey,
+      // privateKey,
       transactions: [],
       balance: 0,
       utxos: [],
-      fetchedTimes: 0,
+      fetchedLast: 0,
       used: false,
     };
-    this.addresses[type][path] = addressData;
+    this.storage.importAddresses(addressData);
     return addressData;
   }
 
@@ -315,12 +238,23 @@ class Account {
    */
   getBalance() {
     let balance = 0;
-    Object.keys(this.addresses.external).forEach((key) => {
-      balance += this.addresses.external[key].balance;
-    });
-    Object.keys(this.addresses.internal).forEach((key) => {
-      balance += this.addresses.internal[key].balance;
-    });
+    console.log('REQUEST TO BALANCE');
+    const { addresses } = this.storage.getStore();
+    const { external, internal } = addresses;
+    const externalPaths = (external && Object.keys(external)) || [];
+    const internalPaths = (internal && Object.keys(internal)) || [];
+    if (externalPaths.length > 0) {
+      externalPaths.forEach((path) => {
+        balance += external[path].balance;
+      });
+    }
+    if (externalPaths.length > 0) {
+      internalPaths.forEach((key) => {
+        balance += internal[key].balance;
+      });
+    }
+
+    console.log('RESULT OF', balance);
     return balance;
   }
 
@@ -328,11 +262,11 @@ class Account {
     let utxos = [];
 
     const self = this;
-    const subwallets = Object.keys(this.addresses);
+    const subwallets = Object.keys(this.store.addresses);
     subwallets.forEach((subwallet) => {
-      const paths = Object.keys(self.addresses[subwallet]);
+      const paths = Object.keys(self.store.addresses[subwallet]);
       paths.forEach((path) => {
-        const address = self.addresses[subwallet][path];
+        const address = self.store.addresses[subwallet][path];
         if (address.utxos) {
           if (!(onlyAvailable && address.locked)) {
             const utxo = address.utxos;
@@ -355,7 +289,11 @@ class Account {
       throw new Error('A recipient is expected to create a transaction');
     }
     const utxos = this.getUTXOS();
-    if (!utxos || utxos.length === 0) return tx;
+    if (!utxos || utxos.length === 0) {
+      if (this.getBalance() > 0) {
+        // In this case, we just don't have proper UTXO
+      } else { return tx; }
+    }
 
     const inputs = [utxos[0]];
 
@@ -383,6 +321,8 @@ class Account {
     }
 
     const privateKeys = this.getPrivateKeys(utxos.map(el => ((el.address))));
+
+    console.log(privateKeys);
     const signedTx = this.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
 
     return signedTx.toString();
@@ -407,13 +347,14 @@ class Account {
     let privKeys = [];
 
     const self = this;
-    const subwallets = Object.keys(this.addresses);
+    const subwallets = Object.keys(this.store.addresses);
     subwallets.forEach((subwallet) => {
-      const paths = Object.keys(self.addresses[subwallet]);
+      const paths = Object.keys(self.store.addresses[subwallet]);
       paths.forEach((path) => {
-        const address = self.addresses[subwallet][path];
+        const address = self.store.addresses[subwallet][path];
         if (addressList.includes(address.address)) {
-          privKeys = privKeys.concat([address.privateKey.privateKey]);
+          privKeys = privKeys.concat([self.keychain.getKeyForPath(address.path).privateKey]);
+          // privKeys = privKeys.concat([address.privateKey.privateKey]);
         }
       });
     });

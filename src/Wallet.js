@@ -1,4 +1,6 @@
 const DashcoreLib = require('@dashevo/dashcore-lib');
+const Storage = require('./Storage');
+const KeyChain = require('./KeyChain');
 
 // const { Registration, TopUp } = DashcoreLib.Transaction.SubscriptionTransactions;
 const {
@@ -50,11 +52,29 @@ class Wallet {
     }
 
     this.adapter = (opts.adapter) ? opts.adapter : null;
+    this.adapter.config();
+
+    this.storage = new Storage({
+      adapter: this.adapter,
+    });
+    this.store = this.storage.store;
+
+    // Handle import of cache
+    if (opts.cache) {
+      if (opts.cache.transactions) {
+        this.storage.importTransactions(opts.cache.transactions);
+      }
+      if (opts.cache.addresses) {
+        this.storage.importAddresses(opts.cache.addresses);
+      }
+    }
+
     // If transport is null, we won't try to fetch anything
     this.transport = (opts.transport) ? new Transporter(opts.transport) : null;
 
     this.accounts = [];
     this.HDPrivateKey = HDPrivateKey;
+    this.keychain = new KeyChain(this.HDPrivateKey);
     this.mnemonic = mnemonic; // We keep it only for the export function..
     this.interface = opts.interface;
     this.savedBackup = false; // When true, we delete mnemonic from internals
