@@ -180,6 +180,7 @@ class Account {
   }
 
   async getTransactionHistory() {
+    const self = this;
     let txs = [];
     Object.keys(this.store.addresses.external).forEach((key) => {
       const el = this.store.addresses.external[key];
@@ -196,9 +197,40 @@ class Account {
 
     txs = txs.filter((item, pos, self) => self.indexOf(item) === pos);
     const p = [];
-    const self = this;
     txs.filter(el => ({ tx: p.push(self.getTransaction(el)) }));
-    const history = await Promise.all(p);
+    const resolvedPromises = await Promise.all(p);
+
+    function cleanUnknownAddr(data) {
+      const knownAddr = [];
+      Object.keys(self.store.addresses.external).forEach((key) => {
+        const el = self.store.addresses.external[key];
+        knownAddr.push(el.address);
+      });
+      Object.keys(self.store.addresses.internal).forEach((key) => {
+        const el = self.store.addresses.internal[key];
+        knownAddr.push(el.address);
+      });
+      Object.keys(self.store.addresses.misc).forEach((key) => {
+        const el = self.store.addresses.misc[key];
+        knownAddr.push(el.address);
+      });
+
+      return data.filter(el => (knownAddr.includes(el.address)))[0];
+    }
+    const history = resolvedPromises.map((el) => {
+      const cleanElement = {
+        type: 'receive',
+        txid: el.txid,
+        time: el.time,
+        from: el.vin.map(vin => vin.addr),
+      };
+      cleanElement.to = cleanUnknownAddr(el.vout.map(vout => ({
+        address: vout.scriptPubKey.addresses[0],
+        amount: vout.value,
+      })));
+
+      return cleanElement;
+    });
 
     return history;
   }
