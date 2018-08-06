@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const { Wallet } = require('../src/index');
 const { Account } = require('../src/index');
 const { mnemonicString1, mnemonicString2 } = require('./fixtures.json');
-
+const { Transaction, PrivateKey} = require('@dashevo/dashcore-lib');
 // const seed1 = new Mnemonic(mnemonic1).toSeed();
 // const dapiClient = 'placeholder';
 // const network = 'testnet';
@@ -25,12 +25,13 @@ const walletConfigs = {
     mnemonic: mnemonicString2,
   },
 };
+
 const walletTestnet = new Wallet(walletConfigs.testnet);
 const walletLivenet = new Wallet(walletConfigs.livenet);
 const walletFakeTransportTestnet = new Wallet(walletConfigs.fakeTransportTestnet);
 const walletFakeTransportLivenet = new Wallet(walletConfigs.fakeTransportLivenet);
 
-describe('Account', () => {
+describe('Account', function suite() {
   it('should create an account using testnet network', () => {
     const accountTestnet = walletTestnet.createAccount({ mode: 'light' }); // Should derivate
     // eslint-disable-next-line no-unused-expressions
@@ -62,9 +63,12 @@ describe('Account', () => {
     });
     expect(account.label).to.equal(label);
   });
-
-  it('should be able to derivate an address for testnet', () => {
+  this.timeout(60000);
+  it('should be able to derivate an address for testnet', (done) => {
     const accountTestnet = walletFakeTransportTestnet.createAccount();
+    accountTestnet.events.on('ready', () => {
+      done();
+    });
     const addressData = accountTestnet.getAddress(0, true);
     expect(addressData).to.have.property('address');
     const { address, path } = addressData;
@@ -137,7 +141,7 @@ describe('Account', () => {
     const rawtx = account.createTransaction(options);
     return account.broadcastTransaction(rawtx).then(
       () => Promise.reject(new Error('Expected method to reject.')),
-      err => expect(err).to.be.a('Error').with.property('message', 'Cannot read property \'transport\' of null'),
+      err => expect(err).to.be.a('Error').with.property('message', 'Cannot read property \'sendRawTransaction\' of null'),
     );
   });
 
@@ -152,9 +156,10 @@ describe('Account', () => {
     const rawtx = account.createTransaction(options);
     return account.broadcastTransaction(rawtx).then(
       () => Promise.reject(new Error('Expected method to reject.')),
-      err => expect(err).to.be.a('Error').with.property('message', 'Cannot read property \'transport\' of null'),
+      err => expect(err).to.be.a('Error').with.property('message', 'Cannot read property \'sendRawTransaction\' of null'),
     );
   });
+
   it('should not be able to sign without parameters', () => {
     const account = walletFakeTransportTestnet.createAccount();
     expect(() => account.sign()).to.throw('Require one or multiple privateKeys to sign');
@@ -170,6 +175,13 @@ describe('Account', () => {
     const account = walletFakeTransportTestnet.createAccount();
     const privateKeys = account.getPrivateKeys(account.getUTXOS().map(el => ((el.address))));
     expect(() => account.sign([1, 1, 2], privateKeys)).to.throw('nhandled object of type Array');
+  });
+  after((done) => {
+    walletTestnet.disconnect();
+    walletLivenet.disconnect();
+    walletFakeTransportTestnet.disconnect();
+    walletFakeTransportLivenet.disconnect();
+    done();
   });
 });
 

@@ -1,5 +1,7 @@
 const DashcoreLib = require('@dashevo/dashcore-lib');
-
+const InMem = require('./adapters/InMem');
+const Storage = require('./Storage');
+const KeyChain = require('./KeyChain');
 // const { Registration, TopUp } = DashcoreLib.Transaction.SubscriptionTransactions;
 const {
   generateNewMnemonic,
@@ -12,6 +14,7 @@ const Transporter = require('./transports/Transporter');
 
 const defaultOptions = {
   network: 'testnet',
+  adapter: new InMem(),
 };
 
 /**
@@ -22,7 +25,7 @@ const defaultOptions = {
 class Wallet {
   /**
    *
-   * @param config
+   * @param opts
    */
   constructor(opts = defaultOptions) {
     let HDPrivateKey = null;
@@ -49,12 +52,30 @@ class Wallet {
       HDPrivateKey = mnemonicToSeed(mnemonic, this.network, passphrase);
     }
 
-    this.adapter = (opts.adapter) ? opts.adapter : null;
+    this.adapter = (opts.adapter) ? opts.adapter : defaultOptions.adapter;
+    this.adapter.config();
+
+    this.storage = new Storage({
+      adapter: this.adapter,
+    });
+    this.store = this.storage.store;
+
+    // Handle import of cache
+    if (opts.cache) {
+      if (opts.cache.transactions) {
+        this.storage.importTransactions(opts.cache.transactions);
+      }
+      if (opts.cache.addresses) {
+        this.storage.importAddresses(opts.cache.addresses);
+      }
+    }
+
     // If transport is null, we won't try to fetch anything
     this.transport = (opts.transport) ? new Transporter(opts.transport) : null;
 
     this.accounts = [];
     this.HDPrivateKey = HDPrivateKey;
+    this.keychain = new KeyChain(this.HDPrivateKey);
     this.mnemonic = mnemonic; // We keep it only for the export function..
     this.interface = opts.interface;
     this.savedBackup = false; // When true, we delete mnemonic from internals
@@ -65,7 +86,7 @@ class Wallet {
    * @param {object} account options
    * @return {account} - account object
    */
-  createAccount(accountOpts) {
+  createAccount(accountOpts = {}) {
     // if(this.accounts[])
     // Auto-populate this.accounts, probably not what we want ?
     return new Account(this, accountOpts);
@@ -82,6 +103,18 @@ class Wallet {
       return mnemonic.toString();
     }
     return (toHDPrivateKey) ? this.HDPrivateKey : exportMnemonic(this.mnemonic);
+  }
+
+  disconnect() {
+    if (this.storage) {
+      this.storage.stopWorker();
+    }
+    if (this.accounts) {
+      const accountPath = Object.keys(this.accounts);
+      accountPath.forEach((path) => {
+        this.accounts[path].disconnect();
+      });
+    }
   }
 }
 

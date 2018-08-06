@@ -4,9 +4,9 @@
   "description": "Light wallet library for Dash",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint .",
+    "lint": "eslint src/*",
     "lint:fix": "eslint . --fix",
-    "test": "nyc --check-coverage --reporter=html --reporter=text mocha --recursive test/*"
+    "test": "nyc --check-coverage --reporter=html --reporter=text mocha test/ --recursive"
   },
   "repository": {
     "type": "git",
@@ -27,7 +27,9 @@
     "@dashevo/dapi-sdk": "git+https://github.com/dashevo/dapi-client.git",
     "@dashevo/dashcore-lib": "git+ssh://git@github.com/dashevo/dashcore-lib.git#evo",
     "@dashevo/dashcore-mnemonic": "^1.5.0",
-    "axios": "^0.18.0"
+    "axios": "^0.18.0",
+    "localforage": "^1.7.2",
+    "socket.io-client": "^2.1.1"
   },
   "devDependencies": {
     "chai": "^4.1.2",

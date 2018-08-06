@@ -4,13 +4,13 @@ function generateNewMnemonic() {
   return Mnemonic();
 }
 
-function HDPrivateKeyToMnemonic(HDPrivKey) {
-  // todo : Is this even possible ?
-  const seed = HDPrivKey.toSeed();
-  // console.log(seed)
-  // eslint-disable-next-line new-cap
-  return new Mnemonic.fromSeed(seed, Mnemonic.Words.ENGLISH);
-}
+// function HDPrivateKeyToMnemonic(HDPrivKey) {
+// todo : Is this even possible ?
+// const seed = HDPrivKey.toSeed();
+// console.log(seed)
+// eslint-disable-next-line new-cap
+// return new Mnemonic.fromSeed(seed, Mnemonic.Words.ENGLISH);
+// }
 /**
  * Will return the HDPrivateKey from a Mnemonic
  * @param {Mnemonic|String} mnemonic
@@ -29,6 +29,6 @@ function mnemonicToSeed(mnemonic, network, passphrase = '') {
 
 module.exports = {
   generateNewMnemonic,
-  HDPrivateKeyToMnemonic,
+  // HDPrivateKeyToMnemonic,
   mnemonicToSeed,
 };
