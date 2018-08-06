@@ -36,19 +36,19 @@ class Account {
 
     this.store = wallet.storage.store;
     this.storage = wallet.storage;
-    this.storage.importAccount({
+    this.storage.importAccounts({
       label: this.label,
       path: this.BIP44PATH,
       network: this.network,
     });
     this.keychain = wallet.keychain;
-
     this.mode = (opts.mode) ? opts.mode : defaultOptions.mode;
+
     this.cacheTx = (opts.cacheTx) ? opts.cacheTx : defaultOptions.cacheTx;
     this.workers = {};
 
     // As per BIP44, we prefetch 20 address
-    if (opts.mode === 'full') {
+    if (this.mode === 'full') {
       this.workers.bip44 = new BIP44Worker({
         storage: this.storage,
         getAddress: this.getAddress.bind(this),
@@ -70,7 +70,7 @@ class Account {
     self.events.emit('started');
     setTimeout(() => {
       self.events.emit('ready');
-    }, 1000);
+    }, 5000);
   }
 
   addAccountToWallet(wallet) {
@@ -84,7 +84,7 @@ class Account {
   }
 
   async broadcastTransaction(rawtx, isIs = false) {
-    const txid = await this.transport.transport.sendRawTransaction(rawtx, isIs);
+    const txid = await this.transport.sendRawTransaction(rawtx, isIs);
     return txid;
   }
 
@@ -145,13 +145,12 @@ class Account {
       const utxo = (balance > 0) ? parseUTXO(await self.transport.getUTXO(address)) : [];
       addrInfo.utxos = utxo;
     }
-    console.log(addrInfo);
     return addrInfo;
   }
 
   getAddresses(external = true) {
     const type = (external) ? 'external' : 'internal';
-    return this.addresses[type];
+    return this.store.addresses[type];
   }
 
   getAddress(index = 0, external = true) {
@@ -196,11 +195,11 @@ class Account {
     });
 
     txs = txs.filter((item, pos, self) => self.indexOf(item) === pos);
-
     const p = [];
     const self = this;
     txs.filter(el => ({ tx: p.push(self.getTransaction(el)) }));
     const history = await Promise.all(p);
+
     return history;
   }
 
@@ -238,7 +237,6 @@ class Account {
    */
   getBalance() {
     let balance = 0;
-    console.log('REQUEST TO BALANCE');
     const { addresses } = this.storage.getStore();
     const { external, internal } = addresses;
     const externalPaths = (external && Object.keys(external)) || [];
@@ -253,8 +251,6 @@ class Account {
         balance += internal[key].balance;
       });
     }
-
-    console.log('RESULT OF', balance);
     return balance;
   }
 
@@ -275,7 +271,7 @@ class Account {
         }
       });
     });
-
+    utxos = utxos.sort((a, b) => b.satoshis - a.satoshis);
     return utxos;
   }
 
@@ -322,7 +318,6 @@ class Account {
 
     const privateKeys = this.getPrivateKeys(utxos.map(el => ((el.address))));
 
-    console.log(privateKeys);
     const signedTx = this.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
 
     return signedTx.toString();
@@ -360,6 +355,21 @@ class Account {
     });
 
     return privKeys;
+  }
+
+  disconnect() {
+    if (this.transport) {
+      this.transport.disconnect();
+    }
+    if (this.workers) {
+      const workersKey = Object.keys(this.workers);
+      workersKey.forEach((key) => {
+        this.workers[key].stopWorker();
+      });
+    }
+    if (this.storage) {
+      this.storage.stopWorker();
+    }
   }
 }
 

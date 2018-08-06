@@ -10,6 +10,7 @@ const fakeReq = {
 const defaultOpts = {
   uri: 'https://testnet-insight.dashevo.org/insight-api-dash',
   socketUri: 'https://testnet-insight.dashevo.org/',
+  useSocket: true,
 };
 /**
  * Temporary class to perform request on insight instead of DAPI
@@ -21,16 +22,25 @@ class InsightClient {
     this.socketUri = (opts.socketUri)
       ? opts.socketUri
       : defaultOpts.socketUri;
+    this.useSocket = (opts.useSocket === null) ? defaultOpts.useSocket : opts.useSocket;
 
-    this.socket = io(this.socketUri, { transports: ['websocket'] });
-    this.socket.emit('subscribe', 'inv');
-    this.socket.on('connect', () => console.log('Socket connected!'));
-    this.socket.on('block', block => console.log('block', block));
-    this.socket.on('tx', tx => console.log('tx', tx));
-    this.socket.on('txlock', txlock => console.log('txlock', txlock));
-    this.socket.on('event', event => console.log('event', event));
-    this.socket.on('disconnect', disconnect => console.log('disconnect', disconnect));
-    this.socket.on('disconnect', error => console.log('error', error));
+    if (this.useSocket) {
+      this.socket = io(this.socketUri, { transports: ['websocket'] });
+      this.socket.emit('subscribe', 'inv');
+      this.socket.on('connect', () => console.log('Socket connected!'));
+      this.socket.on('block', block => console.log('block', block));
+      this.socket.on('tx', tx => console.log('tx', tx));
+      this.socket.on('txlock', txlock => console.log('txlock', txlock));
+      this.socket.on('event', event => console.log('event', event));
+      this.socket.on('disconnect', disconnect => console.log('disconnect', disconnect));
+      this.socket.on('error', error => console.log('error', error));
+    }
+  }
+
+  closeSocket() {
+    if (this.useSocket) {
+      this.socket.close();
+    }
   }
 
   async getAddressSummary(address) {
@@ -69,9 +79,11 @@ class InsightClient {
   }
 
   async subscribeToAddress(address, cb) {
-    console.log('Emit :Subscribe/', address);
-    this.socket.emit('subscribe', 'dashd/addresstxid', [address]);
-    this.socket.on('dashd/addresstxid', cb);
+    if (this.useSocket) {
+      this.socket.emit('subscribe', 'dashd/addresstxid', [address]);
+      this.socket.on('dashd/addresstxid', cb);
+    }
+
     return true;
   }
 }

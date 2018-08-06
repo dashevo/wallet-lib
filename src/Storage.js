@@ -20,19 +20,24 @@ class Storage {
     this.lastModified = null;
 
 
-    this.init();
     this.interval = setInterval(() => {
-      console.log('check state', Date.now(), this.lastModified, this.lastSave);
-
       if (this.lastModified > this.lastSave) {
-        console.log('Fired a saving');
         this.saveState();
       }
     }, 30 * 1000);
+    setTimeout(() => {
+      this.init();
+    }, 1);
+  }
+
+  stopWorker() {
+    clearInterval(this.interval);
+    this.interval = null;
+    return true;
   }
 
   getStore() {
-    return Object.assign(this.store, {});
+    return Object.assign({}, this.store);
   }
 
   async init() {
@@ -40,9 +45,9 @@ class Storage {
   }
 
   async rehydrateState() {
-    this.store.transactions = await this.adapter.getItem('transactions') || this.store.transactions;
-    this.store.addresses = await this.adapter.getItem('addresses') || this.store.addresses;
-    this.store.accounts = await this.adapter.getItem('accounts') || this.store.accounts;
+    this.store.transactions = (this.adapter) ? (await this.adapter.getItem('transactions') || this.store.transactions) : this.store.transactions;
+    this.store.addresses = (this.adapter) ? (await this.adapter.getItem('addresses') || this.store.addresses) : this.store.addresses;
+    this.store.accounts = (this.adapter) ? (await this.adapter.getItem('accounts') || this.store.accounts) : this.store.accounts;
     this.lastRehydrate = +new Date();
   }
 
@@ -52,9 +57,10 @@ class Storage {
     await this.adapter.setItem('addresses', { ...self.store.addresses });
     await this.adapter.setItem('accounts', { ...self.store.accounts });
     this.lastSave = +new Date();
+    return true;
   }
 
-  async importTransactions(transactions) {
+  importTransactions(transactions) {
     const type = transactions.constructor.name;
     const txList = this.store.transactions;
 
@@ -80,9 +86,10 @@ class Storage {
     } else {
       throw new Error('Not implemented. Please create an issue on github if needed.');
     }
+    return true;
   }
 
-  async importAccount(accounts) {
+  importAccounts(accounts) {
     const type = accounts.constructor.name;
     const accList = this.store.accounts;
 
@@ -109,9 +116,10 @@ class Storage {
     } else {
       throw new Error('Not implemented. Please create an issue on github if needed.');
     }
+    return true;
   }
 
-  async updateAddress(address) {
+  updateAddress(address) {
     const addressesStore = this.store.addresses;
     const { path } = address;
     if (!path) throw new Error('Expected path to update an address');
@@ -130,10 +138,10 @@ class Storage {
 
     addressesStore[type][path] = address;
     this.lastModified = Date.now();
-    console.log('updated addr', address, type, path);
+    return true;
   }
 
-  async importAddresses(addresses) {
+  importAddresses(addresses) {
     const addressesStore = this.store.addresses;
     const self = this;
 
@@ -181,6 +189,7 @@ class Storage {
     } else {
       throw new Error('Not implemented. Please create an issue on github if needed.');
     }
+    return true;
   }
 }
 

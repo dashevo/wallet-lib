@@ -14,8 +14,6 @@ const is = {
   undef: val => val === undefined,
   null: val => val === null,
   promise: fn => fn && is.fn(fn.then) && is.fn(fn.catch),
-  obs: obs => is.fn(obs) && is.fn(obs.set),
-  event: ev => is.fn(ev.listen) && is.fn(ev.broadcast),
   JSON(val) { try { JSON.stringify(val); return true; } catch (e) { return false; } },
   stringified(val) { try { JSON.parse(val); return true; } catch (e) { return false; } },
   mnemonic: mnemonic => is.string(mnemonic) || is.type(mnemonic, 'Mnemonic'),

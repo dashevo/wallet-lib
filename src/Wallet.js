@@ -1,7 +1,7 @@
 const DashcoreLib = require('@dashevo/dashcore-lib');
+const InMem = require('./adapters/InMem');
 const Storage = require('./Storage');
 const KeyChain = require('./KeyChain');
-
 // const { Registration, TopUp } = DashcoreLib.Transaction.SubscriptionTransactions;
 const {
   generateNewMnemonic,
@@ -14,6 +14,7 @@ const Transporter = require('./transports/Transporter');
 
 const defaultOptions = {
   network: 'testnet',
+  adapter: new InMem(),
 };
 
 /**
@@ -24,7 +25,7 @@ const defaultOptions = {
 class Wallet {
   /**
    *
-   * @param config
+   * @param opts
    */
   constructor(opts = defaultOptions) {
     let HDPrivateKey = null;
@@ -51,7 +52,7 @@ class Wallet {
       HDPrivateKey = mnemonicToSeed(mnemonic, this.network, passphrase);
     }
 
-    this.adapter = (opts.adapter) ? opts.adapter : null;
+    this.adapter = (opts.adapter) ? opts.adapter : defaultOptions.adapter;
     this.adapter.config();
 
     this.storage = new Storage({
@@ -102,6 +103,18 @@ class Wallet {
       return mnemonic.toString();
     }
     return (toHDPrivateKey) ? this.HDPrivateKey : exportMnemonic(this.mnemonic);
+  }
+
+  disconnect() {
+    if (this.storage) {
+      this.storage.stopWorker();
+    }
+    if (this.accounts) {
+      const accountPath = Object.keys(this.accounts);
+      accountPath.forEach((path) => {
+        this.accounts[path].disconnect();
+      });
+    }
   }
 }
 

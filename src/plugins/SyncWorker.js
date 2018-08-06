@@ -15,7 +15,7 @@ class SyncWorker {
 
   async execAddressFetching() {
     const self = this;
-    const { external, internal } = this.storage.store.addresses;
+    const { external, internal } = this.storage.getStore().addresses;
     const { fetchAddressInfo } = this;
     const externalPaths = Object.keys(external);
     const internalPaths = Object.keys(internal);
@@ -125,7 +125,7 @@ class SyncWorker {
     if (this.worker) this.stopWorker();
     // every minutes, check the pool
     this.worker = setInterval(self.execWorker.bind(self), this.workerIntervalTime);
-    setTimeout(self.execWorker.bind(self), 10 * 1000);
+    setTimeout(self.execWorker.bind(self), 800);
   }
 
   stopWorker() {

@@ -37,6 +37,9 @@ class Transporter {
     const data = await this.transport.getTransaction(txid).catch((err) => {
       throw new Error(err);
     });
+    if (data.confirmations) {
+      delete data.confirmations;
+    }
     return data;
   }
 
@@ -51,6 +54,15 @@ class Transporter {
   async subscribeToAddress(address, cb) {
     if (!is.address(address)) throw new Error('Received an invalid address to fetch');
     return this.transport.subscribeToAddress(address, cb);
+  }
+
+  disconnect() {
+    return (this.transport.closeSocket) ? this.transport.closeSocket() : false;
+  }
+
+  async sendRawTransaction(rawtx, isIs) {
+    if (!is.string(rawtx)) throw new Error('Received an invalid rawtx');
+    return this.transport.sendRawTransaction(rawtx, isIs);
   }
 }
 module.exports = Transporter;

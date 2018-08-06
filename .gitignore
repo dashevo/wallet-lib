@@ -89,3 +89,5 @@ out/
 
 # JIRA plugin
 atlassian-ide-plugin.xml
+
+.DS_Store
