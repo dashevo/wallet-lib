@@ -1,5 +1,8 @@
+const defaultOpts = {
+  threesholdMs: 10 * 60 * 1000,
+};
 class SyncWorker {
-  constructor(opts) {
+  constructor(opts = defaultOpts) {
     this.events = opts.events;
     this.storage = opts.storage;
     this.transport = opts.transport;
@@ -8,6 +11,10 @@ class SyncWorker {
     this.workerPass = 0;
     this.workerRunning = false;
     this.workerIntervalTime = 1 * 60 * 1000;
+
+
+    const fetchDiff = (opts.threesholdMs) ? opts.threesholdMs : defaultOpts.threesholdMs;
+    this.fetchThreeshold = Date.now() - fetchDiff;
 
     this.listeners = [];
     this.bloomfilters = [];
@@ -25,7 +32,7 @@ class SyncWorker {
     if (externalPaths.length > 0) {
       externalPaths.forEach((path) => {
         const el = external[path];
-        if (el.fetchedLast === 0) {
+        if (el.fetchedLast < self.fetchThreeshold) {
           toFetchAddresses.push(el);
         }
       });
@@ -33,7 +40,7 @@ class SyncWorker {
     if (internalPaths.length > 0) {
       internalPaths.forEach((path) => {
         const el = internal[path];
-        if (el.fetchedLast === 0) {
+        if (el.fetchedLast < self.fetchThreeshold) {
           toFetchAddresses.push(el);
         }
       });
