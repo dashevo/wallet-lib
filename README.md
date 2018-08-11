@@ -40,7 +40,11 @@ const options = {
     network
 }
 const wallet = new Wallet(options)
+wallet.disconnect();
 ```
+
+There is several interval running in the app (as service worker), the `disconnect()` method allow to cut them off gracefully before closing.
+
 
 ### Create an account
 ```

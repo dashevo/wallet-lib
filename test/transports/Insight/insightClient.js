@@ -13,7 +13,7 @@ const insightClientOpts = {
 };
 
 describe('Transport : Insight Client', function suite() {
-  this.timeout(60000);
+  this.timeout(6000);
   before((done) => {
     const config = {
       transport: new InsightClient(insightClientOpts),
@@ -26,7 +26,19 @@ describe('Transport : Insight Client', function suite() {
       done();
     });
   });
-  it('should be able to pass Insight Client as a transport layer', () => {
+  it('should be able to subscribe to an event', () => {
+    account.transport.transport.subscribeToEvent('noevent');
+    expect(account.transport.transport.listeners.noevent).to.exist;
+  });
+  it('should be able to unsubscribe of an event', () => {
+    account.transport.transport.unsubscribeFromEvent('noevent');
+    expect(account.transport.transport.listeners.noevent).to.not.exist;
+  });
+  it('should subscribe to address', () => {
+    account.transport.transport.subscribeToAddresses(['yiFNYQxfkDxeCBLyWtWQ9w8UGwYugERLCq']);
+    expect(true).to.equal(true);
+  });
+   it('should be able to pass Insight Client as a transport layer', () => {
     expect(wallet.transport).to.not.equal(null);
     expect(wallet.transport.type).to.equal('InsightClient');
     expect(account.transport).to.not.equal(null);
@@ -49,77 +61,81 @@ describe('Transport : Insight Client', function suite() {
   });
   it('should be able to get the utxos information', () => {
     const addressesExternalData = account.getAddresses();
-    const path = 'm/44\'/1\'/0\'/0/2';
+    const path = 'm/44\'/1\'/0\'/0/4';
     expect(addressesExternalData).to.have.property(path);
     expect(addressesExternalData[path]).to.have.property('utxos');
     expect(addressesExternalData[path].utxos).to.have.length(1);
-    expect(addressesExternalData[path].utxos[0].vout).to.equal(0);
-    expect(addressesExternalData[path].utxos[0].address).to.equal('yRwh2qqnSgWKSaE7Vob35JY4wprvx8ujPZ');
-    expect(addressesExternalData[path].utxos[0].amount).to.equal(10);
-    expect(addressesExternalData[path].utxos[0].satoshis).to.equal(1000000000);
-    expect(addressesExternalData[path].utxos[0].height).to.equal(201516);
-    expect(addressesExternalData[path].utxos[0].scriptPubKey).to.equal('76a9143db3717b49fba213b0d0f988c3f6bca23e65815888ac');
-    expect(addressesExternalData[path].utxos[0].txid).to.equal('6770dee69437c6bf83a56956a04b807ef78cc62b79369b9551f935a922acbf64');
-    expect(addressesExternalData[path].balance).to.equal(10);
+    expect(addressesExternalData[path].utxos[0].outputIndex).to.equal(0);
+    expect(addressesExternalData[path].utxos[0].address).to.equal('yiFNYQxfkDxeCBLyWtWQ9w8UGwYugERLCq');
+    expect(addressesExternalData[path].utxos[0].satoshis).to.equal(5000000000);
+    expect(addressesExternalData[path].utxos[0].script).to.equal('76a914f08d82224ffc020f3d7110e57c3105a5caec058f88ac');
+    expect(addressesExternalData[path].utxos[0].txId).to.equal('4ae8d1960c9a4ed83dbeaf1ad94b4a82f11c8574207144beda87113d94a31da1');
+    expect(addressesExternalData[path].balance).to.equal(50);
+    expect(addressesExternalData[path].balanceSat).to.equal(5000000000);
   });
   it('should be able to get the total balance of an account', () => {
     const balance = account.getBalance();
-    const expectedBalance = 99.99969999999999;
+    const expectedBalance = 142.199;
     expect(balance).to.equal(expectedBalance);
   });
   it('should be able to get a valid UTXO', () => {
     const expectedUTXOS = [
       {
+        address: 'yiFNYQxfkDxeCBLyWtWQ9w8UGwYugERLCq',
+        outputIndex: 0,
+        satoshis: 5000000000,
+        script: '76a914f08d82224ffc020f3d7110e57c3105a5caec058f88ac',
+        txId: '4ae8d1960c9a4ed83dbeaf1ad94b4a82f11c8574207144beda87113d94a31da1',
+      },
+      {
         address: 'yfXQM8TaFiXFYtiFCSm3y6fRq15cj59vVK',
-        amount: 39.9999,
-        height: 201516,
+        outputIndex: 1,
         satoshis: 3999990000,
-        scriptPubKey: '76a914d2ad4b21655c7e019077cdf759cd4c2a0b6682e988ac',
-        txid: '6770dee69437c6bf83a56956a04b807ef78cc62b79369b9551f935a922acbf64',
-        vout: 1,
+        script: '76a914d2ad4b21655c7e019077cdf759cd4c2a0b6682e988ac',
+        txId: '6770dee69437c6bf83a56956a04b807ef78cc62b79369b9551f935a922acbf64',
+      },
+      {
+        address: 'yN3RXNVbRxA2S4gyHweT9TbFKenuGKd7fW',
+        outputIndex: 0,
+        satoshis: 3899970000,
+        script: '76a91412e87d8a188ff29049b6a9e871018de65aa079c288ac',
+        txId: 'd928aedc4ecc6c251cabee0672c19308573e5b4898c32779f3fd211dd8a1fbd8',
       },
       {
         address: 'yMi854XzeEmAz9UczDCj9tvXeddweKc9JM',
-        amount: 39.9998,
-        height: 201517,
-        satoshis: 3999980000,
-        scriptPubKey: '76a9140f42047f86d356426458eba372031f524af548ce88ac',
-        txid: '1954c3263831dd4d80a9dd8f83a6ce998dae0bed3c9ae111f7c84b0a4f65235f',
-        vout: 1,
+        outputIndex: 1,
+        satoshis: 899990000,
+        script: '76a9140f42047f86d356426458eba372031f524af548ce88ac',
+        txId: '6c42619dd84a02577458ba4f880fe8cfaced9ed518ee7c360c5b107d6ff5b62d',
       },
       {
-        address: 'yRwh2qqnSgWKSaE7Vob35JY4wprvx8ujPZ',
-        amount: 10,
-        height: 201516,
-        satoshis: 1000000000,
-        scriptPubKey: '76a9143db3717b49fba213b0d0f988c3f6bca23e65815888ac',
-        txid: '6770dee69437c6bf83a56956a04b807ef78cc62b79369b9551f935a922acbf64',
-        vout: 0,
+        address: 'ySypFbLpFTXrBbpFqRezwpdwwuaDCfrgpo',
+        outputIndex: 1,
+        satoshis: 419950000,
+        script: '76a91449126d84886a9bfc4a2a49aa5ba9cb45c994875288ac',
+        txId: 'b42c5052d7d31a422e711d50d3754217b0b16b6dfa29cf497b3dd75afa4febcb',
       },
-      {
-        address: 'yPT2e1oAxN6GEa3tqahKg7KrXkwtKgpgPm',
-        amount: 10,
-        height: 201517,
-        satoshis: 1000000000,
-        scriptPubKey: '76a91422577ed4afdccae90307e874afe835f5158b068d88ac',
-        txid: '1954c3263831dd4d80a9dd8f83a6ce998dae0bed3c9ae111f7c84b0a4f65235f',
-        vout: 0,
-      },
-
     ];
+
     const UTXOS = account.getUTXOS();
     expect(UTXOS).to.deep.equal(expectedUTXOS);
+  });
+  it('should be able to get an unused address', () => {
+    const unusedExternal = account.getUnusedAddress();
+    const unusedInternal = account.getUnusedAddress(false);
+    expect(unusedExternal.address).to.equal('yf3KLBh1y5ZbNrcab8xr7DN7HPBGhSWoDY');
+    expect(unusedInternal.address).to.equal('yWbRpgDDsAVjXVWGHqZgiEoP7Mop9hAwYS');
   });
 
   it('should be able to create a transaction', () => {
     const { address } = account.getUnusedAddress();
 
-    expect(address).to.equal('yiFNYQxfkDxeCBLyWtWQ9w8UGwYugERLCq');
+    expect(address).to.equal('yf3KLBh1y5ZbNrcab8xr7DN7HPBGhSWoDY');
 
     const txOpts = { amount: 15, to: address };
     const txOptsSatoshis = { satoshis: 1500000000, to: address };
 
-    const expectedRawTx = '030000000164bfac22a935f951959b36792bc68cf77e804ba05669a583bfc63794e6de7067010000006a47304402205d8926de3f37da11ce1d0acf01b3710ca283dfb05157b8bc0c0fa7699ef177ef02201fc2c99b5801ff851d34fe629785881b2379dcf55a1b3c749c6c74ea26e305080121025cf6335bc9a968ee0d113e7b9fb32064c35d816878873f100fe89570dc6fbf31ffffffff02002f6859000000001976a914f08d82224ffc020f3d7110e57c3105a5caec058f88ace0aa0295000000001976a91412e87d8a188ff29049b6a9e871018de65aa079c288ac00000000';
+    const expectedRawTx = '0300000001d8fba1d81d21fdf37927c398485b3e570893c17206eeab1c256ccc4edcae28d9000000006b483045022100d8436eeb4cbd6dbe7ea88f565eca606a06ba043a290e1bb84f0b234aabc8c3bb022037a014ff30b899c8e896c2ccb5d8b6a106bf56c4a6c0093ecd6ee786a50d984d01210389143a6bee1de5a9583c697e160655c703aa6f7199c93bf14287879a20cd01fbffffffff02002f6859000000001976a914cd5d758c0898175abfbcd12b13ebe783e1dc2b2b88acc07b0c8f000000001976a914d9e7ddb55be9df9d5678fda4845e9e1181750b9088ac00000000';
     const rawTxFromAmount = account.createTransaction(txOpts);
     const rawTxFromSatoshisAmount = account.createTransaction(txOptsSatoshis);
     expect(rawTxFromAmount).to.equal(expectedRawTx);
@@ -132,10 +148,11 @@ describe('Transport : Insight Client', function suite() {
       to: address,
       isInstantSend: true,
     };
-    const expectedRawTx = '030000000164bfac22a935f951959b36792bc68cf77e804ba05669a583bfc63794e6de7067010000006a4730440220762e66e56ab4b462a9b1ef84ee859d806c2fab9a5f80b1726d7777b78c5d5097022077a3f6273239fd6d575bfbf97f9431a859e8c2641e6551f189a954bc23c316b00121025cf6335bc9a968ee0d113e7b9fb32064c35d816878873f100fe89570dc6fbf31ffffffff0200ca9a3b000000001976a914f08d82224ffc020f3d7110e57c3105a5caec058f88ace00fd0b2000000001976a91412e87d8a188ff29049b6a9e871018de65aa079c288ac00000000';
+    const expectedRawTx = '0300000001d8fba1d81d21fdf37927c398485b3e570893c17206eeab1c256ccc4edcae28d9000000006a473044022014a6d5b9e6c09edb4040baa8de6b8b21fe7d4f700d2395e4b165040a41c81b930220486ee8ec9c07aaebb50707ce72773927d3095c09369a686c999db587abdb5e5d01210389143a6bee1de5a9583c697e160655c703aa6f7199c93bf14287879a20cd01fbffffffff0200ca9a3b000000001976a914cd5d758c0898175abfbcd12b13ebe783e1dc2b2b88acc0e0d9ac000000001976a914d9e7ddb55be9df9d5678fda4845e9e1181750b9088ac00000000';
     const rawTx = account.createTransaction(txOptsInstant);
     expect(rawTx).to.equal(expectedRawTx);
   });
+
   it('should not be able to create an instantSend transactions without opts', () => {
     expect(() => account.createTransaction()).to.throw('An amount in dash or in satoshis is expected to create a transaction');
   });
@@ -154,6 +171,7 @@ describe('Transport : Insight Client', function suite() {
     };
     expect(() => account.createTransaction(txOptsInstant)).to.throw('A recipient is expected to create a transaction');
   });
+
   it('should be able to create an instantSend transactions with satoshis', () => {
     const { address } = account.getUnusedAddress();
     const txOptsInstant = {
@@ -161,7 +179,7 @@ describe('Transport : Insight Client', function suite() {
       to: address,
       isInstantSend: true,
     };
-    const expectedRawTx = '030000000164bfac22a935f951959b36792bc68cf77e804ba05669a583bfc63794e6de7067010000006b48304502210097b4b84999c5288457bd325e781c6eed9871d3d133b6957f4136d61505dc5480022011d65cbb3dbc686ab698dbd0b00007ff1a86fa5e4152fe1a431d7a91494135f80121025cf6335bc9a968ee0d113e7b9fb32064c35d816878873f100fe89570dc6fbf31ffffffff020b000000000000001976a914f08d82224ffc020f3d7110e57c3105a5caec058f88acd5d96aee000000001976a91412e87d8a188ff29049b6a9e871018de65aa079c288ac00000000';
+    const expectedRawTx = '0300000001a11da3943d1187dabe44712074851cf1824a4bd91aafbe3dd84e9a0c96d1e84a000000006a4730440220462e82c236a13d7800a5ed999a3347e4e8fd2d8f1fa91192491552ae2b4f661702202f3e880ccabb2fbf2618fae91c4a49127e2155d1b63be7a1f9123a7ccfff97a60121039c2ac9fcf618c9bbf3c358b9e391d2c6c0829cc740ab1d11621c369083d26078ffffffff020b000000000000001976a914cd5d758c0898175abfbcd12b13ebe783e1dc2b2b88ace5ca052a010000001976a914d9e7ddb55be9df9d5678fda4845e9e1181750b9088ac00000000';
     const rawTx = account.createTransaction(txOptsInstant);
     expect(rawTx).to.equal(expectedRawTx);
   });
@@ -174,7 +192,7 @@ describe('Transport : Insight Client', function suite() {
       to: address,
       isInstantSend: true,
     };
-    const expectedRawTx = '030000000164bfac22a935f951959b36792bc68cf77e804ba05669a583bfc63794e6de7067010000006b48304502210097b4b84999c5288457bd325e781c6eed9871d3d133b6957f4136d61505dc5480022011d65cbb3dbc686ab698dbd0b00007ff1a86fa5e4152fe1a431d7a91494135f80121025cf6335bc9a968ee0d113e7b9fb32064c35d816878873f100fe89570dc6fbf31ffffffff020b000000000000001976a914f08d82224ffc020f3d7110e57c3105a5caec058f88acd5d96aee000000001976a91412e87d8a188ff29049b6a9e871018de65aa079c288ac00000000';
+    const expectedRawTx = '0300000001a11da3943d1187dabe44712074851cf1824a4bd91aafbe3dd84e9a0c96d1e84a000000006a4730440220462e82c236a13d7800a5ed999a3347e4e8fd2d8f1fa91192491552ae2b4f661702202f3e880ccabb2fbf2618fae91c4a49127e2155d1b63be7a1f9123a7ccfff97a60121039c2ac9fcf618c9bbf3c358b9e391d2c6c0829cc740ab1d11621c369083d26078ffffffff020b000000000000001976a914cd5d758c0898175abfbcd12b13ebe783e1dc2b2b88ace5ca052a010000001976a914d9e7ddb55be9df9d5678fda4845e9e1181750b9088ac00000000';
     const rawTx = account.createTransaction(txOptsInstant);
     expect(rawTx).to.equal(expectedRawTx);
   });
@@ -225,163 +243,168 @@ describe('Transport : Insight Client', function suite() {
     wallet3.disconnect();
   });
 
-  it('should not be able to getAddressSummary by invalid vale ', () => {
+  it('should not be able to getAddressSummary by invalid value', () => {
     const transport = new InsightClient(insightClientOpts);
     return transport.getAddressSummary('address').then(
       () => Promise.reject(new Error('Expected method to reject.')),
       err => expect(err).to.be.a('Error').with.property('message', 'Request failed with status code 400'),
-    );
+    ).then(() => { transport.closeSocket(); });
   });
-
   it('should get a transactions History', () => {
-    const expected = [{
-      txid: 'e66474bfe8ae3d91b2784864fc09e0bd615cbfbf4a2164e46b970bcc488a938f',
-      version: 1,
-      locktime: 0,
-      vin: [{
-        txid: 'b4f567f398ec2174df2d775c9bcbc197efda2902bc4b628858d6c8ef7453284d', vout: 0, sequence: 4294967295, n: 0, scriptSig: { hex: '483045022100bb3c68629c143c6852967dae36744913b2aaa7ee3d09fc62c5902fe1439dcbec022033eb8522173c1d9e0ba8a0d096cda53cad4e9718a5e5848e400558517d00cfaf0121034af503d14b1207cafdc669987b43ef62a6ce52403b29a83b67826c563663a2f7', asm: '3045022100bb3c68629c143c6852967dae36744913b2aaa7ee3d09fc62c5902fe1439dcbec022033eb8522173c1d9e0ba8a0d096cda53cad4e9718a5e5848e400558517d00cfaf[ALL] 034af503d14b1207cafdc669987b43ef62a6ce52403b29a83b67826c563663a2f7' }, addr: 'yRdxQQpXYh9Xkd91peJ7FJxpEzoRb6droH', valueSat: 10000000000, value: 100, doubleSpentTxID: null,
-      }],
-      vout: [{
-        value: '50.00000000',
-        n: 0,
-        scriptPubKey: {
-          hex: '76a914ce07ed014c455640a41e516ad4cc40fbc7fe435c88ac', asm: 'OP_DUP OP_HASH160 ce07ed014c455640a41e516ad4cc40fbc7fe435c OP_EQUALVERIFY OP_CHECKSIG', addresses: ['yf6qYQzQoCzpF7gJYAa7s3n5rBK89RoaCQ'], type: 'pubkeyhash',
+    const expected = [
+      {
+        from: [
+          'yRdxQQpXYh9Xkd91peJ7FJxpEzoRb6droH',
+        ],
+        time: 1529233103,
+        to: {
+          address: 'yf6qYQzQoCzpF7gJYAa7s3n5rBK89RoaCQ',
+          amount: '50.00000000',
         },
-        spentTxId: '6770dee69437c6bf83a56956a04b807ef78cc62b79369b9551f935a922acbf64',
-        spentIndex: 0,
-        spentHeight: 201516,
-      }, {
-        value: '49.99990000',
-        n: 1,
-        scriptPubKey: {
-          hex: '76a914cbdb740680e713c141e9fb32e92c7d90a3f3297588ac', asm: 'OP_DUP OP_HASH160 cbdb740680e713c141e9fb32e92c7d90a3f32975 OP_EQUALVERIFY OP_CHECKSIG', addresses: ['yeuLv2E9FGF4D9o8vphsaC2Vxoa8ZA7Efp'], type: 'pubkeyhash',
+        txid: 'e66474bfe8ae3d91b2784864fc09e0bd615cbfbf4a2164e46b970bcc488a938f',
+        type: 'sent',
+      },
+      {
+        from: [
+          'yfPzgAZasiJGbiaYfJq7zXNN58PJAhbV1R',
+        ],
+        time: 1529201724,
+        to: {
+          address: 'yRdxQQpXYh9Xkd91peJ7FJxpEzoRb6droH',
+          amount: '100.00000000',
         },
-        spentTxId: '1954c3263831dd4d80a9dd8f83a6ce998dae0bed3c9ae111f7c84b0a4f65235f',
-        spentIndex: 0,
-        spentHeight: 201517,
-      }],
-      blockhash: '00000000050beeebb2a07be636dd0e066b11a20fbe13ffbb8c853232d58b96c0',
-      blockheight: 142810,
-      time: 1529233103,
-      blocktime: 1529233103,
-      valueOut: 99.9999,
-      size: 226,
-      valueIn: 100,
-      fees: 0.0001,
-      txlock: false,
-    }, {
-      txid: 'b4f567f398ec2174df2d775c9bcbc197efda2902bc4b628858d6c8ef7453284d',
-      version: 1,
-      locktime: 0,
-      vin: [{
-        txid: '253ef33bc86f73214a37c32ff36721480e7e5386dce0f3c184345f53ea5844c9', vout: 0, sequence: 4294967295, n: 0, scriptSig: { hex: '47304402206f514f909071f5cc77c2e4b1207d5da46e221bf38b797771fc92949c52b24fc50220359a5aca772a5ed19ed1bea9b584322221dfcdb1c9c4fedc4a08d5567b0d28df012103c9e5fb9318eb4517c9a2de863f19176fe1056d5c246bf8891336debd20e4bcf4', asm: '304402206f514f909071f5cc77c2e4b1207d5da46e221bf38b797771fc92949c52b24fc50220359a5aca772a5ed19ed1bea9b584322221dfcdb1c9c4fedc4a08d5567b0d28df[ALL] 03c9e5fb9318eb4517c9a2de863f19176fe1056d5c246bf8891336debd20e4bcf4' }, addr: 'yfPzgAZasiJGbiaYfJq7zXNN58PJAhbV1R', valueSat: 91846658523, value: 918.46658523, doubleSpentTxID: null,
-      }],
-      vout: [{
-        value: '100.00000000',
-        n: 0,
-        scriptPubKey: {
-          hex: '76a9143a58c9ab2acc51d5e810f55ad23717ae94fc965688ac', asm: 'OP_DUP OP_HASH160 3a58c9ab2acc51d5e810f55ad23717ae94fc9656 OP_EQUALVERIFY OP_CHECKSIG', addresses: ['yRdxQQpXYh9Xkd91peJ7FJxpEzoRb6droH'], type: 'pubkeyhash',
+        txid: 'b4f567f398ec2174df2d775c9bcbc197efda2902bc4b628858d6c8ef7453284d',
+        type: 'receive',
+      },
+      {
+        from: [
+          'yf6qYQzQoCzpF7gJYAa7s3n5rBK89RoaCQ',
+        ],
+        time: 1533535851,
+        to: {
+          address: 'yRwh2qqnSgWKSaE7Vob35JY4wprvx8ujPZ',
+          amount: '10.00000000',
         },
-        spentTxId: 'e66474bfe8ae3d91b2784864fc09e0bd615cbfbf4a2164e46b970bcc488a938f',
-        spentIndex: 0,
-        spentHeight: 142810,
-      }, {
-        value: '818.46639083',
-        n: 1,
-        scriptPubKey: {
-          hex: '76a91487f94ff533ace02c608f9104f0a9d15bec797b4188ac', asm: 'OP_DUP OP_HASH160 87f94ff533ace02c608f9104f0a9d15bec797b41 OP_EQUALVERIFY OP_CHECKSIG', addresses: ['yYiQjdCR23ZpFCh9dkUCkjzqHGAqL1MJyE'], type: 'pubkeyhash',
+        txid: '6770dee69437c6bf83a56956a04b807ef78cc62b79369b9551f935a922acbf64',
+        type: 'sent',
+      },
+      {
+        from: [
+          'yRwh2qqnSgWKSaE7Vob35JY4wprvx8ujPZ',
+        ],
+        time: 1533776547,
+        to: {
+          address: 'yMi854XzeEmAz9UczDCj9tvXeddweKc9JM',
+          amount: '8.99990000',
         },
-        spentTxId: 'e092395f069fbc62e4e88df6a962833a26ffb6f8f6fe984c70e23a47d406ac89',
-        spentIndex: 0,
-        spentHeight: 201382,
-      }],
-      blockhash: '0000000005908b72a6934d1be80a7138f951db0bc1262c6ba0ed51ecfd362f07',
-      blockheight: 142615,
-      time: 1529201724,
-      blocktime: 1529201724,
-      valueOut: 918.46639083,
-      size: 225,
-      valueIn: 918.46658523,
-      fees: 0.0001944,
-      txlock: false,
-    }, {
-      txid: '6770dee69437c6bf83a56956a04b807ef78cc62b79369b9551f935a922acbf64',
-      version: 3,
-      locktime: 0,
-      vin: [{
-        txid: 'e66474bfe8ae3d91b2784864fc09e0bd615cbfbf4a2164e46b970bcc488a938f', vout: 0, sequence: 4294967295, n: 0, scriptSig: { hex: '47304402203ac209efce9d8b231cc4e2ce557fc48a693cd22412a0aece05a19f183427e93102200d06ebb4e6520e8bd7167735527fa73e60933dfeab9ed1045e05c89dfaccc4720121029f883b2c3ec3a4804bcc1f66687a65ef265ce15b7f86c9a6e35ef86ca9ceced2', asm: '304402203ac209efce9d8b231cc4e2ce557fc48a693cd22412a0aece05a19f183427e93102200d06ebb4e6520e8bd7167735527fa73e60933dfeab9ed1045e05c89dfaccc472[ALL] 029f883b2c3ec3a4804bcc1f66687a65ef265ce15b7f86c9a6e35ef86ca9ceced2' }, addr: 'yf6qYQzQoCzpF7gJYAa7s3n5rBK89RoaCQ', valueSat: 5000000000, value: 50, doubleSpentTxID: null,
-      }],
-      vout: [{
-        value: '10.00000000',
-        n: 0,
-        scriptPubKey: {
-          hex: '76a9143db3717b49fba213b0d0f988c3f6bca23e65815888ac', asm: 'OP_DUP OP_HASH160 3db3717b49fba213b0d0f988c3f6bca23e658158 OP_EQUALVERIFY OP_CHECKSIG', addresses: ['yRwh2qqnSgWKSaE7Vob35JY4wprvx8ujPZ'], type: 'pubkeyhash',
+        txid: '6c42619dd84a02577458ba4f880fe8cfaced9ed518ee7c360c5b107d6ff5b62d',
+        type: 'sent',
+      },
+      {
+        from: [
+          'yPT2e1oAxN6GEa3tqahKg7KrXkwtKgpgPm',
+        ],
+        time: 1533766930,
+        to: {
+          address: 'yeuLv2E9FGF4D9o8vphsaC2Vxoa8ZA7Efp',
+          amount: '9.19990000',
         },
-        spentTxId: null,
-        spentIndex: null,
-        spentHeight: null,
-      }, {
-        value: '39.99990000',
-        n: 1,
-        scriptPubKey: {
-          hex: '76a914d2ad4b21655c7e019077cdf759cd4c2a0b6682e988ac', asm: 'OP_DUP OP_HASH160 d2ad4b21655c7e019077cdf759cd4c2a0b6682e9 OP_EQUALVERIFY OP_CHECKSIG', addresses: ['yfXQM8TaFiXFYtiFCSm3y6fRq15cj59vVK'], type: 'pubkeyhash',
+        txid: '1240c9e3bba3f143ec354bd37e4b860609b944dee2e426e9868e5c3244e47f04',
+        type: 'sent',
+      },
+      {
+        from: [
+          'yeuLv2E9FGF4D9o8vphsaC2Vxoa8ZA7Efp',
+        ],
+        time: 1533535885,
+        to: {
+          address: 'yPT2e1oAxN6GEa3tqahKg7KrXkwtKgpgPm',
+          amount: '10.00000000',
         },
-        spentTxId: null,
-        spentIndex: null,
-        spentHeight: null,
-      }],
-      blockhash: '00000000030c6efb91a8a2317111efa84e123ce72e944d58913aec8e32e5da5b',
-      blockheight: 201516,
-      time: 1533535851,
-      blocktime: 1533535851,
-      valueOut: 49.9999,
-      size: 225,
-      valueIn: 50,
-      fees: 0.0001,
-      txlock: false,
-    }, {
-      txid: '1954c3263831dd4d80a9dd8f83a6ce998dae0bed3c9ae111f7c84b0a4f65235f',
-      version: 3,
-      locktime: 0,
-      vin: [{
-        txid: 'e66474bfe8ae3d91b2784864fc09e0bd615cbfbf4a2164e46b970bcc488a938f', vout: 1, sequence: 4294967295, n: 0, scriptSig: { hex: '4730440220214bf38364d9d3f2df63d20a8cd6c82b9305c0515080872253c1a9fde140de3f02203d462caf975b169369cdca0b1979a6e776d77d56c9800b9354b81581fcb16477012102b49dd1beb4acbad033563c60879b082d9ab824d9878baa775920d474b9d89455', asm: '30440220214bf38364d9d3f2df63d20a8cd6c82b9305c0515080872253c1a9fde140de3f02203d462caf975b169369cdca0b1979a6e776d77d56c9800b9354b81581fcb16477[ALL] 02b49dd1beb4acbad033563c60879b082d9ab824d9878baa775920d474b9d89455' }, addr: 'yeuLv2E9FGF4D9o8vphsaC2Vxoa8ZA7Efp', valueSat: 4999990000, value: 49.9999, doubleSpentTxID: null,
-      }],
-      vout: [{
-        value: '10.00000000',
-        n: 0,
-        scriptPubKey: {
-          hex: '76a91422577ed4afdccae90307e874afe835f5158b068d88ac', asm: 'OP_DUP OP_HASH160 22577ed4afdccae90307e874afe835f5158b068d OP_EQUALVERIFY OP_CHECKSIG', addresses: ['yPT2e1oAxN6GEa3tqahKg7KrXkwtKgpgPm'], type: 'pubkeyhash',
+        txid: '1954c3263831dd4d80a9dd8f83a6ce998dae0bed3c9ae111f7c84b0a4f65235f',
+        type: 'sent',
+      },
+      {
+        from: [
+          'yQxDtKBqQvo3ecMqQVJv7rrZ6PMAGVDNBd',
+        ],
+        time: 1533815679,
+        to: {
+          address: 'yiFNYQxfkDxeCBLyWtWQ9w8UGwYugERLCq',
+          amount: '50.00000000',
         },
-        spentTxId: null,
-        spentIndex: null,
-        spentHeight: null,
-      }, {
-        value: '39.99980000',
-        n: 1,
-        scriptPubKey: {
-          hex: '76a9140f42047f86d356426458eba372031f524af548ce88ac', asm: 'OP_DUP OP_HASH160 0f42047f86d356426458eba372031f524af548ce OP_EQUALVERIFY OP_CHECKSIG', addresses: ['yMi854XzeEmAz9UczDCj9tvXeddweKc9JM'], type: 'pubkeyhash',
+        txid: '4ae8d1960c9a4ed83dbeaf1ad94b4a82f11c8574207144beda87113d94a31da1',
+        type: 'receive',
+      },
+      {
+        from: [
+          'yeuLv2E9FGF4D9o8vphsaC2Vxoa8ZA7Efp',
+        ],
+        time: 1533775038,
+        to: {
+          address: 'yTLjgT7B9PAZXDEvZHWwE4Pyj2MLX1WX2B',
+          amount: '8.19980000',
         },
-        spentTxId: null,
-        spentIndex: null,
-        spentHeight: null,
-      }],
-      blockhash: '000000000669c888e04819b9c986966c73fe20f6681fc3160f597b21676f2b9c',
-      blockheight: 201517,
-      time: 1533535885,
-      blocktime: 1533535885,
-      valueOut: 49.9998,
-      size: 225,
-      valueIn: 49.9999,
-      fees: 0.0001,
-      txlock: false,
-    }];
+        txid: '1d90ba700b8fa18c8d9a6d3eaa505dde99a4a459c0d1e73bf40ba4b2cc2461cc',
+        type: 'sent',
+      },
+      {
+        from: [
+          'yTLjgT7B9PAZXDEvZHWwE4Pyj2MLX1WX2B',
+        ],
+        time: 1533776253,
+        to: {
+          address: 'yfXQM8TaFiXFYtiFCSm3y6fRq15cj59vVK',
+          amount: '6.19970000',
+        },
+        txid: 'dd02316f28e6d04f1f6f998c30f367dee4dc820309a6cd3cdfc436dc63254c50',
+        type: 'sent',
+      },
+      {
+        from: [
+          'yfXQM8TaFiXFYtiFCSm3y6fRq15cj59vVK',
+        ],
+        time: 1533778221,
+        to: {
+          address: 'yXhm56EBd23RrZpq8WMp1UUUiZobStcaWG',
+          amount: '5.19960000',
+        },
+        txid: 'b452f2d7762b5cd94a0d375e60547c93035b97978a37bcaeed186d27e31feb3a',
+        type: 'sent',
+      },
+      {
+        from: [
+          'yMi854XzeEmAz9UczDCj9tvXeddweKc9JM',
+        ],
+        time: 1533776913,
+        to: {
+          address: 'yN3RXNVbRxA2S4gyHweT9TbFKenuGKd7fW',
+          amount: '38.99970000',
+        },
+        txid: 'd928aedc4ecc6c251cabee0672c19308573e5b4898c32779f3fd211dd8a1fbd8',
+        type: 'sent',
+      },
+      {
+        from: [
+          'yXhm56EBd23RrZpq8WMp1UUUiZobStcaWG',
+        ],
+        time: 1533781707,
+        to: {
+          address: 'ySypFbLpFTXrBbpFqRezwpdwwuaDCfrgpo',
+          amount: '4.19950000',
+        },
+        txid: 'b42c5052d7d31a422e711d50d3754217b0b16b6dfa29cf497b3dd75afa4febcb',
+        type: 'sent',
+      },
+    ];
+
     return account.getTransactionHistory().then(result => expect(result).to.deep.equal(expected));
   });
   it('should get a transaction', () => {
     const expected = {};
     return account.getTransaction(1).then(
       data => expect(data).to.be.a('String'),
-      err => expect(err).to.be.a('Error').with.property('message', 'Received an invalid txid to fetch'),
+      err => expect(err).to.be.a('Error').with.property('message', 'Received an invalid txid to fetch : 1'),
     );
     return account.getTransaction(1).then(result => expect(result).to.deep.equal(expected));
   });
@@ -393,7 +416,7 @@ describe('Transport : Insight Client', function suite() {
       isInstantSend: true,
     };
     const tx = account.createTransaction(txOptsInstant);
-    expect(tx).to.equal('030000000164bfac22a935f951959b36792bc68cf77e804ba05669a583bfc63794e6de7067010000006a4730440220762e66e56ab4b462a9b1ef84ee859d806c2fab9a5f80b1726d7777b78c5d5097022077a3f6273239fd6d575bfbf97f9431a859e8c2641e6551f189a954bc23c316b00121025cf6335bc9a968ee0d113e7b9fb32064c35d816878873f100fe89570dc6fbf31ffffffff0200ca9a3b000000001976a914f08d82224ffc020f3d7110e57c3105a5caec058f88ace00fd0b2000000001976a91412e87d8a188ff29049b6a9e871018de65aa079c288ac00000000');
+    expect(tx).to.equal('0300000001d8fba1d81d21fdf37927c398485b3e570893c17206eeab1c256ccc4edcae28d9000000006a473044022014a6d5b9e6c09edb4040baa8de6b8b21fe7d4f700d2395e4b165040a41c81b930220486ee8ec9c07aaebb50707ce72773927d3095c09369a686c999db587abdb5e5d01210389143a6bee1de5a9583c697e160655c703aa6f7199c93bf14287879a20cd01fbffffffff0200ca9a3b000000001976a914cd5d758c0898175abfbcd12b13ebe783e1dc2b2b88acc0e0d9ac000000001976a914d9e7ddb55be9df9d5678fda4845e9e1181750b9088ac00000000');
     const fakedTx = `${tx}00201010`;
 
     return account.broadcastTransaction(fakedTx).then(

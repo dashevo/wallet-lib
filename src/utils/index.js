@@ -1,4 +1,4 @@
-const { dashToDuffs, duffsToDash } = require('./utils');
+const { dashToDuffs, duffsToDash, getBytesOf } = require('./utils');
 const { generateNewMnemonic, HDPrivateKeyToMnemonic, mnemonicToSeed } = require('./mnemonic.js');
 const is = require('./is');
 const coinSelection = require('./coinSelection');
@@ -13,4 +13,5 @@ module.exports = {
   is,
   coinSelection,
   feeCalculation,
+  getBytesOf,
 };

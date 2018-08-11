@@ -116,7 +116,7 @@ class SyncWorker {
         self.events.emit('balance_changed');
       }
     };
-    const subscribe = await self.transport.subscribeToAddresses(subscribedAddress, cb);
+    await self.transport.subscribeToAddresses(subscribedAddress, cb);
     return true;
   }
 

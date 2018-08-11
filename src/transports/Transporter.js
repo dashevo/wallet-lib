@@ -33,7 +33,7 @@ class Transporter {
   }
 
   async getTransaction(txid) {
-    if (!is.transactionId(txid)) throw new Error('Received an invalid txid to fetch');
+    if (!is.txid(txid)) throw new Error(`Received an invalid txid to fetch : ${txid}`);
     const data = await this.transport.getTransaction(txid).catch((err) => {
       throw new Error(err);
     });
@@ -51,9 +51,13 @@ class Transporter {
     return data;
   }
 
-  async subscribeToAddress(address, cb) {
-    if (!is.address(address)) throw new Error('Received an invalid address to fetch');
-    return this.transport.subscribeToAddress(address, cb);
+  async subscribeToAddresses(addresses, cb) {
+    if (addresses.length > 0) {
+      // todo verify if valid addresses
+      // if (!is.address(address)) throw new Error('Received an invalid address to fetch');
+      return this.transport.subscribeToAddresses(addresses, cb);
+    }
+    return false;
   }
 
   disconnect() {

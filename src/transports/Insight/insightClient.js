@@ -2,11 +2,7 @@ const axios = require('axios');
 const io = require('socket.io-client');
 // Here to avoid asking to much to the network when doing a nodemon for the tests.
 // Probably will require to mock the test part.
-const fakeReq = {
-  addr: {},
-  utxos: {},
-  transaction: {},
-};
+
 const defaultOpts = {
   uri: 'https://testnet-insight.dashevo.org/insight-api-dash',
   socketUri: 'https://testnet-insight.dashevo.org/',
@@ -17,23 +13,25 @@ const defaultOpts = {
  */
 class InsightClient {
   constructor(opts = defaultOpts) {
+    this.listeners = {};
     this.type = this.constructor.name;
     this.uri = (opts.uri) ? opts.uri : defaultOpts.uri;
     this.socketUri = (opts.socketUri)
       ? opts.socketUri
       : defaultOpts.socketUri;
-    this.useSocket = (opts.useSocket === null) ? defaultOpts.useSocket : opts.useSocket;
+    this.useSocket = (opts.useSocket) ? opts.useSocket : defaultOpts.useSocket;
 
     if (this.useSocket) {
       this.socket = io(this.socketUri, { transports: ['websocket'] });
       this.socket.emit('subscribe', 'inv');
       this.socket.on('connect', () => console.log('Socket connected!'));
-      this.socket.on('block', block => console.log('block', block));
-      this.socket.on('tx', tx => console.log('tx', tx));
-      this.socket.on('txlock', txlock => console.log('txlock', txlock));
       this.socket.on('event', event => console.log('event', event));
       this.socket.on('disconnect', disconnect => console.log('disconnect', disconnect));
       this.socket.on('error', error => console.log('error', error));
+
+      // this.subscribeToEvent('block', tx => console.log('txlock', tx));
+      // this.subscribeToEvent('txlock', tx => console.log('txlock', tx));
+      // this.subscribeToEvent('tx', tx => console.log('tx', tx));
     }
   }
 
@@ -44,27 +42,19 @@ class InsightClient {
   }
 
   async getAddressSummary(address) {
-    if (!fakeReq.addr[address]) {
-      const res = await axios.get(`${this.uri}/addr/${address}`);
-      fakeReq.addr[address] = res.data;
-    }
-    return fakeReq.addr[address];// throw new Error(address);
+    const res = await axios.get(`${this.uri}/addr/${address}`);
+    return res.data;
   }
 
+
   async getTransaction(transaction) {
-    if (!fakeReq.transaction[transaction]) {
-      const res = await axios.get(`${this.uri}/tx/${transaction}`);
-      fakeReq.transaction[transaction] = res.data;
-    }
-    return fakeReq.transaction[transaction];// throw new Error(address);
+    const res = await axios.get(`${this.uri}/tx/${transaction}`);
+    return res.data;
   }
 
   async getUTXO(address) {
-    if (!fakeReq.utxos[address]) {
-      const res = await axios.get(`${this.uri}/addr/${address}/utxo`);
-      fakeReq.utxos[address] = res.data;
-    }
-    return fakeReq.utxos[address];// throw new Error(address);
+    const res = await axios.get(`${this.uri}/addr/${address}/utxo`);
+    return res.data;
   }
 
   async sendRawTransaction(rawtx, isIs = false) {
@@ -78,13 +68,57 @@ class InsightClient {
       });
   }
 
-  async subscribeToAddress(address, cb) {
+  subscribeToEvent(eventName, cb) {
     if (this.useSocket) {
-      this.socket.emit('subscribe', 'dashd/addresstxid', [address]);
-      this.socket.on('dashd/addresstxid', cb);
+      const listener = this.socket.on(eventName, cb);
+      if (this.listeners[eventName]) {
+        const oldListener = this.listeners[eventName].listener;
+        this.clearListener(oldListener);
+      }
+      this.listeners[eventName] = {
+        type: eventName,
+        listener,
+        setTime: Date.now(),
+      };
+      console.log('Subscribed to ', eventName);
     }
+  }
 
-    return true;
+  unsubscribeFromEvent(eventName) {
+    if (this.listeners[eventName]) {
+      this.clearListener(this.listeners[eventName].listener);
+      delete this.listeners[eventName];
+    }
+  }
+
+  clearListener(listener) {
+    this.socket.emit('unsubscribe', listener.type);
+    this.socket.removeListener(listener.listener);
+  }
+
+  subscribeToAddresses(addresses, cb) {
+    if (this.useSocket) {
+      const eventName = 'dashd/addresstxid';
+      if (this.listeners[eventName]) {
+        const oldListener = this.listeners[eventName];
+        if (JSON.stringify(addresses) === JSON.stringify(oldListener.addresses)) {
+          return false; // Same addresses, everything is already set
+        }
+        this.clearListener(oldListener);
+      }
+      this.socket.emit('subscribe', eventName, addresses);
+      const listener = this.socket.on(eventName, cb);
+      this.listeners[eventName] = {
+        type: eventName,
+        listener,
+        addresses,
+        emitter: true,
+        setTime: Date.now(),
+      };
+      console.log('Subscribed to ', eventName);
+      return true;
+    }
+    return false;
   }
 }
 module.exports = InsightClient;

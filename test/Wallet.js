@@ -307,6 +307,18 @@ describe('Wallet', () => {
             size: 225,
             txid: '9ab39713e9ce713d41ca6974db83e57bced02402e9516b8a662ed60d5c08f6d1',
             txlock: true,
+            vin: [{
+              txid: 'e4524e918977b70ab47160d8e3b87a5fa9f88f22e43f0eec2abbee2cf364c93b', vout: 1, sequence: 4294967295, n: 0, scriptSig: { hex: '4730440220154e37879e70784daff6cf04993cc88e8cf7e5357f82e98df9c117941cd5b3f702200d02f583085fbfd28c77d31c6b9a69f641a8fef5e99aaec8b8aedd4a3326e4100121025deea4fcd79eb876daa0f5829659c76f00f6b3fe6bf12e3ea83ecc763219bf88', asm: '30440220154e37879e70784daff6cf04993cc88e8cf7e5357f82e98df9c117941cd5b3f702200d02f583085fbfd28c77d31c6b9a69f641a8fef5e99aaec8b8aedd4a3326e410[ALL] 025deea4fcd79eb876daa0f5829659c76f00f6b3fe6bf12e3ea83ecc763219bf88' }, addr: 'yhzoBe1aCTTganFBzFb3ErF4ufwMqonK5a', valueSat: 81246619083, value: 812.46619083, doubleSpentTxID: null,
+            }],
+            vout: [{
+              value: '2.00000000',
+              spentTxId: '6b90bf01b10a0c6cac018d376823f6b330edf2cbb783cc3d02004f8706bbc311',
+              spentIndex: 7,
+            }, {
+              value: '810.46609083',
+              spentTxId: '22c368e09ad8b36553b383c6a4ae989f91d1f66622b2b685262580c8a45175a4',
+              spentIndex: 0,
+            }],
           },
         },
         addresses: {
@@ -315,8 +327,7 @@ describe('Wallet', () => {
             balance: 0,
             fetchedLast: 1533527600644,
             path: "m/44'/1'/0'/0/19",
-            transactions:
-      [],
+            transactions: [],
             utxos: [],
           },
         },

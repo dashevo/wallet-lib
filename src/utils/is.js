@@ -20,11 +20,11 @@ const is = {
   network: network => is.string(network) || is.type(network, 'Network'),
   seed: seed => is.string(seed) || is.type(seed, 'HDPrivateKey'),
   address: addr => is.string(addr) || is.type(addr, 'Address'),
-  transactionId: txid => is.string(txid),
+  transaction: tx => is.obj(tx) && tx.vin && is.arr(tx.vin) && tx.vout && is.arr(tx.vout),
   feeRate: feeRate => is.obj(feeRate) && is.string(feeRate.type) && is.int(feeRate.value),
   txid: txid => is.string(txid),
-  utxo: utxo => is.obj(utxo) && utxo.txid && is.num(utxo.vout)
-    && utxo.scriptPubKey && is.num(utxo.amount),
+  utxo: utxo => is.obj(utxo) && utxo.txId && is.num(utxo.outputIndex)
+    && utxo.script && is.num(utxo.satoshis),
   output: output => is.obj(output) && is.num(output.satoshis) && is.address(output.address),
 };
 module.exports = is;

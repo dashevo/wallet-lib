@@ -1,20 +1,24 @@
+const { cloneDeep } = require('lodash');
+const { is } = require('./utils');
+
 const defaultOpts = {
 
 };
 
+const initialStore = {
+  transactions: {},
+  addresses: {
+    internal: {},
+    external: {},
+    misc: {},
+  },
+  accounts: {},
+};
 class Storage {
   constructor(opts = defaultOpts) {
     this.adapter = opts.adapter;
 
-    this.store = {
-      transactions: {},
-      addresses: {
-        internal: {},
-        external: {},
-        misc: {},
-      },
-      accounts: {},
-    };
+    this.store = cloneDeep(initialStore);
     this.lastRehydrate = null;
     this.lastSave = null;
     this.lastModified = null;
@@ -25,6 +29,7 @@ class Storage {
         this.saveState();
       }
     }, 30 * 1000);
+
     setTimeout(() => {
       this.init();
     }, 1);
@@ -67,7 +72,11 @@ class Storage {
     if (type === 'Object') {
       if (transactions.txid) {
         if (!txList[transactions.txid]) {
+          if (!is.transaction(transactions)) {
+            throw new Error('Can\'t import this transaction. Invalid structure.');
+          }
           txList[transactions.txid] = transactions;
+          this.lastModified = +new Date();
         }
       } else {
         const transactionsIds = Object.keys(transactions);
@@ -75,6 +84,9 @@ class Storage {
           const el = transactions[id];
           if (el.txid) {
             if (!txList[el.txid]) {
+              if (!is.transaction(el)) {
+                throw new Error('Can\'t import this transaction. Invalid structure.');
+              }
               txList[el.txid] = el;
               this.lastModified = +new Date();
             }
@@ -141,6 +153,90 @@ class Storage {
     return true;
   }
 
+  searchAddress(address) {
+    const search = {
+      address,
+      type: null,
+      found: false,
+    };
+    const store = this.getStore();
+
+    // Look up by looping over all addresses todo:optimisation
+    const existingTypes = Object.keys(store.addresses);
+    existingTypes.forEach((type) => {
+      const existingPaths = Object.keys(store.addresses[type]);
+      existingPaths.forEach((path) => {
+        const el = store.addresses[type][path];
+        if (el.address === search.address) {
+          search.path = path;
+          search.type = type;
+          search.found = true;
+          search.result = el;
+        }
+      });
+    });
+    return search;
+  }
+
+  searchTransaction(txid) {
+    const search = {
+      txid,
+      found: false,
+    };
+    const store = this.getStore();
+    if (store.transactions[txid]) {
+      const tx = store.transactions[txid];
+      if (tx.txid === txid) {
+        search.found = true;
+        search.result = tx;
+      }
+    }
+    return search;
+  }
+
+  searchAddressWithTx(txid) {
+    const search = {
+      txid,
+      address: null,
+      type: null,
+      found: false,
+    };
+    const store = this.getStore();
+
+    // Look up by looping over all addresses todo:optimisation
+    const existingTypes = Object.keys(store.addresses);
+    existingTypes.forEach((type) => {
+      const existingPaths = Object.keys(store.addresses[type]);
+      existingPaths.forEach((path) => {
+        const el = store.addresses[type][path];
+        if (el.transactions.includes(search.txid)) {
+          search.path = path;
+          search.address = el.address;
+          search.type = type;
+          search.found = true;
+          search.result = el;
+        }
+      });
+    });
+    return search;
+  }
+
+  addNewTxToAddress(tx) {
+    // console.log('addNewTxToAddress', tx);
+    if (tx.address && tx.txid) {
+      const { type, path, found } = this.searchAddress(tx.address);
+      if (!found) {
+        console.log('Search was not successfull');
+        return false;
+      }
+      this.store.addresses[type][path].transactions.push(tx.txid);
+      this.store.addresses[type][path].fetchedLast = 0; // Because of the unclear state
+      this.lastModified = +new Date();
+      return true;
+    }
+    throw new Error('Invalid tx to add : tx');
+  }
+
   importAddresses(addresses) {
     const addressesStore = this.store.addresses;
     const self = this;
@@ -190,6 +286,11 @@ class Storage {
       throw new Error('Not implemented. Please create an issue on github if needed.');
     }
     return true;
+  }
+
+  async clearAll() {
+    this.store = cloneDeep(initialStore);
+    return this.saveState();
   }
 }
 

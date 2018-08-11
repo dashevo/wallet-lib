@@ -1,6 +1,6 @@
-class DapiClient {
+class DAPIClient {
   constructor() {
     this.type = this.constructor.name;
   }
 }
-module.exports = DapiClient;
+module.exports = DAPIClient;
