@@ -2,12 +2,31 @@ const { BIP44_ADDRESS_GAP } = require('../Constants');
 
 class BIP44Worker {
   constructor(opts) {
+    this.events = opts.events;
     this.storage = opts.storage;
     this.getAddress = opts.getAddress;
     this.worker = null;
     this.workerPass = 0;
     this.workerRunning = false;
     this.workerIntervalTime = 1 * 60 * 1000;
+  }
+
+  getNonContinuousIndexes(type = 'external') {
+    const nonContinuousIndexes = [];
+    const addresses = this.storage.getStore().addresses[type];
+    const paths = Object.keys(addresses);
+    if (paths.length > 0) {
+      const basePath = paths[0].substring(0, paths[0].length - paths[0].split('/')[5].length);
+      const totalNbAddresses = paths.length;
+      for (let i = 0, foundAddresses = 0; i < 100 && foundAddresses < totalNbAddresses; i += 1) {
+        const path = `${basePath}${i}`;
+        if (!addresses[path]) {
+          nonContinuousIndexes.push(i);
+        }
+        foundAddresses += 1;
+      }
+    }
+    return nonContinuousIndexes;
   }
 
   execWorker() {
@@ -30,7 +49,10 @@ class BIP44Worker {
     if (BIP44_ADDRESS_GAP > externalUnused) {
       externalMissingNb = BIP44_ADDRESS_GAP - externalUnused;
       const addressKeys = Object.keys(this.storage.store.addresses.external);
+      // console.log(addressKeys)
       const lastElem = this.storage.store.addresses.external[addressKeys[addressKeys.length - 1]];
+      // console.log(BIP44_ADDRESS_GAP, externalUnused, lastElem, addressKeys)
+
       const addressIndex = (!lastElem) ? -1 : parseInt(lastElem.index, 10);
 
       for (let i = addressIndex + 1; i < addressIndex + 1 + externalMissingNb; i += 1) {
@@ -38,8 +60,18 @@ class BIP44Worker {
         this.getAddress(i, false);
       }
     }
+
+    // Work as a verifier, will check that index are contiguous or create them
+    const nonContinuousIndexes = this.getNonContinuousIndexes();
+    nonContinuousIndexes.forEach((index) => {
+      this.getAddress(index);
+      this.getAddress(index, false);
+    });
+
     this.workerRunning = false;
     this.workerPass += 1;
+
+    this.events.emit('WORKER/BIP44/EXECUTED');
     return true;
   }
 
@@ -48,7 +80,8 @@ class BIP44Worker {
     if (this.worker) this.stopWorker();
     // every minutes, check the pool
     this.worker = setInterval(self.execWorker.bind(self), this.workerIntervalTime);
-    this.execWorker();
+    setTimeout(self.execWorker.bind(self), 100);
+    this.events.emit('WORKER/BIP44/STARTED');
   }
 
   stopWorker() {

@@ -29,6 +29,7 @@
     "@dashevo/dashcore-mnemonic": "^1.5.0",
     "axios": "^0.18.0",
     "localforage": "^1.7.2",
+    "lodash": "^4.17.10",
     "socket.io-client": "^2.1.1"
   },
   "devDependencies": {

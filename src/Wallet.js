@@ -86,15 +86,16 @@ class Wallet {
    * @param {object} account options
    * @return {account} - account object
    */
-  createAccount(accountOpts = {}) {
+  createAccount(accountOpts) {
     // if(this.accounts[])
     // Auto-populate this.accounts, probably not what we want ?
     return new Account(this, accountOpts);
   }
 
-  getAccount(accountIndex = 0) {
+  getAccount(accountIndex = 0, accountOpts) {
     const acc = this.accounts.filter(el => el.accountIndex === accountIndex);
-    return (acc[0]) || this.createAccount({ accountIndex });
+    const opts = Object.assign({ accountIndex }, accountOpts);
+    return (acc[0]) || this.createAccount(opts);
   }
 
   exportWallet(toHDPrivateKey = false) {

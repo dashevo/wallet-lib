@@ -1,11 +1,13 @@
 const { expect } = require('chai');
-const { Networks } = require('@dashevo/dashcore-lib');
+const { Networks, Address } = require('@dashevo/dashcore-lib');
+const Mnemonic = require('@dashevo/dashcore-mnemonic');
 const {
   dashToDuffs,
   duffsToDash,
   generateNewMnemonic,
   mnemonicToSeed,
   is,
+  getBytesOf,
 } = require('../../src/utils/index');
 const { mnemonicString1, HDPrivateKey1Testnet } = require('../fixtures');
 
@@ -185,5 +187,52 @@ describe('Utils', () => {
     const circularReference = {};
     circularReference.myself = circularReference;
     expect(is.stringified(circularReference)).to.be.equals(false);
+  });
+  it('should is.type handle type', () => {
+    const arr = [];
+    expect(is.type(arr, 'Array')).to.be.equal(true);
+  });
+  it('should is.mnemonic work', () => {
+    const mnemonic = new Mnemonic();
+    const mnemonic2 = 'crack spice venue ticket vacant steak next stomach amateur review okay curtain';
+    expect(is.mnemonic(mnemonic)).to.be.equal(true);
+    expect(is.mnemonic(mnemonic2)).to.be.equal(true);
+  });
+  it('should is.network work', () => {
+    const network = Networks.livenet;
+    const network2 = 'testnet';
+    expect(is.network(network)).to.be.equal(true);
+    expect(is.network(network2)).to.be.equal(true);
+  });
+  it('should is.seed work', () => {
+    const seed = new Mnemonic().toSeed();
+    const seed2 = new Mnemonic().toHDPrivateKey();
+    expect(is.seed(seed.toString('hex'))).to.be.equal(true);
+    expect(is.seed(seed2)).to.be.equal(true);
+  });
+  it('should is.address work', () => {
+    const addr = new Address('yinidcHwrfzb4bEJDSq3wtQyxRAgQxsQia');
+    expect(is.address(addr)).to.be.equal(true);
+  });
+  it('should is.txid work', () => {
+    const txid = '00000';
+    expect(is.txid(txid)).to.be.equal(true);
+  });
+  it('should is.transaction work', () => {
+    const transaction = {
+      vin: [],
+      vout: [],
+    };
+    expect(is.transaction(transaction)).to.be.equal(true);
+  });
+  it('should is.feeRate work', () => {
+    const feeRate = {
+      type: 'perBytes',
+      value: 10,
+    };
+    expect(is.feeRate(feeRate)).to.be.equal(true);
+  });
+  it('should getBytesOf return false on unknown type', () => {
+    expect(getBytesOf(null, 'toto')).to.be.equal(false);
   });
 });

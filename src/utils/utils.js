@@ -1,3 +1,4 @@
+const { Script, Address } = require('@dashevo/dashcore-lib');
 const { DUFFS_PER_DASH } = require('../Constants');
 
 function dashToDuffs(dash) {
@@ -12,4 +13,21 @@ function duffsToDash(duffs) {
   }
   return duffs / DUFFS_PER_DASH;
 }
-module.exports = { dashToDuffs, duffsToDash };
+function getBytesOf(elem, type) {
+  let BASE_BYTES = 0;
+  let SCRIPT_BYTES = 0;
+
+  switch (type) {
+    case 'utxo':
+      BASE_BYTES = 32 + 4 + 1 + 4;
+      SCRIPT_BYTES = elem.script.length;
+      return BASE_BYTES + SCRIPT_BYTES;
+    case 'output':
+      BASE_BYTES = 9;
+      SCRIPT_BYTES = Script(new Address(elem.address)).toString().length;
+      return BASE_BYTES + SCRIPT_BYTES;
+    default:
+      return false;
+  }
+}
+module.exports = { dashToDuffs, duffsToDash, getBytesOf };
