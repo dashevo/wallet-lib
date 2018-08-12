@@ -1,10 +1,12 @@
+## Account
 
-### Get Account
+### Get Addresses
 
-`const account = wallet.getAccount()`
+```
+const addresses = account.getAddresses();
+const internalAddresses = account.getAddresses(false);
+```
 
-Additional parameters :
- - accountId : Integer - Default : `0`
 
 ### Get Unused Address
 
@@ -35,3 +37,9 @@ Parameters :
 
 Additional parameters :
  - onlyAvailable : Boolean - Default : `true`
+
+### Disconnect
+
+```
+account.disconnect();
+```

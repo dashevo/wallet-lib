@@ -23,7 +23,10 @@ See also for specific Layer 2 needs (DashDrive/DAPs) : [DAP-SDK](https://github.
     - [Miscellaneous](#miscellaneous)
     - [Transports](#transports)
     - [Adapters](#adapters)
-- [Road map](road-map)
+- [API](#api)
+    - [Workers](#workers)
+- [Exemples](#exemples)
+- [Road map](#road-map)
 - [License](#license)
 - [Credits](#credits)
 
@@ -192,6 +195,23 @@ Adapters (help from community welcomed) :
 - [ ] BerkeleyDB
 - [ ] LowDB
 
+## API
+
+- [Wallet](/docs/wallet.md)
+- [Account](/docs/account.md)
+- [KeyChain](/docs/keychain.md)
+- [Storage](/docs/storage.md)
+- [CoinSelection](/docs/coinSelection.md)
+
+### Workers
+
+- [BIP44Worker](/docs/BIP44Worker.md)
+- [SyncWorker](/docs/SyncWorker.md)
+
+## Exemples
+
+You can see here, some [Exemples](/docs/exemples.md).
+
 ## Road map
 
 - DAPIClient : (09/18)
@@ -202,7 +222,7 @@ Adapters (help from community welcomed) :
 
 ## License
 
-Wallet-lib is made available under the [MIT License](licence.md)
+Wallet-lib is made available under the [MIT License](LICENSE)
 
 ## Credits
 
