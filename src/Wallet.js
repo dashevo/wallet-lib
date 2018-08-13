@@ -92,12 +92,23 @@ class Wallet {
     return new Account(this, accountOpts);
   }
 
+  /**
+   * Get a specific account per accountIndex
+   * @param accountIndex - Default: 0, set a specific index to get
+   * @param accountOpts - If we can't get, we create passing these arg to createAccount method
+   * @return {*|account}
+   */
   getAccount(accountIndex = 0, accountOpts) {
     const acc = this.accounts.filter(el => el.accountIndex === accountIndex);
     const opts = Object.assign({ accountIndex }, accountOpts);
     return (acc[0]) || this.createAccount(opts);
   }
 
+  /**
+   * Export the wallet (mnemonic)
+   * @param toHDPrivateKey - Default: false - Allow to return to a HDPrivateKey type
+   * @return {Mnemonic|HDPrivateKey}
+   */
   exportWallet(toHDPrivateKey = false) {
     function exportMnemonic(mnemonic) {
       if (mnemonic === null) throw new Error('Wallet was not initiated with a mnemonic, can\'t export it');
@@ -106,6 +117,9 @@ class Wallet {
     return (toHDPrivateKey) ? this.HDPrivateKey : exportMnemonic(this.mnemonic);
   }
 
+  /**
+   * Disconnect all the storage worker and process all account to disconnect their endpoint too.
+   */
   disconnect() {
     if (this.storage) {
       this.storage.stopWorker();

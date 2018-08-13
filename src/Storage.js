@@ -14,6 +14,12 @@ const initialStore = {
   },
   accounts: {},
 };
+
+/**
+ * Handle all the storage logic, it's a wrapper around the adapters
+ * So all the needed methods should be provided by the Storage class and the access to the adapter
+ * should be limited.
+ */
 class Storage {
   constructor(opts = defaultOpts) {
     this.adapter = opts.adapter;
@@ -35,12 +41,20 @@ class Storage {
     }, 1);
   }
 
+  /**
+   * Allow to clear the working interval (worker).
+   * @return {boolean}
+   */
   stopWorker() {
     clearInterval(this.interval);
     this.interval = null;
     return true;
   }
 
+  /**
+   * Return the content of the store
+   * @return {{} & any}
+   */
   getStore() {
     return Object.assign({}, this.store);
   }
@@ -49,6 +63,10 @@ class Storage {
     await this.rehydrateState();
   }
 
+  /**
+   * Fetch the state from the persistance adapter
+   * @return {Promise<void>}
+   */
   async rehydrateState() {
     this.store.transactions = (this.adapter) ? (await this.adapter.getItem('transactions') || this.store.transactions) : this.store.transactions;
     this.store.addresses = (this.adapter) ? (await this.adapter.getItem('addresses') || this.store.addresses) : this.store.addresses;
@@ -56,6 +74,10 @@ class Storage {
     this.lastRehydrate = +new Date();
   }
 
+  /**
+   * Force persistance of the state to the adapter
+   * @return {Promise<boolean>}
+   */
   async saveState() {
     const self = this;
     await this.adapter.setItem('transactions', { ...self.store.transactions });
@@ -65,6 +87,11 @@ class Storage {
     return true;
   }
 
+  /**
+   * Import an array of transactions or a transaction object to the store
+   * @param transactions
+   * @return {boolean}
+   */
   importTransactions(transactions) {
     const type = transactions.constructor.name;
     const txList = this.store.transactions;
@@ -101,6 +128,11 @@ class Storage {
     return true;
   }
 
+  /**
+   * Import an array of accounts or a account object to the store
+   * @param accounts
+   * @return {boolean}
+   */
   importAccounts(accounts) {
     const type = accounts.constructor.name;
     const accList = this.store.accounts;
@@ -131,6 +163,12 @@ class Storage {
     return true;
   }
 
+  /**
+   * Update a specific address information in the store
+   * It do not handle any merging right now and write over previous data.
+   * @param address
+   * @return {boolean}
+   */
   updateAddress(address) {
     const addressesStore = this.store.addresses;
     const { path } = address;
@@ -153,6 +191,11 @@ class Storage {
     return true;
   }
 
+  /**
+   * Search a specific address in the store
+   * @param address
+   * @return {{address: *, type: null, found: boolean}}
+   */
   searchAddress(address) {
     const search = {
       address,
@@ -178,6 +221,11 @@ class Storage {
     return search;
   }
 
+  /**
+   * Search a specific txid in the store
+   * @param txid
+   * @return {{txid: *, found: boolean}}
+   */
   searchTransaction(txid) {
     const search = {
       txid,
@@ -194,6 +242,12 @@ class Storage {
     return search;
   }
 
+  /**
+   * Search an address having a specific txid
+   * todo : Handle when multiples one (inbound/outbound)
+   * @param txid
+   * @return {{txid: *, address: null, type: null, found: boolean}}
+   */
   searchAddressWithTx(txid) {
     const search = {
       txid,
@@ -221,6 +275,11 @@ class Storage {
     return search;
   }
 
+  /**
+   * Add a new transaction to an address (push a tx)
+   * @param tx
+   * @return {boolean}
+   */
   addNewTxToAddress(tx) {
     // console.log('addNewTxToAddress', tx);
     if (tx.address && tx.txid) {
@@ -237,6 +296,11 @@ class Storage {
     throw new Error('Invalid tx to add : tx');
   }
 
+  /**
+   * Import one or multiple addresses to the store
+   * @param addresses
+   * @return {boolean}
+   */
   importAddresses(addresses) {
     const addressesStore = this.store.addresses;
     const self = this;
@@ -288,6 +352,10 @@ class Storage {
     return true;
   }
 
+  /**
+   * Clear all the store and save the cleared store to the persistance adapter
+   * @return {Promise<boolean>}
+   */
   async clearAll() {
     this.store = cloneDeep(initialStore);
     return this.saveState();

@@ -47,8 +47,8 @@ class InsightClient {
   }
 
 
-  async getTransaction(transaction) {
-    const res = await axios.get(`${this.uri}/tx/${transaction}`);
+  async getTransaction(transactionid) {
+    const res = await axios.get(`${this.uri}/tx/${transactionid}`);
     return res.data;
   }
 

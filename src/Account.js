@@ -13,6 +13,11 @@ const defaultOptions = {
   subscribe: true,
 };
 
+/**
+ * Add when not existing a element account in a parent wallet
+ * @param account
+ * @param wallet
+ */
 const addAccountToWallet = function (account, wallet) {
   const { accounts } = wallet;
 
@@ -134,7 +139,12 @@ class Account {
     }, 20);
   }
 
-
+  /**
+   * Broadcast a Transaction to the transport layer
+   * @param rawtx {String} - the hexa representation of the transaxtion
+   * @param isIs - If the tx is InstantSend tx todo: Should be automatically deducted from the rawtx
+   * @return {Promise<*>}
+   */
   async broadcastTransaction(rawtx, isIs = false) {
     if (!this.transport) throw new Error('A transport layer is needed to perform a broadcast');
 
@@ -176,12 +186,16 @@ class Account {
     return txid;
   }
 
-
-  async fetchTransactionInfo(tx) {
+  /**
+   * Fetch a specific txid from the transport layer
+   * @param transactionid - The transaction id to fetch
+   * @return {Promise<{txid, blockhash, blockheight, blocktime, fees, size, vout, vin, txlock}>}
+   */
+  async fetchTransactionInfo(transactionid) {
     // valueIn, valueOut,
     const {
       txid, blockhash, blockheight, blocktime, fees, size, vin, vout, txlock,
-    } = await this.transport.getTransaction(tx);
+    } = await this.transport.getTransaction(transactionid);
 
     return {
       txid,
@@ -196,6 +210,12 @@ class Account {
     };
   }
 
+  /**
+   * Fetch a specific address from the transport layer
+   * @param addressObj - AddressObject having an address and a path
+   * @param fetchUtxo - If we also query the utxo (default: yes)
+   * @return {Promise<addressInfo>}
+   */
   async fetchAddressInfo(addressObj, fetchUtxo = true) {
     const self = this;
     const { address, path } = addressObj;
@@ -249,15 +269,30 @@ class Account {
     return addrInfo;
   }
 
+  /**
+   * Get transaction from the store
+   * @return {Object} transactions - All transaction in the store
+   */
   getTransactions() {
     return this.store.transactions;
   }
 
+  /**
+   * Get all the addresses from the store from a given type
+   * @param external - Default: true, return either external or internal type addresses
+   * @return {Object} address - All address matching the type
+   */
   getAddresses(external = true) {
     const type = (external) ? 'external' : 'internal';
     return this.store.addresses[type];
   }
 
+  /**
+   * Get a specific addresss based on the index and type of address.
+   * @param index - The index on the type
+   * @param external - Type of the address (external, internal,...)
+   * @return <AddressInfo>
+   */
   getAddress(index = 0, external = true) {
     const type = (external) ? 'external' : 'internal';
     const path = (external) ? `${this.BIP44PATH}/0/${index}` : `${this.BIP44PATH}/1/${index}`;
@@ -266,6 +301,12 @@ class Account {
     return (addressType[path]) ? addressType[path] : this.generateAddress(path);
   }
 
+  /**
+   * Get an unused address from the store
+   * @param external - (default: true) - Type of the requested usused address
+   * @param skip
+   * @return {*}
+   */
   getUnusedAddress(external = true, skip = 0) {
     const type = (external) ? 'external' : 'internal';
     let unused = {
@@ -290,6 +331,11 @@ class Account {
     return unused;
   }
 
+  /**
+   * Get all the transaction history already formated
+   * todo: add a raw format
+   * @return {Promise<any[]>}
+   */
   async getTransactionHistory() {
     const self = this;
     let txs = [];
@@ -371,11 +417,21 @@ class Account {
     return history;
   }
 
-  async getTransaction(id = null) {
+  /**
+   * Use the transport layer to fetch a specific transaction matchin a txid
+   * @param txid
+   * @return {Promise<*>}
+   */
+  async getTransaction(txid = null) {
     const self = this;
-    return (id !== null && self.transport) ? (self.transport.getTransaction(id)) : [];
+    return (txid !== null && self.transport) ? (self.transport.getTransaction(txid)) : [];
   }
 
+  /**
+   * Generate an address from a path and import it to the store
+   * @param path
+   * @return {addressObj} Address information
+   * */
   generateAddress(path) {
     if (!path) throw new Error('Expected path to generate an address');
     const index = path.split('/')[5];
@@ -427,6 +483,11 @@ class Account {
     return (displayDuffs) ? balance : duffsToDash(balance);
   }
 
+  /**
+   * Return all the utxos (unspendable included)
+   * @param {Boolean} onlyAvailable - Only return available utxos (spendable)
+   * @return {Array}
+   */
   getUTXOS(onlyAvailable = true) {
     let utxos = [];
 
@@ -448,6 +509,15 @@ class Account {
     return utxos;
   }
 
+  /**
+   * Create a transaction based on the passed information
+   * @param opts - Options object
+   * @param opts.amount - Amount in dash that you want to send
+   * @param opts.satoshis - Amount in satoshis
+   * @param opts.to - Address of the recipient
+   * @param opts.isInstantSend - If you want to use IS or stdTx.
+   * @return {String} - rawTx
+   */
   createTransaction(opts) {
     const tx = new Dashcore.Transaction();
 
@@ -502,6 +572,12 @@ class Account {
     return signedTx.toString();
   }
 
+  /**
+   * Allow to sign any transaction or a transition object from a valid privateKeys list
+   * @param object
+   * @param privateKeys
+   * @param sigType
+   */
   // eslint-disable-next-line class-methods-use-this
   sign(object, privateKeys, sigType = Dashcore.crypto.Signature.SIGHASH_ALL) {
     const handledTypes = ['Transaction', 'SubTxRegistrationPayload'];
@@ -518,6 +594,11 @@ class Account {
     return obj;
   }
 
+  /**
+   * Return all the private keys of the parameters passed addresses
+   * @param addressList<String>
+   * @return {Array}<HDPrivateKey>
+   */
   getPrivateKeys(addressList) {
     let addresses = [];
     let privKeys = [];
@@ -541,6 +622,11 @@ class Account {
     return privKeys;
   }
 
+  /**
+   * Force a refresh of all the addresses informations (utxo, balance, txs...)
+   * todo : Use a taskQueue where this would just emit the ask for a refresh.
+   * @return {Boolean}
+   */
   forceRefreshAccount() {
     if (!this.transport) {
       throw new Error('A transport layer is needed to perform a full refresh');
@@ -551,8 +637,15 @@ class Account {
         this.storage.store.addresses[type][path].fetchedLast = 0;
       });
     });
+    return true;
   }
 
+  /**
+   * This method will disconnect from all the opened streams, will stop all running workers
+   * and force a saving of the state.
+   * You want to use this method at the end of your user usage of this lib.
+   * @return {Boolean}
+   */
   disconnect() {
     if (this.transport) {
       this.transport.disconnect();
@@ -564,8 +657,10 @@ class Account {
       });
     }
     if (this.storage) {
+      this.storage.saveState();
       this.storage.stopWorker();
     }
+    return true;
   }
 }
 
