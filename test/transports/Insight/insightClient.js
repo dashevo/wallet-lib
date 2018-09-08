@@ -13,15 +13,17 @@ const insightClientOpts = {
 };
 
 describe('Transport : Insight Client', function suite() {
-  this.timeout(6000);
+  this.timeout(20000);
   before((done) => {
     const config = {
       transport: new InsightClient(insightClientOpts),
       mnemonic: mnemonicString1,
       network: Dashcore.Networks.testnet,
     };
+
     wallet = new Wallet(config);
     account = wallet.createAccount();
+    console.log('Account created');
     account.events.on('ready', () => {
       done();
     });
@@ -53,6 +55,7 @@ describe('Transport : Insight Client', function suite() {
       'e66474bfe8ae3d91b2784864fc09e0bd615cbfbf4a2164e46b970bcc488a938f',
       'b4f567f398ec2174df2d775c9bcbc197efda2902bc4b628858d6c8ef7453284d',
     ];
+    expect(addressesExternalData[`${path}/0/0`].address).to.equal('yRdxQQpXYh9Xkd91peJ7FJxpEzoRb6droH');
     expect(addressesExternalData[`${path}/0/0`].transactions).to.deep.equal(expectedTransactionsArr);
     expect(addressesExternalData[`${path}/0/0`].utxos).to.deep.equal([]);
     expect(addressesExternalData[`${path}/0/0`].fetchedLast).to.be.greaterThan(1533535093789);

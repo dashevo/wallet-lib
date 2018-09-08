@@ -5,6 +5,7 @@ class BIP44Worker {
     this.events = opts.events;
     this.storage = opts.storage;
     this.getAddress = opts.getAddress;
+    this.walletId = opts.walletId;
     this.worker = null;
     this.workerPass = 0;
     this.workerRunning = false;
@@ -13,7 +14,7 @@ class BIP44Worker {
 
   getNonContinuousIndexes(type = 'external') {
     const nonContinuousIndexes = [];
-    const addresses = this.storage.getStore().addresses[type];
+    const addresses = this.storage.getStore().wallets[this.walletId].addresses[type];
     const paths = Object.keys(addresses);
     if (paths.length > 0) {
       const basePath = paths[0].substring(0, paths[0].length - paths[0].split('/')[5].length);
@@ -34,7 +35,7 @@ class BIP44Worker {
       return false;
     }
     this.workerRunning = true;
-    const { addresses } = this.storage.store;
+    const { addresses } = this.storage.store.wallets[this.walletId];
     const externalPaths = Object.keys(addresses.external);
     let externalUnused = 0;
 
@@ -48,9 +49,9 @@ class BIP44Worker {
     let externalMissingNb = 0;
     if (BIP44_ADDRESS_GAP > externalUnused) {
       externalMissingNb = BIP44_ADDRESS_GAP - externalUnused;
-      const addressKeys = Object.keys(this.storage.store.addresses.external);
+      const addressKeys = Object.keys(this.storage.store.wallets[this.walletId].addresses.external);
       // console.log(addressKeys)
-      const lastElem = this.storage.store.addresses.external[addressKeys[addressKeys.length - 1]];
+      const lastElem = this.storage.store.wallets[this.walletId].addresses.external[addressKeys[addressKeys.length - 1]];
       // console.log(BIP44_ADDRESS_GAP, externalUnused, lastElem, addressKeys)
 
       const addressIndex = (!lastElem) ? -1 : parseInt(lastElem.index, 10);

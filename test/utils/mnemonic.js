@@ -4,7 +4,8 @@ const is = require('../../src/utils/is');
 
 const mnemonic1 = 'hole lesson insane entire dolphin scissors game dwarf polar ethics drip math';
 const mnemonic2 = 'woman forest output essay bleak satisfy era ordinary exotic source portion wire';
-const mnemonic3 = 'divorce radar castle wire sun timber master income exchange wash fluid loud'
+const mnemonic3 = 'divorce radar castle wire sun timber master income exchange wash fluid loud';
+const mnemonic4 = 'increase table banana fiscal innocent wool sport mercy motion stable prize promote';
 
 describe('Utils - mnemonic', () => {
   it('should generate new mnemonic', () => {
@@ -29,5 +30,6 @@ describe('Utils - mnemonic', () => {
     expect(mnemonicToWalletId(mnemonic1)).to.equal('f566600d81');
     expect(mnemonicToWalletId(mnemonic2)).to.equal('74bbe91a47');
     expect(mnemonicToWalletId(mnemonic3)).to.equal('f351a836e6');
+    expect(mnemonicToWalletId(mnemonic4)).to.equal('fad183cbf7');
   });
 });

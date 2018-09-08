@@ -62,7 +62,10 @@ describe('Account - Basics', function suite() {
     expect(account.constructor.name).to.equal('Account');
     expect(account.accountIndex).to.equal(0);
     expect(account.BIP44PATH).to.equal('m/44\'/1\'/0\'');
-    expect(account.store.accounts["m/44'/1'/0'"]).to.exist;
+    expect(account.store.wallets).to.exist;
+
+    const walletId = wallet.walletId;
+    expect(account.store.wallets[walletId].accounts["m/44'/1'/0'"]).to.exist;
     expect(account.transport).to.equal(null);
     expect(account.mode).to.equal('full');
     expect(account.label).to.equal(null);
@@ -416,4 +419,4 @@ describe('Account - Transports, Workers', function suite() {
     walletFakeTransportWithUTXO.disconnect();
     accountFakeTransportLivenet.disconnect();
   });
-});
+ });

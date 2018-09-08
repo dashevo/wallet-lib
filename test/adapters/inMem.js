@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const InMem = require('../../src/adapters/InMem');
 
 const inMem = new InMem();
+
 describe('Adapter - inMem', () => {
   it('should provide a config method', () => {
     expect(inMem.config).to.exist;

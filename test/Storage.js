@@ -6,12 +6,19 @@ const adapter = new InMem();
 const storageOpts = {
   adapter,
 };
+
+const miscFixture = require('./fixtures/misc');
+
 describe('Storage', function suite() {
   this.timeout(50000);
   it('should create a new storage without options', () => {
-    const store2 = new Storage();
-    expect(store2).to.exist;
-    store2.stopWorker();
+    const store = new Storage();
+    expect(store).to.exist;
+    expect(store.store).to.deep.equal({
+      wallets: {},
+      transactions: {},
+    });
+    store.stopWorker();
   });
   it('should create a new storage with options', () => {
     const store = new Storage(storageOpts);
@@ -19,13 +26,8 @@ describe('Storage', function suite() {
     expect(store).to.exist;
     expect(store.adapter).to.deep.equal(adapter);
     expect(store.store).to.deep.equal({
+      wallets: {},
       transactions: {},
-      addresses: {
-        internal: {},
-        external: {},
-        misc: {},
-      },
-      accounts: {},
     });
     expect(store.lastRehydrate).to.equal(null);
     expect(store.lastSave).to.equal(null);
@@ -35,38 +37,7 @@ describe('Storage', function suite() {
   });
   it('should import a tx', () => {
     const store = new Storage(storageOpts);
-    const tx = {
-      blockhash: '000000000a84c4703da7a69cfa65837251e4aac80e1621f2a2cc9504e0c149ba',
-      blockheight: 201436,
-      blocktime: 1533525448,
-      fees: 0.0001,
-      size: 225,
-      txid: '9ab39713e9ce713d41ca6974db83e57bced02402e9516b8a662ed60d5c08f6d1',
-      txlock: true,
-      vin: [{
-        txid: 'e4524e918977b70ab47160d8e3b87a5fa9f88f22e43f0eec2abbee2cf364c93b', vout: 1, sequence: 4294967295, n: 0, scriptSig: { hex: '4730440220154e37879e70784daff6cf04993cc88e8cf7e5357f82e98df9c117941cd5b3f702200d02f583085fbfd28c77d31c6b9a69f641a8fef5e99aaec8b8aedd4a3326e4100121025deea4fcd79eb876daa0f5829659c76f00f6b3fe6bf12e3ea83ecc763219bf88', asm: '30440220154e37879e70784daff6cf04993cc88e8cf7e5357f82e98df9c117941cd5b3f702200d02f583085fbfd28c77d31c6b9a69f641a8fef5e99aaec8b8aedd4a3326e410[ALL] 025deea4fcd79eb876daa0f5829659c76f00f6b3fe6bf12e3ea83ecc763219bf88' }, addr: 'yhzoBe1aCTTganFBzFb3ErF4ufwMqonK5a', valueSat: 81246619083, value: 812.46619083, doubleSpentTxID: null,
-      }],
-      vout: [{
-        value: '2.00000000',
-        n: 0,
-        scriptPubKey: {
-          hex: '76a914df128447b46f9c81edbf13494d12aabca066b65688ac', asm: 'OP_DUP OP_HASH160 df128447b46f9c81edbf13494d12aabca066b656 OP_EQUALVERIFY OP_CHECKSIG', addresses: ['ygewiYb7ZJxU4uuNGEVzbbA3wZEpEQJKhr'], type: 'pubkeyhash',
-        },
-        spentTxId: '6b90bf01b10a0c6cac018d376823f6b330edf2cbb783cc3d02004f8706bbc311',
-        spentIndex: 7,
-        spentHeight: 203517,
-      }, {
-        value: '810.46609083',
-        n: 1,
-        scriptPubKey: {
-          hex: '76a914f67b2c4f47ea0a2bae829d3816a01cc486463d7988ac', asm: 'OP_DUP OP_HASH160 f67b2c4f47ea0a2bae829d3816a01cc486463d79 OP_EQUALVERIFY OP_CHECKSIG', addresses: ['yinidcHwrfzb4bEJDSq3wtQyxRAgQxsQia'], type: 'pubkeyhash',
-        },
-        spentTxId: '22c368e09ad8b36553b383c6a4ae989f91d1f66622b2b685262580c8a45175a4',
-        spentIndex: 0,
-        spentHeight: 203155,
-      }],
-    };
-
+    const tx = miscFixture['9ab39713e9ce713d41ca6974db83e57bced02402e9516b8a662ed60d5c08f6d1'];
 
     const result = store.importTransactions(tx);
     expect(result).to.equal(true);
@@ -76,26 +47,26 @@ describe('Storage', function suite() {
 
   it('should import multiple txs', () => {
     const store = new Storage(storageOpts);
+    const tx = miscFixture['1d8f924bef2e24d945d7de2ac66e98c8625e4cefeee4e07db2ea334ce17f9c35'];
+    const tx2 = miscFixture['7ae825f4ecccd1e04e6c123e0c55d236c79cd04c6ab64e839aed2ae0af3003e6'];
 
-
-    expect(() => store.importTransactions([])).to.throw('Not implemented. Please create an issue on github if needed.');
-    expect(() => store.importTransactions(12)).to.throw('Not implemented. Please create an issue on github if needed.');
+    expect(() => store.importTransactions([tx, tx2])).to.throw('Not implemented. Please create an issue on github if needed.');
+    store.stopWorker();
+  });
+  it('should importTx deal with wrong type', () => {
+    const store = new Storage(storageOpts);
+    expect(() => store.importTransactions(12)).to.throw('Invalid transaction. Cannot import.');
     store.stopWorker();
   });
   it('should import a addr', () => {
     const store = new Storage(storageOpts);
-    const addr = {
-      address: 'yLmv6uX1jmn14pCDpc83YCsA8wHVtcbaNw',
-      balance: 0,
-      fetchedLast: 1533527600644,
-      path: "m/44'/1'/0'/0/19",
-      transactions:
-      [],
-      utxos: [],
-    };
-    const result = store.importAddresses(addr);
+    const addr = miscFixture.yizmJb63ygipuJaRgYtpWCV2erQodmaZt8;
+    const walletId = 'fad183cbf7';
+
+    const result = store.importAddresses(addr, walletId);
     expect(result).to.equal(true);
-    expect(store.store.addresses.external[addr.path]).to.deep.equal(addr);
+    expect(store.store.wallets[walletId]).to.exist;
+    expect(store.store.wallets[walletId].addresses.external[addr.path]).to.deep.equal(addr);
 
     store.stopWorker();
   });
@@ -140,14 +111,15 @@ describe('Storage', function suite() {
 
 
     };
-    const result = store.importAddresses(addrs);
+    const walletId = 'fad183cbf7';
+    const result = store.importAddresses(addrs, walletId);
     expect(result).to.equal(true);
-    expect(store.store.addresses.external['m/44\'/1\'/0\'/0/18']).to.deep.equal(addrs['m/44\'/1\'/0\'/0/18']);
-    expect(store.store.addresses.external['m/44\'/1\'/0\'/0/19']).to.deep.equal(addrs['m/44\'/1\'/0\'/0/19']);
+    const addressStore = store.store.wallets[walletId];
+    expect(addressStore.addresses.external['m/44\'/1\'/0\'/0/18']).to.deep.equal(addrs['m/44\'/1\'/0\'/0/18']);
+    expect(addressStore.addresses.external['m/44\'/1\'/0\'/0/19']).to.deep.equal(addrs['m/44\'/1\'/0\'/0/19']);
 
 
-    expect(() => store.importAddresses([])).to.throw('Not implemented. Please create an issue on github if needed.');
-    expect(() => store.importAddresses(12)).to.throw('Not implemented. Please create an issue on github if needed.');
+    expect(() => store.importAddresses([], walletId)).to.throw('Not implemented. Please create an issue on github if needed.');
 
     store.stopWorker();
   });
@@ -158,10 +130,11 @@ describe('Storage', function suite() {
       network: 'testnet',
       path: "m/44'/1'/0'",
     };
-
-    const result = store.importAccounts(acc);
+    const walletId = 'fad183cbf7';
+    const result = store.importAccounts(acc, walletId);
     expect(result).to.equal(true);
-    expect(store.store.accounts[acc.path]).to.deep.equal(acc);
+    const walletStore = store.store.wallets[walletId];
+    expect(walletStore.accounts[acc.path]).to.deep.equal(acc);
     store.stopWorker();
   });
   it('should import multiples account', () => {
@@ -178,14 +151,16 @@ describe('Storage', function suite() {
         path: "m/44'/1'/1'",
       },
     };
+    const walletId = 'fad183cbf7';
 
-
-    const result = store.importAccounts(accounts);
+    const result = store.importAccounts(accounts, walletId);
     expect(result).to.equal(true);
-    expect(store.store.accounts["m/44'/1'/0'"]).to.deep.equal(accounts["m/44'/1'/0'"]);
-    expect(store.store.accounts["m/44'/1'/1'"]).to.deep.equal(accounts["m/44'/1'/1'"]);
-    expect(() => store.importAccounts([])).to.throw('Not implemented. Please create an issue on github if needed.');
-    expect(() => store.importAccounts(12)).to.throw('Not implemented. Please create an issue on github if needed.');
+    const walletStore = store.store.wallets[walletId];
+    expect(walletStore.accounts["m/44'/1'/0'"]).to.deep.equal(accounts["m/44'/1'/0'"]);
+    expect(walletStore.accounts["m/44'/1'/1'"]).to.deep.equal(accounts["m/44'/1'/1'"]);
+    expect(() => store.importAccounts([])).to.throw('Expected walletId to import addresses');
+    expect(() => store.importAccounts([], walletId)).to.throw('Not implemented. Please create an issue on github if needed.');
+    expect(() => store.importAccounts(12, walletId)).to.throw('Invalid account');
 
     store.stopWorker();
   });
@@ -196,22 +171,28 @@ describe('Storage', function suite() {
       network: 'testnet',
       path: "m/44'/1'/0'",
     };
+    const walletId = 'fad183cbf7';
 
-    store.importAccounts(acc);
+    store.importAccounts(acc, walletId);
     const result = store.getStore();
 
     const expectedResult = {
       transactions: {},
-      addresses: {
-        internal: {},
-        external: {},
-        misc: {},
-      },
-      accounts: {
-        "m/44'/1'/0'": {
-          label: 'uberAcc',
-          network: 'testnet',
-          path: "m/44'/1'/0'",
+      wallets: {
+        fad183cbf7: {
+          network: undefined,
+          accounts: {
+            "m/44'/1'/0'": {
+              label: 'uberAcc',
+              network: 'testnet',
+              path: "m/44'/1'/0'",
+            },
+          },
+          addresses: {
+            internal: {},
+            external: {},
+            misc: {},
+          },
         },
       },
     };
@@ -240,18 +221,26 @@ describe('Storage', function suite() {
     const store = new Storage(storageOpts);
     await store.clearAll();
     const result = store.getStore();
+
     const expected = {
       transactions: {},
-      addresses: { internal: {}, external: {}, misc: {} },
-      accounts: {},
+      wallets: {},
     };
     expect(result).to.deep.equal(expected);
     store.stopWorker();
   });
-  it('should fail on import address', () => {
+  it('should fail on import invalid address', () => {
     const store = new Storage(storageOpts);
-    const expected = 'Expected path to generate an address';
-    expect(() => store.importAddresses({ aw: {} })).to.throw(expected);
+    const expected = 'Expected path to import an address';
+    expect(() => store.importAddresses({ aw: {} }, 'fad183cbf7')).to.throw(expected);
+    store.stopWorker();
+  });
+  it('should fail on import address without walletId', () => {
+    const store = new Storage(storageOpts);
+    const expected = 'Expected walletId to import addresses';
+    expect(() => store.importAddresses({
+      yizmJb63ygipuJaRgYtpWCV2erQodmaZt8: miscFixture.yizmJb63ygipuJaRgYtpWCV2erQodmaZt8,
+    })).to.throw(expected);
     store.stopWorker();
   });
   it('should fail on import transaction', () => {
@@ -263,7 +252,9 @@ describe('Storage', function suite() {
   it('should fail on update address', () => {
     const store = new Storage(storageOpts);
     const expected = 'Expected path to update an address';
-    expect(() => store.updateAddress({ aw: {} })).to.throw(expected);
+    const expected2 = 'Expected walletId to update an address';
+    expect(() => store.updateAddress({ aw: {} }, 'fad183cbf7')).to.throw(expected);
+    expect(() => store.updateAddress({ aw: {} })).to.throw(expected2);
     store.stopWorker();
   });
   it('should fail on addNewtxtoAddress', () => {

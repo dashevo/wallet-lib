@@ -26,9 +26,12 @@ class Transporter {
 
   async getAddressSummary(address) {
     if (!is.address(address)) throw new Error('Received an invalid address to fetch');
-    const data = await this.transport.getAddressSummary(address).catch((err) => {
-      throw new Error(err);
-    });
+    const data = await this
+      .transport
+      .getAddressSummary(address)
+      .catch((err) => {
+        throw new Error(err);
+      });
     return data;
   }
 
@@ -62,6 +65,13 @@ class Transporter {
 
   disconnect() {
     return (this.transport.closeSocket) ? this.transport.closeSocket() : false;
+  }
+
+  changeNetwork(network) {
+    if (!this.transport.changeNetwork) {
+      throw new Error('Transport does not handle network changes');
+    }
+    return this.transport.changeNetwork(network);
   }
 
   async sendRawTransaction(rawtx, isIs) {
