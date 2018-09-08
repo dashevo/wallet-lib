@@ -14,14 +14,7 @@ function generateNewMnemonic() {
  */
 function mnemonicToHDPrivateKey(mnemonic, network, passphrase = '') {
   if (!mnemonic) throw new Error('Expect mnemonic to be provided');
-  // const seed = (mnemonic.constructor.name === 'Mnemonic')
-  //   ? mnemonic.toHDPrivateKey(passphrase, network)
-  //   : new Mnemonic(mnemonic).toHDPrivateKey(passphrase, network);
-  // if (mnemonic.constructor.name === 'Mnemonic') {
-  //   console.log('--',new Mnemonic(mnemonic).toHDPrivateKey(passphrase, network));
-  // }
-  // console.log('mnemonictoseed');
-  // return seed;
+
   return (mnemonic.constructor.name === 'Mnemonic')
     ? mnemonic.toHDPrivateKey(passphrase, network)
     : new Mnemonic(mnemonic).toHDPrivateKey(passphrase, network);
