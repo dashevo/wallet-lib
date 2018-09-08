@@ -1,5 +1,5 @@
 const { dashToDuffs, duffsToDash, getBytesOf, hasProp } = require('./utils');
-const { generateNewMnemonic, HDPrivateKeyToMnemonic, mnemonicToSeed, mnemonicToWalletId } = require('./mnemonic.js');
+const { generateNewMnemonic, mnemonicToHDPrivateKey, mnemonicToWalletId } = require('./mnemonic.js');
 const is = require('./is');
 const coinSelection = require('./coinSelection');
 const feeCalculation = require('./feeCalculation');
@@ -9,9 +9,8 @@ module.exports = {
   dashToDuffs,
   duffsToDash,
   generateNewMnemonic,
-  mnemonicToSeed,
+  mnemonicToHDPrivateKey,
   mnemonicToWalletId,
-  HDPrivateKeyToMnemonic,
   is,
   coinSelection,
   feeCalculation,

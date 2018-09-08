@@ -48,7 +48,7 @@ class InsightClient {
       this.socket.on('connect', () => console.log('Socket connected!'));
       this.socket.on('event', event => console.log('event', event));
       this.socket.on('disconnect', disconnect => console.log('disconnect', disconnect));
-      this.socket.on('error', error => console.log('Socket err', error, this.socketUri));
+      this.socket.on('error', error => console.log('Socket err', error));
 
       // this.subscribeToEvent('block', tx => console.log('txlock', tx));
       // this.subscribeToEvent('txlock', tx => console.log('txlock', tx));
@@ -95,7 +95,7 @@ class InsightClient {
       .post(url, { rawtx })
       .then(res => res.data)
       .catch((err) => {
-        console.log(err);
+        console.log(err.response.data);
         throw new Error(err);
       });
   }
@@ -112,7 +112,7 @@ class InsightClient {
         listener,
         setTime: Date.now(),
       };
-      console.log('Subscribed to ', eventName);
+      console.log('Subscribed to event :', eventName);
     }
   }
 

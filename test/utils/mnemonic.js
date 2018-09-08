@@ -1,5 +1,9 @@
 const { expect } = require('chai');
-const {generateNewMnemonic, mnemonicToSeed, mnemonicToWalletId} = require('../../src/utils/mnemonic');
+const Mnemonic = require('@dashevo/dashcore-mnemonic');
+const Dashcore = require('@dashevo/dashcore-lib');
+const {
+  generateNewMnemonic, mnemonicToHDPrivateKey, mnemonicToWalletId,
+} = require('../../src/utils/mnemonic');
 const is = require('../../src/utils/is');
 
 const mnemonic1 = 'hole lesson insane entire dolphin scissors game dwarf polar ethics drip math';
@@ -12,11 +16,11 @@ describe('Utils - mnemonic', () => {
     const result = generateNewMnemonic();
     expect(result.constructor.name).to.be.equal('Mnemonic');
   });
-  it('should do mnemonicToSeed', () => {
-    const mnemonic = generateNewMnemonic()
-    const mnemonic2 = generateNewMnemonic().toString()
-    const result = mnemonicToSeed(mnemonic);
-    const result2 = mnemonicToSeed(mnemonic2);
+  it('should do mnemonicToHDPrivateKey', () => {
+    const mnemonic = generateNewMnemonic();
+    const mnemonic2 = generateNewMnemonic().toString();
+    const result = mnemonicToHDPrivateKey(mnemonic);
+    const result2 = mnemonicToHDPrivateKey(mnemonic2);
     expect(result.constructor.name).to.be.equal('HDPrivateKey');
     expect(result2.constructor.name).to.be.equal('HDPrivateKey');
   });

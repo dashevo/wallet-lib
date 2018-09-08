@@ -5,7 +5,7 @@ const KeyChain = require('./KeyChain');
 // const { Registration, TopUp } = Dashcore.Transaction.SubscriptionTransactions;
 const {
   generateNewMnemonic,
-  mnemonicToSeed,
+  mnemonicToHDPrivateKey,
   mnemonicToWalletId,
   is,
 } = require('./utils/index');
@@ -43,17 +43,17 @@ class Wallet {
       if (!is.mnemonic(opts.mnemonic)) throw new Error('Expected a valid mnemonic (typeof String or Mnemonic)');
       // eslint-disable-next-line prefer-destructuring
       mnemonic = opts.mnemonic;
-      HDPrivateKey = mnemonicToSeed(opts.mnemonic, this.network, passphrase);
+      HDPrivateKey = mnemonicToHDPrivateKey(opts.mnemonic, this.network, passphrase);
     } else if ('seed' in opts) {
       if (!is.seed(opts.seed)) throw new Error('Expected a valid seed (typeof HDPrivateKey or String)');
       HDPrivateKey = opts.seed;
       mnemonic = null; // todo : verify if possible to change from HDPrivateKey to Mnemonic back
     } else {
       mnemonic = generateNewMnemonic();
-      HDPrivateKey = mnemonicToSeed(mnemonic, this.network, passphrase);
+      HDPrivateKey = mnemonicToHDPrivateKey(mnemonic, this.network, passphrase);
     }
 
-    this.walletId = mnemonicToWalletId(mnemonic);
+    this.walletId = (mnemonic) ? mnemonicToWalletId(mnemonic) : mnemonicToWalletId(HDPrivateKey);
     this.adapter = (opts.adapter) ? opts.adapter : defaultOptions.adapter;
     this.adapter.config();
 
