@@ -98,14 +98,10 @@ describe('Utils', () => {
   it('should is.bool handle int', () => {
     expect(is.bool('true')).to.be.equals(false);
   });
-
   it('should is.hex handle hex', () => {
     expect(is.hex('1234567890ABCD')).to.be.equals(true);
+    expect(is.hex('0b757a848f')).to.equal(true);
   });
-  it('should is.hex handle value out of range', () => {
-    expect(is.hex('1234567890ABCDE')).to.be.equals(false);
-  });
-
   it('should is.hex handle not hex', () => {
     expect(is.hex('12648430T')).to.be.equals(false);
   });
@@ -127,7 +123,7 @@ describe('Utils', () => {
     expect(is.fn(false)).to.be.equals(false);
   });
   it('should is.fn handle arrow function', () => {
-    expect(is.fn(() => mnemonicToSeed)).to.be.equals(true);
+    expect(is.fn(() => generateNewMnemonic)).to.be.equals(true);
   });
 
   it('should is.def handle any value', () => {
@@ -157,7 +153,7 @@ describe('Utils', () => {
     expect(is.promise(promise)).to.be.equals(true);
   });
   it('should is.promise handle non promise', () => {
-    expect(is.promise(() => mnemonicToSeed)).to.be.equals(false);
+    expect(is.promise(() => generateNewMnemonic)).to.be.equals(false);
   });
 
   it('should is.JSON handle empty json', () => {
