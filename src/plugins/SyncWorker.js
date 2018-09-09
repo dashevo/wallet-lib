@@ -110,7 +110,7 @@ class SyncWorker {
 
     const cb = async function (tx) {
       if (tx.address && tx.txid) {
-        self.storage.addNewTxToAddress(tx);
+        self.storage.addNewTxToAddress(tx, self.walletId);
         const transactionInfo = await self.transport.getTransaction(tx.txid);
         self.storage.importTransactions(transactionInfo);
         self.events.emit('balance_changed');

@@ -260,7 +260,7 @@ describe('Storage', function suite() {
   it('should fail on addNewtxtoAddress', () => {
     const store = new Storage(storageOpts);
     const expected = 'Invalid tx to add : tx';
-    expect(() => store.addNewTxToAddress({ aw: {} })).to.throw(expected);
+    expect(() => store.addNewTxToAddress({ aw: {} }), 'fad183cbf7').to.throw(expected);
     store.stopWorker();
   });
   it('should not create a wallet twice', () => {

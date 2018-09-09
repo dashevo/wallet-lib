@@ -439,7 +439,7 @@ describe('Transport : Insight Client', function suite() {
       txlock: true,
     };
     return account.getTransaction('b42c5052d7d31a422e711d50d3754217b0b16b6dfa29cf497b3dd75afa4febcb').then(
-      data => console.log(JSON.stringify(data)) && expect(data).to.be.deep.equal(expected),
+      data => expect(data).to.be.deep.equal(expected),
     );
   });
   it('should deal with invalid transaction', () => {

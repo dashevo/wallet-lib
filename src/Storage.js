@@ -295,20 +295,24 @@ class Storage {
     const store = this.getStore();
 
     // Look up by looping over all addresses todo:optimisation
-    const existingTypes = Object.keys(store.addresses);
-    existingTypes.forEach((type) => {
-      const existingPaths = Object.keys(store.addresses[type]);
-      existingPaths.forEach((path) => {
-        const el = store.addresses[type][path];
-        if (el.transactions.includes(search.txid)) {
-          search.path = path;
-          search.address = el.address;
-          search.type = type;
-          search.found = true;
-          search.result = el;
-        }
+    const existingWallets = Object.keys(store);
+    existingWallets.forEach((walletId) => {
+      const existingTypes = Object.keys(store.wallets[walletId].addresses);
+      existingTypes.forEach((type) => {
+        const existingPaths = Object.keys(store.wallets[walletId].addresses[type]);
+        existingPaths.forEach((path) => {
+          const el = store.wallets[walletId].addresses[type][path];
+          if (el.transactions.includes(search.txid)) {
+            search.path = path;
+            search.address = el.address;
+            search.type = type;
+            search.found = true;
+            search.result = el;
+          }
+        });
       });
     });
+
     return search;
   }
 
@@ -317,7 +321,7 @@ class Storage {
    * @param tx
    * @return {boolean}
    */
-  addNewTxToAddress(tx) {
+  addNewTxToAddress(tx, walletId) {
     // console.log('addNewTxToAddress', tx);
     if (tx.address && tx.txid) {
       const { type, path, found } = this.searchAddress(tx.address);
@@ -325,8 +329,9 @@ class Storage {
         console.log('Search was not successfull');
         return false;
       }
-      this.store.addresses[type][path].transactions.push(tx.txid);
-      this.store.addresses[type][path].fetchedLast = 0; // Because of the unclear state
+      this.store.wallets[walletId].addresses[type][path].transactions.push(tx.txid);
+      // Because of the unclear state will force a refresh
+      this.store.wallets[walletId].addresses[type][path].fetchedLast = 0;
       this.lastModified = +new Date();
       return true;
     }
