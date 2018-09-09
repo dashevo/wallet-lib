@@ -29,7 +29,14 @@ Parameters :
 
 ### Get Balance
 
+Will return the balance amount in satoshis,
+
 `const balance = account.getBalance()`
+
+
+Additional parameters :
+ - unconfirmed : Boolean - Default : `true` - Return the balance including unconfirmed inbound tx
+ - displayDuffs : Boolean - Default : `true` - Return in either duff or dash
 
 ### Get UTXO
 

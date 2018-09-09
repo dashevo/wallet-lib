@@ -402,9 +402,9 @@ describe('Account - Transports, Workers', function suite() {
   });
   it('should get a balance of an account', () => {
     const account = accountFakeTransportWithUTXO;
-    expect(account.getBalance()).to.equal(1);
-    expect(account.getBalance(true)).to.equal(1);
-    expect(account.getBalance(true, true)).to.equal(100000000);
+    expect(account.getBalance()).to.equal(100000000);
+    expect(account.getBalance(true)).to.equal(100000000);
+    expect(account.getBalance(true, false)).to.equal(1);
   });
   it('should get transaction history of an account', () => {
     const account = accountFakeTransportWithUTXO;

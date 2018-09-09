@@ -75,7 +75,7 @@ describe('Storage', function suite() {
     const addrs = {
       "m/44'/1'/0'/0/18": {
         address: '"yTf25xm2t4PeppBpuuGEJktQTYnCaBZ7zE"',
-        balance: 0,
+        balanceSat: 0,
         fetchedLast: 1533527600644,
         path: "m/44'/1'/0'/0/18",
         transactions:
@@ -84,7 +84,7 @@ describe('Storage', function suite() {
       },
       "m/44'/1'/0'/0/19": {
         address: 'yLmv6uX1jmn14pCDpc83YCsA8wHVtcbaNw',
-        balance: 0,
+        balanceSat: 0,
         fetchedLast: 1533527600644,
         path: "m/44'/1'/0'/0/19",
         transactions:
@@ -93,7 +93,7 @@ describe('Storage', function suite() {
       },
       "m/44'/1'/0'/1/0": {
         address: 'yihFsR46sPoFgs43hW652Uw9gm1QmvcWor',
-        balance: 0,
+        balanceSat: 0,
         fetchedLast: 1533527600689,
         path: "m/44'/1'/0'/1/0",
         transactions: [],
@@ -101,7 +101,7 @@ describe('Storage', function suite() {
       },
       "m/44'/1'/0'/4/19": {
         address: 'misc',
-        balance: 0,
+        balanceSat: 0,
         fetchedLast: 1533527600644,
         path: "m/44'/1'/0'/4/19",
         transactions:

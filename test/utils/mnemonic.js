@@ -17,16 +17,16 @@ describe('Utils - mnemonic', () => {
     expect(result.constructor.name).to.be.equal('Mnemonic');
   });
   it('should do mnemonicToHDPrivateKey', () => {
-    const mnemonic = generateNewMnemonic();
-    const mnemonic2 = generateNewMnemonic().toString();
-    const result = mnemonicToHDPrivateKey(mnemonic);
-    const result2 = mnemonicToHDPrivateKey(mnemonic2);
+    const mnem1 = generateNewMnemonic();
+    const mnem2 = generateNewMnemonic().toString();
+    const result = mnemonicToHDPrivateKey(mnem1);
+    const result2 = mnemonicToHDPrivateKey(mnem2);
     expect(result.constructor.name).to.be.equal('HDPrivateKey');
     expect(result2.constructor.name).to.be.equal('HDPrivateKey');
   });
   it('should do mnemonicToWalletId', () => {
-    const mnemonic = generateNewMnemonic();
-    const result = mnemonicToWalletId(mnemonic);
+    const mnem1 = generateNewMnemonic();
+    const result = mnemonicToWalletId(mnem1);
     expect(result.constructor.name).to.be.equal('String');
     expect(result.length).to.be.equal(10);
     expect(is.hex(result)).to.be.equal(true);

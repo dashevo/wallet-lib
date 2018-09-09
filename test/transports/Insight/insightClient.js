@@ -60,7 +60,6 @@ describe('Transport : Insight Client', function suite() {
     expect(addressesExternalData[`${path}/0/0`].utxos).to.deep.equal([]);
     expect(addressesExternalData[`${path}/0/0`].fetchedLast).to.be.greaterThan(1533535093789);
     expect(addressesExternalData[`${path}/0/0`].used).to.equal(true);
-    expect(addressesExternalData[`${path}/0/0`].balance).to.equal(0);
   });
   it('should be able to get the utxos information', () => {
     const addressesExternalData = account.getAddresses();
@@ -73,12 +72,11 @@ describe('Transport : Insight Client', function suite() {
     expect(addressesExternalData[path].utxos[0].satoshis).to.equal(5000000000);
     expect(addressesExternalData[path].utxos[0].script).to.equal('76a914f08d82224ffc020f3d7110e57c3105a5caec058f88ac');
     expect(addressesExternalData[path].utxos[0].txId).to.equal('4ae8d1960c9a4ed83dbeaf1ad94b4a82f11c8574207144beda87113d94a31da1');
-    expect(addressesExternalData[path].balance).to.equal(50);
     expect(addressesExternalData[path].balanceSat).to.equal(5000000000);
   });
   it('should be able to get the total balance of an account', () => {
     const balance = account.getBalance();
-    const expectedBalance = 142.199;
+    const expectedBalance = 14219900000;
     expect(balance).to.equal(expectedBalance);
   });
   it('should be able to get a valid UTXO', () => {
