@@ -12,6 +12,8 @@ class KeyChain {
    * @return HDPrivateKey
    */
   generateKeyForPath(path) {
+    // const derivedKey = this.HDRootKey.derive(path);
+    // return derivedKey;
     return this.HDRootKey.derive(path);
   }
 

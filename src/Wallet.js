@@ -88,7 +88,7 @@ class Wallet {
   updateNetwork(network) {
     if (is.network(network) && network !== this.network) {
       this.network = Dashcore.Networks[network];
-      this.transport.changeNetwork(network);
+      this.transport.updateNetwork(network);
       this.accounts.forEach((acc) => {
         acc.updateNetwork(network);
       });

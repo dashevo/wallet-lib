@@ -1,4 +1,6 @@
-const { dashToDuffs, duffsToDash, getBytesOf, hasProp } = require('./utils');
+const {
+  dashToDuffs, duffsToDash, getBytesOf, hasProp,
+} = require('./utils');
 const { generateNewMnemonic, mnemonicToHDPrivateKey, mnemonicToWalletId } = require('./mnemonic.js');
 const is = require('./is');
 const coinSelection = require('./coinSelection');
@@ -18,5 +20,5 @@ module.exports = {
   hash,
   hash256,
   sha256,
-  hasProp
+  hasProp,
 };

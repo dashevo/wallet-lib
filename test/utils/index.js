@@ -7,6 +7,7 @@ const {
   generateNewMnemonic,
   mnemonicToHDPrivateKey,
   is,
+  hasProp,
   getBytesOf,
 } = require('../../src/utils/index');
 const { mnemonicString1, HDPrivateKey1Testnet } = require('../fixtures');
@@ -234,5 +235,11 @@ describe('Utils', () => {
   });
   it('should getBytesOf return false on unknown type', () => {
     expect(getBytesOf(null, 'toto')).to.be.equal(false);
+  });
+  it('should handle hasProp', () => {
+    expect(hasProp({ key1: true }, 'key1')).to.equal(true);
+    expect(hasProp({ key1: true }, 'key2')).to.equal(false);
+    expect(hasProp(['key1'], 'key1')).to.equal(true);
+    expect(hasProp(['key1'], 'key2')).to.equal(false);
   });
 });

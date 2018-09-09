@@ -321,7 +321,7 @@ class Account {
       address: '',
     };
     let skipped = 0;
-    const walletId = this.walletId;
+    const { walletId } = this;
     const keys = Object.keys(this.store.wallets[walletId].addresses[type]);
 
     // eslint-disable-next-line array-callback-return
@@ -348,7 +348,7 @@ class Account {
   async getTransactionHistory() {
     const self = this;
     let txs = [];
-    const walletId = this.walletId;
+    const { walletId } = this;
     Object.keys(this.store.wallets[walletId].addresses.external).forEach((key) => {
       const el = this.store.wallets[walletId].addresses.external[key];
       if (el.transactions && el.transactions.length > 0) {
@@ -376,18 +376,18 @@ class Account {
 
     const resolvedPromises = await Promise.all(p) || [];
 
-    function cleanUnknownAddr(data, walletId) {
+    function cleanUnknownAddr(data, wId) {
       const knownAddr = [];
-      Object.keys(self.store.wallets[walletId].addresses.external).forEach((key) => {
-        const el = self.store.wallets[walletId].addresses.external[key];
+      Object.keys(self.store.wallets[wId].addresses.external).forEach((key) => {
+        const el = self.store.wallets[wId].addresses.external[key];
         knownAddr.push(el.address);
       });
-      Object.keys(self.store.wallets[walletId].addresses.internal).forEach((key) => {
-        const el = self.store.wallets[walletId].addresses.internal[key];
+      Object.keys(self.store.wallets[wId].addresses.internal).forEach((key) => {
+        const el = self.store.wallets[wId].addresses.internal[key];
         knownAddr.push(el.address);
       });
-      Object.keys(self.store.wallets[walletId].addresses.misc).forEach((key) => {
-        const el = self.store.wallets[walletId].addresses.misc[key];
+      Object.keys(self.store.wallets[wId].addresses.misc).forEach((key) => {
+        const el = self.store.wallets[wId].addresses.misc[key];
         knownAddr.push(el.address);
       });
 
@@ -502,7 +502,7 @@ class Account {
     let utxos = [];
 
     const self = this;
-    const walletId = this.walletId;
+    const { walletId } = this;
     const subwallets = Object.keys(this.store.wallets[walletId].addresses);
     subwallets.forEach((subwallet) => {
       const paths = Object.keys(self.store.wallets[walletId].addresses[subwallet]);
@@ -617,7 +617,7 @@ class Account {
       addresses = [addressList];
     } else { addresses = addressList; }
 
-    const walletId = this.walletId;
+    const { walletId } = this;
     const self = this;
     const subwallets = Object.keys(this.store.wallets[walletId].addresses);
     subwallets.forEach((subwallet) => {
@@ -656,8 +656,11 @@ class Account {
   updateNetwork(network) {
     console.log(`Account network - update to(${network}) - from(${this.network}`);
     if (is.network(network) && network !== this.network) {
-      this.BIP44PATH = getBIP44Path(this.network, this.accountIndex);
-      this.network = getNetwork(this.network);
+      this.BIP44PATH = getBIP44Path(network, this.accountIndex);
+      this.network = getNetwork(network);
+      if (this.transport) {
+        this.transport.updateNetwork(network);
+      }
       return true;
     }
     return false;

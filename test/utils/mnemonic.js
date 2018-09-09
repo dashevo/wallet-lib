@@ -35,5 +35,7 @@ describe('Utils - mnemonic', () => {
     expect(mnemonicToWalletId(mnemonic2)).to.equal('74bbe91a47');
     expect(mnemonicToWalletId(mnemonic3)).to.equal('f351a836e6');
     expect(mnemonicToWalletId(mnemonic4)).to.equal('fad183cbf7');
+
+    expect(() => mnemonicToHDPrivateKey()).to.throw('Expect mnemonic to be provided');
   });
 });

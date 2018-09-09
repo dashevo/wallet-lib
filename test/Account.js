@@ -415,6 +415,12 @@ describe('Account - Transports, Workers', function suite() {
         expect(history).to.deep.equal(expected);
       });
   });
+  it('should be able to switch the network', ()=>{
+    const account = accountFakeTransportWithUTXO;
+    expect(account.network.toString()).to.equal('testnet');
+    account.updateNetwork('livenet');
+    expect(account.network.toString()).to.equal('livenet');
+  });
   after(() => {
     walletFakeTransportWithUTXO.disconnect();
     accountFakeTransportLivenet.disconnect();

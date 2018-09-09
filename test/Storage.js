@@ -263,4 +263,12 @@ describe('Storage', function suite() {
     expect(() => store.addNewTxToAddress({ aw: {} })).to.throw(expected);
     store.stopWorker();
   });
+  it('should not create a wallet twice', () => {
+    const wid = '12345';
+    const wid2 = '12346';
+    const store = new Storage({ ...storageOpts, walletId: wid });
+    expect(store.createWallet(wid)).to.equal(false);
+    expect(store.createWallet(wid2)).to.equal(true);
+    store.stopWorker();
+  });
 });

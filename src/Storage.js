@@ -1,6 +1,5 @@
-const { cloneDeep } = require('lodash');
+const { cloneDeep, merge } = require('lodash');
 const { is, hasProp } = require('./utils');
-const _ = require('lodash');
 
 const defaultOpts = {
 
@@ -10,9 +9,7 @@ const initialStore = {
   wallets: {},
   transactions: {},
 };
-const mergeHelper = function (initial = {}, additionnal = {}) {
-  return _.merge(initial, additionnal);
-};
+const mergeHelper = (initial = {}, additional = {}) => merge(initial, additional);
 /**
  * Handle all the storage logic, it's a wrapper around the adapters
  * So all the needed methods should be provided by the Storage class and the access to the adapter

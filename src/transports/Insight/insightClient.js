@@ -62,7 +62,7 @@ class InsightClient {
     return true;
   }
 
-  changeNetwork(network) {
+  updateNetwork(network) {
     return this.setNetwork(network) && this.setSocketURI() && this.setInsightURI();
   }
 

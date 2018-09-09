@@ -49,9 +49,10 @@ class BIP44Worker {
     let externalMissingNb = 0;
     if (BIP44_ADDRESS_GAP > externalUnused) {
       externalMissingNb = BIP44_ADDRESS_GAP - externalUnused;
-      const addressKeys = Object.keys(this.storage.store.wallets[this.walletId].addresses.external);
+      const { external } = this.storage.store.wallets[this.walletId].addresses;
+      const addressKeys = Object.keys(external);
       // console.log(addressKeys)
-      const lastElem = this.storage.store.wallets[this.walletId].addresses.external[addressKeys[addressKeys.length - 1]];
+      const lastElem = external[addressKeys[addressKeys.length - 1]];
       // console.log(BIP44_ADDRESS_GAP, externalUnused, lastElem, addressKeys)
 
       const addressIndex = (!lastElem) ? -1 : parseInt(lastElem.index, 10);
