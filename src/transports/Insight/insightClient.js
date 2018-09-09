@@ -1,6 +1,7 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const axios = require('axios');
 const io = require('socket.io-client');
+const { is, dashToDuffs } = require('../../utils/index');
 // Here to avoid asking to much to the network when doing a nodemon for the tests.
 // Probably will require to mock the test part.
 
@@ -81,6 +82,9 @@ class InsightClient {
 
   async getTransaction(transactionid) {
     const res = await axios.get(`${this.insightUri}/tx/${transactionid}`);
+    if (res.data && res.data.fees && is.float(res.data.fees)) {
+      res.data.fees = dashToDuffs(res.data.fees);
+    }
     return res.data;
   }
 

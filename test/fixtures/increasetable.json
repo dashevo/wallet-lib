@@ -32,7 +32,7 @@
       "blockhash": "0000000007a3b51cccc3d8516917d3e8386dd82ec49322c790a0a873ee4e54d2",
       "blockheight": 204344,
       "blocktime": 0,
-      "fees": 0.00000245,
+      "fees": 245,
       "size": 225,
       "txlock": false
     }
@@ -43,7 +43,7 @@
       "blockhash": "0000000007a3b51cccc3d8516917d3e8386dd82ec49322c790a0a873ee4e54d2",
       "blockheight": 204344,
       "blocktime": 0,
-      "fees": 0.00000245,
+      "fees": 245,
       "size": 225,
       "txlock": false,
       "vin": [
@@ -92,7 +92,7 @@
       "blockhash": "0000000002922d7d0a69ce3e29908dc26aba6565af760d208dac77a8b520fbf3",
       "blockheight": 204161,
       "blocktime": 1533900199,
-      "fees": 0.0001,
+      "fees": 1000,
       "size": 226,
       "txlock": false,
       "vout": [
@@ -149,7 +149,7 @@
       "blockhash": "000000000388f8a1de91702e25209aad802d28fcd2710ac2e2acd12e9738dbe2",
       "blockheight": 203633,
       "blocktime": 1533827521,
-      "fees": 0.0001,
+      "fees": 1000,
       "size": 225,
       "txlock": true,
       "vout": [
@@ -248,7 +248,7 @@
         "blockhash": "0000000002922d7d0a69ce3e29908dc26aba6565af760d208dac77a8b520fbf3",
         "blockheight": 204161,
         "blocktime": 1533900199,
-        "fees": 0.0001,
+        "fees": 1000,
         "size": 226,
         "txlock": false,
         "vout": [
@@ -305,7 +305,7 @@
         "blockhash": "000000000388f8a1de91702e25209aad802d28fcd2710ac2e2acd12e9738dbe2",
         "blockheight": 203633,
         "blocktime": 1533827521,
-        "fees": 0.0001,
+        "fees": 10000,
         "size": 225,
         "txlock": true,
         "vout": [
@@ -362,7 +362,7 @@
         "blockhash": "00000000220536db0f4c0afc5d3ec80b36a5a253390359b3e3bb7aaf7664edc6",
         "blockheight": 206745,
         "blocktime": 1534255937,
-        "fees": 0.0001944,
+        "fees": 1944,
         "size": 22,
         "txlock": false,
         "vout": [
@@ -419,7 +419,7 @@
         "blockhash": "0000000007a3b51cccc3d8516917d3e8386dd82ec49322c790a0a873ee4e54d2",
         "blockheight": 204344,
         "blocktime": 1533926635,
-        "fees": 0.00000245,
+        "fees": 245,
         "size": 225,
         "txlock": false,
         "vout": [

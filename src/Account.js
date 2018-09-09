@@ -206,12 +206,14 @@ class Account {
       txid, blockhash, blockheight, blocktime, fees, size, vin, vout, txlock,
     } = await this.transport.getTransaction(transactionid);
 
+
+    const feesInSat = is.float(fees) ? dashToDuffs(fees) : (fees);
     return {
       txid,
       blockhash,
       blockheight,
       blocktime,
-      fees,
+      fees: feesInSat,
       size,
       vout,
       vin,

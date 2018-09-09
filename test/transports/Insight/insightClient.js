@@ -40,7 +40,7 @@ describe('Transport : Insight Client', function suite() {
     account.transport.transport.subscribeToAddresses(['yiFNYQxfkDxeCBLyWtWQ9w8UGwYugERLCq']);
     expect(true).to.equal(true);
   });
-   it('should be able to pass Insight Client as a transport layer', () => {
+  it('should be able to pass Insight Client as a transport layer', () => {
     expect(wallet.transport).to.not.equal(null);
     expect(wallet.transport.type).to.equal('InsightClient');
     expect(account.transport).to.not.equal(null);
@@ -401,7 +401,48 @@ describe('Transport : Insight Client', function suite() {
 
     return account.getTransactionHistory().then(result => expect(result).to.deep.equal(expected));
   });
-  it('should get a transaction', () => {
+  it('should get transaction', () => {
+    const expected = {
+      txid: 'b42c5052d7d31a422e711d50d3754217b0b16b6dfa29cf497b3dd75afa4febcb',
+      version: 1,
+      locktime: 0,
+      vin: [{
+        txid: 'b452f2d7762b5cd94a0d375e60547c93035b97978a37bcaeed186d27e31feb3a', vout: 1, sequence: 4294967295, n: 0, scriptSig: { hex: '483045022100d803161dfdc72be62cb97cc62e862f5c30c061ea987514e7f8e4ff85b5420ed902205c188d20aff9475a86623addf055bed5b8c36e6de2285af1438fb8ede64ae668012103d9576eb9807c16c7bf8e4268969311dd0c1d3209db09e4a62a631b4d68f16fe0', asm: '3045022100d803161dfdc72be62cb97cc62e862f5c30c061ea987514e7f8e4ff85b5420ed902205c188d20aff9475a86623addf055bed5b8c36e6de2285af1438fb8ede64ae668[ALL] 03d9576eb9807c16c7bf8e4268969311dd0c1d3209db09e4a62a631b4d68f16fe0' }, addr: 'yXhm56EBd23RrZpq8WMp1UUUiZobStcaWG', valueSat: 519960000, value: 5.1996, doubleSpentTxID: null,
+      }],
+      vout: [{
+        value: '1.00000000',
+        n: 0,
+        scriptPubKey: {
+          hex: '76a914843859336f31e96025afc658bf152fb0b0bb751188ac', asm: 'OP_DUP OP_HASH160 843859336f31e96025afc658bf152fb0b0bb7511 OP_EQUALVERIFY OP_CHECKSIG', addresses: ['yYNZYgZrCVHQkJ4sPbmegb768zLaoAtREb'], type: 'pubkeyhash',
+        },
+        spentTxId: '6ca8795f2534972e1371249c3d7b6c5095e1513bc8cc351eeaa2f364020dbc01',
+        spentIndex: 4,
+        spentHeight: 203674,
+      }, {
+        value: '4.19950000',
+        n: 1,
+        scriptPubKey: {
+          hex: '76a91449126d84886a9bfc4a2a49aa5ba9cb45c994875288ac', asm: 'OP_DUP OP_HASH160 49126d84886a9bfc4a2a49aa5ba9cb45c9948752 OP_EQUALVERIFY OP_CHECKSIG', addresses: ['ySypFbLpFTXrBbpFqRezwpdwwuaDCfrgpo'], type: 'pubkeyhash',
+        },
+        spentTxId: null,
+        spentIndex: null,
+        spentHeight: null,
+      }],
+      blockhash: '000000000adca9739d088cf532a981d88c301987e40948ffb90bf1c9eeb98ccd',
+      blockheight: 203313,
+      time: 1533781707,
+      blocktime: 1533781707,
+      valueOut: 5.1995,
+      size: 226,
+      valueIn: 5.1996,
+      fees: 10000,
+      txlock: true,
+    };
+    return account.getTransaction('b42c5052d7d31a422e711d50d3754217b0b16b6dfa29cf497b3dd75afa4febcb').then(
+      data => console.log(JSON.stringify(data)) && expect(data).to.be.deep.equal(expected),
+    );
+  });
+  it('should deal with invalid transaction', () => {
     const expected = {};
     return account.getTransaction(1).then(
       data => expect(data).to.be.a('String'),
