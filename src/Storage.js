@@ -1,5 +1,6 @@
 const { cloneDeep, merge } = require('lodash');
 const { is, hasProp } = require('./utils');
+const { Networks } = require('@dashevo/dashcore-lib');
 
 const defaultOpts = {
 
@@ -25,7 +26,7 @@ class Storage {
     this.lastModified = null;
 
     if (opts.walletId) {
-      this.createWallet(opts.walletId);
+      this.createWallet(opts.walletId, opts.network);
     }
     this.interval = setInterval(() => {
       if (this.lastModified > this.lastSave) {
@@ -60,11 +61,12 @@ class Storage {
     await this.rehydrateState();
   }
 
-  createWallet(walletId) {
+  createWallet(walletId, network = Networks.testnet) {
     if (!hasProp(this.store.wallets, walletId)) {
       this.store.wallets[walletId] = {
         accounts: {},
-        network: undefined,
+        network,
+        blockheight: 0,
         addresses: {
           external: {},
           internal: {},
@@ -210,6 +212,23 @@ class Storage {
     this.lastModified = Date.now();
     return true;
   }
+
+  /**
+   * Update a specific transaction information in the store
+   * It do not handle any merging right now and write over previous data.
+   * @param address
+   * @param walletId
+   * @return {boolean}
+   */
+  updateTransaction(transaction) {
+    if (!transaction) throw new Error('Expected a transaction to update');
+
+    const transactionStore = this.store.transactions;
+    transactionStore[transaction.txid] = transaction;
+    this.lastModified = Date.now();
+    return true;
+  }
+
 
   /**
    * Search a specific address in the store

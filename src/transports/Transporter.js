@@ -39,6 +39,15 @@ class Transporter {
     this.transport = transport;
   }
 
+  async getStatus() {
+    const data = await this.transport
+      .getStatus()
+      .catch((err) => {
+        throw new Error(err);
+      });
+    return data.info;
+  }
+
   async getAddressSummary(address) {
     if (!is.address(address)) throw new Error('Received an invalid address to fetch');
     const data = await this
@@ -74,6 +83,13 @@ class Transporter {
       // todo verify if valid addresses
       // if (!is.address(address)) throw new Error('Received an invalid address to fetch');
       return this.transport.subscribeToAddresses(addresses, cb);
+    }
+    return false;
+  }
+
+  async subscribeToEvent(eventName, cb) {
+    if (is.string(eventName)) {
+      return this.transport.subscribeToEvent(eventName, cb);
     }
     return false;
   }

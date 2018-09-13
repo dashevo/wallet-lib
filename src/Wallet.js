@@ -60,6 +60,7 @@ class Wallet {
     this.storage = new Storage({
       adapter: this.adapter,
       walletId: this.walletId,
+      network: this.network
     });
     this.store = this.storage.store;
 

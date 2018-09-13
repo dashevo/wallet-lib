@@ -111,6 +111,7 @@ class Account {
         storage: this.storage,
         fetchAddressInfo: this.fetchAddressInfo.bind(this),
         fetchTransactionInfo: this.fetchTransactionInfo.bind(this),
+        fetchStatus: this.fetchStatus.bind(this),
         transport: this.transport,
         walletId: this.walletId,
 
@@ -219,6 +220,10 @@ class Account {
       vin,
       txlock,
     };
+  }
+
+  async fetchStatus() {
+    return await this.transport.getStatus();
   }
 
   /**
@@ -657,6 +662,7 @@ class Account {
     if (is.network(network) && network !== this.network) {
       this.BIP44PATH = getBIP44Path(network, this.accountIndex);
       this.network = getNetwork(network);
+      this.storage.store.wallets[this.walletId].network = network.toString();
       if (this.transport) {
         this.transport.updateNetwork(network);
       }

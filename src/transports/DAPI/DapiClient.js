@@ -7,6 +7,10 @@ class DAPIClient {
     throw new Error(`Missing implementation - ${this.type}`);
   }
 
+  async getStatus() {
+    throw new Error(`Missing implementation - ${this.type}`);
+  }
+
   async getTransaction() {
     throw new Error(`Missing implementation - ${this.type}`);
   }
