@@ -1,11 +1,12 @@
-const DashcoreLib = require('@dashevo/dashcore-lib');
+const Dashcore = require('@dashevo/dashcore-lib');
 const InMem = require('./adapters/InMem');
 const Storage = require('./Storage');
 const KeyChain = require('./KeyChain');
-// const { Registration, TopUp } = DashcoreLib.Transaction.SubscriptionTransactions;
+// const { Registration, TopUp } = Dashcore.Transaction.SubscriptionTransactions;
 const {
   generateNewMnemonic,
-  mnemonicToSeed,
+  mnemonicToHDPrivateKey,
+  mnemonicToWalletId,
   is,
 } = require('./utils/index');
 
@@ -33,7 +34,7 @@ class Wallet {
     let mnemonic = null;
 
     if (!(opts.network && is.network(opts.network))) throw new Error('Expected a valid network (typeof Network or String)');
-    this.network = DashcoreLib.Networks[opts.network];
+    this.network = Dashcore.Networks[opts.network];
     // eslint-disable-next-line prefer-destructuring
     if (opts.passphrase) passphrase = opts.passphrase;
 
@@ -42,21 +43,23 @@ class Wallet {
       if (!is.mnemonic(opts.mnemonic)) throw new Error('Expected a valid mnemonic (typeof String or Mnemonic)');
       // eslint-disable-next-line prefer-destructuring
       mnemonic = opts.mnemonic;
-      HDPrivateKey = mnemonicToSeed(opts.mnemonic, this.network, passphrase);
+      HDPrivateKey = mnemonicToHDPrivateKey(opts.mnemonic, this.network, passphrase);
     } else if ('seed' in opts) {
       if (!is.seed(opts.seed)) throw new Error('Expected a valid seed (typeof HDPrivateKey or String)');
       HDPrivateKey = opts.seed;
       mnemonic = null; // todo : verify if possible to change from HDPrivateKey to Mnemonic back
     } else {
       mnemonic = generateNewMnemonic();
-      HDPrivateKey = mnemonicToSeed(mnemonic, this.network, passphrase);
+      HDPrivateKey = mnemonicToHDPrivateKey(mnemonic, this.network, passphrase);
     }
 
+    this.walletId = (mnemonic) ? mnemonicToWalletId(mnemonic) : mnemonicToWalletId(HDPrivateKey);
     this.adapter = (opts.adapter) ? opts.adapter : defaultOptions.adapter;
     this.adapter.config();
 
     this.storage = new Storage({
       adapter: this.adapter,
+      walletId: this.walletId,
     });
     this.store = this.storage.store;
 
@@ -66,7 +69,7 @@ class Wallet {
         this.storage.importTransactions(opts.cache.transactions);
       }
       if (opts.cache.addresses) {
-        this.storage.importAddresses(opts.cache.addresses);
+        this.storage.importAddresses(opts.cache.addresses, this.walletId);
       }
     }
 
@@ -79,6 +82,19 @@ class Wallet {
     this.mnemonic = mnemonic; // We keep it only for the export function..
     this.interface = opts.interface;
     this.savedBackup = false; // When true, we delete mnemonic from internals
+  }
+
+  // TODO : Add tests
+  updateNetwork(network) {
+    if (is.network(network) && network !== this.network) {
+      this.network = Dashcore.Networks[network];
+      this.transport.updateNetwork(network);
+      this.accounts.forEach((acc) => {
+        acc.updateNetwork(network);
+      });
+      return true;
+    }
+    return false;
   }
 
   /**

@@ -5,8 +5,9 @@ const {
   dashToDuffs,
   duffsToDash,
   generateNewMnemonic,
-  mnemonicToSeed,
+  mnemonicToHDPrivateKey,
   is,
+  hasProp,
   getBytesOf,
 } = require('../../src/utils/index');
 const { mnemonicString1, HDPrivateKey1Testnet } = require('../fixtures');
@@ -29,13 +30,13 @@ describe('Utils', () => {
   });
   it('should convert mnemonic to seed', () => {
     const network = Networks.testnet;
-    const seed = mnemonicToSeed(mnemonicString1, network);
+    const seed = mnemonicToHDPrivateKey(mnemonicString1, network);
     expect(seed).to.be.a('object');
     expect(seed.toString()).to.equal(HDPrivateKey1Testnet);
   });
-  it('should throw error when mnemonic is not provided in mnemonicToSeed', () => {
+  it('should throw error when mnemonic is not provided in mnemonicToHDPrivateKey', () => {
     const network = Networks.testnet;
-    expect(() => mnemonicToSeed('', network)).to.throw('Expect mnemonic to be provide');
+    expect(() => mnemonicToHDPrivateKey('', network)).to.throw('Expect mnemonic to be provide');
   });
   it('should is.num handle numbers', () => {
     expect(is.num(100)).to.be.equals(true);
@@ -234,5 +235,11 @@ describe('Utils', () => {
   });
   it('should getBytesOf return false on unknown type', () => {
     expect(getBytesOf(null, 'toto')).to.be.equal(false);
+  });
+  it('should handle hasProp', () => {
+    expect(hasProp({ key1: true }, 'key1')).to.equal(true);
+    expect(hasProp({ key1: true }, 'key2')).to.equal(false);
+    expect(hasProp(['key1'], 'key1')).to.equal(true);
+    expect(hasProp(['key1'], 'key2')).to.equal(false);
   });
 });

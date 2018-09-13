@@ -1,11 +1,21 @@
+const Dashcore = require('@dashevo/dashcore-lib');
 const axios = require('axios');
 const io = require('socket.io-client');
 // Here to avoid asking to much to the network when doing a nodemon for the tests.
 // Probably will require to mock the test part.
 
 const defaultOpts = {
-  uri: 'https://testnet-insight.dashevo.org/insight-api-dash',
-  socketUri: 'https://testnet-insight.dashevo.org/',
+  uris: {
+    insight: {
+      livenet: 'https://insight.dashevo.org/insight-api-dash',
+      testnet: 'https://testnet-insight.dashevo.org/insight-api-dash',
+    },
+    sockets: {
+      livenet: 'https://insight.dashevo.org/',
+      testnet: 'https://testnet-insight.dashevo.org/',
+    },
+  },
+  network: 'testnet',
   useSocket: true,
 };
 /**
@@ -15,24 +25,45 @@ class InsightClient {
   constructor(opts = defaultOpts) {
     this.listeners = {};
     this.type = this.constructor.name;
-    this.uri = (opts.uri) ? opts.uri : defaultOpts.uri;
-    this.socketUri = (opts.socketUri)
-      ? opts.socketUri
-      : defaultOpts.socketUri;
     this.useSocket = (opts.useSocket) ? opts.useSocket : defaultOpts.useSocket;
 
+    this.setNetwork((opts.network) ? opts.network : defaultOpts.network);
+    this.setInsightURI((opts.uri) ? opts.uri : defaultOpts.uris.insight[this.network]);
+    this.setSocketURI((opts.socketUri) ? opts.socketUri : defaultOpts.uris.sockets[this.network]);
+  }
+
+  setNetwork(network) {
+    this.network = (network) ? Dashcore.Networks[network] : Dashcore.Networks.testnet;
+    return true;
+  }
+
+  setSocketURI(uri) {
+    this.socketUri = (uri) || (defaultOpts.uris.sockets[this.network]);
     if (this.useSocket) {
+      if (this.socket) {
+        this.closeSocket();
+      }
       this.socket = io(this.socketUri, { transports: ['websocket'] });
       this.socket.emit('subscribe', 'inv');
       this.socket.on('connect', () => console.log('Socket connected!'));
       this.socket.on('event', event => console.log('event', event));
       this.socket.on('disconnect', disconnect => console.log('disconnect', disconnect));
-      this.socket.on('error', error => console.log('error', error));
+      this.socket.on('error', error => console.log('Socket err', error));
 
       // this.subscribeToEvent('block', tx => console.log('txlock', tx));
       // this.subscribeToEvent('txlock', tx => console.log('txlock', tx));
       // this.subscribeToEvent('tx', tx => console.log('tx', tx));
     }
+    return true;
+  }
+
+  setInsightURI(uri) {
+    this.insightUri = (uri) || defaultOpts.uris.insight[this.network];
+    return true;
+  }
+
+  updateNetwork(network) {
+    return this.setNetwork(network) && this.setSocketURI() && this.setInsightURI();
   }
 
   closeSocket() {
@@ -42,28 +73,29 @@ class InsightClient {
   }
 
   async getAddressSummary(address) {
-    const res = await axios.get(`${this.uri}/addr/${address}`);
+    const res = await axios
+      .get(`${this.insightUri}/addr/${address}`);
     return res.data;
   }
 
 
   async getTransaction(transactionid) {
-    const res = await axios.get(`${this.uri}/tx/${transactionid}`);
+    const res = await axios.get(`${this.insightUri}/tx/${transactionid}`);
     return res.data;
   }
 
   async getUTXO(address) {
-    const res = await axios.get(`${this.uri}/addr/${address}/utxo`);
+    const res = await axios.get(`${this.insightUri}/addr/${address}/utxo`);
     return res.data;
   }
 
   async sendRawTransaction(rawtx, isIs = false) {
-    const url = (isIs) ? `${this.uri}/tx/sendix` : `${this.uri}/tx/send`;
+    const url = (isIs) ? `${this.insightUri}/tx/sendix` : `${this.insightUri}/tx/send`;
     return axios
       .post(url, { rawtx })
       .then(res => res.data)
       .catch((err) => {
-        console.log(err);
+        console.log(err.response.data);
         throw new Error(err);
       });
   }
@@ -80,7 +112,7 @@ class InsightClient {
         listener,
         setTime: Date.now(),
       };
-      console.log('Subscribed to ', eventName);
+      console.log('Subscribed to event :', eventName);
     }
   }
 
@@ -95,6 +127,7 @@ class InsightClient {
     this.socket.emit('unsubscribe', listener.type);
     this.socket.removeListener(listener.listener);
   }
+
 
   subscribeToAddresses(addresses, cb) {
     if (this.useSocket) {

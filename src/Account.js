@@ -26,6 +26,14 @@ const addAccountToWallet = function (account, wallet) {
     wallet.accounts.push(account);
   }
 };
+const getBIP44Path = function (network, accountIndex) {
+  return (network === Dashcore.Networks.livenet)
+    ? `${BIP44_LIVENET_ROOT_PATH}/${accountIndex}'`
+    : `${BIP44_TESTNET_ROOT_PATH}/${accountIndex}'`;
+};
+const getNetwork = function (network) {
+  return Dashcore.Networks[network] || Dashcore.Networks.testnet;
+};
 class Account {
   constructor(wallet, opts = defaultOptions) {
     this.events = new EventEmitter();
@@ -35,13 +43,11 @@ class Account {
     const accountIndex = (opts.accountIndex) ? opts.accountIndex : wallet.accounts.length;
     this.accountIndex = accountIndex;
 
-    this.BIP44PATH = (wallet.network === Dashcore.Networks.livenet)
-      ? `${BIP44_LIVENET_ROOT_PATH}/${accountIndex}'`
-      : `${BIP44_TESTNET_ROOT_PATH}/${accountIndex}'`;
-
-    this.network = wallet.network;
+    this.network = getNetwork(wallet.network.toString());
+    this.BIP44PATH = getBIP44Path(this.network, accountIndex);
 
     this.transactions = {};
+    this.walletId = wallet.walletId;
 
     this.label = (opts && opts.label && is.string(opts.label)) ? opts.label : null;
 
@@ -50,11 +56,12 @@ class Account {
 
     this.store = wallet.storage.store;
     this.storage = wallet.storage;
+
     this.storage.importAccounts({
       label: this.label,
       path: this.BIP44PATH,
       network: this.network,
-    });
+    }, this.walletId);
     this.keychain = wallet.keychain;
     this.mode = (opts.mode) ? opts.mode : defaultOptions.mode;
 
@@ -90,6 +97,7 @@ class Account {
         events: this.events,
         storage: this.storage,
         getAddress: this.getAddress.bind(this),
+        walletId: this.walletId,
       });
       this.workers.bip44.startWorker();
     }
@@ -104,6 +112,8 @@ class Account {
         fetchAddressInfo: this.fetchAddressInfo.bind(this),
         fetchTransactionInfo: this.fetchTransactionInfo.bind(this),
         transport: this.transport,
+        walletId: this.walletId,
+
       });
       this.workers.sync.startWorker();
     }
@@ -120,7 +130,7 @@ class Account {
       }
       if (opts.cache.addresses) {
         try {
-          this.storage.importAddresses(opts.cache.addresses);
+          this.storage.importAddresses(opts.cache.addresses, this.walletId);
         } catch (e) {
           this.disconnect();
           throw e;
@@ -166,7 +176,7 @@ class Account {
 
       affectedTxs.forEach((affectedtxid) => {
         const { path, type } = this.storage.searchAddressWithTx(affectedtxid);
-        const address = this.storage.store.addresses[type][path];
+        const address = this.storage.store.wallets[this.walletId].addresses[type][path];
         const cleanedUtxos = [];
         address.utxos.forEach((utxo) => {
           if (utxo.txId === affectedtxid) {
@@ -231,10 +241,8 @@ class Account {
       transactions,
       fetchedLast: +new Date(),
     };
-
+    addrInfo.used = (transactions.length > 0);
     if (transactions.length > 0) {
-      addrInfo.used = true;
-
       // If we have cacheTx, then we will check if we know this transactions
       if (self.cacheTx) {
         transactions.forEach(async (tx) => {
@@ -284,7 +292,7 @@ class Account {
    */
   getAddresses(external = true) {
     const type = (external) ? 'external' : 'internal';
-    return this.store.addresses[type];
+    return this.store.wallets[this.walletId].addresses[type];
   }
 
   /**
@@ -296,8 +304,8 @@ class Account {
   getAddress(index = 0, external = true) {
     const type = (external) ? 'external' : 'internal';
     const path = (external) ? `${this.BIP44PATH}/0/${index}` : `${this.BIP44PATH}/1/${index}`;
-    const { addresses } = this.storage.getStore();
-    const addressType = addresses[type];
+    const { wallets } = this.storage.getStore();
+    const addressType = wallets[this.walletId].addresses[type];
     return (addressType[path]) ? addressType[path] : this.generateAddress(path);
   }
 
@@ -313,11 +321,12 @@ class Account {
       address: '',
     };
     let skipped = 0;
-    const keys = Object.keys(this.store.addresses[type]);
+    const { walletId } = this;
+    const keys = Object.keys(this.store.wallets[walletId].addresses[type]);
 
     // eslint-disable-next-line array-callback-return
     keys.some((key) => {
-      const el = (this.store.addresses[type][key]);
+      const el = (this.store.wallets[walletId].addresses[type][key]);
       if (!el.used) {
         if (skipped === skip) {
           unused = el;
@@ -339,14 +348,15 @@ class Account {
   async getTransactionHistory() {
     const self = this;
     let txs = [];
-    Object.keys(this.store.addresses.external).forEach((key) => {
-      const el = this.store.addresses.external[key];
+    const { walletId } = this;
+    Object.keys(this.store.wallets[walletId].addresses.external).forEach((key) => {
+      const el = this.store.wallets[walletId].addresses.external[key];
       if (el.transactions && el.transactions.length > 0) {
         txs = txs.concat(el.transactions);
       }
     });
-    Object.keys(this.store.addresses.internal).forEach((key) => {
-      const el = this.store.addresses.internal[key];
+    Object.keys(this.store.wallets[walletId].addresses.internal).forEach((key) => {
+      const el = this.store.wallets[walletId].addresses.internal[key];
       if (el.transactions && el.transactions.length > 0) {
         txs = txs.concat(el.transactions);
       }
@@ -366,18 +376,18 @@ class Account {
 
     const resolvedPromises = await Promise.all(p) || [];
 
-    function cleanUnknownAddr(data) {
+    function cleanUnknownAddr(data, wId) {
       const knownAddr = [];
-      Object.keys(self.store.addresses.external).forEach((key) => {
-        const el = self.store.addresses.external[key];
+      Object.keys(self.store.wallets[wId].addresses.external).forEach((key) => {
+        const el = self.store.wallets[wId].addresses.external[key];
         knownAddr.push(el.address);
       });
-      Object.keys(self.store.addresses.internal).forEach((key) => {
-        const el = self.store.addresses.internal[key];
+      Object.keys(self.store.wallets[wId].addresses.internal).forEach((key) => {
+        const el = self.store.wallets[wId].addresses.internal[key];
         knownAddr.push(el.address);
       });
-      Object.keys(self.store.addresses.misc).forEach((key) => {
-        const el = self.store.addresses.misc[key];
+      Object.keys(self.store.wallets[wId].addresses.misc).forEach((key) => {
+        const el = self.store.wallets[wId].addresses.misc[key];
         knownAddr.push(el.address);
       });
 
@@ -405,7 +415,7 @@ class Account {
         cleanElement.to = cleanUnknownAddr(el.vout.map(vout => ({
           address: vout.scriptPubKey.addresses[0],
           amount: vout.value,
-        })));
+        })), this.walletId);
       } else {
         cleanElement.to = 'unknown';
       }
@@ -453,7 +463,7 @@ class Account {
       fetchedLast: 0,
       used: false,
     };
-    this.storage.importAddresses(addressData);
+    this.storage.importAddresses(addressData, this.walletId);
     return addressData;
   }
 
@@ -464,7 +474,7 @@ class Account {
    */
   getBalance(unconfirmed = true, displayDuffs = false) {
     let balance = 0;
-    const { addresses } = this.storage.getStore();
+    const { addresses } = this.storage.getStore().wallets[this.walletId];
     const { external, internal } = addresses;
     const externalPaths = (external && Object.keys(external)) || [];
     const internalPaths = (internal && Object.keys(internal)) || [];
@@ -492,11 +502,12 @@ class Account {
     let utxos = [];
 
     const self = this;
-    const subwallets = Object.keys(this.store.addresses);
+    const { walletId } = this;
+    const subwallets = Object.keys(this.store.wallets[walletId].addresses);
     subwallets.forEach((subwallet) => {
-      const paths = Object.keys(self.store.addresses[subwallet]);
+      const paths = Object.keys(self.store.wallets[walletId].addresses[subwallet]);
       paths.forEach((path) => {
-        const address = self.store.addresses[subwallet][path];
+        const address = self.store.wallets[walletId].addresses[subwallet][path];
         if (address.utxos) {
           if (!(onlyAvailable && address.locked)) {
             const utxo = address.utxos;
@@ -606,12 +617,13 @@ class Account {
       addresses = [addressList];
     } else { addresses = addressList; }
 
+    const { walletId } = this;
     const self = this;
-    const subwallets = Object.keys(this.store.addresses);
+    const subwallets = Object.keys(this.store.wallets[walletId].addresses);
     subwallets.forEach((subwallet) => {
-      const paths = Object.keys(self.store.addresses[subwallet]);
+      const paths = Object.keys(self.store.wallets[walletId].addresses[subwallet]);
       paths.forEach((path) => {
-        const address = self.store.addresses[subwallet][path];
+        const address = self.store.wallets[walletId].addresses[subwallet][path];
         if (addresses.includes(address.address)) {
           const { privateKey } = self.keychain.getKeyForPath(address.path);
           privKeys = privKeys.concat([privateKey]);
@@ -631,13 +643,27 @@ class Account {
     if (!this.transport) {
       throw new Error('A transport layer is needed to perform a full refresh');
     }
-
+    const addressStore = this.storage.store.wallets[this.walletId].addresses;
     ['internal', 'external', 'misc'].forEach((type) => {
-      Object.keys(this.storage.store.addresses[type]).forEach((path) => {
-        this.storage.store.addresses[type][path].fetchedLast = 0;
+      Object.keys(addressStore[type]).forEach((path) => {
+        addressStore[type][path].fetchedLast = 0;
       });
     });
     return true;
+  }
+
+  // TODO : Add tests
+  updateNetwork(network) {
+    console.log(`Account network - update to(${network}) - from(${this.network}`);
+    if (is.network(network) && network !== this.network) {
+      this.BIP44PATH = getBIP44Path(network, this.accountIndex);
+      this.network = getNetwork(network);
+      if (this.transport) {
+        this.transport.updateNetwork(network);
+      }
+      return true;
+    }
+    return false;
   }
 
   /**

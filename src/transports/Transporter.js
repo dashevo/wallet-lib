@@ -1,34 +1,52 @@
-const { is } = require('../utils/index');
+const { is, hasProp } = require('../utils/index');
 const InsightClient = require('../transports/Insight/insightClient');
 const DAPIClient = require('../transports/DAPI/DapiClient');
 
-function isValidTransport(transport) {
-  return !!(transport);
-}
 
 const transportList = {
   Insight: InsightClient,
   DAPIClient,
 };
 
+function isValidTransport(transport) {
+  if (is.string(transport)) {
+    return hasProp(transportList, transport);
+  } if (is.obj(transport)) {
+    let valid = true;
+    const expectedKeys = ['getAddressSummary', 'getTransaction', 'getUTXO', 'subscribeToAddresses', 'closeSocket', 'sendRawTransaction'];
+    expectedKeys.forEach((key) => {
+      if (!transport[key]) {
+        valid = false;
+      }
+    });
+    return valid;
+  }
+  return false;
+}
+
 class Transporter {
   constructor(transportArg) {
-    this.valid = isValidTransport(transportArg);
+    if (!transportArg) {
+      throw new Error('Expect a transport name or valid object as arg');
+    }
 
     let transport = transportArg;
     if (is.string(transportArg) && Object.keys(transportList).includes(transportArg)) {
       transport = transportList[transportArg];
     }
+    this.valid = isValidTransport(transportArg);
     this.type = transport.type || transport.constructor.name;
-    if (!this.valid) throw new Error(`Invalid transport of type ${this.type}`);
     this.transport = transport;
   }
 
   async getAddressSummary(address) {
     if (!is.address(address)) throw new Error('Received an invalid address to fetch');
-    const data = await this.transport.getAddressSummary(address).catch((err) => {
-      throw new Error(err);
-    });
+    const data = await this
+      .transport
+      .getAddressSummary(address)
+      .catch((err) => {
+        throw new Error(err);
+      });
     return data;
   }
 
@@ -62,6 +80,17 @@ class Transporter {
 
   disconnect() {
     return (this.transport.closeSocket) ? this.transport.closeSocket() : false;
+  }
+
+  updateNetwork(network) {
+    if (!this.transport.updateNetwork) {
+      throw new Error('Transport does not handle network changes');
+    }
+    return this.transport.updateNetwork(network);
+  }
+
+  getNetwork() {
+    return this.transport.network;
   }
 
   async sendRawTransaction(rawtx, isIs) {

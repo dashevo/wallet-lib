@@ -228,3 +228,4 @@ Wallet-lib is made available under the [MIT License](LICENSE)
 
 Wallet-Lib is maintained by the Dash Core Developers.
 We want to thanks all member of the community that have submited suggestions, issues and pull requests.
+

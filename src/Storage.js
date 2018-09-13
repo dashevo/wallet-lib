@@ -1,20 +1,15 @@
-const { cloneDeep } = require('lodash');
-const { is } = require('./utils');
+const { cloneDeep, merge } = require('lodash');
+const { is, hasProp } = require('./utils');
 
 const defaultOpts = {
 
 };
 
 const initialStore = {
+  wallets: {},
   transactions: {},
-  addresses: {
-    internal: {},
-    external: {},
-    misc: {},
-  },
-  accounts: {},
 };
-
+const mergeHelper = (initial = {}, additional = {}) => merge(initial, additional);
 /**
  * Handle all the storage logic, it's a wrapper around the adapters
  * So all the needed methods should be provided by the Storage class and the access to the adapter
@@ -29,7 +24,9 @@ class Storage {
     this.lastSave = null;
     this.lastModified = null;
 
-
+    if (opts.walletId) {
+      this.createWallet(opts.walletId);
+    }
     this.interval = setInterval(() => {
       if (this.lastModified > this.lastSave) {
         this.saveState();
@@ -63,14 +60,32 @@ class Storage {
     await this.rehydrateState();
   }
 
+  createWallet(walletId) {
+    if (!hasProp(this.store.wallets, walletId)) {
+      this.store.wallets[walletId] = {
+        accounts: {},
+        network: undefined,
+        addresses: {
+          external: {},
+          internal: {},
+          misc: {},
+        },
+      };
+      return true;
+    }
+    return false;
+  }
+
   /**
    * Fetch the state from the persistance adapter
    * @return {Promise<void>}
    */
   async rehydrateState() {
-    this.store.transactions = (this.adapter) ? (await this.adapter.getItem('transactions') || this.store.transactions) : this.store.transactions;
-    this.store.addresses = (this.adapter) ? (await this.adapter.getItem('addresses') || this.store.addresses) : this.store.addresses;
-    this.store.accounts = (this.adapter) ? (await this.adapter.getItem('accounts') || this.store.accounts) : this.store.accounts;
+    const transactions = (this.adapter) ? (await this.adapter.getItem('transactions') || this.store.transactions) : this.store.transactions;
+    const wallets = (this.adapter) ? (await this.adapter.getItem('wallets') || this.store.wallets) : this.store.wallets;
+
+    this.store.transactions = mergeHelper(this.store.transactions, transactions);
+    this.store.wallets = mergeHelper(this.store.wallets, wallets);
     this.lastRehydrate = +new Date();
   }
 
@@ -81,8 +96,7 @@ class Storage {
   async saveState() {
     const self = this;
     await this.adapter.setItem('transactions', { ...self.store.transactions });
-    await this.adapter.setItem('addresses', { ...self.store.addresses });
-    await this.adapter.setItem('accounts', { ...self.store.accounts });
+    await this.adapter.setItem('wallets', { ...self.store.wallets });
     this.lastSave = +new Date();
     return true;
   }
@@ -123,7 +137,7 @@ class Storage {
     } else if (type === 'Array') {
       throw new Error('Not implemented. Please create an issue on github if needed.');
     } else {
-      throw new Error('Not implemented. Please create an issue on github if needed.');
+      throw new Error('Invalid transaction. Cannot import.');
     }
     return true;
   }
@@ -131,11 +145,16 @@ class Storage {
   /**
    * Import an array of accounts or a account object to the store
    * @param accounts
+   * @param walletId
    * @return {boolean}
    */
-  importAccounts(accounts) {
+  importAccounts(accounts, walletId) {
     const type = accounts.constructor.name;
-    const accList = this.store.accounts;
+    if (!walletId) throw new Error('Expected walletId to import addresses');
+    if (!this.searchWallet(walletId).found) {
+      this.createWallet(walletId);
+    }
+    const accList = this.store.wallets[walletId].accounts;
 
     if (type === 'Object') {
       if (accounts.path) {
@@ -158,7 +177,7 @@ class Storage {
     } else if (type === 'Array') {
       throw new Error('Not implemented. Please create an issue on github if needed.');
     } else {
-      throw new Error('Not implemented. Please create an issue on github if needed.');
+      throw new Error('Invalid account. Cannot import.');
     }
     return true;
   }
@@ -167,10 +186,11 @@ class Storage {
    * Update a specific address information in the store
    * It do not handle any merging right now and write over previous data.
    * @param address
+   * @param walletId
    * @return {boolean}
    */
-  updateAddress(address) {
-    const addressesStore = this.store.addresses;
+  updateAddress(address, walletId) {
+    if (!walletId) throw new Error('Expected walletId to update an address');
     const { path } = address;
     if (!path) throw new Error('Expected path to update an address');
     const typeInt = path.split('/')[4];
@@ -185,7 +205,7 @@ class Storage {
       default:
         type = 'misc';
     }
-
+    const addressesStore = this.store.wallets[walletId].addresses;
     addressesStore[type][path] = address;
     this.lastModified = Date.now();
     return true;
@@ -205,19 +225,36 @@ class Storage {
     const store = this.getStore();
 
     // Look up by looping over all addresses todo:optimisation
-    const existingTypes = Object.keys(store.addresses);
-    existingTypes.forEach((type) => {
-      const existingPaths = Object.keys(store.addresses[type]);
-      existingPaths.forEach((path) => {
-        const el = store.addresses[type][path];
-        if (el.address === search.address) {
-          search.path = path;
-          search.type = type;
-          search.found = true;
-          search.result = el;
-        }
+    const existingWallets = Object.keys(store.wallets);
+    existingWallets.forEach((walletId) => {
+      const existingTypes = Object.keys(store.wallets[walletId].addresses);
+      existingTypes.forEach((type) => {
+        const existingPaths = Object.keys(store.wallets[walletId].addresses[type]);
+        existingPaths.forEach((path) => {
+          const el = store.wallets[walletId].addresses[type][path];
+          if (el.address === search.address) {
+            search.path = path;
+            search.type = type;
+            search.found = true;
+            search.result = el;
+          }
+        });
       });
     });
+
+    return search;
+  }
+
+  searchWallet(walletId) {
+    const search = {
+      walletId,
+      found: false,
+    };
+    const store = this.getStore();
+    if (store.wallets[walletId]) {
+      search.found = true;
+      search.result = store.wallets[walletId];
+    }
     return search;
   }
 
@@ -299,16 +336,22 @@ class Storage {
   /**
    * Import one or multiple addresses to the store
    * @param addresses
+   * @param walletId
    * @return {boolean}
    */
-  importAddresses(addresses) {
-    const addressesStore = this.store.addresses;
+  importAddresses(addresses, walletId) {
+    if (!walletId) throw new Error('Expected walletId to import addresses');
+    if (!this.searchWallet(walletId).found) {
+      this.createWallet(walletId);
+    }
+    const addressesStore = this.store.wallets[walletId].addresses;
     const self = this;
 
-    function importAddress(address) {
+    function importAddress(address, wId) {
       const addressObj = address;
       const { path } = addressObj;
-      if (!path) throw new Error('Expected path to generate an address');
+      if (!path) throw new Error('Expected path to import an address');
+      if (!wId) throw new Error('Expected walletId to import an address');
       const index = path.split('/')[5];
       const typeInt = path.split('/')[4];
       let type;
@@ -322,10 +365,11 @@ class Storage {
         default:
           type = 'misc';
       }
+      if (!walletId) throw new Error('Invalid walletId. Cannot import');
       if (!addressObj.index) addressObj.index = index;
       if (addressesStore[type][path]) {
         if (addressesStore[type][path].fetchedLast < addressObj.fetchedLast) {
-          self.updateAddress(addressObj);
+          self.updateAddress(addressObj, walletId);
         }
       } else {
         addressesStore[type][path] = addressObj;
@@ -336,12 +380,12 @@ class Storage {
     if (type === 'Object') {
       if (addresses.path) {
         const address = addresses;
-        importAddress(address);
+        importAddress(address, walletId);
       } else {
         const addressPaths = Object.keys(addresses);
         addressPaths.forEach((path) => {
           const address = addresses[path];
-          importAddress(address);
+          importAddress(address, walletId);
         });
       }
     } else if (type === 'Array') {

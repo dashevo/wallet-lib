@@ -13,15 +13,17 @@ const insightClientOpts = {
 };
 
 describe('Transport : Insight Client', function suite() {
-  this.timeout(6000);
+  this.timeout(20000);
   before((done) => {
     const config = {
       transport: new InsightClient(insightClientOpts),
       mnemonic: mnemonicString1,
       network: Dashcore.Networks.testnet,
     };
+
     wallet = new Wallet(config);
     account = wallet.createAccount();
+    console.log('Account created');
     account.events.on('ready', () => {
       done();
     });
@@ -53,6 +55,7 @@ describe('Transport : Insight Client', function suite() {
       'e66474bfe8ae3d91b2784864fc09e0bd615cbfbf4a2164e46b970bcc488a938f',
       'b4f567f398ec2174df2d775c9bcbc197efda2902bc4b628858d6c8ef7453284d',
     ];
+    expect(addressesExternalData[`${path}/0/0`].address).to.equal('yRdxQQpXYh9Xkd91peJ7FJxpEzoRb6droH');
     expect(addressesExternalData[`${path}/0/0`].transactions).to.deep.equal(expectedTransactionsArr);
     expect(addressesExternalData[`${path}/0/0`].utxos).to.deep.equal([]);
     expect(addressesExternalData[`${path}/0/0`].fetchedLast).to.be.greaterThan(1533535093789);
@@ -123,19 +126,19 @@ describe('Transport : Insight Client', function suite() {
   it('should be able to get an unused address', () => {
     const unusedExternal = account.getUnusedAddress();
     const unusedInternal = account.getUnusedAddress(false);
-    expect(unusedExternal.address).to.equal('yf3KLBh1y5ZbNrcab8xr7DN7HPBGhSWoDY');
-    expect(unusedInternal.address).to.equal('yWbRpgDDsAVjXVWGHqZgiEoP7Mop9hAwYS');
+    expect(unusedExternal.address).to.equal('yLmv6uX1jmn14pCDpc83YCsA8wHVtcbaNw');
+    expect(unusedInternal.address).to.equal('yUgh63wqLQSvPBKPEnsw43BxAXAsT2d1aZ');
   });
 
   it('should be able to create a transaction', () => {
     const { address } = account.getUnusedAddress();
 
-    expect(address).to.equal('yf3KLBh1y5ZbNrcab8xr7DN7HPBGhSWoDY');
+    expect(address).to.equal('yLmv6uX1jmn14pCDpc83YCsA8wHVtcbaNw');
 
     const txOpts = { amount: 15, to: address };
     const txOptsSatoshis = { satoshis: 1500000000, to: address };
 
-    const expectedRawTx = '0300000001d8fba1d81d21fdf37927c398485b3e570893c17206eeab1c256ccc4edcae28d9000000006b483045022100d8436eeb4cbd6dbe7ea88f565eca606a06ba043a290e1bb84f0b234aabc8c3bb022037a014ff30b899c8e896c2ccb5d8b6a106bf56c4a6c0093ecd6ee786a50d984d01210389143a6bee1de5a9583c697e160655c703aa6f7199c93bf14287879a20cd01fbffffffff02002f6859000000001976a914cd5d758c0898175abfbcd12b13ebe783e1dc2b2b88acc07b0c8f000000001976a914d9e7ddb55be9df9d5678fda4845e9e1181750b9088ac00000000';
+    const expectedRawTx = '0300000001d8fba1d81d21fdf37927c398485b3e570893c17206eeab1c256ccc4edcae28d9000000006b483045022100f08ad7399d32ff87a377ca6488f239627f7761f3b4d96681dbcdd177508da481022042c862579dae12a7234e3bf3288a39fa74083ae4733ac60257b8b1d0dee6298001210389143a6bee1de5a9583c697e160655c703aa6f7199c93bf14287879a20cd01fbffffffff02002f6859000000001976a914050190a979dcc08085915d97cadcda0089eb6e7488acc07b0c8f000000001976a91450a799970165fd20e66e62e9df2f955556d5408788ac00000000';
     const rawTxFromAmount = account.createTransaction(txOpts);
     const rawTxFromSatoshisAmount = account.createTransaction(txOptsSatoshis);
     expect(rawTxFromAmount).to.equal(expectedRawTx);
@@ -148,7 +151,7 @@ describe('Transport : Insight Client', function suite() {
       to: address,
       isInstantSend: true,
     };
-    const expectedRawTx = '0300000001d8fba1d81d21fdf37927c398485b3e570893c17206eeab1c256ccc4edcae28d9000000006a473044022014a6d5b9e6c09edb4040baa8de6b8b21fe7d4f700d2395e4b165040a41c81b930220486ee8ec9c07aaebb50707ce72773927d3095c09369a686c999db587abdb5e5d01210389143a6bee1de5a9583c697e160655c703aa6f7199c93bf14287879a20cd01fbffffffff0200ca9a3b000000001976a914cd5d758c0898175abfbcd12b13ebe783e1dc2b2b88acc0e0d9ac000000001976a914d9e7ddb55be9df9d5678fda4845e9e1181750b9088ac00000000';
+    const expectedRawTx = '0300000001d8fba1d81d21fdf37927c398485b3e570893c17206eeab1c256ccc4edcae28d9000000006a473044022032f99f36d587ea18962deeb78e23c4d9ee11b9af52b1ba555b11e2833b8984d3022014ac5d11ba5fff0ffd2fa15bc5d07be4d9f33ff7736cd585105a762d0be7fd5601210389143a6bee1de5a9583c697e160655c703aa6f7199c93bf14287879a20cd01fbffffffff0200ca9a3b000000001976a914050190a979dcc08085915d97cadcda0089eb6e7488acc0e0d9ac000000001976a91450a799970165fd20e66e62e9df2f955556d5408788ac00000000';
     const rawTx = account.createTransaction(txOptsInstant);
     expect(rawTx).to.equal(expectedRawTx);
   });
@@ -179,7 +182,7 @@ describe('Transport : Insight Client', function suite() {
       to: address,
       isInstantSend: true,
     };
-    const expectedRawTx = '0300000001a11da3943d1187dabe44712074851cf1824a4bd91aafbe3dd84e9a0c96d1e84a000000006a4730440220462e82c236a13d7800a5ed999a3347e4e8fd2d8f1fa91192491552ae2b4f661702202f3e880ccabb2fbf2618fae91c4a49127e2155d1b63be7a1f9123a7ccfff97a60121039c2ac9fcf618c9bbf3c358b9e391d2c6c0829cc740ab1d11621c369083d26078ffffffff020b000000000000001976a914cd5d758c0898175abfbcd12b13ebe783e1dc2b2b88ace5ca052a010000001976a914d9e7ddb55be9df9d5678fda4845e9e1181750b9088ac00000000';
+    const expectedRawTx = '0300000001a11da3943d1187dabe44712074851cf1824a4bd91aafbe3dd84e9a0c96d1e84a000000006a473044022078eef50e4802ee4fcd120bc7e5949bfa93dc8c140a1038362e25e1a524a40f9d02201ba1e5f369730c61be7733217252f706c52c2c828a0acf1a134cb45732bb93140121039c2ac9fcf618c9bbf3c358b9e391d2c6c0829cc740ab1d11621c369083d26078ffffffff020b000000000000001976a914050190a979dcc08085915d97cadcda0089eb6e7488ace5ca052a010000001976a91450a799970165fd20e66e62e9df2f955556d5408788ac00000000';
     const rawTx = account.createTransaction(txOptsInstant);
     expect(rawTx).to.equal(expectedRawTx);
   });
@@ -192,7 +195,7 @@ describe('Transport : Insight Client', function suite() {
       to: address,
       isInstantSend: true,
     };
-    const expectedRawTx = '0300000001a11da3943d1187dabe44712074851cf1824a4bd91aafbe3dd84e9a0c96d1e84a000000006a4730440220462e82c236a13d7800a5ed999a3347e4e8fd2d8f1fa91192491552ae2b4f661702202f3e880ccabb2fbf2618fae91c4a49127e2155d1b63be7a1f9123a7ccfff97a60121039c2ac9fcf618c9bbf3c358b9e391d2c6c0829cc740ab1d11621c369083d26078ffffffff020b000000000000001976a914cd5d758c0898175abfbcd12b13ebe783e1dc2b2b88ace5ca052a010000001976a914d9e7ddb55be9df9d5678fda4845e9e1181750b9088ac00000000';
+    const expectedRawTx = '0300000001a11da3943d1187dabe44712074851cf1824a4bd91aafbe3dd84e9a0c96d1e84a000000006a473044022078eef50e4802ee4fcd120bc7e5949bfa93dc8c140a1038362e25e1a524a40f9d02201ba1e5f369730c61be7733217252f706c52c2c828a0acf1a134cb45732bb93140121039c2ac9fcf618c9bbf3c358b9e391d2c6c0829cc740ab1d11621c369083d26078ffffffff020b000000000000001976a914050190a979dcc08085915d97cadcda0089eb6e7488ace5ca052a010000001976a91450a799970165fd20e66e62e9df2f955556d5408788ac00000000';
     const rawTx = account.createTransaction(txOptsInstant);
     expect(rawTx).to.equal(expectedRawTx);
   });
@@ -416,7 +419,7 @@ describe('Transport : Insight Client', function suite() {
       isInstantSend: true,
     };
     const tx = account.createTransaction(txOptsInstant);
-    expect(tx).to.equal('0300000001d8fba1d81d21fdf37927c398485b3e570893c17206eeab1c256ccc4edcae28d9000000006a473044022014a6d5b9e6c09edb4040baa8de6b8b21fe7d4f700d2395e4b165040a41c81b930220486ee8ec9c07aaebb50707ce72773927d3095c09369a686c999db587abdb5e5d01210389143a6bee1de5a9583c697e160655c703aa6f7199c93bf14287879a20cd01fbffffffff0200ca9a3b000000001976a914cd5d758c0898175abfbcd12b13ebe783e1dc2b2b88acc0e0d9ac000000001976a914d9e7ddb55be9df9d5678fda4845e9e1181750b9088ac00000000');
+    expect(tx).to.equal('0300000001d8fba1d81d21fdf37927c398485b3e570893c17206eeab1c256ccc4edcae28d9000000006a473044022032f99f36d587ea18962deeb78e23c4d9ee11b9af52b1ba555b11e2833b8984d3022014ac5d11ba5fff0ffd2fa15bc5d07be4d9f33ff7736cd585105a762d0be7fd5601210389143a6bee1de5a9583c697e160655c703aa6f7199c93bf14287879a20cd01fbffffffff0200ca9a3b000000001976a914050190a979dcc08085915d97cadcda0089eb6e7488acc0e0d9ac000000001976a91450a799970165fd20e66e62e9df2f955556d5408788ac00000000');
     const fakedTx = `${tx}00201010`;
 
     return account.broadcastTransaction(fakedTx).then(

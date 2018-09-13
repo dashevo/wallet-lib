@@ -8,11 +8,11 @@ class SyncWorker {
     this.transport = opts.transport;
     this.fetchAddressInfo = opts.fetchAddressInfo;
     this.fetchTransactionInfo = opts.fetchTransactionInfo;
+    this.walletId = opts.walletId;
     this.worker = null;
     this.workerPass = 0;
     this.workerRunning = false;
     this.workerIntervalTime = 1 * 10 * 1000;
-
 
     const fetchDiff = (opts.threesholdMs) ? opts.threesholdMs : defaultOpts.threesholdMs;
     this.fetchThreeshold = Date.now() - fetchDiff;
@@ -25,7 +25,7 @@ class SyncWorker {
 
   async execAddressFetching() {
     const self = this;
-    const { external, internal } = this.storage.getStore().addresses;
+    const { external, internal } = this.storage.getStore().wallets[this.walletId].addresses;
     const { fetchAddressInfo } = this;
     const externalPaths = Object.keys(external);
     const internalPaths = Object.keys(internal);
@@ -53,7 +53,7 @@ class SyncWorker {
     toFetchAddresses.forEach((addressObj) => {
       const p = fetchAddressInfo(addressObj)
         .then((addrInfo) => {
-          self.storage.updateAddress(addrInfo);
+          self.storage.updateAddress(addrInfo, self.walletId);
           self.events.emit('balance_changed');
         });
       promises.push(p);
@@ -71,7 +71,7 @@ class SyncWorker {
     this.listeners.addresses.filter(listener => listenerAddresses.push(listener.address));
     const toPushListener = [];
 
-    const { external, internal } = this.storage.store.addresses;
+    const { external, internal } = this.storage.store.wallets[this.walletId].addresses;
     const externalPaths = Object.keys(external);
     const internalPaths = Object.keys(internal);
 
@@ -122,7 +122,7 @@ class SyncWorker {
 
   async execTransactionsFetching() {
     const self = this;
-    const { external, internal } = this.storage.getStore().addresses;
+    const { external, internal } = this.storage.getStore().wallets[this.walletId].addresses;
     const { fetchTransactionInfo } = this;
     const externalPaths = Object.keys(external);
     const internalPaths = Object.keys(internal);

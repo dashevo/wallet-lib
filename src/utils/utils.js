@@ -13,6 +13,12 @@ function duffsToDash(duffs) {
   }
   return duffs / DUFFS_PER_DASH;
 }
+function hasProp(obj, prop) {
+  if (Array.isArray(obj)) {
+    return obj.includes(prop);
+  }
+  return {}.hasOwnProperty.call(obj, prop);
+}
 function getBytesOf(elem, type) {
   let BASE_BYTES = 0;
   let SCRIPT_BYTES = 0;
@@ -30,4 +36,6 @@ function getBytesOf(elem, type) {
       return false;
   }
 }
-module.exports = { dashToDuffs, duffsToDash, getBytesOf };
+module.exports = {
+  dashToDuffs, duffsToDash, getBytesOf, hasProp,
+};

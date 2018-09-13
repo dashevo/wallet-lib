@@ -9,8 +9,8 @@
 
 // privateHDKey.derive('m/1');
 
-describe('Bloom Fiters', () => {
-  it('should...', (done) => {
+// describe('Bloom Fiters', () => {
+//   it('should...', (done) => {
     // const noElements = 10;
     // const privKeySeeds = [];
     //
@@ -26,6 +26,6 @@ describe('Bloom Fiters', () => {
     // expect(filter.nTweak === 0);
     // expect(filter.vData.length === 5);
     // expect(filter.vData.toString() === '1,0,0,0,1');
-    done();
-  });
-});
+    // done();
+  // });
+// });
