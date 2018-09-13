@@ -303,7 +303,7 @@ describe('Wallet', () => {
             blockhash: '000000000a84c4703da7a69cfa65837251e4aac80e1621f2a2cc9504e0c149ba',
             blockheight: 201436,
             blocktime: 1533525448,
-            fees: 0.0001,
+            fees: 1000,
             size: 225,
             txid: '9ab39713e9ce713d41ca6974db83e57bced02402e9516b8a662ed60d5c08f6d1',
             txlock: true,

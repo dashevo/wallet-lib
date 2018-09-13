@@ -3,7 +3,7 @@
     "blockhash": "000000000a84c4703da7a69cfa65837251e4aac80e1621f2a2cc9504e0c149ba",
     "blockheight": 201436,
     "blocktime": 1533525448,
-    "fees": 0.0001,
+    "fees": 1000,
     "size": 225,
     "txid": "9ab39713e9ce713d41ca6974db83e57bced02402e9516b8a662ed60d5c08f6d1",
     "txlock": true,
@@ -61,7 +61,7 @@
     "blockhash": "000000000388f8a1de91702e25209aad802d28fcd2710ac2e2acd12e9738dbe2",
     "blockheight": 203633,
     "blocktime": 1533827521,
-    "fees": 0.0001,
+    "fees": 1000,
     "size": 225,
     "txlock": true,
     "vout": [
@@ -118,7 +118,7 @@
     "blockhash": "0000000002922d7d0a69ce3e29908dc26aba6565af760d208dac77a8b520fbf3",
     "blockheight": 204161,
     "blocktime": 1533900199,
-    "fees": 0.0001,
+    "fees": 1000,
     "size": 226,
     "txlock": false,
     "vout": [
@@ -172,7 +172,6 @@
   },
   "yizmJb63ygipuJaRgYtpWCV2erQodmaZt8":{
     "address": "yizmJb63ygipuJaRgYtpWCV2erQodmaZt8",
-    "balance": 0,
     "balanceSat": 0,
     "fetchedLast": 1534867407075,
     "path": "m/44'/1'/0'/0/0",

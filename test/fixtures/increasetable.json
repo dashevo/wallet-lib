@@ -4,7 +4,6 @@
     "external": {
       "m/44'/1'/0'/0/0": {
         "address": "yizmJb63ygipuJaRgYtpWCV2erQodmaZt8",
-        "balance": 1,
         "balanceSat": 100000000,
         "fetchedLast": 0,
         "path": "m/44'/1'/0'/0/0",
@@ -33,7 +32,7 @@
       "blockhash": "0000000007a3b51cccc3d8516917d3e8386dd82ec49322c790a0a873ee4e54d2",
       "blockheight": 204344,
       "blocktime": 0,
-      "fees": 0.00000245,
+      "fees": 245,
       "size": 225,
       "txlock": false
     }
@@ -44,7 +43,7 @@
       "blockhash": "0000000007a3b51cccc3d8516917d3e8386dd82ec49322c790a0a873ee4e54d2",
       "blockheight": 204344,
       "blocktime": 0,
-      "fees": 0.00000245,
+      "fees": 245,
       "size": 225,
       "txlock": false,
       "vin": [
@@ -93,7 +92,7 @@
       "blockhash": "0000000002922d7d0a69ce3e29908dc26aba6565af760d208dac77a8b520fbf3",
       "blockheight": 204161,
       "blocktime": 1533900199,
-      "fees": 0.0001,
+      "fees": 1000,
       "size": 226,
       "txlock": false,
       "vout": [
@@ -150,7 +149,7 @@
       "blockhash": "000000000388f8a1de91702e25209aad802d28fcd2710ac2e2acd12e9738dbe2",
       "blockheight": 203633,
       "blocktime": 1533827521,
-      "fees": 0.0001,
+      "fees": 1000,
       "size": 225,
       "txlock": true,
       "vout": [
@@ -249,7 +248,7 @@
         "blockhash": "0000000002922d7d0a69ce3e29908dc26aba6565af760d208dac77a8b520fbf3",
         "blockheight": 204161,
         "blocktime": 1533900199,
-        "fees": 0.0001,
+        "fees": 1000,
         "size": 226,
         "txlock": false,
         "vout": [
@@ -306,7 +305,7 @@
         "blockhash": "000000000388f8a1de91702e25209aad802d28fcd2710ac2e2acd12e9738dbe2",
         "blockheight": 203633,
         "blocktime": 1533827521,
-        "fees": 0.0001,
+        "fees": 10000,
         "size": 225,
         "txlock": true,
         "vout": [
@@ -363,7 +362,7 @@
         "blockhash": "00000000220536db0f4c0afc5d3ec80b36a5a253390359b3e3bb7aaf7664edc6",
         "blockheight": 206745,
         "blocktime": 1534255937,
-        "fees": 0.0001944,
+        "fees": 1944,
         "size": 22,
         "txlock": false,
         "vout": [
@@ -420,7 +419,7 @@
         "blockhash": "0000000007a3b51cccc3d8516917d3e8386dd82ec49322c790a0a873ee4e54d2",
         "blockheight": 204344,
         "blocktime": 1533926635,
-        "fees": 0.00000245,
+        "fees": 245,
         "size": 225,
         "txlock": false,
         "vout": [
@@ -477,7 +476,6 @@
       "external": {
         "m/44'/1'/0'/0/0": {
           "address": "yizmJb63ygipuJaRgYtpWCV2erQodmaZt8",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407075,
           "path": "m/44'/1'/0'/0/0",
@@ -493,7 +491,6 @@
         },
         "m/44'/1'/0'/0/1": {
           "address": "yhLGmtf5Jmdb3DUvsaNJUHyCjjxTcBJEry",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867406705,
           "path": "m/44'/1'/0'/0/1",
@@ -504,7 +501,6 @@
         },
         "m/44'/1'/0'/0/2": {
           "address": "yfX4zBhV6syJTbRJLwxhCNdXkDnE7Mj1N7",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867406711,
           "path": "m/44'/1'/0'/0/2",
@@ -515,7 +511,6 @@
         },
         "m/44'/1'/0'/0/3": {
           "address": "ySqLBsyTsyAJ9ee3tamaVPrHyN4tpYPH4b",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867406727,
           "path": "m/44'/1'/0'/0/3",
@@ -526,7 +521,6 @@
         },
         "m/44'/1'/0'/0/4": {
           "address": "yjageEcheCFsHiVJTonpJ7MuXqox7skPuz",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/0/4",
@@ -537,7 +531,6 @@
         },
         "m/44'/1'/0'/0/5": {
           "address": "yYTWoV19dxRrsBxGjGt8aRjSPviqTPK6Yv",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/0/5",
@@ -548,7 +541,6 @@
         },
         "m/44'/1'/0'/0/6": {
           "address": "yUf3iBng8e5xYu3HjgPHeZ5TeT3n3DrDEx",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/0/6",
@@ -559,7 +551,6 @@
         },
         "m/44'/1'/0'/0/7": {
           "address": "yeDeNn3xUtRdQJDrreqq739krZ4Gq6Cr3W",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/0/7",
@@ -570,7 +561,6 @@
         },
         "m/44'/1'/0'/0/8": {
           "address": "yVXJVuzQys4WdPXn1bThSvQNb6Y7ni9dav",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/0/8",
@@ -581,7 +571,6 @@
         },
         "m/44'/1'/0'/0/9": {
           "address": "yN53BceF98DsnmMy6CFWvWAUsVE6LYm35X",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/0/9",
@@ -592,7 +581,6 @@
         },
         "m/44'/1'/0'/0/10": {
           "address": "yPetUJo1WeAjLpNYACntNSgEvHuUu3p1a8",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/0/10",
@@ -605,7 +593,6 @@
       "internal": {
         "m/44'/1'/0'/1/0": {
           "address": "yjSivd8eWH1vVywaeePiHBLXqMbHFXxxXE",
-          "balance": 0.0122056,
           "balanceSat": 1220560,
           "fetchedLast": 1534867407092,
           "path": "m/44'/1'/0'/1/0",
@@ -620,7 +607,6 @@
         },
         "m/44'/1'/0'/1/1": {
           "address": "yTM7nPiekjMBkMCU6cPmFD2KReeFUeVwCp",
-          "balance": 0.9989,
           "balanceSat": 99890000,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/1/1",
@@ -633,7 +619,6 @@
         },
         "m/44'/1'/0'/1/2": {
           "address": "yXy7rfGH5tZJs9GmFbdk6hPg2mzb8MRdfC",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/1/2",
@@ -644,7 +629,6 @@
         },
         "m/44'/1'/0'/1/3": {
           "address": "yZgVHYQb63az5Fex8Xs8K6T2ZgR5RbuawE",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/1/3",
@@ -655,7 +639,6 @@
         },
         "m/44'/1'/0'/1/4": {
           "address": "yc9ZmPczW1D6mFQneTAo3KAwGmpddV2zMc",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/1/4",
@@ -666,7 +649,6 @@
         },
         "m/44'/1'/0'/1/5": {
           "address": "yf1Znbd7eUTgFpaFqMSs6uu3s5cixF3rWG",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/1/5",
@@ -677,7 +659,6 @@
         },
         "m/44'/1'/0'/1/6": {
           "address": "yaRW7DRpAEXLfKBps5yUVmJnBaAyc6q7iq",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/1/6",
@@ -688,7 +669,6 @@
         },
         "m/44'/1'/0'/1/7": {
           "address": "yXVuvMZRiAdSBni27ERcx6R2pLuaaDKdsZ",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/1/7",
@@ -699,7 +679,6 @@
         },
         "m/44'/1'/0'/1/8": {
           "address": "yPpC6Tjo3occEXHBvLWt3q8UD5KS75pKGb",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/1/8",
@@ -710,7 +689,6 @@
         },
         "m/44'/1'/0'/1/9": {
           "address": "yM471igq2M2Drf6tXa8dcWk8BQ6NfxaTtf",
-          "balance": 0,
           "balanceSat": 0,
           "fetchedLast": 1534867407080,
           "path": "m/44'/1'/0'/1/9",

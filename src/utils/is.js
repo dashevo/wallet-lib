@@ -4,7 +4,7 @@ const is = {
   num: num => !Number.isNaN(num) && typeof num === 'number',
   float: (float => is.num(float) && Math.floor(float) !== float),
   int: int => Number.isInteger(int) || (is.num(int) && Math.floor(int) === int),
-  hex: h => parseInt(h.toLowerCase(), 16).toString(16) === h.toLowerCase(),
+  hex: h => is.string(h) && (h.match(/([0-9]|[a-f])/gim) || []).length === h.length,
   string: str => typeof str === 'string',
   bool: b => b === true || b === false,
   obj: obj => obj && obj && obj === Object(obj),

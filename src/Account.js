@@ -182,7 +182,6 @@ class Account {
           if (utxo.txId === affectedtxid) {
             totalSatoshis -= utxo.satoshis;
             address.balanceSat -= utxo.satoshis;
-            address.balance = duffsToDash(address.balanceSat);
           } else {
             cleanedUtxos.push(utxo);
           }
@@ -207,12 +206,14 @@ class Account {
       txid, blockhash, blockheight, blocktime, fees, size, vin, vout, txlock,
     } = await this.transport.getTransaction(transactionid);
 
+
+    const feesInSat = is.float(fees) ? dashToDuffs(fees) : (fees);
     return {
       txid,
       blockhash,
       blockheight,
       blocktime,
-      fees,
+      fees: feesInSat,
       size,
       vout,
       vin,
@@ -230,12 +231,11 @@ class Account {
     const self = this;
     const { address, path } = addressObj;
     const {
-      balance, balanceSat, unconfirmedBalanceSat, transactions,
+      balanceSat, unconfirmedBalanceSat, transactions,
     } = await this.transport.getAddressSummary(address);
     const addrInfo = {
       address,
       path,
-      balance,
       balanceSat,
       unconfirmedBalanceSat,
       transactions,
@@ -271,7 +271,7 @@ class Account {
     }
     if (fetchUtxo) {
       const originalUtxo = (await self.transport.getUTXO(address));
-      const utxo = (balance > 0) ? parseUTXO(originalUtxo) : [];
+      const utxo = (balanceSat > 0) ? parseUTXO(originalUtxo) : [];
       addrInfo.utxos = utxo;
     }
     return addrInfo;
@@ -456,7 +456,6 @@ class Account {
       address,
       // privateKey,
       transactions: [],
-      balance: 0,
       balanceSat: 0,
       unconfirmedBalanceSat: 0,
       utxos: [],
@@ -469,11 +468,11 @@ class Account {
 
   /**
    * Return the total balance of an account.
-   * Ezpect paralel fetching/discovery to be activated.
+   * Expect paralel fetching/discovery to be activated.
    * @return {number} Balance in dash
    */
-  getBalance(unconfirmed = true, displayDuffs = false) {
-    let balance = 0;
+  getBalance(unconfirmed = true, displayDuffs = true) {
+    let totalSat = 0;
     const { addresses } = this.storage.getStore().wallets[this.walletId];
     const { external, internal } = addresses;
     const externalPaths = (external && Object.keys(external)) || [];
@@ -481,16 +480,16 @@ class Account {
     if (externalPaths.length > 0) {
       externalPaths.forEach((path) => {
         const { unconfirmedBalanceSat, balanceSat } = external[path];
-        balance += (unconfirmed) ? unconfirmedBalanceSat + balanceSat : balanceSat;
+        totalSat += (unconfirmed) ? unconfirmedBalanceSat + balanceSat : balanceSat;
       });
     }
     if (externalPaths.length > 0) {
       internalPaths.forEach((path) => {
         const { unconfirmedBalanceSat, balanceSat } = internal[path];
-        balance += (unconfirmed) ? unconfirmedBalanceSat + balanceSat : balanceSat;
+        totalSat += (unconfirmed) ? unconfirmedBalanceSat + balanceSat : balanceSat;
       });
     }
-    return (displayDuffs) ? balance : duffsToDash(balance);
+    return (displayDuffs) ? totalSat : duffsToDash(totalSat);
   }
 
   /**
@@ -545,7 +544,7 @@ class Account {
       tx.to(output.address, output.satoshis);
     });
 
-    if (outputs[0].satoshis > this.getBalance(true, true)) {
+    if (outputs[0].satoshis > this.getBalance(true)) {
       throw new Error('Not enought fund');
     }
 
