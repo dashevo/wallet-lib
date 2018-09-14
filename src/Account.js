@@ -102,7 +102,7 @@ class Account {
       this.workers.bip44.startWorker();
     }
 
-    if (this.transport !== null) {
+    if (this.transport && this.transport.valid) {
       workersWatcher.sync = { ready: false, started: false };
       this.events.on('WORKER/SYNC/STARTED', () => { workersWatcher.sync.started = true; });
       this.events.on('WORKER/SYNC/EXECUTED', () => { workersWatcher.sync.ready = true; });
@@ -157,7 +157,7 @@ class Account {
    * @return {Promise<*>}
    */
   async broadcastTransaction(rawtx, isIs = false) {
-    if (!this.transport) throw new Error('A transport layer is needed to perform a broadcast');
+    if (!this.transport.valid) throw new Error('A transport layer is needed to perform a broadcast');
 
     const txid = await this.transport.sendRawTransaction(rawtx, isIs);
     if (is.txid(txid)) {
@@ -202,6 +202,8 @@ class Account {
    * @return {Promise<{txid, blockhash, blockheight, blocktime, fees, size, vout, vin, txlock}>}
    */
   async fetchTransactionInfo(transactionid) {
+    if (!this.transport.valid) throw new Error('A transport layer is needed to fetch tx info');
+
     // valueIn, valueOut,
     const {
       txid, blockhash, blockheight, blocktime, fees, size, vin, vout, txlock,
@@ -223,7 +225,8 @@ class Account {
   }
 
   async fetchStatus() {
-    return await this.transport.getStatus();
+    if (!this.transport.valid) throw new Error('A transport layer is needed to fetch status');
+    return (this.transport) ? this.transport.getStatus() : false;
   }
 
   /**
@@ -233,6 +236,7 @@ class Account {
    * @return {Promise<addressInfo>}
    */
   async fetchAddressInfo(addressObj, fetchUtxo = true) {
+    if (!this.transport.valid) throw new Error('A transport layer is needed to fetch addr info');
     const self = this;
     const { address, path } = addressObj;
     const {
@@ -644,7 +648,7 @@ class Account {
    * @return {Boolean}
    */
   forceRefreshAccount() {
-    if (!this.transport) {
+    if (!this.transport.valid) {
       throw new Error('A transport layer is needed to perform a full refresh');
     }
     const addressStore = this.storage.store.wallets[this.walletId].addresses;
@@ -663,7 +667,7 @@ class Account {
       this.BIP44PATH = getBIP44Path(network, this.accountIndex);
       this.network = getNetwork(network);
       this.storage.store.wallets[this.walletId].network = network.toString();
-      if (this.transport) {
+      if (this.transport.valid) {
         this.transport.updateNetwork(network);
       }
       return true;
@@ -678,7 +682,7 @@ class Account {
    * @return {Boolean}
    */
   disconnect() {
-    if (this.transport) {
+    if (this.transport.valid) {
       this.transport.disconnect();
     }
     if (this.workers) {

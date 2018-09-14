@@ -13,7 +13,14 @@ function isValidTransport(transport) {
     return hasProp(transportList, transport);
   } if (is.obj(transport)) {
     let valid = true;
-    const expectedKeys = ['getAddressSummary', 'getTransaction', 'getUTXO', 'subscribeToAddresses', 'closeSocket', 'sendRawTransaction'];
+    const expectedKeys = [
+      'getAddressSummary',
+      'getTransaction',
+      'getUTXO',
+      'subscribeToAddresses',
+      'closeSocket',
+      'sendRawTransaction',
+    ];
     expectedKeys.forEach((key) => {
       if (!transport[key]) {
         valid = false;
@@ -26,17 +33,19 @@ function isValidTransport(transport) {
 
 class Transporter {
   constructor(transportArg) {
-    if (!transportArg) {
-      throw new Error('Expect a transport name or valid object as arg');
-    }
+    this.valid = false;
+    this.type = null;
+    this.transport = null;
 
-    let transport = transportArg;
-    if (is.string(transportArg) && Object.keys(transportList).includes(transportArg)) {
-      transport = transportList[transportArg];
+    if (transportArg) {
+      let transport = transportArg;
+      if (is.string(transportArg) && Object.keys(transportList).includes(transportArg)) {
+        transport = transportList[transportArg];
+      }
+      this.valid = isValidTransport(transportArg);
+      this.type = transport.type || transport.constructor.name;
+      this.transport = transport;
     }
-    this.valid = isValidTransport(transportArg);
-    this.type = transport.type || transport.constructor.name;
-    this.transport = transport;
   }
 
   async getStatus() {

@@ -26,29 +26,23 @@ class SyncWorker {
 
   async execAddressFetching() {
     const self = this;
-    const { external, internal } = this.storage.getStore().wallets[this.walletId].addresses;
+    const { addresses } = this.storage.getStore().wallets[this.walletId];
     const { fetchAddressInfo } = this;
-    const externalPaths = Object.keys(external);
-    const internalPaths = Object.keys(internal);
 
     const toFetchAddresses = [];
 
-    if (externalPaths.length > 0) {
-      externalPaths.forEach((path) => {
-        const el = external[path];
-        if (el.unconfirmedBalanceSat > 0 || el.fetchedLast < self.fetchThreeshold) {
-          toFetchAddresses.push(el);
-        }
-      });
-    }
-    if (internalPaths.length > 0) {
-      internalPaths.forEach((path) => {
-        const el = internal[path];
-        if (el.unconfirmedBalanceSat > 0 || el.fetchedLast < self.fetchThreeshold) {
-          toFetchAddresses.push(el);
-        }
-      });
-    }
+    Object.keys(addresses).forEach((walletType) => {
+      const walletAddresses = addresses[walletType];
+      const walletPaths = Object.keys(walletAddresses);
+      if (walletPaths.length > 0) {
+        walletPaths.forEach((path) => {
+          const address = walletAddresses[path];
+          if (address.unconfirmedBalanceSat > 0 || address.fetchedLast < self.fetchThreeshold) {
+            toFetchAddresses.push(address);
+          }
+        });
+      }
+    });
     const promises = [];
 
     toFetchAddresses.forEach((addressObj) => {
@@ -79,7 +73,7 @@ class SyncWorker {
       //   self.events.emit('balance_changed');
       // }
     };
-    await self.transport.subscribeToEvent('block', cb);
+    self.transport.subscribeToEvent('block', cb);
   }
 
   async execAddressListener() {
@@ -88,29 +82,24 @@ class SyncWorker {
     this.listeners.addresses.filter(listener => listenerAddresses.push(listener.address));
     const toPushListener = [];
 
-    const { external, internal } = this.storage.store.wallets[this.walletId].addresses;
-    const externalPaths = Object.keys(external);
-    const internalPaths = Object.keys(internal);
+    const { addresses } = this.storage.getStore().wallets[this.walletId];
 
-    externalPaths.forEach((path) => {
-      const el = external[path];
-      if (!listenerAddresses.includes(el.address)) {
-        const listener = {
-          address: el.address,
-        };
-        toPushListener.push(listener);
+    Object.keys(addresses).forEach((walletType) => {
+      const walletAddresses = addresses[walletType];
+      const walletPaths = Object.keys(walletAddresses);
+      if (walletPaths.length > 0) {
+        walletPaths.forEach((path) => {
+          const address = walletAddresses[path];
+          if (!listenerAddresses.includes(address.address)) {
+            const listener = {
+              address: address.address,
+            };
+            toPushListener.push(listener);
+          }
+        });
       }
     });
 
-    internalPaths.forEach((path) => {
-      const el = internal[path];
-      if (!listenerAddresses.includes(el.address)) {
-        const listener = {
-          address: el.address,
-        };
-        toPushListener.push(listener);
-      }
-    });
     toPushListener.forEach((listener) => {
       const listenerObj = Object.assign({}, listener);
       listenerObj.cb = function (event) {
@@ -141,10 +130,7 @@ class SyncWorker {
     const self = this;
     const { transactions, wallets } = this.storage.getStore();
     const { blockheight, addresses } = wallets[this.walletId];
-    const { external, internal } = addresses;
     const { fetchTransactionInfo } = this;
-    const externalPaths = Object.keys(external);
-    const internalPaths = Object.keys(internal);
 
     const toFetchTransactions = [];
     const unconfirmedThreshold = 6;
@@ -152,34 +138,33 @@ class SyncWorker {
     // Parse all addresses and will check if some transaction need to be fetch.
     // This could happen if a tx is yet unconfirmed or if unknown yet.
 
-    if (externalPaths.length > 0) {
-      externalPaths.forEach((path) => {
-        const el = external[path];
-        const knownsTxId = Object.keys(transactions);
-        el.transactions.forEach((txid) => {
-          const txBlockheight = transactions[txid].blockheight;
-          if (!knownsTxId.includes(txid) || txBlockheight === -1) {
-            toFetchTransactions.push(txid);
-          } else if (blockheight - txBlockheight < unconfirmedThreshold) {
-            console.log(blockheight, txBlockheight, unconfirmedThreshold, blockheight - txBlockheight);
-          }
+    Object.keys(addresses).forEach((walletType) => {
+      const walletAddresses = addresses[walletType];
+      const walletPaths = Object.keys(walletAddresses);
+      if (walletPaths.length > 0) {
+        walletPaths.forEach((path) => {
+          const address = walletAddresses[path];
+          const knownsTxId = Object.keys(transactions);
+          address.transactions.forEach((txid) => {
+            const tx = transactions[txid];
+            const txBlockheight = tx.blockheight;
+            // In case we have a transaction associated to an address but unknown in global level
+            if (!knownsTxId.includes(txid)) {
+              toFetchTransactions.push(txid);
+            } else if (txBlockheight === -1) {
+              toFetchTransactions.push(txid);
+            } else if (blockheight - txBlockheight < unconfirmedThreshold) {
+              // When the txid is more than -1 but less than 6 conf.
+              tx.spendable = false;
+              self.storage.updateTransaction(tx);
+            } else if (tx.spendable === false) {
+              tx.spendable = false;
+              self.storage.updateTransaction(tx);
+            }
+          });
         });
-      });
-    }
-    if (internalPaths.length > 0) {
-      internalPaths.forEach((path) => {
-        const el = internal[path];
-        const knownsTxId = Object.keys(self.storage.store.transactions);
-        el.transactions.forEach((txid) => {
-          const txBlockheight = transactions[txid].blockheight;
-          if (!knownsTxId.includes(txid) || txBlockheight === -1) {
-            toFetchTransactions.push(txid);
-          } else if (blockheight - txBlockheight < unconfirmedThreshold) {
-            console.log(blockheight, txBlockheight, unconfirmedThreshold, blockheight - txBlockheight);
-          }
-        });
-      });
-    }
+      }
+    });
 
     const promises = [];
 
@@ -187,6 +172,7 @@ class SyncWorker {
       const p = fetchTransactionInfo(transactionObj)
         .then((transactionInfo) => {
           self.storage.updateTransaction(transactionInfo);
+          // todo : should fire only if really changed.
           self.events.emit('balance_changed');
         });
       promises.push(p);
@@ -228,6 +214,9 @@ class SyncWorker {
 
   async execInitialFetch() {
     const res = await this.fetchStatus();
+    if (!res) {
+      return false;
+    }
     const { blocks } = res;
     this.storage.store.wallets[this.walletId].blockheight = blocks;
     this.events.emit('blockheight_changed');

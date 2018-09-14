@@ -66,7 +66,7 @@ describe('Account - Basics', function suite() {
 
     const walletId = wallet.walletId;
     expect(account.store.wallets[walletId].accounts["m/44'/1'/0'"]).to.exist;
-    expect(account.transport).to.equal(null);
+    expect(account.transport).to.not.equal(null);
     expect(account.mode).to.equal('full');
     expect(account.label).to.equal(null);
     expect(account.cacheTx).to.equal(true);
@@ -86,7 +86,7 @@ describe('Account - Basics', function suite() {
     expect(account.constructor.name).to.equal('Account');
     expect(account.accountIndex).to.equal(0);
     expect(account.BIP44PATH).to.equal('m/44\'/1\'/0\'');
-    expect(account.transport).to.equal(null);
+    expect(account.transport).to.not.equal(null);
     expect(account.mode).to.equal('full');
     expect(account.label).to.equal(null);
     expect(account.cacheTx).to.equal(true);
@@ -109,7 +109,7 @@ describe('Account - Basics', function suite() {
     expect(account.constructor.name).to.equal('Account');
     expect(account.accountIndex).to.equal(0);
     expect(account.BIP44PATH).to.equal('m/44\'/1\'/0\'');
-    expect(account.transport).to.equal(null);
+    expect(account.transport).to.not.equal(null);
     expect(account.mode).to.equal('full');
     expect(account.label).to.equal(null);
     expect(account.cacheTx).to.equal(true);
@@ -131,7 +131,7 @@ describe('Account - Basics', function suite() {
     expect(account.constructor.name).to.equal('Account');
     expect(account.accountIndex).to.equal(0);
     expect(account.BIP44PATH).to.equal('m/44\'/1\'/0\'');
-    expect(account.transport).to.equal(null);
+    expect(account.transport).to.not.equal(null);
     expect(account.mode).to.equal('full');
     expect(account.label).to.equal(null);
     expect(account.cacheTx).to.equal(true);

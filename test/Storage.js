@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const { Networks } = require('@dashevo/dashcore-lib');
 const Storage = require('../src/Storage');
 const InMem = require('../src/adapters/InMem');
 
@@ -180,7 +181,8 @@ describe('Storage', function suite() {
       transactions: {},
       wallets: {
         fad183cbf7: {
-          network: undefined,
+          blockheight: 0,
+          network: Networks.testnet,
           accounts: {
             "m/44'/1'/0'": {
               label: 'uberAcc',

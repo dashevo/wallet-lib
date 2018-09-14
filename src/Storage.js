@@ -1,6 +1,6 @@
 const { cloneDeep, merge } = require('lodash');
-const { is, hasProp } = require('./utils');
 const { Networks } = require('@dashevo/dashcore-lib');
+const { is, hasProp } = require('./utils');
 
 const defaultOpts = {
 

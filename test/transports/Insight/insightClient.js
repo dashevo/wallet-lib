@@ -203,7 +203,7 @@ describe('Transport : Insight Client', function suite() {
       mnemonic: 'wisdom claim quote stadium input danger planet angry crucial cargo struggle medal',
       network: 'testnet',
     });
-    expect(wallet2.transport).to.be.equal(null);
+    expect(wallet2.transport).to.not.equal(null);
     const acc1 = wallet2.createAccount({ mode: 'light' });
     const acc2 = wallet2.createAccount({ mode: 'light' });
     const acc3 = wallet2.createAccount({ mode: 'light' });
@@ -227,6 +227,7 @@ describe('Transport : Insight Client', function suite() {
 
     });
     expect(wallet3.transport).to.not.equal(null);
+    expect(wallet3.transport.valid).to.equal(false);
     expect(wallet3.transport.type).to.equal('String');
 
     const acc1 = wallet3.createAccount({ mode: 'light' });
@@ -240,6 +241,8 @@ describe('Transport : Insight Client', function suite() {
       expect(el.BIP44PATH).to.equal(`m/44'/1'/${i}'`);
     });
     expect(acc1.transport).to.not.equal(null);
+    expect(acc1.transport).to.be.a('Object');
+    expect(acc1.transport.valid).to.equal(false);
     expect(acc1.transport.type).to.equal('String');
     wallet3.disconnect();
   });

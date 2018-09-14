@@ -46,7 +46,8 @@ describe('Transporter', () => {
     transporterInsight2.disconnect();
   });
   it('should handle invalid transporter', () => {
-    expect(() => new Transporter()).to.throw('Expect a transport name or valid object as arg');
+    const empty = new Transporter();
+    expect(empty.valid).to.equal(false);
     const invalid = new Transporter('invalidName');
     expect(invalid.valid).to.equal(false);
 

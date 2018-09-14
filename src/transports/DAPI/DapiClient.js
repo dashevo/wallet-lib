@@ -23,6 +23,14 @@ class DAPIClient {
     throw new Error(`Missing implementation - ${this.type}`);
   }
 
+  async subscribeToEvent() {
+    throw new Error(`Missing implementation - ${this.type}`);
+  }
+
+  async unsubscribeFromEvent() {
+    throw new Error(`Missing implementation - ${this.type}`);
+  }
+
   async sendRawTransaction() {
     throw new Error(`Missing implementation - ${this.type}`);
   }

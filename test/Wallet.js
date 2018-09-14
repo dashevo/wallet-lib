@@ -20,7 +20,7 @@ describe('Wallet', () => {
     expect(wallet).to.exist;
     expect(wallet).to.be.a('object');
     expect(wallet.constructor.name).to.equal('Wallet');
-    expect(wallet.transport).to.equal(null);
+    expect(wallet.transport).to.not.equal(null);
     expect(wallet.HDPrivateKey.toString()).to.equal(privateHDKey1.toString());
     wallet.disconnect();
   });
@@ -36,7 +36,7 @@ describe('Wallet', () => {
     expect(wallet).to.exist;
     expect(wallet).to.be.a('object');
     expect(wallet.constructor.name).to.equal('Wallet');
-    expect(wallet.transport).to.equal(null);
+    expect(wallet.transport).to.not.equal(null);
     expect(wallet.HDPrivateKey.toString()).to.equal(hdKey.toString());
     wallet.disconnect();
   });
@@ -52,7 +52,7 @@ describe('Wallet', () => {
     expect(wallet).to.exist;
     expect(wallet).to.be.a('object');
     expect(wallet.constructor.name).to.equal('Wallet');
-    expect(wallet.transport).to.equal(null);
+    expect(wallet.transport).to.not.equal(null);
     expect(wallet.HDPrivateKey.toString()).to.equal(hdKey.toString());
     wallet.disconnect();
   });
@@ -66,7 +66,7 @@ describe('Wallet', () => {
     expect(wallet).to.exist;
     expect(wallet).to.be.a('object');
     expect(wallet.constructor.name).to.equal('Wallet');
-    expect(wallet.transport).to.equal(null);
+    expect(wallet.transport).to.not.equal(null);
     expect(wallet.mnemonic).to.be.an.instanceof(Mnemonic);
     wallet.disconnect();
   });
@@ -103,7 +103,12 @@ describe('Wallet', () => {
     expect(wallet).to.exist;
     expect(wallet).to.be.a('object');
     expect(wallet.constructor.name).to.equal('Wallet');
+
+    expect(wallet.transport).to.not.equal(null);
     expect(wallet.transport).to.be.a('object');
+    expect(wallet.transport.valid).to.equal(false);
+    expect(wallet.transport.type).to.equal('String');
+
     expect(wallet.HDPrivateKey.toString()).to.equal(privateHDKey1.toString());
     wallet.transport.getAddressSummary('fake').then(
       () => Promise.reject(new Error('Expected method to reject.')),
@@ -124,7 +129,10 @@ describe('Wallet', () => {
     expect(wallet).to.exist;
     expect(wallet).to.be.a('object');
     expect(wallet.constructor.name).to.equal('Wallet');
+    expect(wallet.transport).to.not.equal(null);
     expect(wallet.transport).to.be.a('object');
+    expect(wallet.transport.valid).to.equal(false);
+    expect(wallet.transport.type).to.equal('String');
     expect(wallet.HDPrivateKey.toString()).to.equal(privateHDKey1.toString());
     wallet.transport.getAddressSummary(123).then(
       () => Promise.reject(new Error('Expected method to reject.')),
