@@ -1,8 +1,10 @@
 const { cloneDeep, merge } = require('lodash');
+const { Networks } = require('@dashevo/dashcore-lib');
 const { is, hasProp } = require('./utils');
 
 const defaultOpts = {
-
+  rehydrate: true,
+  autosave: true,
 };
 
 const initialStore = {
@@ -20,12 +22,14 @@ class Storage {
     this.adapter = opts.adapter;
 
     this.store = cloneDeep(initialStore);
+    this.rehydrate = (opts.rehydrate) ? opts.rehydrate : defaultOpts.rehydrate;
+    this.autosave = (opts.autosave) ? opts.autosave : defaultOpts.autosave;
     this.lastRehydrate = null;
     this.lastSave = null;
     this.lastModified = null;
 
     if (opts.walletId) {
-      this.createWallet(opts.walletId);
+      this.createWallet(opts.walletId, opts.network, opts.mnemonic);
     }
     this.interval = setInterval(() => {
       if (this.lastModified > this.lastSave) {
@@ -60,11 +64,13 @@ class Storage {
     await this.rehydrateState();
   }
 
-  createWallet(walletId) {
+  createWallet(walletId, network = Networks.testnet, mnemonic = null) {
     if (!hasProp(this.store.wallets, walletId)) {
       this.store.wallets[walletId] = {
         accounts: {},
-        network: undefined,
+        network,
+        mnemonic,
+        blockheight: 0,
         addresses: {
           external: {},
           internal: {},
@@ -81,12 +87,19 @@ class Storage {
    * @return {Promise<void>}
    */
   async rehydrateState() {
-    const transactions = (this.adapter) ? (await this.adapter.getItem('transactions') || this.store.transactions) : this.store.transactions;
-    const wallets = (this.adapter) ? (await this.adapter.getItem('wallets') || this.store.wallets) : this.store.wallets;
+    if (this.rehydrate && this.lastRehydrate === null) {
+      const transactions = (this.adapter && hasProp(this.adapter, 'getItem'))
+        ? (await this.adapter.getItem('transactions') || this.store.transactions)
+        : this.store.transactions;
+      const wallets = (this.adapter && hasProp(this.adapter, 'getItem'))
+        ? (await this.adapter.getItem('wallets') || this.store.wallets)
+        : this.store.wallets;
 
-    this.store.transactions = mergeHelper(this.store.transactions, transactions);
-    this.store.wallets = mergeHelper(this.store.wallets, wallets);
-    this.lastRehydrate = +new Date();
+      this.store.transactions = mergeHelper(this.store.transactions, transactions);
+      this.store.wallets = mergeHelper(this.store.wallets, wallets);
+      this.lastRehydrate = +new Date();
+    }
+    await this.saveState();
   }
 
   /**
@@ -94,11 +107,14 @@ class Storage {
    * @return {Promise<boolean>}
    */
   async saveState() {
-    const self = this;
-    await this.adapter.setItem('transactions', { ...self.store.transactions });
-    await this.adapter.setItem('wallets', { ...self.store.wallets });
-    this.lastSave = +new Date();
-    return true;
+    if (this.autosave && this.adapter && this.adapter.setItem) {
+      const self = this;
+      await this.adapter.setItem('transactions', { ...self.store.transactions });
+      await this.adapter.setItem('wallets', { ...self.store.wallets });
+      this.lastSave = +new Date();
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -212,6 +228,23 @@ class Storage {
   }
 
   /**
+   * Update a specific transaction information in the store
+   * It do not handle any merging right now and write over previous data.
+   * @param address
+   * @param walletId
+   * @return {boolean}
+   */
+  updateTransaction(transaction) {
+    if (!transaction) throw new Error('Expected a transaction to update');
+
+    const transactionStore = this.store.transactions;
+    transactionStore[transaction.txid] = transaction;
+    this.lastModified = Date.now();
+    return true;
+  }
+
+
+  /**
    * Search a specific address in the store
    * @param address
    * @return {{address: *, type: null, found: boolean}}
@@ -295,20 +328,24 @@ class Storage {
     const store = this.getStore();
 
     // Look up by looping over all addresses todo:optimisation
-    const existingTypes = Object.keys(store.addresses);
-    existingTypes.forEach((type) => {
-      const existingPaths = Object.keys(store.addresses[type]);
-      existingPaths.forEach((path) => {
-        const el = store.addresses[type][path];
-        if (el.transactions.includes(search.txid)) {
-          search.path = path;
-          search.address = el.address;
-          search.type = type;
-          search.found = true;
-          search.result = el;
-        }
+    const existingWallets = Object.keys(store);
+    existingWallets.forEach((walletId) => {
+      const existingTypes = Object.keys(store.wallets[walletId].addresses);
+      existingTypes.forEach((type) => {
+        const existingPaths = Object.keys(store.wallets[walletId].addresses[type]);
+        existingPaths.forEach((path) => {
+          const el = store.wallets[walletId].addresses[type][path];
+          if (el.transactions.includes(search.txid)) {
+            search.path = path;
+            search.address = el.address;
+            search.type = type;
+            search.found = true;
+            search.result = el;
+          }
+        });
       });
     });
+
     return search;
   }
 
@@ -317,7 +354,7 @@ class Storage {
    * @param tx
    * @return {boolean}
    */
-  addNewTxToAddress(tx) {
+  addNewTxToAddress(tx, walletId) {
     // console.log('addNewTxToAddress', tx);
     if (tx.address && tx.txid) {
       const { type, path, found } = this.searchAddress(tx.address);
@@ -325,8 +362,9 @@ class Storage {
         console.log('Search was not successfull');
         return false;
       }
-      this.store.addresses[type][path].transactions.push(tx.txid);
-      this.store.addresses[type][path].fetchedLast = 0; // Because of the unclear state
+      this.store.wallets[walletId].addresses[type][path].transactions.push(tx.txid);
+      // Because of the unclear state will force a refresh
+      this.store.wallets[walletId].addresses[type][path].fetchedLast = 0;
       this.lastModified = +new Date();
       return true;
     }

@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const { Networks } = require('@dashevo/dashcore-lib');
 const Storage = require('../src/Storage');
 const InMem = require('../src/adapters/InMem');
 
@@ -180,7 +181,9 @@ describe('Storage', function suite() {
       transactions: {},
       wallets: {
         fad183cbf7: {
-          network: undefined,
+          blockheight: 0,
+          mnemonic: null,
+          network: Networks.testnet,
           accounts: {
             "m/44'/1'/0'": {
               label: 'uberAcc',
@@ -257,10 +260,16 @@ describe('Storage', function suite() {
     expect(() => store.updateAddress({ aw: {} })).to.throw(expected2);
     store.stopWorker();
   });
+  it('should fail on update tx', () => {
+    const store = new Storage(storageOpts);
+    const expected = 'Expected a transaction to update';
+    expect(() => store.updateTransaction()).to.throw(expected);
+    store.stopWorker();
+  });
   it('should fail on addNewtxtoAddress', () => {
     const store = new Storage(storageOpts);
     const expected = 'Invalid tx to add : tx';
-    expect(() => store.addNewTxToAddress({ aw: {} })).to.throw(expected);
+    expect(() => store.addNewTxToAddress({ aw: {} }), 'fad183cbf7').to.throw(expected);
     store.stopWorker();
   });
   it('should not create a wallet twice', () => {
@@ -270,5 +279,8 @@ describe('Storage', function suite() {
     expect(store.createWallet(wid)).to.equal(false);
     expect(store.createWallet(wid2)).to.equal(true);
     store.stopWorker();
+  });
+  it('should', () => {
+    console.log();
   });
 });

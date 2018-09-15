@@ -14,6 +14,7 @@ function duffsToDash(duffs) {
   return duffs / DUFFS_PER_DASH;
 }
 function hasProp(obj, prop) {
+  if (!obj) return false;
   if (Array.isArray(obj)) {
     return obj.includes(prop);
   }

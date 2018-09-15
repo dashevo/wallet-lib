@@ -82,9 +82,21 @@ class InsightClient {
 
   async getTransaction(transactionid) {
     const res = await axios.get(`${this.insightUri}/tx/${transactionid}`);
-    if (res.data && res.data.fees && is.float(res.data.fees)) {
-      res.data.fees = dashToDuffs(res.data.fees);
+    if (res.data) {
+      if (res.data.fees && is.float(res.data.fees)) {
+        res.data.fees = dashToDuffs(res.data.fees);
+      }
+      if (res.data.confirmations) {
+        delete res.data.confirmations;
+      }
     }
+
+
+    return res.data;
+  }
+
+  async getStatus() {
+    const res = await axios.get(`${this.insightUri}/status`);
     return res.data;
   }
 
@@ -106,18 +118,20 @@ class InsightClient {
 
   subscribeToEvent(eventName, cb) {
     if (this.useSocket) {
-      const listener = this.socket.on(eventName, cb);
       if (this.listeners[eventName]) {
-        const oldListener = this.listeners[eventName].listener;
-        this.clearListener(oldListener);
+        return false;
       }
+      this.socket.emit('subscribe', eventName);
+      const listener = this.socket.on(eventName, cb);
       this.listeners[eventName] = {
         type: eventName,
         listener,
         setTime: Date.now(),
       };
       console.log('Subscribed to event :', eventName);
+      return true;
     }
+    return false;
   }
 
   unsubscribeFromEvent(eventName) {

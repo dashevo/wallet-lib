@@ -101,6 +101,7 @@ describe('Utils', () => {
   it('should is.hex handle hex', () => {
     expect(is.hex('1234567890ABCD')).to.be.equals(true);
     expect(is.hex('0b757a848f')).to.equal(true);
+    expect(is.hex('')).to.be.equals(true);
   });
   it('should is.hex handle not hex', () => {
     expect(is.hex('12648430T')).to.be.equals(false);
@@ -237,5 +238,6 @@ describe('Utils', () => {
     expect(hasProp({ key1: true }, 'key2')).to.equal(false);
     expect(hasProp(['key1'], 'key1')).to.equal(true);
     expect(hasProp(['key1'], 'key2')).to.equal(false);
+    expect(hasProp(null, 'key2')).to.equal(false);
   });
 });

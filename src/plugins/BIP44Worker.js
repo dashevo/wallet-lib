@@ -1,7 +1,10 @@
 const { BIP44_ADDRESS_GAP } = require('../Constants');
 
+const defaultOpts = {
+  workerIntervalTime: 1 * 60 * 1000,
+};
 class BIP44Worker {
-  constructor(opts) {
+  constructor(opts = defaultOpts) {
     this.events = opts.events;
     this.storage = opts.storage;
     this.getAddress = opts.getAddress;
@@ -9,7 +12,9 @@ class BIP44Worker {
     this.worker = null;
     this.workerPass = 0;
     this.workerRunning = false;
-    this.workerIntervalTime = 1 * 60 * 1000;
+    this.workerIntervalTime = (opts.workerIntervalTime)
+      ? opts.workerIntervalTime
+      : defaultOpts.workerIntervalTime;
   }
 
   getNonContinuousIndexes(type = 'external') {
@@ -89,6 +94,8 @@ class BIP44Worker {
   stopWorker() {
     clearInterval(this.worker);
     this.worker = null;
+    this.workerPass = 0;
+    this.workerRunning = false;
   }
 }
 module.exports = BIP44Worker;

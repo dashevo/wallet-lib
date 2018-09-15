@@ -13,7 +13,14 @@ function isValidTransport(transport) {
     return hasProp(transportList, transport);
   } if (is.obj(transport)) {
     let valid = true;
-    const expectedKeys = ['getAddressSummary', 'getTransaction', 'getUTXO', 'subscribeToAddresses', 'closeSocket', 'sendRawTransaction'];
+    const expectedKeys = [
+      'getAddressSummary',
+      'getTransaction',
+      'getUTXO',
+      'subscribeToAddresses',
+      'closeSocket',
+      'sendRawTransaction',
+    ];
     expectedKeys.forEach((key) => {
       if (!transport[key]) {
         valid = false;
@@ -26,17 +33,28 @@ function isValidTransport(transport) {
 
 class Transporter {
   constructor(transportArg) {
-    if (!transportArg) {
-      throw new Error('Expect a transport name or valid object as arg');
-    }
+    this.valid = false;
+    this.type = null;
+    this.transport = null;
 
-    let transport = transportArg;
-    if (is.string(transportArg) && Object.keys(transportList).includes(transportArg)) {
-      transport = transportList[transportArg];
+    if (transportArg) {
+      let transport = transportArg;
+      if (is.string(transportArg) && Object.keys(transportList).includes(transportArg)) {
+        transport = transportList[transportArg];
+      }
+      this.valid = isValidTransport(transportArg);
+      this.type = transport.type || transport.constructor.name;
+      this.transport = transport;
     }
-    this.valid = isValidTransport(transportArg);
-    this.type = transport.type || transport.constructor.name;
-    this.transport = transport;
+  }
+
+  async getStatus() {
+    const data = await this.transport
+      .getStatus()
+      .catch((err) => {
+        throw new Error(err);
+      });
+    return data.info;
   }
 
   async getAddressSummary(address) {
@@ -78,12 +96,19 @@ class Transporter {
     return false;
   }
 
+  async subscribeToEvent(eventName, cb) {
+    if (is.string(eventName)) {
+      return this.transport.subscribeToEvent(eventName, cb);
+    }
+    return false;
+  }
+
   disconnect() {
     return (this.transport.closeSocket) ? this.transport.closeSocket() : false;
   }
 
   updateNetwork(network) {
-    if (!this.transport.updateNetwork) {
+    if (!this.transport || !this.transport.updateNetwork) {
       throw new Error('Transport does not handle network changes');
     }
     return this.transport.updateNetwork(network);

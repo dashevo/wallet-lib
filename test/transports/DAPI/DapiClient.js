@@ -12,53 +12,76 @@ describe('Transports - DAPIClient', () => {
     const client = new DAPIClient();
     return client
       .getAddressSummary()
-      .then(() => Promise.reject(new Error('Expected method to reject.')))
-      .catch((err) => { expect(err.toString()).to.be.equal(new Error('Missing implementation - DAPIClient').toString()); });
+      .then((res) => { expect(res).to.be.equal(false); })
+      .catch(() => Promise.reject(new Error('Expected method to return false.')));
+  });
+  it('should handle getStatus', () => {
+    const client = new DAPIClient();
+    return client
+      .getStatus()
+      .then((res) => { expect(res).to.be.equal(false); })
+      .catch(() => Promise.reject(new Error('Expected method to return false.')));
   });
   it('should handle getTransaction', () => {
     const client = new DAPIClient();
     return client
       .getTransaction()
-      .then(() => Promise.reject(new Error('Expected method to reject.')))
-      .catch((err) => { expect(err.toString()).to.be.equal(new Error('Missing implementation - DAPIClient').toString()); });
+      .then((res) => { expect(res).to.be.equal(false); })
+      .catch(() => Promise.reject(new Error('Expected method to return false.')));
   });
   it('should handle getUTXO', () => {
     const client = new DAPIClient();
     return client
       .getUTXO()
-      .then(() => Promise.reject(new Error('Expected method to reject.')))
-      .catch((err) => { expect(err.toString()).to.be.equal(new Error('Missing implementation - DAPIClient').toString()); });
+      .then((res) => { expect(res).to.be.equal(false); })
+      .catch(() => Promise.reject(new Error('Expected method to return false.')));
   });
   it('should handle subscribeToAddresses', () => {
     const client = new DAPIClient();
 
     return client
       .subscribeToAddresses()
-      .then(() => Promise.reject(new Error('Expected method to reject.')))
-      .catch((err) => { expect(err.toString()).to.be.equal(new Error('Missing implementation - DAPIClient').toString()); });
+      .then((res) => { expect(res).to.be.equal(false); })
+      .catch(() => Promise.reject(new Error('Expected method to return false.')));
+  });
+  it('should handle subscribeToEvent', () => {
+    const client = new DAPIClient();
+
+    return client
+      .subscribeToEvent()
+      .then((res) => { expect(res).to.be.equal(false); })
+      .catch(() => Promise.reject(new Error('Expected method to return false.')));
+  });
+  it('should handle unsubscribeFromEvent', () => {
+    const client = new DAPIClient();
+
+    return client
+      .unsubscribeFromEvent()
+      .then((res) => { expect(res).to.be.equal(false); })
+      .catch(() => Promise.reject(new Error('Expected method to return false.')));
   });
   it('should handle sendRawTransaction', () => {
     const client = new DAPIClient();
 
     return client
       .sendRawTransaction()
-      .then(() => Promise.reject(new Error('Expected method to reject.')))
-      .catch((err) => { expect(err.toString()).to.be.equal(new Error('Missing implementation - DAPIClient').toString()); });
+      .then((res) => { expect(res).to.be.equal(false); })
+      .catch(() => Promise.reject(new Error('Expected method to return false.')));
   });
   it('should handle updateNetwork', () => {
     const client = new DAPIClient();
 
     return client
       .updateNetwork()
-      .then(() => Promise.reject(new Error('Expected method to reject.')))
-      .catch((err) => { expect(err.toString()).to.be.equal(new Error('Missing implementation - DAPIClient').toString()); });
+      .then((res) => { expect(res).to.be.equal(false); })
+      .catch(() => Promise.reject(new Error('Expected method to return false.')));
   });
   it('should handle closeSocket', () => {
     const client = new DAPIClient();
 
     return client
       .closeSocket()
-      .then(() => Promise.reject(new Error('Expected method to reject.')))
-      .catch((err) => { expect(err.toString()).to.be.equal(new Error('Missing implementation - DAPIClient').toString()); });
+      .then((res) => { expect(res).to.be.equal(false); })
+      .catch(() => Promise.reject(new Error('Expected method to return false.')));
   });
 });
