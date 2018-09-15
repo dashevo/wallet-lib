@@ -1,5 +1,6 @@
 const defaultOpts = {
   threesholdMs: 10 * 60 * 1000,
+  workerIntervalTime: 1 * 10 * 1000,
 };
 class SyncWorker {
   constructor(opts = defaultOpts) {
@@ -13,7 +14,9 @@ class SyncWorker {
     this.worker = null;
     this.workerPass = 0;
     this.workerRunning = false;
-    this.workerIntervalTime = 1 * 10 * 1000;
+    this.workerIntervalTime = (opts.workerIntervalTime)
+      ? opts.workerIntervalTime
+      : defaultOpts.workerIntervalTime;
 
     const fetchDiff = (opts.threesholdMs) ? opts.threesholdMs : defaultOpts.threesholdMs;
     this.fetchThreeshold = Date.now() - fetchDiff;
@@ -73,7 +76,9 @@ class SyncWorker {
       //   self.events.emit('balance_changed');
       // }
     };
-    self.transport.subscribeToEvent('block', cb);
+    if (self.transport.valid) {
+      self.transport.subscribeToEvent('block', cb);
+    }
   }
 
   async execAddressListener() {
@@ -200,6 +205,8 @@ class SyncWorker {
     }
     this.workerRunning = true;
 
+    // Todo : Ensure the performance impact of this.
+    // We would love to have a small perf footprint and this seems improvable.
     await this.execBlockListener();
     await this.execAddressFetching();
     await this.execAddressListener();
@@ -236,6 +243,8 @@ class SyncWorker {
   stopWorker() {
     clearInterval(this.worker);
     this.worker = null;
+    this.workerPass = 0;
+    this.workerRunning = false;
   }
 }
 module.exports = SyncWorker;

@@ -648,9 +648,6 @@ class Account {
    * @return {Boolean}
    */
   forceRefreshAccount() {
-    if (!this.transport.valid) {
-      throw new Error('A transport layer is needed to perform a full refresh');
-    }
     const addressStore = this.storage.store.wallets[this.walletId].addresses;
     ['internal', 'external', 'misc'].forEach((type) => {
       Object.keys(addressStore[type]).forEach((path) => {
@@ -668,9 +665,8 @@ class Account {
       this.network = getNetwork(network);
       this.storage.store.wallets[this.walletId].network = network.toString();
       if (this.transport.valid) {
-        this.transport.updateNetwork(network);
+        return this.transport.updateNetwork(network);
       }
-      return true;
     }
     return false;
   }

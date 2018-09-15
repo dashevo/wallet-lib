@@ -3,7 +3,8 @@ const { Networks } = require('@dashevo/dashcore-lib');
 const { is, hasProp } = require('./utils');
 
 const defaultOpts = {
-
+  rehydrate: true,
+  autosave: true,
 };
 
 const initialStore = {
@@ -21,12 +22,14 @@ class Storage {
     this.adapter = opts.adapter;
 
     this.store = cloneDeep(initialStore);
+    this.rehydrate = (opts.rehydrate) ? opts.rehydrate : defaultOpts.rehydrate;
+    this.autosave = (opts.autosave) ? opts.autosave : defaultOpts.autosave;
     this.lastRehydrate = null;
     this.lastSave = null;
     this.lastModified = null;
 
     if (opts.walletId) {
-      this.createWallet(opts.walletId, opts.network);
+      this.createWallet(opts.walletId, opts.network, opts.mnemonic);
     }
     this.interval = setInterval(() => {
       if (this.lastModified > this.lastSave) {
@@ -61,11 +64,12 @@ class Storage {
     await this.rehydrateState();
   }
 
-  createWallet(walletId, network = Networks.testnet) {
+  createWallet(walletId, network = Networks.testnet, mnemonic = null) {
     if (!hasProp(this.store.wallets, walletId)) {
       this.store.wallets[walletId] = {
         accounts: {},
         network,
+        mnemonic,
         blockheight: 0,
         addresses: {
           external: {},
@@ -83,12 +87,19 @@ class Storage {
    * @return {Promise<void>}
    */
   async rehydrateState() {
-    const transactions = (this.adapter) ? (await this.adapter.getItem('transactions') || this.store.transactions) : this.store.transactions;
-    const wallets = (this.adapter) ? (await this.adapter.getItem('wallets') || this.store.wallets) : this.store.wallets;
+    if (this.rehydrate && this.lastRehydrate === null) {
+      const transactions = (this.adapter && hasProp(this.adapter, 'getItem'))
+        ? (await this.adapter.getItem('transactions') || this.store.transactions)
+        : this.store.transactions;
+      const wallets = (this.adapter && hasProp(this.adapter, 'getItem'))
+        ? (await this.adapter.getItem('wallets') || this.store.wallets)
+        : this.store.wallets;
 
-    this.store.transactions = mergeHelper(this.store.transactions, transactions);
-    this.store.wallets = mergeHelper(this.store.wallets, wallets);
-    this.lastRehydrate = +new Date();
+      this.store.transactions = mergeHelper(this.store.transactions, transactions);
+      this.store.wallets = mergeHelper(this.store.wallets, wallets);
+      this.lastRehydrate = +new Date();
+    }
+    await this.saveState();
   }
 
   /**
@@ -96,11 +107,14 @@ class Storage {
    * @return {Promise<boolean>}
    */
   async saveState() {
-    const self = this;
-    await this.adapter.setItem('transactions', { ...self.store.transactions });
-    await this.adapter.setItem('wallets', { ...self.store.wallets });
-    this.lastSave = +new Date();
-    return true;
+    if (this.autosave && this.adapter && this.adapter.setItem) {
+      const self = this;
+      await this.adapter.setItem('transactions', { ...self.store.transactions });
+      await this.adapter.setItem('wallets', { ...self.store.wallets });
+      this.lastSave = +new Date();
+      return true;
+    }
+    return false;
   }
 
   /**

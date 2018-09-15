@@ -65,6 +65,7 @@ describe('Transporter', () => {
     const insightClient = new InsightClient();
     const transport = new Transporter(insightClient);
     expect(transport.getNetwork().toString()).to.equal('testnet');
+    console.log(transport);
     transport.updateNetwork('livenet');
     expect(transport.getNetwork().toString()).to.equal('livenet');
     transport.disconnect();
@@ -89,6 +90,27 @@ describe('Transporter', () => {
       .then(() => Promise.reject(new Error('Expected method to reject.')))
       .catch((err) => {
         expect(err.toString()).to.be.equal(new Error('Received an invalid rawtx').toString());
+        transport.disconnect();
+      });
+  });
+  it('should handle getUTXO', async () => {
+    const insightClient = new InsightClient();
+    const transport = new Transporter(insightClient);
+
+    return transport.getUTXO(123)
+      .then(() => Promise.reject(new Error('Expected method to reject.')))
+      .catch((err) => {
+        expect(err.toString()).to.be.equal(new Error('Received an invalid address to fetch').toString());
+        transport.disconnect();
+      });
+  });
+  it('should handle subscribeToEvent', async () => {
+    const insightClient = new InsightClient();
+    const transport = new Transporter(insightClient);
+
+    return transport.subscribeToEvent(null)
+      .then((res) => {
+        expect(res).to.be.equal(false);
         transport.disconnect();
       });
   });

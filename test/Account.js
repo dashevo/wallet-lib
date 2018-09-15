@@ -365,9 +365,9 @@ describe('Account - Transports, Workers', function suite() {
     const privateKeys = account.getPrivateKeys(account.getUTXOS().map(el => ((el.address))));
     expect(() => account.sign([1, 1, 2], privateKeys)).to.throw('Unhandled object of type Array');
   });
-  it('should not allow to refresh an account without a transport', () => {
+  it('should allow to refresh an account without a transport', () => {
     const account = accountFakeTransportWithUTXO;
-    expect(() => account.forceRefreshAccount()).to.throw('A transport layer is needed to perform a full refresh');
+    expect(account.forceRefreshAccount()).to.equal(true);
   });
   it('should detect lack of recipient', () => {
     const account = accountFakeTransportWithUTXO;
@@ -415,14 +415,41 @@ describe('Account - Transports, Workers', function suite() {
         expect(history).to.deep.equal(expected);
       });
   });
-  it('should be able to switch the network', ()=>{
+  it('should be able to switch the network', () => {
     const account = accountFakeTransportWithUTXO;
     expect(account.network.toString()).to.equal('testnet');
     account.updateNetwork('livenet');
     expect(account.network.toString()).to.equal('livenet');
+    const change = account.updateNetwork('something');
+    expect(change).to.equal(false);
+    expect(account.network.toString()).to.equal('testnet');
+  });
+  it('should not be able to fetchStatus with invalid transport layer', () => {
+    const account = accountFakeTransportWithUTXO;
+    return account.fetchStatus()
+      .then(
+        () => Promise.reject(new Error('Expected method to reject.')),
+        err => expect(err).to.be.a('Error').with.property('message', 'A transport layer is needed to fetch status'),
+      );
+  });
+  it('should not be able to fetchAddressInfo with invalid transport layer', () => {
+    const account = accountFakeTransportWithUTXO;
+    return account.fetchAddressInfo()
+      .then(
+        () => Promise.reject(new Error('Expected method to reject.')),
+        err => expect(err).to.be.a('Error').with.property('message', 'A transport layer is needed to fetch addr info'),
+      );
+  });
+  it('should not be able to fetchTransactionInfo with invalid transport layer', () => {
+    const account = accountFakeTransportWithUTXO;
+    return account.fetchTransactionInfo()
+      .then(
+        () => Promise.reject(new Error('Expected method to reject.')),
+        err => expect(err).to.be.a('Error').with.property('message', 'A transport layer is needed to fetch tx info'),
+      );
   });
   after(() => {
     walletFakeTransportWithUTXO.disconnect();
     accountFakeTransportLivenet.disconnect();
   });
- });
+});

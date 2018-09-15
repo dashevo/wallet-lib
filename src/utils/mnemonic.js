@@ -22,10 +22,10 @@ function mnemonicToHDPrivateKey(mnemonic, network, passphrase = '') {
 
 function mnemonicToWalletId(mnemonic) {
   if (!mnemonic) throw new Error('Expect mnemonic to be provided');
+
   const buffMnemonic = Buffer.from(mnemonic.toString());
   const buff = hash256(buffMnemonic);
-  const walletId = buff.toString('hex').slice(0, 10);
-  return walletId;
+  return buff.toString('hex').slice(0, 10);
 }
 
 module.exports = {

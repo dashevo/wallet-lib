@@ -15,7 +15,6 @@ const Transporter = require('./transports/Transporter');
 
 const defaultOptions = {
   network: 'testnet',
-  adapter: new InMem(),
 };
 
 /**
@@ -54,13 +53,14 @@ class Wallet {
     }
 
     this.walletId = (mnemonic) ? mnemonicToWalletId(mnemonic) : mnemonicToWalletId(HDPrivateKey);
-    this.adapter = (opts.adapter) ? opts.adapter : defaultOptions.adapter;
+    this.adapter = (opts.adapter) ? opts.adapter : new InMem();
     this.adapter.config();
 
     this.storage = new Storage({
       adapter: this.adapter,
       walletId: this.walletId,
       network: this.network,
+      mnemonic,
     });
     this.store = this.storage.store;
 

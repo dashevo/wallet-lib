@@ -4,43 +4,53 @@ class DAPIClient {
   }
 
   async getAddressSummary() {
-    throw new Error(`Missing implementation - ${this.type}`);
+    console.error(`Missing implementation - ${this.type} - getAddressSummary`);
+    return false;
   }
 
   async getStatus() {
-    throw new Error(`Missing implementation - ${this.type}`);
+    console.error(`Missing implementation - ${this.type} - getStatus`);
+    return false;
   }
 
   async getTransaction() {
-    throw new Error(`Missing implementation - ${this.type}`);
+    console.error(`Missing implementation - ${this.type} - getTransaction`);
+    return false;
   }
 
   async getUTXO() {
-    throw new Error(`Missing implementation - ${this.type}`);
+    console.error(`Missing implementation - ${this.type} - getUTXO`);
+    return false;
   }
 
   async subscribeToAddresses() {
-    throw new Error(`Missing implementation - ${this.type}`);
+    console.error(`Missing implementation - ${this.type} - subscribeToAddresses`);
+    return false;
   }
 
   async subscribeToEvent() {
-    throw new Error(`Missing implementation - ${this.type}`);
+    console.error(`Missing implementation - ${this.type} - subscribeToEvent`);
+    return false;
   }
 
   async unsubscribeFromEvent() {
-    throw new Error(`Missing implementation - ${this.type}`);
+    console.error(`Missing implementation - ${this.type} - unsubscribeFromEvent`);
+    return false;
   }
 
   async sendRawTransaction() {
-    throw new Error(`Missing implementation - ${this.type}`);
+    console.error(`Missing implementation - ${this.type} - sendRawTransaction`);
+    return false;
   }
 
   async updateNetwork() {
-    throw new Error(`Missing implementation - ${this.type}`);
+    console.error(`Missing implementation - ${this.type} - updateNetwork`);
+    return false;
   }
 
   async closeSocket() {
-    throw new Error(`Missing implementation - ${this.type}`);
+    console.error(`Missing implementation - ${this.type} - closeSocket`);
+    return false;
   }
 }
 module.exports = DAPIClient;

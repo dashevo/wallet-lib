@@ -108,7 +108,7 @@ class Transporter {
   }
 
   updateNetwork(network) {
-    if (!this.transport.updateNetwork) {
+    if (!this.transport || !this.transport.updateNetwork) {
       throw new Error('Transport does not handle network changes');
     }
     return this.transport.updateNetwork(network);

@@ -182,6 +182,7 @@ describe('Storage', function suite() {
       wallets: {
         fad183cbf7: {
           blockheight: 0,
+          mnemonic: null,
           network: Networks.testnet,
           accounts: {
             "m/44'/1'/0'": {
@@ -259,6 +260,12 @@ describe('Storage', function suite() {
     expect(() => store.updateAddress({ aw: {} })).to.throw(expected2);
     store.stopWorker();
   });
+  it('should fail on update tx', () => {
+    const store = new Storage(storageOpts);
+    const expected = 'Expected a transaction to update';
+    expect(() => store.updateTransaction()).to.throw(expected);
+    store.stopWorker();
+  });
   it('should fail on addNewtxtoAddress', () => {
     const store = new Storage(storageOpts);
     const expected = 'Invalid tx to add : tx';
@@ -272,5 +279,8 @@ describe('Storage', function suite() {
     expect(store.createWallet(wid)).to.equal(false);
     expect(store.createWallet(wid2)).to.equal(true);
     store.stopWorker();
+  });
+  it('should', () => {
+    console.log();
   });
 });
