@@ -37,6 +37,7 @@ const getNetwork = function (network) {
 class Account {
   constructor(wallet, opts = defaultOptions) {
     this.events = new EventEmitter();
+    this.isReady = false;
 
     if (!wallet || wallet.constructor.name !== 'Wallet') throw new Error('Expected wallet to be created and passed as param');
 
@@ -145,6 +146,7 @@ class Account {
     workersWatcher.interval = setInterval(() => {
       if (workersWatcher.isReadyYet()) {
         self.events.emit('ready');
+        this.isReady = true;
         workersWatcher.clearInterval();
       }
     }, 20);
