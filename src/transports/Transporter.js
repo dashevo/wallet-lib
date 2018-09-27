@@ -40,7 +40,7 @@ class Transporter {
     if (transportArg) {
       let transport = transportArg;
       if (is.string(transportArg) && Object.keys(transportList).includes(transportArg)) {
-        transport = transportList[transportArg];
+        transport = new transportList[transportArg]();
       }
       this.valid = isValidTransport(transportArg);
       this.type = transport.type || transport.constructor.name;
