@@ -8,6 +8,7 @@ const SyncWorker = require('./plugins/SyncWorker');
 const BIP44Worker = require('./plugins/BIP44Worker');
 
 const defaultOptions = {
+  network: 'testnet',
   mode: 'full',
   cacheTx: true,
   subscribe: true,
