@@ -11,11 +11,17 @@ const {
 } = require('./utils/index');
 
 const Account = require('./Account');
+const SingleAddress = require('./SingleAddress');
 const Transporter = require('./transports/Transporter');
 
 const defaultOptions = {
   network: 'testnet',
 };
+const TYPES = {
+  'SINGLE_ADDRESS':'sigle_address',
+  "HDWALLET":'hdwallet'
+};
+
 
 /**
  * Instantiate a basic Wallet object,
@@ -76,17 +82,16 @@ class Wallet {
     this.transport = (opts.transport) ? new Transporter(opts.transport) : new Transporter();
 
     this.accounts = [];
-    this.keychain = (this.HDPrivateKey) ? new KeyChain(this.HDPrivateKey) : null;
     this.interface = opts.interface;
     this.savedBackup = false; // When true, we delete mnemonic from internals
   }
   generateNewWalletId(){
     const type = this.type;
     switch (type) {
-      case "address":
+      case TYPES.SINGLE_ADDRESS:
         this.walletId =  mnemonicToWalletId(this.privateKey);
         break;
-      case "hdwallet":
+      case TYPES.HDWALLET:
       default:
         if(!this.HDPrivateKey) throw new Error('Cannot generate a walletId : Do not find any HDPrivateKey');
         this.walletId = mnemonicToWalletId(this.HDPrivateKey);
@@ -96,24 +101,28 @@ class Wallet {
   }
   fromPrivateKey(privateKey){
     if (!is.privateKey(privateKey)) throw new Error('Expected a valid private key (typeof PrivateKey or String)');
-    this.type = 'single_address';
+    this.type = TYPES.SINGLE_ADDRESS;
     this.mnemonic = null;
     this.privateKey = privateKey;
+    this.keychain = new KeyChain({privateKey:privateKey});
+
   }
   fromSeed(seed){
     if (!is.seed(seed)) throw new Error('Expected a valid seed (typeof HDPrivateKey or String)');
-    this.type = 'hdwallet';
+    this.type = TYPES.HDWALLET;
     this.mnemonic = null;
     this.HDPrivateKey = seed;
+    this.keychain = new KeyChain({HDRootKey:seed});
   }
   fromMnemonic(mnemonic){
     if (!is.mnemonic(mnemonic)) {
       throw new Error('Expected a valid mnemonic (typeof String or Mnemonic)');
     }
     const trimmedMnemonic = mnemonic.toString().trim();
-    this.type = 'hdwallet';
+    this.type = TYPES.HDWALLET;
     this.mnemonic = trimmedMnemonic; // todo : What about without this ?
     this.HDPrivateKey=mnemonicToHDPrivateKey(trimmedMnemonic, this.network, this.passphrase);
+    this.keychain = new KeyChain({HDRootKey:this.HDPrivateKey});
   }
   // TODO : Add tests
   updateNetwork(network) {
@@ -140,12 +149,21 @@ class Wallet {
   }
 
   /**
+   *
+   */
+  createSingleAddress(singleAddressOpts){
+    return new SingleAddress(this, singleAddressOpts);
+  }
+  /**
    * Get a specific account per accountIndex
    * @param accountIndex - Default: 0, set a specific index to get
    * @param accountOpts - If we can't get, we create passing these arg to createAccount method
    * @return {*|account}
    */
   getAccount(accountIndex = 0, accountOpts) {
+    if(this.type===TYPES.SINGLE_ADDRESS){
+      return this.createSingleAddress({privateKey:this.privateKey});
+    }
     const acc = this.accounts.filter(el => el.accountIndex === accountIndex);
     const opts = Object.assign({ accountIndex }, accountOpts);
     return (acc[0]) || this.createAccount(opts);
@@ -161,7 +179,21 @@ class Wallet {
       if (mnemonic === null) throw new Error('Wallet was not initiated with a mnemonic, can\'t export it');
       return mnemonic.toString();
     }
-    return (toHDPrivateKey) ? this.HDPrivateKey : exportMnemonic(this.mnemonic);
+
+    if(toHDPrivateKey){
+      return this.HDPrivateKey;
+    }
+    switch (this.type) {
+      case TYPES.SINGLE_ADDRESS:
+        if(!this.privateKey) throw new Error('Nothing to export');
+        return this.privateKey;
+        break;
+      case TYPES.HDWALLET:
+        return exportMnemonic(this.mnemonic)
+        break;
+      default:
+        throw new Error('Nothing to export');
+    }
   }
 
   /**
