@@ -179,6 +179,8 @@ Miscellaneous :
 - [x] HDWallet : Encrypt PrivKey (BIP38) - Passphrase Protection
 - [x] HDWallet : Import (Mnemonic, HDPrivKey)
 - [x] HDWallet : Export (Mnemonic, HDPrivKey)
+- [X] PrivateKey : Single private key mngt handled
+- [X] PrivateKey : WIF Supported
 - [x] Discovery : Discover existing account
 - [x] Discovery : Discover existing address / change
 - [x] Transaction : Create transaction (rawtx)

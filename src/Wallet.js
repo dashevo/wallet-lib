@@ -18,7 +18,7 @@ const defaultOptions = {
   network: 'testnet',
 };
 const TYPES = {
-  'SINGLE_ADDRESS':'sigle_address',
+  'SINGLE_ADDRESS':'single_address',
   "HDWALLET":'hdwallet'
 };
 
