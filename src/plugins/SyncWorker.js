@@ -76,7 +76,7 @@ class SyncWorker {
       //   self.events.emit('balance_changed');
       // }
     };
-    if (self.transport.valid) {
+    if (self.transport.isValid) {
       self.transport.subscribeToEvent('block', cb);
     }
   }

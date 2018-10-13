@@ -10,16 +10,16 @@ describe('Transporter', () => {
     const transporterDAPI = new Transporter('DAPIClient');
     const transporterInsight = new Transporter('Insight');
 
-    expect(transporterDAPI.valid).to.equal(true);
-    expect(transporterInsight.valid).to.equal(true);
+    expect(transporterDAPI.isValid).to.equal(true);
+    expect(transporterInsight.isValid).to.equal(true);
 
     const dapiClient = new DAPIClient();
     const insightClient = new InsightClient();
 
     const transporterDAPI2 = new Transporter(dapiClient);
     const transporterInsight2 = new Transporter(insightClient);
-    expect(transporterDAPI2.valid).to.equal(true);
-    expect(transporterInsight2.valid).to.equal(true);
+    expect(transporterDAPI2.isValid).to.equal(true);
+    expect(transporterInsight2.isValid).to.equal(true);
 
     const fakeTransportPlugin = {};
     [...pluginRequiredKeys]
@@ -29,7 +29,7 @@ describe('Transporter', () => {
         };
       });
     const transporterFake = new Transporter(fakeTransportPlugin);
-    expect(transporterFake.valid).to.equal(true);
+    expect(transporterFake.isValid).to.equal(true);
 
     const fakeTransportPlugin2 = {};
     pluginRequiredKeys.forEach((key) => {
@@ -38,7 +38,7 @@ describe('Transporter', () => {
       };
     });
     const transporterFake2 = new Transporter(fakeTransportPlugin2);
-    expect(transporterFake2.valid).to.equal(true);
+    expect(transporterFake2.isValid).to.equal(true);
 
     transporterDAPI.disconnect();
     transporterInsight.disconnect();
@@ -47,9 +47,9 @@ describe('Transporter', () => {
   });
   it('should handle invalid transporter', () => {
     const empty = new Transporter();
-    expect(empty.valid).to.equal(false);
+    expect(empty.isValid).to.equal(false);
     const invalid = new Transporter('invalidName');
-    expect(invalid.valid).to.equal(false);
+    expect(invalid.isValid).to.equal(false);
 
     const fakeTransportPlugin = {};
     [...pluginRequiredKeys.slice(0, pluginRequiredKeys.length - 1)]
@@ -59,7 +59,7 @@ describe('Transporter', () => {
         };
       });
     const transporterFake = new Transporter(fakeTransportPlugin);
-    expect(transporterFake.valid).to.equal(false);
+    expect(transporterFake.isValid).to.equal(false);
   });
   it('should handle the change of a network', () => {
     const insightClient = new InsightClient();

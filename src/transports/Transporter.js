@@ -5,8 +5,8 @@ const DAPIClient = require('../transports/DAPI/DapiClient');
 
 
 const transportList = {
-  Insight: InsightClient,
-  DAPIClient,
+  insight: InsightClient,
+  dapiclient: DAPIClient,
 };
 
 function isValidTransport(transport) {
@@ -33,23 +33,28 @@ function isValidTransport(transport) {
 
 class Transporter {
   constructor(transportArg) {
-    this.valid = false;
+    this.isValid = false;
     this.type = null;
     this.transport = null;
 
     if (transportArg) {
       let transport = transportArg;
-      if (is.string(transportArg) && Object.keys(transportList).includes(transportArg)) {
-        transport = new transportList[transportArg]();
+      if (is.string(transportArg)){
+        let loweredTransportName = transportArg.toString().toLowerCase();
+        if(Object.keys(transportList).includes(loweredTransportName)){
+          transport = new transportList[loweredTransportName]();
+          this.isValid = isValidTransport(loweredTransportName);
+        }
+      }else{
+        this.isValid = isValidTransport(transportArg);
       }
-      this.valid = isValidTransport(transportArg);
       this.type = transport.type || transport.constructor.name;
       this.transport = transport;
     }
   }
 
   async getStatus() {
-    if(_.has(this.transport,'getStatus')){
+    if(typeof this.transport.getStatus==='function'){
       const data = await this.transport
         .getStatus()
         .catch((err) => {

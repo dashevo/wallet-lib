@@ -234,7 +234,7 @@ describe('Transport : Insight Client', function suite() {
 
     });
     expect(wallet3.transport).to.not.equal(null);
-    expect(wallet3.transport.valid).to.equal(false);
+    expect(wallet3.transport.isValid).to.equal(false);
     expect(wallet3.transport.type).to.equal('String');
 
     const acc1 = wallet3.createAccount({ mode: 'light' });
@@ -249,7 +249,7 @@ describe('Transport : Insight Client', function suite() {
     });
     expect(acc1.transport).to.not.equal(null);
     expect(acc1.transport).to.be.a('Object');
-    expect(acc1.transport.valid).to.equal(false);
+    expect(acc1.transport.isValid).to.equal(false);
     expect(acc1.transport.type).to.equal('String');
     wallet3.disconnect();
   });

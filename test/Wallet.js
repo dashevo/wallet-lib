@@ -105,7 +105,7 @@ describe('Wallet', () => {
 
     expect(wallet.transport).to.not.equal(null);
     expect(wallet.transport).to.be.a('object');
-    expect(wallet.transport.valid).to.equal(false);
+    expect(wallet.transport.isValid).to.equal(false);
     expect(wallet.transport.type).to.equal('String');
 
     expect(wallet.HDPrivateKey.toString()).to.equal(privateHDKey1.toString());
@@ -130,7 +130,7 @@ describe('Wallet', () => {
     expect(wallet.constructor.name).to.equal('Wallet');
     expect(wallet.transport).to.not.equal(null);
     expect(wallet.transport).to.be.a('object');
-    expect(wallet.transport.valid).to.equal(false);
+    expect(wallet.transport.isValid).to.equal(false);
     expect(wallet.transport.type).to.equal('String');
     expect(wallet.HDPrivateKey.toString()).to.equal(privateHDKey1.toString());
     wallet.transport.getAddressSummary(123).then(
