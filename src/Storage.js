@@ -163,9 +163,10 @@ class Storage {
    * Import an array of accounts or a account object to the store
    * @param accounts
    * @param walletId
+   * @params walletType
    * @return {boolean}
    */
-  importAccounts(accounts, walletId) {
+  importAccounts(accounts, walletId, walletType) {
     const type = accounts.constructor.name;
     if (!walletId) throw new Error('Expected walletId to import addresses');
     if (!this.searchWallet(walletId).found) {

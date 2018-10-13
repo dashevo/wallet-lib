@@ -446,7 +446,7 @@ describe('Transport : Insight Client', function suite() {
       size: 226,
       valueIn: 5.1996,
       fees: 10000,
-      txlock: true,
+      txlock: false,
     };
     return account.getTransaction('b42c5052d7d31a422e711d50d3754217b0b16b6dfa29cf497b3dd75afa4febcb').then(
       data => expect(data).to.be.deep.equal(expected),

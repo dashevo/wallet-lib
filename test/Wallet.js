@@ -67,7 +67,6 @@ describe('Wallet', () => {
     expect(wallet).to.be.a('object');
     expect(wallet.constructor.name).to.equal('Wallet');
     expect(wallet.transport).to.not.equal(null);
-    expect(wallet.mnemonic).to.be.an.instanceof(Mnemonic);
     wallet.disconnect();
   });
   it('should be able to create a wallet', () => {

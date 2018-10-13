@@ -107,10 +107,10 @@ class Wallet {
     this.HDPrivateKey = seed;
   }
   fromMnemonic(mnemonic){
-    const trimmedMnemonic = mnemonic.toString().trim();
-    if (!is.mnemonic(trimmedMnemonic)) {
+    if (!is.mnemonic(mnemonic)) {
       throw new Error('Expected a valid mnemonic (typeof String or Mnemonic)');
     }
+    const trimmedMnemonic = mnemonic.toString().trim();
     this.type = 'hdwallet';
     this.mnemonic = trimmedMnemonic; // todo : What about without this ?
     this.HDPrivateKey=mnemonicToHDPrivateKey(trimmedMnemonic, this.network, this.passphrase);
