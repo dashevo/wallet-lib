@@ -232,6 +232,10 @@ class Account {
     return (this.transport) ? this.transport.getStatus() : false;
   }
 
+  sign(object, privateKeys, sigType) {
+    return this.keychain.sign(object, privateKeys, sigType);
+  }
+
   /**
    * Fetch a specific address from the transport layer
    * @param addressObj - AddressObject having an address and a path
@@ -589,32 +593,11 @@ class Account {
 
     const addressList = utxos.utxos.map(el => ((el.address)));
     const privateKeys = this.getPrivateKeys(addressList);
-    const signedTx = this.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
+    const signedTx = this.keychain.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
 
     return signedTx.toString();
   }
 
-  /**
-   * Allow to sign any transaction or a transition object from a valid privateKeys list
-   * @param object
-   * @param privateKeys
-   * @param sigType
-   */
-  // eslint-disable-next-line class-methods-use-this
-  sign(object, privateKeys, sigType = Dashcore.crypto.Signature.SIGHASH_ALL) {
-    const handledTypes = ['Transaction', 'SubTxRegistrationPayload'];
-    if (!privateKeys) throw new Error('Require one or multiple privateKeys to sign');
-    if (!object) throw new Error('Nothing to sign');
-    if (!handledTypes.includes(object.constructor.name)) {
-      throw new Error(`Unhandled object of type ${object.constructor.name}`);
-    }
-    const obj = object.sign(privateKeys, sigType);
-
-    if (!obj.isFullySigned()) {
-      throw new Error('Not fully signed transaction');
-    }
-    return obj;
-  }
 
   /**
    * Return all the private keys of the parameters passed addresses
