@@ -88,9 +88,8 @@ class Wallet {
         break;
       case "hdwallet":
       default:
-        const mnemonic = this.mnemonic;
-        //fixme : should be sane walletID per wallet, here it gave different result with HD or mnemonic
-        this.walletId = (mnemonic) ? mnemonicToWalletId(mnemonic) : mnemonicToWalletId(this.HDPrivateKey);
+        if(!this.HDPrivateKey) throw new Error('Cannot generate a walletId : Do not find any HDPrivateKey');
+        this.walletId = mnemonicToWalletId(this.HDPrivateKey);
         break;
     }
 
