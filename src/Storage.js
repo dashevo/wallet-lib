@@ -29,7 +29,7 @@ class Storage {
     this.lastModified = null;
 
     if (opts.walletId) {
-      this.createWallet(opts.walletId, opts.network, opts.mnemonic);
+      this.createWallet(opts.walletId, opts.network, opts.mnemonic, opts.type);
     }
     this.interval = setInterval(() => {
       if (this.lastModified > this.lastSave) {
@@ -64,12 +64,13 @@ class Storage {
     await this.rehydrateState();
   }
 
-  createWallet(walletId, network = Networks.testnet, mnemonic = null) {
+  createWallet(walletId, network = Networks.testnet, mnemonic = null, type = null) {
     if (!hasProp(this.store.wallets, walletId)) {
       this.store.wallets[walletId] = {
         accounts: {},
         network,
         mnemonic,
+        type,
         blockheight: 0,
         addresses: {
           external: {},

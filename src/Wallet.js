@@ -21,6 +21,12 @@ const defaultOptions = {
  * Instantiate a basic Wallet object,
  * A wallet is able to spawn up all preliminary steps toward the creation of a Account with
  * it's own transactions
+ *
+ * A wallet can be of multiple types, which some method. Type are attributed in function of opts (mnemonic, seed,...)
+ *
+ * Types :
+ *     - address : opts.privateKey is provided. Allow to handle a single address object.
+ *     - hdwallet : opts.mnemonic or opts.seed is provided. Handle a HD Wallet with it's account.
  */
 class Wallet {
   /**
@@ -28,33 +34,23 @@ class Wallet {
    * @param opts
    */
   constructor(opts = defaultOptions) {
-    let HDPrivateKey = null;
-    let passphrase = null;
-    let mnemonic = null;
-
     if (!(opts.network && is.network(opts.network))) throw new Error('Expected a valid network (typeof Network or String)');
+    this.passphrase = (opts.passphrase) ? (opts.passphrase) : null;
     this.network = Dashcore.Networks[opts.network];
-    // eslint-disable-next-line prefer-destructuring
-    if (opts.passphrase) passphrase = opts.passphrase;
-
 
     if ('mnemonic' in opts) {
-      if (!is.mnemonic(opts.mnemonic)) {
-        throw new Error('Expected a valid mnemonic (typeof String or Mnemonic)');
-      }
-      // eslint-disable-next-line prefer-destructuring
-      mnemonic = opts.mnemonic.trim();
-      HDPrivateKey = mnemonicToHDPrivateKey(mnemonic, this.network, passphrase);
+      this.fromMnemonic(opts.mnemonic);
     } else if ('seed' in opts) {
-      if (!is.seed(opts.seed)) throw new Error('Expected a valid seed (typeof HDPrivateKey or String)');
-      HDPrivateKey = opts.seed;
-      mnemonic = null; // todo : verify if possible to change from HDPrivateKey to Mnemonic back
+      this.fromSeed(opts.seed);
+    } else if ('privateKey' in opts) {
+      this.fromPrivateKey(opts.privateKey);
     } else {
-      mnemonic = generateNewMnemonic();
-      HDPrivateKey = mnemonicToHDPrivateKey(mnemonic, this.network, passphrase);
+      this.fromMnemonic(generateNewMnemonic());
     }
 
-    this.walletId = (mnemonic) ? mnemonicToWalletId(mnemonic) : mnemonicToWalletId(HDPrivateKey);
+    //Notice : Most of the time, wallet id is deterministic
+    this.generateNewWalletId();
+
     this.adapter = (opts.adapter) ? opts.adapter : new InMem();
     this.adapter.config();
 
@@ -62,7 +58,8 @@ class Wallet {
       adapter: this.adapter,
       walletId: this.walletId,
       network: this.network,
-      mnemonic,
+      mnemonic:this.mnemonic,
+      type:this.type
     });
     this.store = this.storage.store;
 
@@ -79,13 +76,46 @@ class Wallet {
     this.transport = (opts.transport) ? new Transporter(opts.transport) : new Transporter();
 
     this.accounts = [];
-    this.HDPrivateKey = HDPrivateKey;
-    this.keychain = new KeyChain(this.HDPrivateKey);
-    this.mnemonic = mnemonic; // We keep it only for the export function..
+    this.keychain = (this.HDPrivateKey) ? new KeyChain(this.HDPrivateKey) : null;
     this.interface = opts.interface;
     this.savedBackup = false; // When true, we delete mnemonic from internals
   }
+  generateNewWalletId(){
+    const type = this.type;
+    switch (type) {
+      case "address":
+        this.walletId =  mnemonicToWalletId(this.privateKey);
+        break;
+      case "hdwallet":
+      default:
+        const mnemonic = this.mnemonic;
+        //fixme : should be sane walletID per wallet, here it gave different result with HD or mnemonic
+        this.walletId = (mnemonic) ? mnemonicToWalletId(mnemonic) : mnemonicToWalletId(this.HDPrivateKey);
+        break;
+    }
 
+  }
+  fromPrivateKey(privateKey){
+    if (!is.privateKey(privateKey)) throw new Error('Expected a valid private key (typeof PrivateKey or String)');
+    this.type = 'single_address';
+    this.mnemonic = null;
+    this.privateKey = privateKey;
+  }
+  fromSeed(seed){
+    if (!is.seed(seed)) throw new Error('Expected a valid seed (typeof HDPrivateKey or String)');
+    this.type = 'hdwallet';
+    this.mnemonic = null;
+    this.HDPrivateKey = seed;
+  }
+  fromMnemonic(mnemonic){
+    const trimmedMnemonic = mnemonic.toString().trim();
+    if (!is.mnemonic(trimmedMnemonic)) {
+      throw new Error('Expected a valid mnemonic (typeof String or Mnemonic)');
+    }
+    this.type = 'hdwallet';
+    this.mnemonic = trimmedMnemonic; // todo : What about without this ?
+    this.HDPrivateKey=mnemonicToHDPrivateKey(trimmedMnemonic, this.network, this.passphrase);
+  }
   // TODO : Add tests
   updateNetwork(network) {
     if (is.network(network) && network !== this.network) {
