@@ -1,13 +1,12 @@
 const Wallet = require('../src/Wallet');
-const InsightClient = require('../src/transports/Insight/insightClient');
 
 const wallet = new Wallet({
   mnemonic: 'wisdom claim quote stadium input danger planet angry crucial cargo struggle medal',
   network: 'testnet',
-  transport: new InsightClient(),
+  transport: 'insight',
 });
 
-const account = wallet.createAccount();
+const account = wallet.getAccount();
 
 account.events.on('prefetched', () => {
   console.log('prefetched');
@@ -16,21 +15,23 @@ account.events.on('discovery_started', () => {
   console.log('discovery_started');
 });
 account.events.on('ready', async () => {
-  // console.log(account.addresses)
-  console.log('Funding address', account.getAddress(0, true).address);
-  console.log('---');
-  console.log('Balance', account.getBalance());
+  const balance = account.getBalance();
+  console.log('Balance', balance);
+
   const { address } = account.getUnusedAddress(true);
-  console.log('Send to a child address', address);
+  console.log('Send half balance a child addr:', address);
+
   const isIs = true;
-  const amount = parseInt(account.getBalance() / 2, 10);
+  const amount = parseInt(balance / 2, 10);
+
+  console.log('Will pay', amount, 'in is to', address);
+
   const rawTx = account.createTransaction({
     to: address,
-    amount,
+    satoshis: amount,
     isInstantSend: isIs,
   });
-  console.log('Will pay', amount, 'in is to', address);
   console.log('Created rawtx', rawTx);
-  const txid = await account.broadcastTransaction(rawTx, true);
-  console.log('Broadcasted:', txid);
+  // const txid = await account.broadcastTransaction(rawTx, true);
+  // console.log('Broadcasted:', txid);
 });
