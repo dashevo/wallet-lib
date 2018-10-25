@@ -12,6 +12,7 @@ const defaultOptions = {
   mode: 'full',
   cacheTx: true,
   subscribe: true,
+  plugins: []
 };
 
 /**
@@ -68,6 +69,12 @@ class Account {
     this.mode = (opts.mode) ? opts.mode : defaultOptions.mode;
 
     this.cacheTx = (opts.cacheTx) ? opts.cacheTx : defaultOptions.cacheTx;
+    this.plugins = wallet.plugins;
+    Object.keys(this.plugins).forEach((pluginName)=>{
+      const item = this.plugins[pluginName];
+      if(item.init) item.init(this);
+    })
+
     this.workers = {};
 
     // List of events we are waiting for before firing a ready

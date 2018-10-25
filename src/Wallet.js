@@ -15,8 +15,9 @@ const SingleAddress = require('./SingleAddress');
 const Transporter = require('./transports/Transporter');
 
 const defaultOptions = {
-  network: 'testnet',
-};
+    network: 'testnet',
+    plugins: []
+  };
 const TYPES = {
   'SINGLE_ADDRESS':'single_address',
   "HDWALLET":'hdwallet'
@@ -68,6 +69,11 @@ class Wallet {
       type:this.type
     });
     this.store = this.storage.store;
+    const plugins = opts.plugins || defaultOptions.plugins;
+    this.plugins = {};
+    plugins.map((item)=> {
+        this.plugins[item.name]=item
+    });
 
     // Handle import of cache
     if (opts.cache) {
