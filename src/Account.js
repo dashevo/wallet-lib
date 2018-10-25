@@ -351,12 +351,15 @@ class Account {
     keys.some((key) => {
       const el = (this.store.wallets[walletId].addresses[type][key]);
       if (!el.used) {
-        if (skipped === skip) {
+        if (skipped >= skip) {
           unused = el;
         }
         skipped += 1;
       }
     });
+    if(skipped<skip){
+      unused = this.getAddress(skipped);
+    }
     if (unused.address === '') {
       return this.getAddress(0, external);
     }
