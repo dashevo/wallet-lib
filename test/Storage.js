@@ -173,8 +173,8 @@ describe('Storage', function suite() {
       path: "m/44'/1'/0'",
     };
     const walletId = 'fad183cbf7';
-
-    store.importAccounts(acc, walletId);
+    const type = 'hdwallet';
+    store.importAccounts(acc, walletId, type);
     const result = store.getStore();
 
     const expectedResult = {
@@ -184,6 +184,7 @@ describe('Storage', function suite() {
           blockheight: 0,
           mnemonic: null,
           network: Networks.testnet,
+          type: null,
           accounts: {
             "m/44'/1'/0'": {
               label: 'uberAcc',

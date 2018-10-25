@@ -2,7 +2,7 @@ const defaultOpts = {
   threesholdMs: 10 * 60 * 1000,
   workerIntervalTime: 1 * 10 * 1000,
 };
-class SyncWorker {
+class SingleSyncWorker {
   constructor(opts = defaultOpts) {
     this.events = opts.events;
     this.storage = opts.storage;
@@ -21,44 +21,20 @@ class SyncWorker {
     const fetchDiff = (opts.threesholdMs) ? opts.threesholdMs : defaultOpts.threesholdMs;
     this.fetchThreeshold = Date.now() - fetchDiff;
 
-    this.listeners = {
-      addresses: [],
-    };
+    this.listeners = {};
     this.bloomfilters = [];
   }
 
   async execAddressFetching() {
     const self = this;
     const { addresses } = this.storage.getStore().wallets[this.walletId];
-    const { fetchAddressInfo } = this;
-
-    const toFetchAddresses = [];
-
-    Object.keys(addresses).forEach((walletType) => {
-      const walletAddresses = addresses[walletType];
-      const walletPaths = Object.keys(walletAddresses);
-      if (walletPaths.length > 0) {
-        walletPaths.forEach((path) => {
-          const address = walletAddresses[path];
-          if (address.unconfirmedBalanceSat > 0 || address.fetchedLast < self.fetchThreeshold) {
-            toFetchAddresses.push(address);
-          }
-        });
-      }
-    });
-    const promises = [];
-
-    toFetchAddresses.forEach((addressObj) => {
-      const p = fetchAddressInfo(addressObj)
-        .then((addrInfo) => {
-          self.storage.updateAddress(addrInfo, self.walletId);
-          self.events.emit('balance_changed');
-        });
-      promises.push(p);
-    });
-
-    await Promise.all(promises);
-
+    const address = (addresses.misc['0'] && addresses.misc['0'].address) || null;
+    if (!address || address.unconfirmedBalanceSat > 0 || address.fetchedLast < self.fetchThreeshold) {
+      const addrInfo = await this.fetchAddressInfo();
+      console.log(addrInfo)
+      self.storage.updateAddress(addrInfo, self.walletId);
+    }
+    self.events.emit('balance_changed');
     this.events.emit('fetched/address');
     return true;
   }
@@ -152,13 +128,12 @@ class SyncWorker {
           const knownsTxId = Object.keys(transactions);
           address.transactions.forEach((txid) => {
             const tx = transactions[txid];
-            const txBlockheight = tx.blockheight;
             // In case we have a transaction associated to an address but unknown in global level
             if (!knownsTxId.includes(txid)) {
               toFetchTransactions.push(txid);
-            } else if (txBlockheight === -1) {
+            } else if (tx.blockheight === -1) {
               toFetchTransactions.push(txid);
-            } else if (blockheight - txBlockheight < unconfirmedThreshold) {
+            } else if (tx.blockheight - tx.blockheight < unconfirmedThreshold) {
               // When the txid is more than -1 but less than 6 conf.
               tx.spendable = false;
               self.storage.updateTransaction(tx);
@@ -209,13 +184,13 @@ class SyncWorker {
     // We would love to have a small perf footprint and this seems improvable.
     await this.execBlockListener();
     await this.execAddressFetching();
-    await this.execAddressListener();
+    // await this.execAddressListener();
     await this.execTransactionsFetching();
-    await this.execAddressBloomfilter();
+    // await this.execAddressBloomfilter();
 
     this.workerRunning = false;
     this.workerPass += 1;
-    this.events.emit('WORKER/SYNC/EXECUTED');
+    this.events.emit('WORKER/SINGLESYNC/EXECUTED');
     return true;
   }
 
@@ -237,7 +212,7 @@ class SyncWorker {
     // every minutes, check the pool
     this.worker = setInterval(self.execWorker.bind(self), this.workerIntervalTime);
     setTimeout(self.execWorker.bind(self), 3000);
-    this.events.emit('WORKER/SYNC/STARTED');
+    this.events.emit('WORKER/SINGLESYNC/STARTED');
   }
 
   stopWorker() {
@@ -247,4 +222,4 @@ class SyncWorker {
     this.workerRunning = false;
   }
 }
-module.exports = SyncWorker;
+module.exports = SingleSyncWorker;

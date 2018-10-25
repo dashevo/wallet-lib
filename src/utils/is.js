@@ -1,3 +1,5 @@
+//Todo : Some validators here are really proto type of methods, urgent impr is needed here.
+const { PrivateKey,HDPrivateKey } = require('@dashevo/dashcore-lib');
 const is = {
   // Primitives
   arr: arr => Array.isArray(arr) || arr.constructor.name === 'Array',
@@ -18,7 +20,9 @@ const is = {
   stringified(val) { try { JSON.parse(val); return true; } catch (e) { return false; } },
   mnemonic: mnemonic => is.string(mnemonic) || is.type(mnemonic, 'Mnemonic'),
   network: network => is.string(network) || is.type(network, 'Network'),
-  seed: seed => is.string(seed) || is.type(seed, 'HDPrivateKey'),
+  privateKey: pKey => is.type(pKey, 'PrivateKey') || (is.string(pKey) && PrivateKey.isValid(pKey)),
+  HDPrivateKey: hdKey => is.type(hdKey, 'HDPrivateKey') || (is.string(hdKey) && HDPrivateKey.isValidSerialized(hdKey)),
+  seed: seed => is.string(seed) || is.privateKey(seed) || is.HDPrivateKey(seed) || is.mnemonic(seed),
   address: addr => is.string(addr) || is.type(addr, 'Address'),
   transaction: tx => is.obj(tx) && tx.vin && is.arr(tx.vin) && tx.vout && is.arr(tx.vout),
   feeRate: feeRate => is.obj(feeRate) && is.string(feeRate.type) && is.int(feeRate.value),

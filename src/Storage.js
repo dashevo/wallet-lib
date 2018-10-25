@@ -29,7 +29,7 @@ class Storage {
     this.lastModified = null;
 
     if (opts.walletId) {
-      this.createWallet(opts.walletId, opts.network, opts.mnemonic);
+      this.createWallet(opts.walletId, opts.network, opts.mnemonic, opts.type);
     }
     this.interval = setInterval(() => {
       if (this.lastModified > this.lastSave) {
@@ -64,12 +64,13 @@ class Storage {
     await this.rehydrateState();
   }
 
-  createWallet(walletId, network = Networks.testnet, mnemonic = null) {
+  createWallet(walletId, network = Networks.testnet, mnemonic = null, type = null) {
     if (!hasProp(this.store.wallets, walletId)) {
       this.store.wallets[walletId] = {
         accounts: {},
         network,
         mnemonic,
+        type,
         blockheight: 0,
         addresses: {
           external: {},
@@ -189,6 +190,27 @@ class Storage {
             }
           }
         });
+      }
+    } else if (type === 'Array') {
+      throw new Error('Not implemented. Please create an issue on github if needed.');
+    } else {
+      throw new Error('Invalid account. Cannot import.');
+    }
+    return true;
+  }
+
+  importSingleAddress(singleAddress, walletId){
+    const type = singleAddress.constructor.name;
+    if (!walletId) throw new Error('Expected walletId to import single address');
+    if (!this.searchWallet(walletId).found) {
+      this.createWallet(walletId);
+    }
+    const accList = this.store.wallets[walletId].accounts;
+
+    if (type === 'Object') {
+      if (singleAddress.path) {
+          accList[singleAddress.path] = (singleAddress);
+          this.lastModified = +new Date();
       }
     } else if (type === 'Array') {
       throw new Error('Not implemented. Please create an issue on github if needed.');

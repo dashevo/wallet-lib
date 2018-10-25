@@ -104,7 +104,7 @@ class Account {
       this.workers.bip44.startWorker();
     }
 
-    if (this.transport && this.transport.valid) {
+    if (this.transport && this.transport.isValid) {
       workersWatcher.sync = { ready: false, started: false };
       this.events.on('WORKER/SYNC/STARTED', () => { workersWatcher.sync.started = true; });
       this.events.on('WORKER/SYNC/EXECUTED', () => { workersWatcher.sync.ready = true; });
@@ -160,7 +160,7 @@ class Account {
    * @return {Promise<*>}
    */
   async broadcastTransaction(rawtx, isIs = false) {
-    if (!this.transport.valid) throw new Error('A transport layer is needed to perform a broadcast');
+    if (!this.transport.isValid) throw new Error('A transport layer is needed to perform a broadcast');
 
     const txid = await this.transport.sendRawTransaction(rawtx, isIs);
     if (is.txid(txid)) {
@@ -205,7 +205,7 @@ class Account {
    * @return {Promise<{txid, blockhash, blockheight, blocktime, fees, size, vout, vin, txlock}>}
    */
   async fetchTransactionInfo(transactionid) {
-    if (!this.transport.valid) throw new Error('A transport layer is needed to fetch tx info');
+    if (!this.transport.isValid) throw new Error('A transport layer is needed to fetch tx info');
 
     // valueIn, valueOut,
     const {
@@ -228,8 +228,12 @@ class Account {
   }
 
   async fetchStatus() {
-    if (!this.transport.valid) throw new Error('A transport layer is needed to fetch status');
+    if (!this.transport.isValid) throw new Error('A transport layer is needed to fetch status');
     return (this.transport) ? this.transport.getStatus() : false;
+  }
+
+  sign(object, privateKeys, sigType) {
+    return this.keychain.sign(object, privateKeys, sigType);
   }
 
   /**
@@ -239,7 +243,7 @@ class Account {
    * @return {Promise<addressInfo>}
    */
   async fetchAddressInfo(addressObj, fetchUtxo = true) {
-    if (!this.transport.valid) throw new Error('A transport layer is needed to fetch addr info');
+    if (!this.transport.isValid) throw new Error('A transport layer is needed to fetch addr info');
     const self = this;
     const { address, path } = addressObj;
     const {
@@ -589,32 +593,11 @@ class Account {
 
     const addressList = utxos.utxos.map(el => ((el.address)));
     const privateKeys = this.getPrivateKeys(addressList);
-    const signedTx = this.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
+    const signedTx = this.keychain.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
 
     return signedTx.toString();
   }
 
-  /**
-   * Allow to sign any transaction or a transition object from a valid privateKeys list
-   * @param object
-   * @param privateKeys
-   * @param sigType
-   */
-  // eslint-disable-next-line class-methods-use-this
-  sign(object, privateKeys, sigType = Dashcore.crypto.Signature.SIGHASH_ALL) {
-    const handledTypes = ['Transaction', 'SubTxRegistrationPayload'];
-    if (!privateKeys) throw new Error('Require one or multiple privateKeys to sign');
-    if (!object) throw new Error('Nothing to sign');
-    if (!handledTypes.includes(object.constructor.name)) {
-      throw new Error(`Unhandled object of type ${object.constructor.name}`);
-    }
-    const obj = object.sign(privateKeys, sigType);
-
-    if (!obj.isFullySigned()) {
-      throw new Error('Not fully signed transaction');
-    }
-    return obj;
-  }
 
   /**
    * Return all the private keys of the parameters passed addresses
@@ -667,7 +650,7 @@ class Account {
       this.BIP44PATH = getBIP44Path(network, this.accountIndex);
       this.network = getNetwork(network);
       this.storage.store.wallets[this.walletId].network = network.toString();
-      if (this.transport.valid) {
+      if (this.transport.isValid) {
         return this.transport.updateNetwork(network);
       }
     }
@@ -681,7 +664,7 @@ class Account {
    * @return {Boolean}
    */
   disconnect() {
-    if (this.transport.valid) {
+    if (this.transport.isValid) {
       this.transport.disconnect();
     }
     if (this.workers) {
