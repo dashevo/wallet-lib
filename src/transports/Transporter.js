@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const { is, hasProp } = require('../utils/index');
 const InsightClient = require('../transports/Insight/insightClient');
 const DAPIClient = require('../transports/DAPI/DapiClient');
@@ -17,12 +18,11 @@ function isValidTransport(transport) {
       'getAddressSummary',
       'getTransaction',
       'getUTXO',
-      'subscribeToAddresses',
-      'closeSocket',
       'sendRawTransaction',
     ];
     expectedKeys.forEach((key) => {
       if (!transport[key]) {
+        console.log('missing', key)
         valid = false;
       }
     });
@@ -40,7 +40,7 @@ class Transporter {
     if (transportArg) {
       let transport = transportArg;
       if (is.string(transportArg) && Object.keys(transportList).includes(transportArg)) {
-        transport = transportList[transportArg];
+        transport = new transportList[transportArg]();
       }
       this.valid = isValidTransport(transportArg);
       this.type = transport.type || transport.constructor.name;
@@ -49,12 +49,15 @@ class Transporter {
   }
 
   async getStatus() {
-    const data = await this.transport
-      .getStatus()
-      .catch((err) => {
-        throw new Error(err);
-      });
-    return data.info;
+    if(_.has(this.transport,'getStatus')){
+      const data = await this.transport
+        .getStatus()
+        .catch((err) => {
+          throw new Error(err);
+        });
+      return data.info;
+    }
+    return false;
   }
 
   async getAddressSummary(address) {
@@ -88,7 +91,7 @@ class Transporter {
   }
 
   async subscribeToAddresses(addresses, cb) {
-    if (addresses.length > 0) {
+    if (addresses.length > 0 && _.has(this.transport, 'subscribeToAddresses')) {
       // todo verify if valid addresses
       // if (!is.address(address)) throw new Error('Received an invalid address to fetch');
       return this.transport.subscribeToAddresses(addresses, cb);
@@ -97,7 +100,7 @@ class Transporter {
   }
 
   async subscribeToEvent(eventName, cb) {
-    if (is.string(eventName)) {
+    if (is.string(eventName) && _.has(this.transport, 'subscribeToEvent')) {
       return this.transport.subscribeToEvent(eventName, cb);
     }
     return false;

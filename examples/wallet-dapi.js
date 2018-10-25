@@ -1,36 +1,26 @@
-const DAPIClient = require('@dashevo/dapi-sdk');
+const DAPIClient = require('@dashevo/dapi-client');
 const Wallet = require('../src/Wallet');
 
-const wallet = new Wallet({
-  mnemonic: 'churn toast puppy fame blush fatal dove category item eyebrow nest bulk',
-  network: 'testnet',
-  transport: new DAPIClient(),
+const start = async () => {
+  const transport = new DAPIClient({ seeds: [{ ip: '18.237.151.230', port: 3000 }] });
+  const mnList = await transport.MNDiscovery.getMNList();
+  const peersIP = mnList.map(el => ({ ip } = el.ip));
 
-});
-
-const account = wallet.createAccount();
-
-account.events.on('prefetched', () => {
-  console.log('prefetched');
-});
-account.events.on('discovery_started', () => {
-  console.log('discovery_started');
-});
-account.events.on('ready', async () => {
-  console.log('Funding address', account.getAddress(0, true).address);
-  console.log('---');
-  console.log('Balance', account.getBalance());
-  const { address } = account.getUnusedAddress(true);
-  console.log('Send to a child address', address);
-  const isIs = true;
-  const amount = parseInt(account.getBalance() / 2, 10);
-  const rawTx = account.createTransaction({
-    to: address,
-    amount,
-    isInstantSend: isIs,
+  const wallet = new Wallet({
+    network: 'testnet',
+    transport,
+    mnemonic: 'protect cave garden achieve hand vacant clarify atom finish outer waste sword',
   });
-  console.log('Will pay', amount, 'in is to', address);
-  console.log('Created rawtx', rawTx);
-  // const txid = await account.broadcastTransaction(rawTx, true);
-  // console.log('Broadcasted:', txid);
-});
+  console.log('New Clients :', peersIP);
+
+  console.log(wallet.exportWallet());
+  const account = wallet.getAccount(0);
+  console.log(account);
+
+  const balance = account.getBalance();
+  console.log(balance);
+
+  const address = account.getUnusedAddress();
+  console.log(address);
+};
+start();

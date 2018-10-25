@@ -39,10 +39,12 @@ class Wallet {
 
 
     if ('mnemonic' in opts) {
-      if (!is.mnemonic(opts.mnemonic)) throw new Error('Expected a valid mnemonic (typeof String or Mnemonic)');
+      if (!is.mnemonic(opts.mnemonic)) {
+        throw new Error('Expected a valid mnemonic (typeof String or Mnemonic)');
+      }
       // eslint-disable-next-line prefer-destructuring
-      mnemonic = opts.mnemonic;
-      HDPrivateKey = mnemonicToHDPrivateKey(opts.mnemonic, this.network, passphrase);
+      mnemonic = opts.mnemonic.trim();
+      HDPrivateKey = mnemonicToHDPrivateKey(mnemonic, this.network, passphrase);
     } else if ('seed' in opts) {
       if (!is.seed(opts.seed)) throw new Error('Expected a valid seed (typeof HDPrivateKey or String)');
       HDPrivateKey = opts.seed;
