@@ -1,12 +1,12 @@
 const _ = require('lodash')
 const { is, hasProp } = require('../utils/index');
 const InsightClient = require('../transports/Insight/insightClient');
-const DAPIClient = require('../transports/DAPI/DapiClient');
+const DAPIClient = require('@dashevo/dapi-client');
 
 
 const transportList = {
   insight: InsightClient,
-  dapiclient: DAPIClient,
+  dapi: DAPIClient,
 };
 
 function isValidTransport(transport) {
@@ -37,6 +37,9 @@ class Transporter {
     this.type = null;
     this.transport = null;
 
+    if(!transportArg){
+      transportArg = 'dapi'
+    }
     if (transportArg) {
       let transport = transportArg;
       if (is.string(transportArg)){
