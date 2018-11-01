@@ -199,7 +199,7 @@ class Storage {
     return true;
   }
 
-  importSingleAddress(singleAddress, walletId){
+  importSingleAddress(singleAddress, walletId) {
     const type = singleAddress.constructor.name;
     if (!walletId) throw new Error('Expected walletId to import single address');
     if (!this.searchWallet(walletId).found) {
@@ -209,8 +209,8 @@ class Storage {
 
     if (type === 'Object') {
       if (singleAddress.path) {
-          accList[singleAddress.path] = (singleAddress);
-          this.lastModified = +new Date();
+        accList[singleAddress.path] = (singleAddress);
+        this.lastModified = +new Date();
       }
     } else if (type === 'Array') {
       throw new Error('Not implemented. Please create an issue on github if needed.');
@@ -229,7 +229,7 @@ class Storage {
    */
   updateAddress(address, walletId) {
     if (!walletId) throw new Error('Expected walletId to update an address');
-    if(!is.address(address)) throw new Error('Invalid address provided');
+    if (!is.address(address)) throw new Error('Invalid address provided');
     const { path } = address;
     if (!path) throw new Error('Expected path to update an address');
     const typeInt = path.split('/')[4];

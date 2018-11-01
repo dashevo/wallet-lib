@@ -1,14 +1,15 @@
+const _ = require('lodash');
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
+const SyncWorker = require('./plugins/Workers/SyncWorker');
+const BIP44Worker = require('./plugins/Workers/BIP44Worker');
 const {
   BIP44_LIVENET_ROOT_PATH, BIP44_TESTNET_ROOT_PATH, FEES, WALLET_TYPES,
 } = require('./Constants');
 const {
-  feeCalculation, is, dashToDuffs, duffsToDash, coinSelection,
+  is, dashToDuffs, duffsToDash, coinSelection,
 } = require('./utils/');
-const SyncWorker = require('./plugins/Workers/SyncWorker');
-const BIP44Worker = require('./plugins/Workers/BIP44Worker');
-const _ = require('lodash');
+
 const {
   UnknownPlugin,
   UnknownDAP,
@@ -104,7 +105,7 @@ class Account {
       workers: {},
       daps: {},
       standard: {},
-      _watchers: {},
+      watchers: {},
     };
     if (this.injectDefaultPlugins) {
       if (this.type === WALLET_TYPES.HDWALLET) {
@@ -143,10 +144,10 @@ class Account {
     addAccountToWallet(this, wallet);
 
     const readinessInterval = setInterval(() => {
-      const watchedWorkers = Object.keys(this.plugins._watchers);
+      const watchedWorkers = Object.keys(this.plugins.watchers);
       let readyWorkers = 0;
       watchedWorkers.forEach((workerName) => {
-        if (this.plugins._watchers[workerName].ready === true) {
+        if (this.plugins.watchers[workerName].ready === true) {
           readyWorkers += 1;
         }
       });
@@ -297,14 +298,14 @@ class Account {
     function parseUTXO(utxos) {
       const parsedUtxos = [];
       utxos.forEach((utxo) => {
-        console.log(utxo)
+        console.log(utxo);
         parsedUtxos.push(Object.assign({}, {
           satoshis: utxo.satoshis,
           txId: utxo.txid,
           address: utxo.address,
           outputIndex: utxo.vout,
           scriptPubKey: utxo.scriptPubKey,
-          scriptSig: utxo.scriptSig
+          scriptSig: utxo.scriptSig,
         }));
       });
       return parsedUtxos;
@@ -343,10 +344,12 @@ class Account {
    * @return <AddressInfo>
    */
   getAddress(index = 0, external = true) {
+  // eslint-disable-next-line no-nested-ternary
     const type = (this.type === WALLET_TYPES.SINGLE_ADDRESS)
       ? 'misc'
       : ((external) ? 'external' : 'internal');
 
+    // eslint-disable-next-line no-nested-ternary
     const path = (type === 'misc')
       ? '0'
       : ((external === true) ? `${this.BIP44PATH}/0/${index}` : `${this.BIP44PATH}/1/${index}`);
@@ -544,7 +547,7 @@ class Account {
    * @param {Boolean} onlyAvailable - Only return available utxos (spendable)
    * @return {Array}
    */
-   getUTXOS(onlyAvailable = true) {
+  getUTXOS(onlyAvailable = true) {
     let utxos = [];
 
     const self = this;
@@ -584,6 +587,7 @@ class Account {
 
     tx.from(utxos);
 
+    // eslint-disable-next-line no-underscore-dangle
     tx.to(recipient, tx._getInputAmount());
 
     tx.change(recipient);
@@ -633,19 +637,25 @@ class Account {
     }
 
     const utxosList = this.getUTXOS();
-    utxosList.map((utxo)=>{
-      const tx = self.storage.searchTransaction(utxo.txId);
-      if(tx.found){
-        utxo.scriptSig = tx.result.vin[0].scriptSig.hex
+    utxosList.map((utxo) => {
+      const utxoTx = self.storage.searchTransaction(utxo.txId);
+      if (utxoTx.found) {
+        // eslint-disable-next-line no-param-reassign
+        utxo.scriptSig = utxoTx.result.vin[0].scriptSig.hex;
       }
-    })
+      return utxo;
+    });
 
     const selection = coinSelection(utxosList, outputs, deductFee);
     const selectedUTXOs = selection.utxos;
-    const selectedOutputs = selection.outputs;
-    const {feeCategory, estimatedFee, selectedUTXOsValue} = selection;
+    // const selectedOutputs = selection.outputs;
+    const {
+      // feeCategory,
+      estimatedFee,
+      // selectedUTXOsValue
+    } = selection;
 
-    //We parse our inputs, transform them into a Dashcore UTXO object.
+    // We parse our inputs, transform them into a Dashcore UTXO object.
     const inputs = selectedUTXOs.reduce((accumulator, current) => {
       const unspentoutput = new Dashcore.Transaction.UnspentOutput(current);
       accumulator.push(unspentoutput);
@@ -654,21 +664,21 @@ class Account {
     }, []);
 
     if (!inputs) return tx;
-    //We can now add direction our inputs to the Dashcore TX object
+    // We can now add direction our inputs to the Dashcore TX object
     tx.from(inputs);
 
-    //In case or excessive fund, we will get that to an address in our possession
+    // In case or excessive fund, we will get that to an address in our possession
     const addressChange = this.getUnusedAddress(false, 1).address;
     tx.change(addressChange);
 
 
-    //TODO : Deduct fee operation should happen here ?
+    // TODO : Deduct fee operation should happen here ?
 
     // const feeRate = (opts.isInstantSend) ? feeCalculation('instantSend') : feeCalculation();
     // if (feeRate.type === 'perBytes') {
-      // console.log(feeRate.value * tx.size)
-      // tx.feePerKb(feeRate.value * 10);
-      // tx.fee(FEES.DEFAULT_FEE);
+    // console.log(feeRate.value * tx.size)
+    // tx.feePerKb(feeRate.value * 10);
+    // tx.fee(FEES.DEFAULT_FEE);
     // }
     // if (feeRate.type === 'perInputs') {
     //   const fee = inputs.length * FEES.NORMAL;
@@ -679,7 +689,7 @@ class Account {
 
     const addressList = selectedUTXOs.map(el => ((el.address)));
     const privateKeys = _.has(opts, 'privateKeys') ? opts.privateKeys : this.getPrivateKeys(addressList);
-    console.log(addressList, this.getPrivateKeys(addressList), addressList, this.storage.getStore().wallets['1910f99f7b'].addresses)
+    console.log(addressList, this.getPrivateKeys(addressList), addressList, this.storage.getStore().wallets['1910f99f7b'].addresses);
     const signedTx = this.keychain.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
 
     return signedTx.toString();
@@ -707,7 +717,7 @@ class Account {
         const address = self.store.wallets[walletId].addresses[subwallet][path];
         if (addresses.includes(address.address)) {
           const privateKey = self.keychain.getKeyForPath(path);
-          console.log(privateKey)
+          console.log(privateKey);
           privKeys = privKeys.concat([privateKey]);
         }
       });
@@ -788,12 +798,12 @@ class Account {
     return true;
   }
 
-  async injectPlugin(unsafePlugin, force = false) {
+  async injectPlugin(UnsafePlugin, force = false) {
     const self = this;
     return new Promise((res, rej) => {
-      const isInit = !(typeof unsafePlugin === 'function');
-      const plugin = (isInit) ? unsafePlugin : new unsafePlugin();
-      if (_.isEmpty(plugin)) throw new InjectionErrorCannotInject('Empty plugin');
+      const isInit = !(typeof UnsafePlugin === 'function');
+      const plugin = (isInit) ? UnsafePlugin : new UnsafePlugin();
+      if (_.isEmpty(plugin)) rej(new InjectionErrorCannotInject('Empty plugin'));
 
       // All plugins will require the event object
       const { pluginType } = plugin;
@@ -817,19 +827,25 @@ class Account {
             plugin.inject(dependencyName, this.plugins.standard[loweredDependencyName], true);
           } else if (injectedDaps.includes(loweredDependencyName)) {
             plugin.inject(dependencyName, this.plugins.daps[loweredDependencyName], true);
-          } else throw new InjectionErrorCannotInjectUnknownDependency(dependencyName);
+          } else rej(new InjectionErrorCannotInjectUnknownDependency(dependencyName));
         }
       });
       switch (pluginType) {
         case 'Worker':
           if (plugin.executeOnStart === true) {
             if (plugin.firstExecutionRequired === true) {
-              const watcher = self.plugins._watchers[pluginName] = {
+              const watcher = {
                 ready: false,
                 started: false,
               };
-              self.events.on(`WORKER/${pluginName.toUpperCase()}/STARTED`, () => watcher.started = true);
-              self.events.on(`WORKER/${pluginName.toUpperCase()}/EXECUTED`, () => watcher.ready = true);
+              self.plugins.watchers[pluginName] = watcher;
+
+              // eslint-disable-next-line
+             const updateStarted = watcher => watcher.started = true;
+              // eslint-disable-next-line
+             const updateReady = watcher => watcher.ready = true;
+              self.events.on(`WORKER/${pluginName.toUpperCase()}/STARTED`, updateStarted.bind(watcher));
+              self.events.on(`WORKER/${pluginName.toUpperCase()}/EXECUTED`, updateReady.bind(watcher));
             }
             plugin.startWorker();
           }

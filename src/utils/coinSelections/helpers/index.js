@@ -1,6 +1,7 @@
 const sortAndVerifyUTXOS = require('./sortAndVerifyUTXOS');
+
 module.exports = {
-  sortAndVerifyUTXOS
+  sortAndVerifyUTXOS,
 };
 
 // const is = require('../utils/is');
@@ -32,4 +33,3 @@ module.exports = {
 //
 //   return parseInt(feeInSatoshis, 10);
 // };
-

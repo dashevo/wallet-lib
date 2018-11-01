@@ -1,3 +1,2 @@
-module.exports = sortAndVerifyUTXOS = (utxosList) => {
-  return utxosList.sort((a, b) => b.satoshis - a.satoshis);
-}
+const sortAndVerifyUTXOS = utxosList => utxosList.sort((a, b) => b.satoshis - a.satoshis);
+module.exports = sortAndVerifyUTXOS;

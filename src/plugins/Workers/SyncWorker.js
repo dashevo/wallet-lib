@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const { Worker } = require('../');
-const { ValidTransportLayerRequired } = require('../../errors')
+const { ValidTransportLayerRequired } = require('../../errors');
 
 const defaultOpts = {
   fetchThreshold: 10 * 60 * 1000,
@@ -42,7 +42,7 @@ class SyncWorker extends Worker {
   }
 
   async execStatusFetch() {
-    try{
+    try {
       const res = await this.fetchStatus();
       if (!res) {
         return false;
@@ -51,12 +51,12 @@ class SyncWorker extends Worker {
       this.storage.store.wallets[this.walletId].blockheight = blocks;
       this.events.emit('blockheight_changed');
       return true;
-    }catch (e) {
-      if(typeof e === ValidTransportLayerRequired){
+    } catch (e) {
+      if (e instanceof ValidTransportLayerRequired) {
         console.log('invalid');
       }
+      return e;
     }
-
   }
 
   async execBlockListener() {
@@ -134,7 +134,8 @@ class SyncWorker extends Worker {
       if (walletPaths.length > 0) {
         walletPaths.forEach((path) => {
           const address = walletAddresses[path];
-          if (address.unconfirmedBalanceSat > 0 || address.fetchedLast < Date.now() - self.fetchThreshold) {
+          if (address.unconfirmedBalanceSat > 0
+            || address.fetchedLast < Date.now() - self.fetchThreshold) {
             toFetchAddresses.push(address);
           }
         });
@@ -143,21 +144,23 @@ class SyncWorker extends Worker {
     const promises = [];
 
     toFetchAddresses.forEach((addressObj) => {
-      const p = fetchAddressInfo(addressObj).catch((e)=>{
-        if(typeof e === ValidTransportLayerRequired) return false;
-      });
+      const p = fetchAddressInfo(addressObj)
+        .catch((e) => {
+          if (e instanceof ValidTransportLayerRequired) return false;
+          return e;
+        });
       promises.push(p);
     });
 
     const responses = await Promise.all(promises);
     responses.forEach((addrInfo) => {
-      try{
+      try {
         self.storage.updateAddress(addrInfo, self.walletId);
         if (addrInfo.balanceSat > 0) {
           self.events.emit('balance_changed');
         }
       } catch (e) {
-        self.events.emit(`ERROR`, e);
+        self.events.emit('ERROR', e);
       }
     });
     this.events.emit('fetched/address');
@@ -183,7 +186,7 @@ class SyncWorker extends Worker {
         walletPaths.forEach((path) => {
           const address = walletAddresses[path];
           const knownsTxId = Object.keys(transactions);
-          address.transactions.forEach((txid) => {          
+          address.transactions.forEach((txid) => {
             // In case we have a transaction associated to an address but unknown in global level
             if (!knownsTxId.includes(txid)) {
               toFetchTransactions.push(txid);
@@ -230,14 +233,14 @@ class SyncWorker extends Worker {
     return true;
   }
 
-  announce(type, el){
-    switch(type){
-      case "block":
-        console.log('block', el)
-        self.events.emit('block');
-        self.events.emit('blockheight_changed');
+  announce(type, el) {
+    switch (type) {
+      case 'block':
+        this.events.emit('block');
+        this.events.emit('blockheight_changed');
         break;
-
+      default:
+        console.error('Not implemented, announce of ', type, el);
     }
   }
 }

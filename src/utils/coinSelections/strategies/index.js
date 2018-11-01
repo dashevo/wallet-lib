@@ -1,6 +1,6 @@
 const simpleAccumulator = require('./simpleAccumulator');
 
 const STRATEGIES = {
-  simpleAccumulator
-}
+  simpleAccumulator,
+};
 module.exports = STRATEGIES;

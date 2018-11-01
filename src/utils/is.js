@@ -1,5 +1,7 @@
-//Todo : Some validators here are really proto type of methods, urgent impr is needed here.
-const { PrivateKey,HDPrivateKey } = require('@dashevo/dashcore-lib');
+/* eslint-disable max-len */
+// Todo : Some validators here are really proto type of methods, urgent impr is needed here.
+const { PrivateKey, HDPrivateKey } = require('@dashevo/dashcore-lib');
+
 const is = {
   // Primitives
   arr: arr => Array.isArray(arr) || arr.constructor.name === 'Array',

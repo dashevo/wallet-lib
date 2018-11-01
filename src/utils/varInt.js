@@ -1,8 +1,7 @@
 module.exports = {
-  varIntSizeBytesFromLength:(length) =>{
+  varIntSizeBytesFromLength: (length) => {
     let bytes = 1;
-
-    if(length>=0xfd) {
+    if (length >= 0xfd) {
       bytes += 2;
       if (length >= 0xffff) {
         bytes += 2;
@@ -12,5 +11,5 @@ module.exports = {
       }
     }
     return bytes;
-  }
+  },
 };

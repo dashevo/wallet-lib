@@ -1,7 +1,7 @@
-const _ = require('lodash')
+const _ = require('lodash');
+const DAPIClient = require('@dashevo/dapi-client');
 const { is, hasProp } = require('../utils/index');
 const InsightClient = require('../transports/Insight/insightClient');
-const DAPIClient = require('@dashevo/dapi-client');
 
 
 const transportList = {
@@ -22,7 +22,7 @@ function isValidTransport(transport) {
     ];
     expectedKeys.forEach((key) => {
       if (!transport[key]) {
-        console.log('missing', key)
+        console.log('missing', key);
         valid = false;
       }
     });
@@ -37,18 +37,19 @@ class Transporter {
     this.type = null;
     this.transport = null;
 
-    if(is.undef(transportArg)){
-      transportArg = 'dapi'
+    if (is.undef(transportArg)) {
+      // eslint-disable-next-line no-param-reassign
+      transportArg = 'dapi';
     }
     if (transportArg) {
       let transport = transportArg;
-      if (is.string(transportArg)){
-        let loweredTransportName = transportArg.toString().toLowerCase();
-        if(Object.keys(transportList).includes(loweredTransportName)){
+      if (is.string(transportArg)) {
+        const loweredTransportName = transportArg.toString().toLowerCase();
+        if (Object.keys(transportList).includes(loweredTransportName)) {
           transport = new transportList[loweredTransportName]();
           this.isValid = isValidTransport(loweredTransportName);
         }
-      }else{
+      } else {
         this.isValid = isValidTransport(transportArg);
       }
       this.type = transport.type || transport.constructor.name;
@@ -57,7 +58,7 @@ class Transporter {
   }
 
   async getStatus() {
-    if(typeof this.transport.getStatus==='function'){
+    if (typeof this.transport.getStatus === 'function') {
       const data = await this.transport
         .getStatus()
         .catch((err) => {
@@ -69,7 +70,7 @@ class Transporter {
   }
 
   async getAddressSummary(address) {
-    if(!this.isValid) return false;
+    if (!this.isValid) return false;
     if (!is.address(address)) throw new Error('Received an invalid address to fetch');
     const data = await this
       .transport

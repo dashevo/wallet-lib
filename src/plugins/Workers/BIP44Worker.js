@@ -2,16 +2,17 @@ const { Worker } = require('../');
 const { BIP44_ADDRESS_GAP } = require('../../Constants');
 
 class BIP44Worker extends Worker {
-  constructor(){
+  constructor() {
     super({
-      firstExecutionRequired:true,
-      executeOnStart:true,
+      firstExecutionRequired: true,
+      executeOnStart: true,
       dependencies: [
-        'storage','getAddress','walletId'
-      ]
+        'storage', 'getAddress', 'walletId',
+      ],
     });
   }
-  execute(){
+
+  execute() {
     const { addresses } = this.storage.store.wallets[this.walletId];
     const externalPaths = Object.keys(addresses.external);
     let externalUnused = 0;
@@ -47,6 +48,7 @@ class BIP44Worker extends Worker {
       this.getAddress(index, false);
     });
   }
+
   getNonContinuousIndexes(type = 'external') {
     const nonContinuousIndexes = [];
     const addresses = this.storage.getStore().wallets[this.walletId].addresses[type];
@@ -64,6 +66,5 @@ class BIP44Worker extends Worker {
     }
     return nonContinuousIndexes;
   }
-
-};
+}
 module.exports = BIP44Worker;

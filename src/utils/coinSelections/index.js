@@ -1,6 +1,7 @@
 const is = require('../../utils/is');
 const STRATEGIES = require('./strategies');
-module.exports = function coinSelection(utxosList, outputsList, deductFee = false, feeCategory = 'normal', strategyName = 'simpleAccumulator' ) {
+
+module.exports = function coinSelection(utxosList, outputsList, deductFee = false, feeCategory = 'normal', strategyName = 'simpleAccumulator') {
   if (!utxosList) { throw new Error('Require a utxosList to select from'); }
   if (utxosList.constructor.name !== 'Array') { throw new Error('Require utxosList to be an array of utxos'); }
   if (utxosList.length < 1) { throw new Error('Require utxosList to contains at least 1 utxo'); }
@@ -24,6 +25,9 @@ module.exports = function coinSelection(utxosList, outputsList, deductFee = fals
     }
     outputValue += output.satoshis;
   });
+  if (utxosValue < outputValue) {
+    throw new Error('Unsufficient utxos to cover the output');
+  }
 
   return STRATEGIES[strategyName](utxosList, outputsList, deductFee, feeCategory);
 };

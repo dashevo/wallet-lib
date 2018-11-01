@@ -195,7 +195,7 @@ Miscellaneous :
 - [ ] Paper-sweep wallet
 - [ ] Log tool to be able to help for decentralized debugging
 - [ ] [docs/plugins](Plugins.md) support (Worker, DAP)
-
+- [ ] CoinSelection strategy as a plugins.
 Transports :
 
 - [ ] DAPI-Client : [https://github.com/dashevo/dapi-client]

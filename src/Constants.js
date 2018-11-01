@@ -72,5 +72,10 @@ const Constants = {
       'walletId',
     ],
   },
+  TXIN_PREV_OUTPUTS_BYTES: 36,
+  TXIN_SEQUENCE_BYTES: 4,
+  TXOUT_DUFFS_VALUE_BYTES: 8,
+  VERSION_BYTES: 4,
+  N_LOCKTIME_BYTES: 4,
 };
 module.exports = Constants;

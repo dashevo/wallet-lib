@@ -10,8 +10,8 @@ class SingleSyncWorker extends Worker {
       firstExecutionRequired: true,
       workerIntervalTime: defaultOpts.workerIntervalTime,
       dependencies: [
-        'storage', 'transport', 'fetchStatus', 'fetchAddressInfo', 'fetchTransactionInfo', 'walletId'
-      ]
+        'storage', 'transport', 'fetchStatus', 'fetchAddressInfo', 'fetchTransactionInfo', 'walletId',
+      ],
     }, opts);
     super(params);
 
@@ -21,16 +21,18 @@ class SingleSyncWorker extends Worker {
     this.bloomfilters = [];
   }
 
-  async execDuringStart(){
+  async execDuringStart() {
     this.execStatusFetch();
   }
+
   async execAddressFetching() {
     const self = this;
     const { addresses } = this.storage.getStore().wallets[this.walletId];
     const address = (addresses.misc['0'] && addresses.misc['0'].address) || null;
-    if (!address || address.unconfirmedBalanceSat > 0 || address.fetchedLast < self.fetchThreeshold) {
+    const isTresholdLimitOver = address.fetchedLast < self.fetchThreeshold;
+    if (!address || address.unconfirmedBalanceSat > 0 || isTresholdLimitOver) {
       const addrInfo = await this.fetchAddressInfo();
-      console.log(addrInfo)
+      console.log(addrInfo);
       self.storage.updateAddress(addrInfo, self.walletId);
     }
     self.events.emit('balance_changed');
@@ -92,7 +94,11 @@ class SingleSyncWorker extends Worker {
   async execTransactionsFetching() {
     const self = this;
     const { transactions, wallets } = this.storage.getStore();
-    const { blockheight, addresses } = wallets[this.walletId];
+    const {
+      // blockheight,
+      addresses,
+    } = wallets[this.walletId];
+
     const { fetchTransactionInfo } = this;
 
     const toFetchTransactions = [];
@@ -175,6 +181,5 @@ class SingleSyncWorker extends Worker {
     this.events.emit('WORKER/SINGLESYNC/EXECUTED');
     return true;
   }
-
 }
 module.exports = SingleSyncWorker;
