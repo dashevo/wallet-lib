@@ -229,6 +229,7 @@ class Storage {
    */
   updateAddress(address, walletId) {
     if (!walletId) throw new Error('Expected walletId to update an address');
+    if(!is.address(address)) throw new Error('Invalid address provided');
     const { path } = address;
     if (!path) throw new Error('Expected path to update an address');
     const typeInt = path.split('/')[4];

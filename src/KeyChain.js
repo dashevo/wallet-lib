@@ -1,5 +1,5 @@
 const { PrivateKey, crypto } = require('@dashevo/dashcore-lib');
-
+const _ = require('lodash')
 const {has} = require('lodash');
 class KeyChain {
   constructor(opts) {
@@ -15,20 +15,24 @@ class KeyChain {
 
     };
   }
-
   /**
    * Derive from HDRootKey to a specific path
    * @param path
    * @return HDPrivateKey
    */
   generateKeyForPath(path) {
-    // const derivedKey = this.HDRootKey.derive(path);
-    // return derivedKey;
     return (this.type==='HDRootKey') ? this.HDRootKey.derive(path) : null;
   }
 
   getPrivateKey(){
-    return PrivateKey(this.privateKey);
+    let pk;
+    if(this.type==='HDRootKey'){
+      pk= PrivateKey(this.HDRootKey);
+    }
+    if(this.type==='privateKey'){
+      pk= PrivateKey(this.privateKey);
+    }
+    return pk;
   }
 
   /**
@@ -45,9 +49,9 @@ class KeyChain {
         this.keys[path] = this.getPrivateKey(path);
       }
     }
+
     return this.keys[path];
   }
-
 
   /**
    * Allow to sign any transaction or a transition object from a valid privateKeys list

@@ -37,7 +37,7 @@ class Transporter {
     this.type = null;
     this.transport = null;
 
-    if(!transportArg){
+    if(is.undef(transportArg)){
       transportArg = 'dapi'
     }
     if (transportArg) {
@@ -69,6 +69,7 @@ class Transporter {
   }
 
   async getAddressSummary(address) {
+    if(!this.isValid) return false;
     if (!is.address(address)) throw new Error('Received an invalid address to fetch');
     const data = await this
       .transport

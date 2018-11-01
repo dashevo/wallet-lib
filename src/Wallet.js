@@ -2,6 +2,7 @@ const Dashcore = require('@dashevo/dashcore-lib');
 const InMem = require('./adapters/InMem');
 const Storage = require('./Storage');
 const KeyChain = require('./KeyChain');
+const _ = require('lodash');
 // const { Registration, TopUp } = Dashcore.Transaction.SubscriptionTransactions;
 const {
   generateNewMnemonic,
@@ -16,12 +17,11 @@ const Transporter = require('./transports/Transporter');
 
 const defaultOptions = {
     network: 'testnet',
-    plugins: []
+    plugins: [],
+    passphrase: null,
+    injectDefaultPlugins: true
   };
-const TYPES = {
-  'SINGLE_ADDRESS':'single_address',
-  "HDWALLET":'hdwallet'
-};
+const { WALLET_TYPES } = require("./Constants")
 
 
 /**
@@ -31,7 +31,7 @@ const TYPES = {
  *
  * A wallet can be of multiple types, which some method. Type are attributed in function of opts (mnemonic, seed,...)
  *
- * Types :
+ * WALLET_TYPES :
  *     - address : opts.privateKey is provided. Allow to handle a single address object.
  *     - hdwallet : opts.mnemonic or opts.seed is provided. Handle a HD Wallet with it's account.
  */
@@ -41,9 +41,13 @@ class Wallet {
    * @param opts
    */
   constructor(opts = defaultOptions) {
-    if (!(opts.network && is.network(opts.network))) throw new Error('Expected a valid network (typeof Network or String)');
-    this.passphrase = (opts.passphrase) ? (opts.passphrase) : null;
-    this.network = Dashcore.Networks[opts.network];
+    let network = _.has(opts,'network') ? opts.network : defaultOptions.network;
+    let passphrase = _.has(opts,'passphrase') ? opts.passphrase : defaultOptions.passphrase;
+    this.injectDefaultPlugins = _.has(opts,'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
+    this.injectPluginsList = opts.plugins || [];
+
+    if (!(is.network(network))) throw new Error('Expected a valid network (typeof Network or String)');
+    this.network = Dashcore.Networks[network];
 
     if ('mnemonic' in opts) {
       this.fromMnemonic(opts.mnemonic);
@@ -86,7 +90,6 @@ class Wallet {
     }
 
     this.transport = (opts.transport) ? new Transporter(opts.transport) : new Transporter();
-
     this.accounts = [];
     this.interface = opts.interface;
     this.savedBackup = false; // When true, we delete mnemonic from internals
@@ -94,10 +97,10 @@ class Wallet {
   generateNewWalletId(){
     const type = this.type;
     switch (type) {
-      case TYPES.SINGLE_ADDRESS:
+      case WALLET_TYPES.SINGLE_ADDRESS:
         this.walletId =  mnemonicToWalletId(this.privateKey);
         break;
-      case TYPES.HDWALLET:
+      case WALLET_TYPES.HDWALLET:
       default:
         if(!this.HDPrivateKey) throw new Error('Cannot generate a walletId : Do not find any HDPrivateKey');
         this.walletId = mnemonicToWalletId(this.HDPrivateKey);
@@ -107,7 +110,7 @@ class Wallet {
   }
   fromPrivateKey(privateKey){
     if (!is.privateKey(privateKey)) throw new Error('Expected a valid private key (typeof PrivateKey or String)');
-    this.type = TYPES.SINGLE_ADDRESS;
+    this.type = WALLET_TYPES.SINGLE_ADDRESS;
     this.mnemonic = null;
     this.privateKey = privateKey;
     this.keychain = new KeyChain({privateKey:privateKey});
@@ -115,7 +118,7 @@ class Wallet {
   }
   fromSeed(seed){
     if (!is.seed(seed)) throw new Error('Expected a valid seed (typeof HDPrivateKey or String)');
-    this.type = TYPES.HDWALLET;
+    this.type = WALLET_TYPES.HDWALLET;
     this.mnemonic = null;
     this.HDPrivateKey = seed;
     this.keychain = new KeyChain({HDRootKey:seed});
@@ -125,7 +128,7 @@ class Wallet {
       throw new Error('Expected a valid mnemonic (typeof String or Mnemonic)');
     }
     const trimmedMnemonic = mnemonic.toString().trim();
-    this.type = TYPES.HDWALLET;
+    this.type = WALLET_TYPES.HDWALLET;
     this.mnemonic = trimmedMnemonic; // todo : What about without this ?
     this.HDPrivateKey=mnemonicToHDPrivateKey(trimmedMnemonic, this.network, this.passphrase);
     this.keychain = new KeyChain({HDRootKey:this.HDPrivateKey});
@@ -167,11 +170,14 @@ class Wallet {
    * @return {*|account}
    */
   getAccount(accountIndex = 0, accountOpts) {
-    if(this.type===TYPES.SINGLE_ADDRESS){
-      return this.createSingleAddress({privateKey:this.privateKey});
-    }
+
+    const injectDefaultPlugins = this.injectDefaultPlugins;
+    const plugins = this.injectPluginsList;
     const acc = this.accounts.filter(el => el.accountIndex === accountIndex);
-    const opts = Object.assign({ accountIndex }, accountOpts);
+    const baseOpts = {accountIndex, injectDefaultPlugins, plugins};
+    if(this.type===WALLET_TYPES.SINGLE_ADDRESS){baseOpts.privateKey=this.privateKey};
+
+    const opts = Object.assign(baseOpts, accountOpts);
     return (acc[0]) || this.createAccount(opts);
   }
 
@@ -190,11 +196,11 @@ class Wallet {
       return this.HDPrivateKey;
     }
     switch (this.type) {
-      case TYPES.SINGLE_ADDRESS:
+      case WALLET_TYPES.SINGLE_ADDRESS:
         if(!this.privateKey) throw new Error('Nothing to export');
         return this.privateKey;
         break;
-      case TYPES.HDWALLET:
+      case WALLET_TYPES.HDWALLET:
         return exportMnemonic(this.mnemonic)
         break;
       default:

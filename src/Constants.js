@@ -18,13 +18,59 @@ const Constants = {
   // The maximum amount to pay for using small inputs instead of one big input
   // when fees are significant (proportional to how much we would pay for using that big input only)
   UTXO_SELECTION_MAX_FEE_VS_SINGLE_UTXO_FEE_FACTOR: 5,
+  MAX_STANDARD_TX_SIZE: 100000,
+  MAX_P2SH_SIGOPS: 15,
   UTXO_MAX_INOPUTS_PER_TX: 25,
   FEES: {
+    DUST_RELAY_TX_FEE: 1000,
+    ZERO: 0,
+    ECONOMIC: 500,
+    NORMAL: 1000,
+    PRIORITY: 10000,
     // Fee for IS are 0.0001 * INPUTS
     INSTANT_FEE_PER_INPUTS: 10000,
-    // Todo : Ensure value.
-    // Need to be multiplied by a multiplier (*1.5 / *2) to higher the priority
-    FEE_PER_KB: 1000,
+  },
+  WALLET_TYPES: {
+    SINGLE_ADDRESS: 'single_address',
+    HDWALLET: 'hdwallet',
+  },
+  // List of account function and properties that can be injected in a plugin
+  INJECTION_LISTS: {
+    SAFE_FUNCTIONS: [
+      'createTransaction',
+      'createTransactionFromUTXOS',
+      'getUTXOS',
+      'getUnusedAddress',
+      'getBalance',
+      'broadcastTransaction',
+      'getAddress',
+      'fetchAddressInfo',
+      'fetchStatus',
+      'fetchTransactionInfo',
+      'getPlugin',
+      'getDAP',
+      'sign',
+      'getTransactions',
+      'getTransactionHistory',
+      'forceRefreshAccount',
+      'updateNetwork',
+      'disconnect',
+      'connect',
+    ],
+    UNSAFE_FUNCTIONS: [
+      'generateAddress',
+      'getPrivateKeys',
+      'injectPlugin',
+    ],
+    UNSAFE_PROPERTIES: [
+      'storage',
+      'keyChain',
+    ],
+    SAFE_PROPERTIES: [
+      'events',
+      'transport',
+      'walletId',
+    ],
   },
 };
 module.exports = Constants;
