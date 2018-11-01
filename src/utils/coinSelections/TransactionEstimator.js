@@ -6,7 +6,7 @@ const {
 const { Input, Output } = Transaction;
 const {
   FEES, VERSION_BYTES, TXOUT_DUFFS_VALUE_BYTES, N_LOCKTIME_BYTES,
-} = require('../../Constants');
+} = require('../../CONSTANTS');
 const is = require('../is');
 const { varIntSizeBytesFromLength } = require('../varInt');
 
@@ -16,7 +16,7 @@ const calculateInputsSize = (inputs, tx) => {
   // eslint-disable-next-line new-cap
     const output = new Output.fromObject({
       satoshis: _input.satoshis,
-      script: _input.script,
+      script: _input.scriptPubKey,
     });
     const scriptSig = new Script(_input.scriptSig);
 
@@ -89,7 +89,7 @@ class TransactionEstimator {
     if (inputs.length < 1) return false;
 
     const addInputs = (input) => {
-      if (!_.has(input, 'script')) throw new Error('Expected script to add input');
+      if (!_.has(input, 'script') && !_.has(input,'scriptPubKey')) throw new Error('Expected script to add input');
       self.state.inputs.push(input);
     };
 

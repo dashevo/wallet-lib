@@ -111,7 +111,6 @@ class InsightClient {
       .post(url, { rawtx })
       .then(res => res.data)
       .catch((err) => {
-        console.log(err.response.data);
         throw new Error(err);
       });
   }
@@ -148,6 +147,7 @@ class InsightClient {
 
 
   subscribeToAddresses(addresses, cb) {
+
     if (this.useSocket) {
       const eventName = 'dashd/addresstxid';
       if (this.listeners[eventName]) {

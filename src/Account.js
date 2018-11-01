@@ -5,10 +5,11 @@ const SyncWorker = require('./plugins/Workers/SyncWorker');
 const BIP44Worker = require('./plugins/Workers/BIP44Worker');
 const {
   BIP44_LIVENET_ROOT_PATH, BIP44_TESTNET_ROOT_PATH, FEES, WALLET_TYPES,
-} = require('./Constants');
+} = require('./CONSTANTS');
 const {
   is, dashToDuffs, duffsToDash, coinSelection,
 } = require('./utils/');
+const EVENTS = require('./EVENTS');
 
 const {
   UnknownPlugin,
@@ -50,6 +51,8 @@ const getNetwork = function (network) {
 };
 class Account {
   constructor(wallet, opts = defaultOptions) {
+    if (!wallet || wallet.constructor.name !== 'Wallet') throw new Error('Expected wallet to be created and passed as param');
+    if (!_.has(wallet, 'walletId')) throw new Error('Missing walletID to create an account');
     this.walletId = wallet.walletId;
 
     this.events = new EventEmitter();
@@ -57,7 +60,6 @@ class Account {
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
 
     this.type = wallet.type;
-    if (!wallet || wallet.constructor.name !== 'Wallet') throw new Error('Expected wallet to be created and passed as param');
 
     const accountIndex = (opts.accountIndex) ? opts.accountIndex : wallet.accounts.length;
     this.accountIndex = accountIndex;
@@ -121,14 +123,6 @@ class Account {
 
     // Handle import of cache
     if (opts.cache) {
-      if (opts.cache.transactions) {
-        try {
-          this.storage.importTransactions(opts.cache.transactions);
-        } catch (e) {
-          this.disconnect();
-          throw e;
-        }
-      }
       if (opts.cache.addresses) {
         try {
           this.storage.importAddresses(opts.cache.addresses, this.walletId);
@@ -137,10 +131,18 @@ class Account {
           throw e;
         }
       }
+      if (opts.cache.transactions) {
+        try {
+          this.storage.importTransactions(opts.cache.transactions);
+        } catch (e) {
+          this.disconnect();
+          throw e;
+        }
+      }
     }
 
     const self = this;
-    self.events.emit('started');
+    self.events.emit(EVENTS.STARTED);
     addAccountToWallet(this, wallet);
 
     const readinessInterval = setInterval(() => {
@@ -152,7 +154,8 @@ class Account {
         }
       });
       if (readyWorkers === watchedWorkers.length) {
-        self.events.emit('ready');
+        console.log('EMIT READY');
+        self.events.emit(EVENTS.READY);
         self.isReady = true;
         clearInterval(readinessInterval);
       }
@@ -217,7 +220,7 @@ class Account {
         address.utxos = cleanedUtxos;
         console.log('Broadcast totalSatoshi', totalSatoshis);
         // this.storage.store.addresses[type][path].fetchedLast = 0;// In order to trigger a refresh
-        this.events.emit('balance_changed');
+        this.events.emit(EVENTS.BALANCE_CHANGED, { delta: -totalSatoshis });
       });
     }
     return txid;
@@ -272,6 +275,7 @@ class Account {
     const {
       balanceSat, unconfirmedBalanceSat, transactions,
     } = await this.transport.getAddressSummary(address);
+
     const addrInfo = {
       address,
       path,
@@ -286,6 +290,7 @@ class Account {
       if (self.cacheTx) {
         transactions.forEach(async (tx) => {
           const knownTx = Object.keys(self.store.transactions);
+
           if (!knownTx.includes(tx)) {
             const txInfo = await self.fetchTransactionInfo(tx);
             await self.storage.importTransactions(txInfo);
@@ -298,7 +303,6 @@ class Account {
     function parseUTXO(utxos) {
       const parsedUtxos = [];
       utxos.forEach((utxo) => {
-        console.log(utxo);
         parsedUtxos.push(Object.assign({}, {
           satoshis: utxo.satoshis,
           txId: utxo.txid,
@@ -310,10 +314,15 @@ class Account {
       });
       return parsedUtxos;
     }
+
     if (fetchUtxo) {
       const originalUtxo = (await self.transport.getUTXO(address));
+      if (originalUtxo.length > 0) {
+      }
       const utxo = (balanceSat > 0) ? parseUTXO(originalUtxo) : [];
-      addrInfo.utxos = utxo;
+      if (utxo.length > 0) {
+        self.storage.updateAddressUTXO(addressObj.address, utxo);
+      }
     }
 
     return addrInfo;
@@ -370,20 +379,26 @@ class Account {
     let unused = {
       address: '',
     };
-    let skipped = 0;
+    const skipped = 0;
     const { walletId } = this;
     const keys = Object.keys(this.store.wallets[walletId].addresses[type]);
 
-    // eslint-disable-next-line array-callback-return
-    keys.some((key) => {
+
+    for (let i = 0, skipped = 0; i < keys.length; i++) {
+      const key = keys[i];
       const el = (this.store.wallets[walletId].addresses[type][key]);
-      if (!el.used) {
-        if (skipped >= skip) {
-          unused = el;
+      unused = el;
+      if (el.used === false) {
+        if (skipped < skip) {
+          skipped += 1;
+        } else {
+          break;
         }
-        skipped += 1;
       }
-    });
+      // Generate extra address when needed. BIP44 should take care of that.
+      console.error('getUnusedAddress had to generate new address.');
+    }
+
     if (skipped < skip) {
       unused = this.getAddress(skipped);
     }
@@ -689,8 +704,14 @@ class Account {
 
     const addressList = selectedUTXOs.map(el => ((el.address)));
     const privateKeys = _.has(opts, 'privateKeys') ? opts.privateKeys : this.getPrivateKeys(addressList);
-    console.log(addressList, this.getPrivateKeys(addressList), addressList, this.storage.getStore().wallets['1910f99f7b'].addresses);
-    const signedTx = this.keychain.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
+    const transformedPrivateKeys = [];
+    privateKeys.forEach((pk) => {
+      if (pk.constructor.name === 'PrivateKey') {
+        transformedPrivateKeys.push(pk);
+      } else if (pk.constructor.name === 'HDPrivateKey') transformedPrivateKeys.push(pk.privateKey);
+      else console.log('Unexpected pk type', pk, pk.constructor.name, pk instanceof Dashcore.HDPrivateKey);
+    });
+    const signedTx = this.keychain.sign(tx, transformedPrivateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
 
     return signedTx.toString();
   }
@@ -717,7 +738,6 @@ class Account {
         const address = self.store.wallets[walletId].addresses[subwallet][path];
         if (addresses.includes(address.address)) {
           const privateKey = self.keychain.getKeyForPath(path);
-          console.log(privateKey);
           privKeys = privKeys.concat([privateKey]);
         }
       });
@@ -840,12 +860,15 @@ class Account {
               };
               self.plugins.watchers[pluginName] = watcher;
 
-              // eslint-disable-next-line
-             const updateStarted = watcher => watcher.started = true;
-              // eslint-disable-next-line
-             const updateReady = watcher => watcher.ready = true;
-              self.events.on(`WORKER/${pluginName.toUpperCase()}/STARTED`, updateStarted.bind(watcher));
-              self.events.on(`WORKER/${pluginName.toUpperCase()}/EXECUTED`, updateReady.bind(watcher));
+
+              const startWatcher = watcher => watcher.started = true;
+              const setReadyWatch = watcher => watcher.ready = true;
+
+              const onStartedEvent = () => startWatcher(watcher);
+              const onExecuteEvent = () => setReadyWatch(watcher);
+
+              self.events.on(`WORKER/${pluginName.toUpperCase()}/STARTED`, onStartedEvent);
+              self.events.on(`WORKER/${pluginName.toUpperCase()}/EXECUTED`, onExecuteEvent);
             }
             plugin.startWorker();
           }

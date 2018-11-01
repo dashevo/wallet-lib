@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const EventEmitter = require('events');
-const SyncWorker = require('../../src/plugins/SyncWorker');
+const SyncWorkerSyncWorker = require('../../src/plugins/Workers/SyncWorker');
 const Transporter = require('../../src/transports/Transporter');
 
 const opts = {

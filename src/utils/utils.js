@@ -1,5 +1,5 @@
 const { Script, Address } = require('@dashevo/dashcore-lib');
-const { DUFFS_PER_DASH } = require('../Constants');
+const { DUFFS_PER_DASH } = require('../CONSTANTS');
 
 function dashToDuffs(dash) {
   if (dash === undefined || dash.constructor.name !== 'Number') {

@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
-const Mnemonic = require('@dashevo/dashcore-mnemonic');
+const { Mnemonic } = require('@dashevo/dashcore-lib');
 const { Wallet } = require('../src/index');
 const { mnemonicString1, invalidMnemonicString1 } = require('./fixtures.json');
 

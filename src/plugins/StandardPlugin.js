@@ -1,10 +1,9 @@
 const _ = require('lodash');
 const { InjectionToPluginUnallowed } = require('../errors');
-const { SAFE_FUNCTIONS, SAFE_PROPERTIES } = require('../Constants').INJECTION_LISTS;
+const { SAFE_FUNCTIONS, SAFE_PROPERTIES } = require('../CONSTANTS').INJECTION_LISTS;
 
 class StandardPlugin {
   constructor(opts) {
-    console.log(opts);
     this.pluginType = _.has(opts, 'type') ? opts.type : 'Standard';
     this.dependencies = _.has(opts, 'dependencies') ? opts.dependencies : [];
     this.events = null;

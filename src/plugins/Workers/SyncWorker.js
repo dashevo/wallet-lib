@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const { Worker } = require('../');
 const { ValidTransportLayerRequired } = require('../../errors');
+const EVENTS = require('../../EVENTS');
 
 const defaultOpts = {
   fetchThreshold: 10 * 60 * 1000,
@@ -49,7 +50,7 @@ class SyncWorker extends Worker {
       }
       const { blocks } = res;
       this.storage.store.wallets[this.walletId].blockheight = blocks;
-      this.events.emit('blockheight_changed');
+      this.events.emit(EVENTS.BLOCKHEIGHT_CHANGED);
       return true;
     } catch (e) {
       if (e instanceof ValidTransportLayerRequired) {
@@ -63,10 +64,10 @@ class SyncWorker extends Worker {
     const self = this;
     const cb = async function (block) {
       self.storage.store.wallets[self.walletId].blockheight += 1;
-      self.announce('block', block);
+      self.announce(EVENTS.BLOCK, block);
     };
     if (self.transport.isValid) {
-      self.transport.subscribeToEvent('block', cb);
+      self.transport.subscribeToEvent(EVENTS.BLOCK, cb);
     }
   }
 
@@ -108,15 +109,20 @@ class SyncWorker extends Worker {
       return acc;
     }, []);
 
-    const cb = async function (tx) {
+    const getTransactionAndStore = async function (tx) {
+      console.log(tx);
       if (tx.address && tx.txid) {
+        console.log('TransactionINFO', transactionInfo);
         self.storage.addNewTxToAddress(tx, self.walletId);
         const transactionInfo = await self.transport.getTransaction(tx.txid);
+        console.log('TransactionINFO', transactionInfo);
         self.storage.importTransactions(transactionInfo);
-        self.events.emit('balance_changed');
+        console.log('TransactionINFO', transactionInfo);
+        self.events.emit(EVENTS.BALANCE_CHANGED, {delta:transactionInfo.satoshis});
+        self.events.emit(EVENTS.BALANCE_CHANGED, {delta:transactionInfo.satoshis});
       }
     };
-    await self.transport.subscribeToAddresses(subscribedAddress, cb);
+    await self.transport.subscribeToAddresses(subscribedAddress, getTransactionAndStore);
     return true;
   }
 
@@ -153,17 +159,19 @@ class SyncWorker extends Worker {
     });
 
     const responses = await Promise.all(promises);
+    // console.log(responses)
     responses.forEach((addrInfo) => {
       try {
         self.storage.updateAddress(addrInfo, self.walletId);
         if (addrInfo.balanceSat > 0) {
-          self.events.emit('balance_changed');
+          self.events.emit(EVENTS.BALANCE_CHANGED, {delta:addrInfo.balanceSat});
+          self.events.emit(EVENTS.BALANCE_CHANGED, {delta:addrInfo.balanceSat});
         }
       } catch (e) {
-        self.events.emit('ERROR', e);
+        self.events.emit(EVENTS.ERROR_UPDATE_ADDRESS, e);
       }
     });
-    this.events.emit('fetched/address');
+    this.events.emit(EVENTS.FETCHED_ADDRESS, responses);
     return true;
   }
 
@@ -212,13 +220,16 @@ class SyncWorker extends Worker {
         .then((transactionInfo) => {
           self.storage.updateTransaction(transactionInfo);
           // todo : should fire only if really changed.
-          self.events.emit('balance_changed');
+          console.log(transactionInfo)
+          self.events.emit(EVENTS.BALANCE_CHANGED, {delta:transactionInfo.satoshis});
+          self.events.emit(EVENTS.BALANCE_CHANGED, {delta:transactionInfo.satoshis});
+          self.events.emit(EVENTS.BALANCE_CHANGED, {delta:transactionInfo.satoshis});
         });
       promises.push(p);
     });
 
     await Promise.all(promises);
-    this.events.emit('fetched/transactions');
+    this.events.emit(EVENTS.FETCHED_TRANSACTIONS, promises);
     return true;
   }
 
@@ -235,9 +246,9 @@ class SyncWorker extends Worker {
 
   announce(type, el) {
     switch (type) {
-      case 'block':
-        this.events.emit('block');
-        this.events.emit('blockheight_changed');
+      case EVENTS.BLOCK:
+        this.events.emit(EVENTS.BLOCK);
+        this.events.emit(EVENTS.BLOCKHEIGHT_CHANGED);
         break;
       default:
         console.error('Not implemented, announce of ', type, el);

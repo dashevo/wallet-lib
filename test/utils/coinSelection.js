@@ -25,7 +25,7 @@ const outputs = {
   },
 };
 describe('Utils - coinSelection', () => {
-  /*it('should require a utxosList', () => {
+  /* it('should require a utxosList', () => {
     expect(() => coinSelection()).to.throw('Require a utxosList to select from');
   });
   it('should require a utxosList as an array', () => {
@@ -105,10 +105,19 @@ describe('Utils - coinSelection', () => {
       utxosValue: 2549960000,
     };
     expect(result).to.deep.equal(expectedResult);
-  });*/
+  }); */
   it('should handle a case when using more than 45 utxos', () => {
     const result = coinSelection(utxosList, [outputs.FOURTY_FIVE_DASH]);
     const expectedResult = {
+      estimatedFee: 85,
+      feeCategory: 'normal',
+      outputs: [
+        {
+          address: 'ybefxSHaEbDATvq5gVCxjV375NWus3ttV7',
+          satoshis: 4500000000,
+          scriptType: 'P2PKH',
+        },
+      ],
       utxos: [{
         address: 'yNgqjoW69ouSivtBMNFRCG5zSG85nyxW3d',
         txId: '36820d7268090d6f315eef03b28b7b2b2097c8b067608f652612a2c4612a6697',
@@ -162,6 +171,14 @@ describe('Utils - coinSelection', () => {
         amount: 4,
         satoshis: 400000000,
         height: 203313,
+      }, {
+        address: 'yMfDnWF6piqNA7mbSeEeAP4LiiqgxkJvNL',
+        txId: '96eb6c951d69a3b8703673ca0d588cf6cee528f866fc598e84205ddcc34ea100',
+        outputIndex: 0,
+        script: '76a9140eb58a39a96968c19411568752ecdecf55dabb8588ac',
+        amount: 2,
+        satoshis: 200000000,
+        height: 201738,
       },
       {
         address: 'yW5qRPWdp1NzvxPbE4v95FDCxjxNqDEi42',
@@ -180,26 +197,17 @@ describe('Utils - coinSelection', () => {
         amount: 2,
         satoshis: 200000000,
         height: 203276,
-      },
-      {
-        address: 'yMfDnWF6piqNA7mbSeEeAP4LiiqgxkJvNL',
-        txId: '96eb6c951d69a3b8703673ca0d588cf6cee528f866fc598e84205ddcc34ea100',
-        outputIndex: 0,
-        script: '76a9140eb58a39a96968c19411568752ecdecf55dabb8588ac',
-        amount: 2,
-        satoshis: 200000000,
-        height: 201738,
       }],
       utxosValue: 4549960000,
     };
     expect(result).to.deep.equal(expectedResult);
   });
-  /*it('should return an error in not any utxo has been found', () => {
+  it('should return an error in not any utxo has been found', () => {
     const utxo = utxosList[15];
     const utxos = [];
     for (let i = 0; i <= 45; i++) {
       utxos.push(utxosList[15]);
     }
     expect(() => coinSelection(utxos, [outputs.FOURTY_FIVE_DASH])).to.throw('Did not found any utxo, missing implementation of this case');
-  });*/
+  });
 });

@@ -1,12 +1,12 @@
 const _ = require('lodash');
-const DAPIClient = require('@dashevo/dapi-client');
+// const DAPIClient = require('@dashevo/dapi-client');
 const { is, hasProp } = require('../utils/index');
 const InsightClient = require('../transports/Insight/insightClient');
 
 
 const transportList = {
   insight: InsightClient,
-  dapi: DAPIClient,
+  // dapi: DAPIClient,
 };
 
 function isValidTransport(transport) {
@@ -57,6 +57,10 @@ class Transporter {
     }
   }
 
+  hasSupportFor(fnName) {
+    return typeof this.transport[fnName] === 'function';
+  }
+
   async getStatus() {
     if (typeof this.transport.getStatus === 'function') {
       const data = await this.transport
@@ -101,7 +105,7 @@ class Transporter {
   }
 
   async subscribeToAddresses(addresses, cb) {
-    if (addresses.length > 0 && _.has(this.transport, 'subscribeToAddresses')) {
+    if (addresses.length > 0 && this.hasSupportFor('subscribeToAddresses')) {
       // todo verify if valid addresses
       // if (!is.address(address)) throw new Error('Received an invalid address to fetch');
       return this.transport.subscribeToAddresses(addresses, cb);
@@ -110,7 +114,7 @@ class Transporter {
   }
 
   async subscribeToEvent(eventName, cb) {
-    if (is.string(eventName) && _.has(this.transport, 'subscribeToEvent')) {
+    if (is.string(eventName) && this.hasSupportFor('subscribeToEvent')) {
       return this.transport.subscribeToEvent(eventName, cb);
     }
     return false;

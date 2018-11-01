@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const EventEmitter = require('events');
-const BIP44Worker = require('../../src/plugins/BIP44Worker');
+const BIP44Worker = require('../../src/plugins/Workers/BIP44Worker');
 
 
 const opts = {

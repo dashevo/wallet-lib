@@ -4,8 +4,8 @@
 
 ```
 const { Wallet } = require('@dashevo/wallet-lib');
-const { DAPIClient } = require('@dashevo/dapi-client');
-const { Mnemonic } = require('@dashevo/dashcore-mnemonic');
+const DAPIClient = require('@dashevo/dapi-client');
+const { Mnemonic } = require('@dashevo/dashcore-lib');
 const localForage = require('localforage');
 
 

@@ -1,4 +1,4 @@
-const Constants = {
+const CONSTANTS = {
   BIP45: 'BIP45',
   BIP44: 'BIP44',
   DUFFS_PER_DASH: 100000000,
@@ -78,4 +78,4 @@ const Constants = {
   VERSION_BYTES: 4,
   N_LOCKTIME_BYTES: 4,
 };
-module.exports = Constants;
+module.exports = CONSTANTS;

@@ -70,8 +70,9 @@ describe('Account - Basics', function suite() {
     expect(account.mode).to.equal('full');
     expect(account.label).to.equal(null);
     expect(account.cacheTx).to.equal(true);
-    expect(account.workers).to.be.a('object');
-    expect(account.workers.bip44).to.be.a('object');
+    expect(account.plugins).to.be.a('object');
+    expect(account.plugins.workers).to.be.a('object');
+    expect(account.plugins.workers.bip44worker).to.be.a('object');
 
     wallet.disconnect();
   });
@@ -90,15 +91,18 @@ describe('Account - Basics', function suite() {
     expect(account.mode).to.equal('full');
     expect(account.label).to.equal(null);
     expect(account.cacheTx).to.equal(true);
-    expect(account.workers).to.be.a('object');
-    expect(account.workers.bip44).to.be.a('object');
+    expect(account.plugins).to.be.a('object');
+    expect(account.plugins.workers).to.be.a('object');
+    expect(account.plugins.workers.bip44worker).to.be.a('object');
     wallet.disconnect();
   });
   it('should be able to create an account with cache parameters', () => {
-    const wallet = new Wallet({
+    const walletOpts = {
       network: 'testnet',
       mnemonic: fixtures.increasetable.mnemonic,
-    });
+      injectDefaultPlugins: false,
+    };
+    const wallet = new Wallet(walletOpts);
     const account = wallet.createAccount({
       cache: {
         addresses: fixtures.increasetable.addresses.external,
@@ -113,8 +117,8 @@ describe('Account - Basics', function suite() {
     expect(account.mode).to.equal('full');
     expect(account.label).to.equal(null);
     expect(account.cacheTx).to.equal(true);
-    expect(account.workers).to.be.a('object');
-    expect(account.workers.bip44).to.be.a('object');
+    expect(account.plugins).to.be.a('object');
+    expect(account.plugins.workers).to.be.a('object');
     expect(account.getAddresses()).to.deep.equal(fixtures.increasetable.addresses.external);
     wallet.disconnect();
   });
@@ -135,8 +139,9 @@ describe('Account - Basics', function suite() {
     expect(account.mode).to.equal('full');
     expect(account.label).to.equal(null);
     expect(account.cacheTx).to.equal(true);
-    expect(account.workers).to.be.a('object');
-    expect(account.workers.bip44).to.be.a('object');
+    expect(account.plugins).to.be.a('object');
+    expect(account.plugins.workers).to.be.a('object');
+    expect(account.plugins.workers.bip44worker).to.be.a('object');
     expect(account.getTransactions()).to.deep.equal(fixtures.increasetable.transactions);
 
     wallet.disconnect();
@@ -272,6 +277,7 @@ describe('Account - Transports, Workers', function suite() {
       }
     }, 20);
   });
+
   it('should be able to derivate an address for livenet', () => {
     const account = accountFakeTransportLivenet;
     const addressData = account.getAddress(0, true);
@@ -311,7 +317,6 @@ describe('Account - Transports, Workers', function suite() {
     const internalDataKeys = Object.keys(addressesInternalData);
     expect(internalDataKeys.length).to.equal(21);
   });
-
   it('should be able to get a unused address', () => {
     const account = accountFakeTransportWithUTXO;
     const unusedAddress = account.getUnusedAddress();

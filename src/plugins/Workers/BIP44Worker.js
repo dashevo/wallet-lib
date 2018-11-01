@@ -1,5 +1,5 @@
 const { Worker } = require('../');
-const { BIP44_ADDRESS_GAP } = require('../../Constants');
+const { BIP44_ADDRESS_GAP } = require('../../CONSTANTS');
 
 class BIP44Worker extends Worker {
   constructor() {

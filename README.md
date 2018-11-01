@@ -87,7 +87,7 @@ Most of the time, here is what configuration you will be using :
 ```
 const { Wallet } = require('@dashevo/wallet-lib');
 const { DAPIClient } = require('@dashevo/dapi-client');
-const { Mnemonic } = require('@dashevo/dashcore-mnemonic');
+const { Mnemonic } = require('@dashevo/dashcore-lib');
 const localForage = require('localforage');
 
 

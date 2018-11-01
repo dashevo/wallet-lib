@@ -1,6 +1,5 @@
 const { expect } = require('chai');
-const { Networks, Address } = require('@dashevo/dashcore-lib');
-const Mnemonic = require('@dashevo/dashcore-mnemonic');
+const { Networks, Address, Mnemonic } = require('@dashevo/dashcore-lib');
 const {
   dashToDuffs,
   duffsToDash,

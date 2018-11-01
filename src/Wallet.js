@@ -20,7 +20,7 @@ const defaultOptions = {
   passphrase: null,
   injectDefaultPlugins: true,
 };
-const { WALLET_TYPES } = require('./Constants');
+const { WALLET_TYPES } = require('./CONSTANTS');
 
 
 /**
@@ -156,6 +156,10 @@ class Wallet {
   createAccount(accountOpts) {
     // if(this.accounts[])
     // Auto-populate this.accounts, probably not what we want ?
+    if (this.injectDefaultPlugins === false && !_.has(accountOpts, 'injectDefaultPlugins')) {
+    // eslint-disable-next-line
+      accountOpts.injectDefaultPlugins = this.injectDefaultPlugins;
+    }
     return new Account(this, accountOpts);
   }
 

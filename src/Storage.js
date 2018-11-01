@@ -1,4 +1,4 @@
-const { cloneDeep, merge } = require('lodash');
+const { cloneDeep, merge, has } = require('lodash');
 const { Networks } = require('@dashevo/dashcore-lib');
 const { is, hasProp } = require('./utils');
 
@@ -16,7 +16,7 @@ const mergeHelper = (initial = {}, additional = {}) => merge(initial, additional
  * Handle all the storage logic, it's a wrapper around the adapters
  * So all the needed methods should be provided by the Storage class and the access to the adapter
  * should be limited.
- */
+ * */
 class Storage {
   constructor(opts = defaultOpts) {
     this.adapter = opts.adapter;
@@ -118,37 +118,74 @@ class Storage {
     return false;
   }
 
+  updateAddressUTXO(address, utxos) {
+    if (!is.address(address)) throw new Error('Expected address to update');
+    const {
+      result, found, type, walletId,
+    } = this.searchAddress(address);
+
+    if (found === true) {
+      const el = this.store.wallets[walletId].addresses[type][result.path];
+      el.utxos = utxos;
+      const txs = el.transactions;
+
+      // Also add the transactions if not present
+      utxos.forEach((utxo) => {
+        if (!txs.includes(utxo.txId)) {
+          txs.push(utxo.txId);
+        }
+      });
+      this.recalculateBalance(address);
+      return el;
+    }
+    return false;
+  }
+
+  recalculateBalance(address) {
+    if (!is.address(address)) throw new Error('Expected address to update');
+    const {
+      result, found, type, walletId,
+    } = this.searchAddress(address);
+
+    if (found === true) {
+      const el = this.store.wallets[walletId].addresses[type][result.path];
+      el.balanceSat = el.utxos.reduce((prev, curr) => prev + curr.satoshis, 0);
+      return el;
+    }
+    return false;
+  }
+
   /**
    * Import an array of transactions or a transaction object to the store
    * @param transactions
    * @return {boolean}
-   */
+   * */
   importTransactions(transactions) {
     const type = transactions.constructor.name;
     const txList = this.store.transactions;
 
+    const addTxToListIfNotExist = (el, transactionList) => {
+      if (!el || !has(el, 'txid')) {
+        console.error('Trying to add invalid tx', el); return;
+      }
+      if (!transactionList[el.txid]) {
+        if (!is.transaction(el)) {
+          throw new Error('Can\'t import this transaction. Invalid structure.');
+        }
+        // eslint-disable-next-line no-param-reassign
+        transactionList[el.txid] = el;
+        this.lastModified = +new Date();
+      }
+    };
     if (type === 'Object') {
       if (transactions.txid) {
-        if (!txList[transactions.txid]) {
-          if (!is.transaction(transactions)) {
-            throw new Error('Can\'t import this transaction. Invalid structure.');
-          }
-          txList[transactions.txid] = transactions;
-          this.lastModified = +new Date();
-        }
+        const el = transactions;
+        addTxToListIfNotExist(el, txList);
       } else {
         const transactionsIds = Object.keys(transactions);
         transactionsIds.forEach((id) => {
           const el = transactions[id];
-          if (el.txid) {
-            if (!txList[el.txid]) {
-              if (!is.transaction(el)) {
-                throw new Error('Can\'t import this transaction. Invalid structure.');
-              }
-              txList[el.txid] = el;
-              this.lastModified = +new Date();
-            }
-          }
+          addTxToListIfNotExist(el, txList);
         });
       }
     } else if (type === 'Array') {
@@ -293,6 +330,7 @@ class Storage {
             search.type = type;
             search.found = true;
             search.result = el;
+            search.walletId = walletId;
           }
         });
       });
@@ -378,7 +416,6 @@ class Storage {
    * @return {boolean}
    */
   addNewTxToAddress(tx, walletId) {
-    // console.log('addNewTxToAddress', tx);
     if (tx.address && tx.txid) {
       const { type, path, found } = this.searchAddress(tx.address);
       if (!found) {

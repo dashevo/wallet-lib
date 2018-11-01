@@ -11,7 +11,7 @@ const is = {
   hex: h => is.string(h) && (h.match(/([0-9]|[a-f])/gim) || []).length === h.length,
   string: str => typeof str === 'string',
   bool: b => b === true || b === false,
-  obj: obj => obj && obj && obj === Object(obj),
+  obj: obj => obj === Object(obj),
   fn: fn => typeof fn === 'function',
   type(val, type) { return val && val.constructor.name === type; },
   def: val => val !== undefined,
@@ -29,8 +29,7 @@ const is = {
   transaction: tx => is.obj(tx) && tx.vin && is.arr(tx.vin) && tx.vout && is.arr(tx.vout),
   feeRate: feeRate => is.obj(feeRate) && is.string(feeRate.type) && is.int(feeRate.value),
   txid: txid => is.string(txid),
-  utxo: utxo => is.obj(utxo) && utxo.txId && is.num(utxo.outputIndex)
-    && utxo.script && is.num(utxo.satoshis),
+  utxo: utxo => is.obj(utxo) && is.txid(utxo.txId) && is.num(utxo.outputIndex) && is.num(utxo.satoshis) && is.string(utxo.scriptPubKey),
   output: output => is.obj(output) && is.num(output.satoshis) && is.address(output.address),
 };
 module.exports = is;
