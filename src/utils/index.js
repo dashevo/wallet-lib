@@ -1,3 +1,4 @@
+const { varIntSizeBytesFromLength } = require('./varInt');
 const {
   dashToDuffs, duffsToDash, getBytesOf, hasProp,
 } = require('./utils');
@@ -16,6 +17,7 @@ module.exports = {
   is,
   coinSelection,
   feeCalculation,
+  varIntSizeBytesFromLength,
   getBytesOf,
   hash,
   hash256,
