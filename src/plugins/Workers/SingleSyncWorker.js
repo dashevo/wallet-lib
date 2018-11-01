@@ -1,30 +1,29 @@
+const { Worker } = require('../');
+
 const defaultOpts = {
-  threesholdMs: 10 * 60 * 1000,
   workerIntervalTime: 1 * 10 * 1000,
 };
-class SingleSyncWorker {
+class SingleSyncWorker extends Worker {
   constructor(opts = defaultOpts) {
-    this.events = opts.events;
-    this.storage = opts.storage;
-    this.transport = opts.transport;
-    this.fetchStatus = opts.fetchStatus;
-    this.fetchAddressInfo = opts.fetchAddressInfo;
-    this.fetchTransactionInfo = opts.fetchTransactionInfo;
-    this.walletId = opts.walletId;
-    this.worker = null;
-    this.workerPass = 0;
-    this.workerRunning = false;
-    this.workerIntervalTime = (opts.workerIntervalTime)
-      ? opts.workerIntervalTime
-      : defaultOpts.workerIntervalTime;
+    const params = Object.assign({
+      executeOnStart: true,
+      firstExecutionRequired: true,
+      workerIntervalTime: defaultOpts.workerIntervalTime,
+      dependencies: [
+        'storage', 'transport', 'fetchStatus', 'fetchAddressInfo', 'fetchTransactionInfo', 'walletId'
+      ]
+    }, opts);
+    super(params);
 
-    const fetchDiff = (opts.threesholdMs) ? opts.threesholdMs : defaultOpts.threesholdMs;
-    this.fetchThreeshold = Date.now() - fetchDiff;
-
-    this.listeners = {};
+    this.listeners = {
+      addresses: [],
+    };
     this.bloomfilters = [];
   }
 
+  async execDuringStart(){
+    this.execStatusFetch();
+  }
   async execAddressFetching() {
     const self = this;
     const { addresses } = this.storage.getStore().wallets[this.walletId];
@@ -39,23 +38,6 @@ class SingleSyncWorker {
     return true;
   }
 
-  async execBlockListener() {
-    const self = this;
-    const cb = async function (block) {
-      self.storage.store.wallets[self.walletId].blockheight += 1;
-      console.log('A new block', block, self.storage.store.wallets[self.walletId].blockheight);
-      self.events.emit('blockheight_changed');
-      // if (tx.address && tx.txid) {
-      //   self.storage.addNewTxToAddress(tx, self.walletId);
-      //   const transactionInfo = await self.transport.getTransaction(tx.txid);
-      //   self.storage.importTransactions(transactionInfo);
-      //   self.events.emit('balance_changed');
-      // }
-    };
-    if (self.transport.isValid) {
-      self.transport.subscribeToEvent('block', cb);
-    }
-  }
 
   async execAddressListener() {
     const self = this;
@@ -194,32 +176,5 @@ class SingleSyncWorker {
     return true;
   }
 
-  async execInitialFetch() {
-    const res = await this.fetchStatus();
-    if (!res) {
-      return false;
-    }
-    const { blocks } = res;
-    this.storage.store.wallets[this.walletId].blockheight = blocks;
-    this.events.emit('blockheight_changed');
-    return true;
-  }
-
-  startWorker() {
-    const self = this;
-    if (this.worker) this.stopWorker();
-    this.execInitialFetch();
-    // every minutes, check the pool
-    this.worker = setInterval(self.execWorker.bind(self), this.workerIntervalTime);
-    setTimeout(self.execWorker.bind(self), 3000);
-    this.events.emit('WORKER/SINGLESYNC/STARTED');
-  }
-
-  stopWorker() {
-    clearInterval(this.worker);
-    this.worker = null;
-    this.workerPass = 0;
-    this.workerRunning = false;
-  }
 }
 module.exports = SingleSyncWorker;

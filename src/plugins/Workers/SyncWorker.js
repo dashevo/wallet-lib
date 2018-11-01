@@ -1,25 +1,25 @@
+const _ = require('lodash');
+const { Worker } = require('../');
+const { ValidTransportLayerRequired } = require('../../errors')
+
 const defaultOpts = {
-  threesholdMs: 10 * 60 * 1000,
+  fetchThreshold: 10 * 60 * 1000,
   workerIntervalTime: 1 * 10 * 1000,
 };
-class SyncWorker {
-  constructor(opts = defaultOpts) {
-    this.events = opts.events;
-    this.storage = opts.storage;
-    this.transport = opts.transport;
-    this.fetchStatus = opts.fetchStatus;
-    this.fetchAddressInfo = opts.fetchAddressInfo;
-    this.fetchTransactionInfo = opts.fetchTransactionInfo;
-    this.walletId = opts.walletId;
-    this.worker = null;
-    this.workerPass = 0;
-    this.workerRunning = false;
-    this.workerIntervalTime = (opts.workerIntervalTime)
-      ? opts.workerIntervalTime
-      : defaultOpts.workerIntervalTime;
 
-    const fetchDiff = (opts.threesholdMs) ? opts.threesholdMs : defaultOpts.threesholdMs;
-    this.fetchThreeshold = Date.now() - fetchDiff;
+class SyncWorker extends Worker {
+  constructor(opts = defaultOpts) {
+    const params = Object.assign({
+      executeOnStart: true,
+      firstExecutionRequired: true,
+      workerIntervalTime: defaultOpts.workerIntervalTime,
+      fetchThreshold: defaultOpts.fetchThreshold,
+      dependencies: [
+        'storage', 'transport', 'fetchStatus', 'fetchAddressInfo', 'fetchTransactionInfo', 'walletId', 'getBalance',
+      ],
+    }, opts);
+    super(params);
+    this.isBIP44 = _.has(opts, 'isBIP44') ? opts.isBIP44 : true;
 
     this.listeners = {
       addresses: [],
@@ -27,54 +27,43 @@ class SyncWorker {
     this.bloomfilters = [];
   }
 
-  async execAddressFetching() {
-    const self = this;
-    const { addresses } = this.storage.getStore().wallets[this.walletId];
-    const { fetchAddressInfo } = this;
+  async execDuringStart() {
+    this.execStatusFetch();
+  }
 
-    const toFetchAddresses = [];
+  async execute() {
+    // Todo : Ensure the performance impact of this.
+    // We would love to have a small perf footprint and this seems improvable.
+    await this.execBlockListener();
+    await this.execAddressFetching();
+    await this.execAddressListener();
+    await this.execTransactionsFetching();
+    await this.execAddressBloomfilter();
+  }
 
-    Object.keys(addresses).forEach((walletType) => {
-      const walletAddresses = addresses[walletType];
-      const walletPaths = Object.keys(walletAddresses);
-      if (walletPaths.length > 0) {
-        walletPaths.forEach((path) => {
-          const address = walletAddresses[path];
-          if (address.unconfirmedBalanceSat > 0 || address.fetchedLast < self.fetchThreeshold) {
-            toFetchAddresses.push(address);
-          }
-        });
+  async execStatusFetch() {
+    try{
+      const res = await this.fetchStatus();
+      if (!res) {
+        return false;
       }
-    });
-    const promises = [];
+      const { blocks } = res;
+      this.storage.store.wallets[this.walletId].blockheight = blocks;
+      this.events.emit('blockheight_changed');
+      return true;
+    }catch (e) {
+      if(typeof e === ValidTransportLayerRequired){
+        console.log('invalid');
+      }
+    }
 
-    toFetchAddresses.forEach((addressObj) => {
-      const p = fetchAddressInfo(addressObj)
-        .then((addrInfo) => {
-          self.storage.updateAddress(addrInfo, self.walletId);
-          self.events.emit('balance_changed');
-        });
-      promises.push(p);
-    });
-
-    await Promise.all(promises);
-
-    this.events.emit('fetched/address');
-    return true;
   }
 
   async execBlockListener() {
     const self = this;
     const cb = async function (block) {
       self.storage.store.wallets[self.walletId].blockheight += 1;
-      console.log('A new block', block, self.storage.store.wallets[self.walletId].blockheight);
-      self.events.emit('blockheight_changed');
-      // if (tx.address && tx.txid) {
-      //   self.storage.addNewTxToAddress(tx, self.walletId);
-      //   const transactionInfo = await self.transport.getTransaction(tx.txid);
-      //   self.storage.importTransactions(transactionInfo);
-      //   self.events.emit('balance_changed');
-      // }
+      self.announce('block', block);
     };
     if (self.transport.isValid) {
       self.transport.subscribeToEvent('block', cb);
@@ -131,6 +120,50 @@ class SyncWorker {
     return true;
   }
 
+  async execAddressFetching() {
+    const self = this;
+    const { addresses } = this.storage.getStore().wallets[this.walletId];
+    const { fetchAddressInfo } = this;
+
+    const toFetchAddresses = [];
+
+    Object.keys(addresses).forEach((walletType) => {
+      const walletAddresses = addresses[walletType];
+      const walletPaths = Object.keys(walletAddresses);
+
+      if (walletPaths.length > 0) {
+        walletPaths.forEach((path) => {
+          const address = walletAddresses[path];
+          if (address.unconfirmedBalanceSat > 0 || address.fetchedLast < Date.now() - self.fetchThreshold) {
+            toFetchAddresses.push(address);
+          }
+        });
+      }
+    });
+    const promises = [];
+
+    toFetchAddresses.forEach((addressObj) => {
+      const p = fetchAddressInfo(addressObj).catch((e)=>{
+        if(typeof e === ValidTransportLayerRequired) return false;
+      });
+      promises.push(p);
+    });
+
+    const responses = await Promise.all(promises);
+    responses.forEach((addrInfo) => {
+      try{
+        self.storage.updateAddress(addrInfo, self.walletId);
+        if (addrInfo.balanceSat > 0) {
+          self.events.emit('balance_changed');
+        }
+      } catch (e) {
+        self.events.emit(`ERROR`, e);
+      }
+    });
+    this.events.emit('fetched/address');
+    return true;
+  }
+
   async execTransactionsFetching() {
     const self = this;
     const { transactions, wallets } = this.storage.getStore();
@@ -150,21 +183,19 @@ class SyncWorker {
         walletPaths.forEach((path) => {
           const address = walletAddresses[path];
           const knownsTxId = Object.keys(transactions);
-          address.transactions.forEach((txid) => {
-            const tx = transactions[txid];
-            const txBlockheight = tx.blockheight;
+          address.transactions.forEach((txid) => {          
             // In case we have a transaction associated to an address but unknown in global level
             if (!knownsTxId.includes(txid)) {
               toFetchTransactions.push(txid);
-            } else if (txBlockheight === -1) {
+            } else if (transactions[txid].blockheight === -1) {
               toFetchTransactions.push(txid);
-            } else if (blockheight - txBlockheight < unconfirmedThreshold) {
+            } else if (blockheight - transactions[txid].blockheight < unconfirmedThreshold) {
               // When the txid is more than -1 but less than 6 conf.
-              tx.spendable = false;
-              self.storage.updateTransaction(tx);
-            } else if (tx.spendable === false) {
-              tx.spendable = false;
-              self.storage.updateTransaction(tx);
+              transactions[txid].spendable = false;
+              self.storage.updateTransaction(transactions[txid]);
+            } else if (transactions[txid].spendable === false) {
+              transactions[txid].spendable = false;
+              self.storage.updateTransaction(transactions[txid]);
             }
           });
         });
@@ -199,52 +230,15 @@ class SyncWorker {
     return true;
   }
 
-  async execWorker() {
-    if (this.workerRunning || this.workerPass > 42000) {
-      return false;
+  announce(type, el){
+    switch(type){
+      case "block":
+        console.log('block', el)
+        self.events.emit('block');
+        self.events.emit('blockheight_changed');
+        break;
+
     }
-    this.workerRunning = true;
-
-    // Todo : Ensure the performance impact of this.
-    // We would love to have a small perf footprint and this seems improvable.
-    await this.execBlockListener();
-    await this.execAddressFetching();
-    await this.execAddressListener();
-    await this.execTransactionsFetching();
-    await this.execAddressBloomfilter();
-
-    this.workerRunning = false;
-    this.workerPass += 1;
-    this.events.emit('WORKER/SYNC/EXECUTED');
-    return true;
-  }
-
-  async execInitialFetch() {
-    const res = await this.fetchStatus();
-    if (!res) {
-      return false;
-    }
-    const { blocks } = res;
-    this.storage.store.wallets[this.walletId].blockheight = blocks;
-    this.events.emit('blockheight_changed');
-    return true;
-  }
-
-  startWorker() {
-    const self = this;
-    if (this.worker) this.stopWorker();
-    this.execInitialFetch();
-    // every minutes, check the pool
-    this.worker = setInterval(self.execWorker.bind(self), this.workerIntervalTime);
-    setTimeout(self.execWorker.bind(self), 3000);
-    this.events.emit('WORKER/SYNC/STARTED');
-  }
-
-  stopWorker() {
-    clearInterval(this.worker);
-    this.worker = null;
-    this.workerPass = 0;
-    this.workerRunning = false;
   }
 }
 module.exports = SyncWorker;

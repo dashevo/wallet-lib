@@ -1,6 +1,6 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
-const SingleSyncWorker = require('./plugins/SingleSyncWorker');
+const SingleSyncWorker = require('./plugins/Workers/SingleSyncWorker');
 const _ = require('lodash');
 const {dashToDuffs,duffsToDash,coinSelection, feeCalculation, is} = require('./utils/');
 const defaultOptions = {

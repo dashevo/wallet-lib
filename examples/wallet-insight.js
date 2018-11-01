@@ -15,6 +15,11 @@ account.events.on('discovery_started', () => {
   console.log('discovery_started');
 });
 account.events.on('ready', async () => {
+  console.log('ready!');
+  const tx = await account.getTransactionHistory();
+  // console.log(tx);
+  // console.log(account.storage.store.wallets['7793436096'].addresses.external)
+
   const balance = account.getBalance();
   console.log('Balance', balance);
 

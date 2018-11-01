@@ -1,5 +1,14 @@
 const DAPIClient = require('@dashevo/dapi-client');
 const Wallet = require('../src/Wallet');
+const transport = new DAPIClient({ seeds: [{ ip: '54.191.116.37', port: 3000 }] });
+
+const startG = async () => {
+  let g = await transport.getBestBlockHeight();
+  console.log(g)
+}
+startG();
+
+
 
 const start = async () => {
   const transport = new DAPIClient({ seeds: [{ ip: '54.255.164.83', port: 3000 }] });
@@ -26,4 +35,4 @@ const start = async () => {
   const { address } = account.getUnusedAddress();
   console.log("New unused address", address);
 };
-start();
+// start();

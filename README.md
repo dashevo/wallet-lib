@@ -194,6 +194,7 @@ Miscellaneous :
 - [ ] Compatibility with old format (BIP32)
 - [ ] Paper-sweep wallet
 - [ ] Log tool to be able to help for decentralized debugging
+- [ ] [docs/plugins](Plugins.md) support (Worker, DAP)
 
 Transports :
 

@@ -1,6 +1,7 @@
 const { Wallet } = require('../index');
 
 const wallet = new Wallet();
+
 const account = wallet.getAccount(0);
 
 const start = () => {
