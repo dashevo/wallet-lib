@@ -1,31 +1,37 @@
 const { Wallet, EVENTS } = require('../index');
 
 const wallet = new Wallet({
-  // mnemonic: 'wisdom claim quote stadium input danger planet angry crucial cargo struggle medal',
-  mnemonic: 'vicious small purity purpose maze scatter library second parent lake ask boil',
+   //mnemonic: 'wisdom claim quote stadium input danger planet angry crucial cargo struggle medal',
+  //mnemonic: 'vicious small purity purpose maze scatter library second parent lake ask boil',
+  //mnemonic: 'stumble airport enact ladder replace desert wire volcano custom warrior shrug save', // Dashpay Wallet common
+  mnemonic: 'figure bridge cupboard reduce note fatal idea agent uphold media almost announce',//500 dash
   network: 'testnet',
   transport: 'insight',
 });
 
 const account = wallet.getAccount();
 
+// console.log(JSON.stringify(account.storage.getStore().wallets[wallet.walletId].addresses))
+// throw new Error();
 const start = async () => {
   console.log('ready!');
   // const txHistory = await account.getTransactionHistory();
-  // console.log('Transaction History', tx);
+  // console.log('Transaction History', txHistory);
 
-  console.log('WalletID', wallet.walletId);
-  // console.log('Store', account.storage.getStore().wallets[wallet.walletId].addresses.external[`m/44'/1'/0'/0/19`]);
+  // console.log('WalletID', wallet.walletId);
+  // console.log('TX 1', JSON.stringify(account.storage.getTransaction('56150e17895255d178eb4d3da0ccd580fdf50233a3767e1f562e05f00b48cf79')));
+  // console.log('TX 1', JSON.stringify(account.storage.getTransaction('3428f0c29370d1293b4706ffd0f8b0c84a5b7c1c217d319e5ef4722354000c6e')));
+  // console.log('Store', account.storage.getStore().wallets[wallet.walletId].addresses.external[`m/44'/1'/0'/0/1`]);
   // console.log('Store', Object.keys(account.storage.getStore().transactions));
   // console.log('Plugins', account.plugins.workers.syncworker);
 
   // console.log(account.storage.store.wallets['7793436096'].addresses.external)
   // console.log(wallet.exportWallet());
   const balance = account.getBalance();
-  console.log('Balance', balance);
+  // console.log('Balance', balance);
 
   const { address } = account.getUnusedAddress(true);
-  console.log('Send half balance a child addr:', address);
+  // console.log('Send half balance a child addr:', address);
 
   const isIs = true;
   // const amount = parseInt(balance / 2, 10);

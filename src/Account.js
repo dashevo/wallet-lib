@@ -210,7 +210,7 @@ class Account {
         const address = this.storage.store.wallets[this.walletId].addresses[type][path];
         const cleanedUtxos = [];
         address.utxos.forEach((utxo) => {
-          if (utxo.txId === affectedtxid) {
+          if (utxo.txid === affectedtxid) {
             totalSatoshis -= utxo.satoshis;
             address.balanceSat -= utxo.satoshis;
           } else {
@@ -293,6 +293,7 @@ class Account {
 
           if (!knownTx.includes(tx)) {
             const txInfo = await self.fetchTransactionInfo(tx);
+            // console.log(txInfo)
             await self.storage.importTransactions(txInfo);
           }
         });
@@ -305,7 +306,7 @@ class Account {
       utxos.forEach((utxo) => {
         parsedUtxos.push(Object.assign({}, {
           satoshis: utxo.satoshis,
-          txId: utxo.txid,
+          txid: utxo.txid,
           address: utxo.address,
           outputIndex: utxo.vout,
           scriptPubKey: utxo.scriptPubKey,
@@ -321,7 +322,7 @@ class Account {
       }
       const utxo = (balanceSat > 0) ? parseUTXO(originalUtxo) : [];
       if (utxo.length > 0) {
-        self.storage.updateAddressUTXO(addressObj.address, utxo);
+        self.storage.addUTXOToAddress(utxo, addressObj.address);
       }
     }
 
@@ -396,7 +397,7 @@ class Account {
         }
       }
       // Generate extra address when needed. BIP44 should take care of that.
-      console.error('getUnusedAddress had to generate new address.');
+      console.error('getUnusedAddress had to generate new address.', i, skipped);
     }
 
     if (skipped < skip) {
@@ -433,10 +434,10 @@ class Account {
     txs = txs.filter((item, pos, txslist) => txslist.indexOf(item) === pos);
     const p = [];
 
-    txs.forEach((txId) => {
-      const search = self.storage.searchTransaction(txId);
+    txs.forEach((txid) => {
+      const search = self.storage.searchTransaction(txid);
       if (!search.found) {
-        p.push(self.getTransaction(txId));
+        p.push(self.getTransaction(txid));
       } else {
         p.push(search.result);
       }
@@ -575,7 +576,13 @@ class Account {
         if (address.utxos) {
           if (!(onlyAvailable && address.locked)) {
             const utxo = address.utxos;
-            utxos = utxos.concat(utxo);
+            if (utxo.length > 0) {
+              const modifiedUtxo = Array.from(utxo);
+              modifiedUtxo.forEach((el) => {
+                el.address = address.address;
+              });
+              utxos = utxos.concat(modifiedUtxo);
+            }
           }
         }
       });
@@ -652,8 +659,9 @@ class Account {
     }
 
     const utxosList = this.getUTXOS();
+
     utxosList.map((utxo) => {
-      const utxoTx = self.storage.searchTransaction(utxo.txId);
+      const utxoTx = self.storage.searchTransaction(utxo.txid);
       if (utxoTx.found) {
         // eslint-disable-next-line no-param-reassign
         utxo.scriptSig = utxoTx.result.vin[0].scriptSig.hex;
@@ -711,9 +719,15 @@ class Account {
       } else if (pk.constructor.name === 'HDPrivateKey') transformedPrivateKeys.push(pk.privateKey);
       else console.log('Unexpected pk type', pk, pk.constructor.name, pk instanceof Dashcore.HDPrivateKey);
     });
-    const signedTx = this.keychain.sign(tx, transformedPrivateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
-
-    return signedTx.toString();
+    try {
+      const signedTx = this.keychain.sign(tx, transformedPrivateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
+      return signedTx.toString();
+    } catch (e) {
+      if (e.message === 'Not fully signed transaction') {
+        console.log(tx, transformedPrivateKeys);
+      }
+      return e;
+    }
   }
 
 

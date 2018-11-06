@@ -78,7 +78,7 @@ describe('Transport : Insight Client', function suite() {
     expect(addressesExternalData[path].utxos[0].address).to.equal('yiFNYQxfkDxeCBLyWtWQ9w8UGwYugERLCq');
     expect(addressesExternalData[path].utxos[0].satoshis).to.equal(5000000000);
     expect(addressesExternalData[path].utxos[0].script).to.equal('76a914f08d82224ffc020f3d7110e57c3105a5caec058f88ac');
-    expect(addressesExternalData[path].utxos[0].txId).to.equal('4ae8d1960c9a4ed83dbeaf1ad94b4a82f11c8574207144beda87113d94a31da1');
+    expect(addressesExternalData[path].utxos[0].txid).to.equal('4ae8d1960c9a4ed83dbeaf1ad94b4a82f11c8574207144beda87113d94a31da1');
     expect(addressesExternalData[path].balanceSat).to.equal(5000000000);
   });
   it('should be able to get the total balance of an account', () => {
@@ -93,35 +93,35 @@ describe('Transport : Insight Client', function suite() {
         outputIndex: 0,
         satoshis: 5000000000,
         script: '76a914f08d82224ffc020f3d7110e57c3105a5caec058f88ac',
-        txId: '4ae8d1960c9a4ed83dbeaf1ad94b4a82f11c8574207144beda87113d94a31da1',
+        txid: '4ae8d1960c9a4ed83dbeaf1ad94b4a82f11c8574207144beda87113d94a31da1',
       },
       {
         address: 'yfXQM8TaFiXFYtiFCSm3y6fRq15cj59vVK',
         outputIndex: 1,
         satoshis: 3999990000,
         script: '76a914d2ad4b21655c7e019077cdf759cd4c2a0b6682e988ac',
-        txId: '6770dee69437c6bf83a56956a04b807ef78cc62b79369b9551f935a922acbf64',
+        txid: '6770dee69437c6bf83a56956a04b807ef78cc62b79369b9551f935a922acbf64',
       },
       {
         address: 'yN3RXNVbRxA2S4gyHweT9TbFKenuGKd7fW',
         outputIndex: 0,
         satoshis: 3899970000,
         script: '76a91412e87d8a188ff29049b6a9e871018de65aa079c288ac',
-        txId: 'd928aedc4ecc6c251cabee0672c19308573e5b4898c32779f3fd211dd8a1fbd8',
+        txid: 'd928aedc4ecc6c251cabee0672c19308573e5b4898c32779f3fd211dd8a1fbd8',
       },
       {
         address: 'yMi854XzeEmAz9UczDCj9tvXeddweKc9JM',
         outputIndex: 1,
         satoshis: 899990000,
         script: '76a9140f42047f86d356426458eba372031f524af548ce88ac',
-        txId: '6c42619dd84a02577458ba4f880fe8cfaced9ed518ee7c360c5b107d6ff5b62d',
+        txid: '6c42619dd84a02577458ba4f880fe8cfaced9ed518ee7c360c5b107d6ff5b62d',
       },
       {
         address: 'ySypFbLpFTXrBbpFqRezwpdwwuaDCfrgpo',
         outputIndex: 1,
         satoshis: 419950000,
         script: '76a91449126d84886a9bfc4a2a49aa5ba9cb45c994875288ac',
-        txId: 'b42c5052d7d31a422e711d50d3754217b0b16b6dfa29cf497b3dd75afa4febcb',
+        txid: 'b42c5052d7d31a422e711d50d3754217b0b16b6dfa29cf497b3dd75afa4febcb',
       },
     ];
 

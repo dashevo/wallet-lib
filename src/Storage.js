@@ -1,6 +1,7 @@
 const { cloneDeep, merge, has } = require('lodash');
 const { Networks } = require('@dashevo/dashcore-lib');
-const { is, hasProp } = require('./utils');
+const { is, hasProp, dashToDuffs } = require('./utils');
+const { TransactionNotInStore, InvalidAddressObject, InvalidTransaction } = require('./errors');
 
 const defaultOpts = {
   rehydrate: true,
@@ -21,6 +22,7 @@ class Storage {
   constructor(opts = defaultOpts) {
     this.adapter = opts.adapter;
 
+    this.events = opts.events;
     this.store = cloneDeep(initialStore);
     this.rehydrate = (opts.rehydrate) ? opts.rehydrate : defaultOpts.rehydrate;
     this.autosave = (opts.autosave) ? opts.autosave : defaultOpts.autosave;
@@ -131,8 +133,8 @@ class Storage {
 
       // Also add the transactions if not present
       utxos.forEach((utxo) => {
-        if (!txs.includes(utxo.txId)) {
-          txs.push(utxo.txId);
+        if (!txs.includes(utxo.txid)) {
+          txs.push(utxo.txid);
         }
       });
       this.recalculateBalance(address);
@@ -155,6 +157,89 @@ class Storage {
     return false;
   }
 
+  getTransaction(txid) {
+    const { transactions } = this.store;
+    if (!transactions[txid]) throw new TransactionNotInStore(txid);
+    return this.store.transactions[txid];
+  }
+
+  addUTXOToAddress(utxo, address) {
+    if (!is.address(address)) throw new Error('Invalid address');
+    if (is.arr(utxo)) {
+      utxo.forEach((_utxo) => {
+        this.addUTXOToAddress(_utxo, address);
+      });
+    }
+    if (!is.utxo(utxo)) throw new Error('Invalid utxo');
+    const searchAddr = this.searchAddress(address);
+    if (searchAddr.found) {
+      const newAddr = Object.assign({}, searchAddr.result);
+      if (!newAddr.transactions.includes(utxo.txid)) {
+        newAddr.transactions.push(utxo.txid);
+      }
+      let utxoExist = false;
+      newAddr.utxos.forEach((_utxo) => {
+        if (_utxo.txid === utxo.txid) utxoExist = true;
+      });
+
+      if (!utxoExist) {
+        newAddr.utxos.push(utxo);
+        newAddr.used = true;
+        this.updateAddress(newAddr, searchAddr.walletId);
+        this.recalculateBalance(searchAddr.result.address);
+      }
+    }
+  }
+
+  importTransaction(transaction) {
+    const self = this;
+    if (!is.transaction(transaction)) throw new InvalidTransaction(transaction);
+    const transactionStore = this.store.transactions;
+    const transactionsIds = Object.keys(transactionStore);
+
+    if (!transactionsIds.includes[transaction.txid]) {
+      // eslint-disable-next-line no-param-reassign
+      transactionStore[transaction.txid] = transaction;
+
+      // We should now also check if it concern one of our address
+      // VIN
+      const vins = transaction.vin;
+      vins.forEach((vin) => {
+        const search = self.searchAddress(vin.addr);
+        if (search.found) {
+          const newAddr = Object.assign({}, search.result);
+          if (!newAddr.transactions.includes(transaction.txid)) {
+            newAddr.transactions.push(transaction.txid);
+            newAddr.used = true;
+            self.updateAddress(newAddr, search.walletId);
+          }
+        }
+      });
+      // VOUT
+      const vouts = transaction.vout;
+      vouts.forEach((vout) => {
+        vout.scriptPubKey.addresses.forEach((addr) => {
+          const search = self.searchAddress(addr);
+          if (search.found) {
+            const isSpent = !!vout.spentTxId;
+            if (!isSpent) {
+              const utxo = {
+                txid: transaction.txid,
+                outputIndex: vout.n,
+                satoshis: dashToDuffs(parseFloat(vout.value)),
+                scriptPubKey: vout.scriptPubKey.hex,
+              };
+              self.addUTXOToAddress(utxo, search.result.address);
+            }
+          }
+        });
+      });
+      this.lastModified = +new Date();
+    } else {
+      throw new Error('Tx already exist');
+    }
+  }
+
   /**
    * Import an array of transactions or a transaction object to the store
    * @param transactions
@@ -162,30 +247,20 @@ class Storage {
    * */
   importTransactions(transactions) {
     const type = transactions.constructor.name;
-    const txList = this.store.transactions;
+    const self = this;
 
-    const addTxToListIfNotExist = (el, transactionList) => {
-      if (!el || !has(el, 'txid')) {
-        console.error('Trying to add invalid tx', el); return;
-      }
-      if (!transactionList[el.txid]) {
-        if (!is.transaction(el)) {
-          throw new Error('Can\'t import this transaction. Invalid structure.');
-        }
-        // eslint-disable-next-line no-param-reassign
-        transactionList[el.txid] = el;
-        this.lastModified = +new Date();
-      }
-    };
     if (type === 'Object') {
       if (transactions.txid) {
-        const el = transactions;
-        addTxToListIfNotExist(el, txList);
+        const transaction = transactions;
+        self.importTransaction(transaction);
       } else {
         const transactionsIds = Object.keys(transactions);
+        if (transactionsIds.length === 0) {
+          throw new Error('Invalid transaction');
+        }
         transactionsIds.forEach((id) => {
-          const el = transactions[id];
-          addTxToListIfNotExist(el, txList);
+          const transaction = transactions[id];
+          self.importTransaction(transaction);
         });
       }
     } else if (type === 'Array') {
@@ -260,14 +335,14 @@ class Storage {
   /**
    * Update a specific address information in the store
    * It do not handle any merging right now and write over previous data.
-   * @param address
+   * @param addressObj
    * @param walletId
    * @return {boolean}
    */
-  updateAddress(address, walletId) {
+  updateAddress(addressObj, walletId) {
     if (!walletId) throw new Error('Expected walletId to update an address');
-    if (!is.address(address)) throw new Error('Invalid address provided');
-    const { path } = address;
+    if (!is.addressObj(addressObj)) throw new InvalidAddressObject(addressObj);
+    const { path } = addressObj;
     if (!path) throw new Error('Expected path to update an address');
     const typeInt = path.split('/')[4];
     let type;
@@ -282,7 +357,7 @@ class Storage {
         type = 'misc';
     }
     const addressesStore = this.store.wallets[walletId].addresses;
-    addressesStore[type][path] = address;
+    addressesStore[type][path] = addressObj;
     this.lastModified = Date.now();
     return true;
   }
@@ -432,6 +507,47 @@ class Storage {
   }
 
   /**
+   * Import one address to the store
+   * @param addressObj
+   * @param walletId
+   * @return {boolean}
+   */
+  importAddress(addressObj, walletId) {
+    if (!walletId) throw new Error('Expected walletId to import addresses');
+    if (!this.searchWallet(walletId).found) {
+      this.createWallet(walletId);
+    }
+    const addressesStore = this.store.wallets[walletId].addresses;
+    if (is.undef(walletId)) throw new Error('Expected walletId to import an address');
+    if (!is.addressObj(addressObj)) throw new InvalidAddressObject(addressObj);
+    const { path } = addressObj;
+    const modifiedAddressObject = Object.assign({}, addressObj);
+    const index = parseInt(path.split('/')[5], 10);
+    const typeInt = path.split('/')[4];
+    let type;
+    switch (typeInt) {
+      case '0':
+        type = 'external';
+        break;
+      case '1':
+        type = 'internal';
+        break;
+      default:
+        type = 'misc';
+    }
+    if (!walletId) throw new Error('Invalid walletId. Cannot import');
+    if (!modifiedAddressObject.index) modifiedAddressObject.index = index;
+    if (addressesStore[type][path]) {
+      if (addressesStore[type][path].fetchedLast < modifiedAddressObject.fetchedLast) {
+        this.updateAddress(modifiedAddressObject, walletId);
+      }
+    } else {
+      this.updateAddress(modifiedAddressObject, walletId);
+    }
+    return true;
+  }
+
+  /**
    * Import one or multiple addresses to the store
    * @param addresses
    * @param walletId
@@ -442,48 +558,16 @@ class Storage {
     if (!this.searchWallet(walletId).found) {
       this.createWallet(walletId);
     }
-    const addressesStore = this.store.wallets[walletId].addresses;
-    const self = this;
-
-    function importAddress(address, wId) {
-      const addressObj = address;
-      const { path } = addressObj;
-      if (!path) throw new Error('Expected path to import an address');
-      if (!wId) throw new Error('Expected walletId to import an address');
-      const index = path.split('/')[5];
-      const typeInt = path.split('/')[4];
-      let type;
-      switch (typeInt) {
-        case '0':
-          type = 'external';
-          break;
-        case '1':
-          type = 'internal';
-          break;
-        default:
-          type = 'misc';
-      }
-      if (!walletId) throw new Error('Invalid walletId. Cannot import');
-      if (!addressObj.index) addressObj.index = index;
-      if (addressesStore[type][path]) {
-        if (addressesStore[type][path].fetchedLast < addressObj.fetchedLast) {
-          self.updateAddress(addressObj, walletId);
-        }
-      } else {
-        addressesStore[type][path] = addressObj;
-        self.lastModified = Date.now();
-      }
-    }
     const type = addresses.constructor.name;
     if (type === 'Object') {
       if (addresses.path) {
         const address = addresses;
-        importAddress(address, walletId);
+        this.importAddress(address, walletId);
       } else {
         const addressPaths = Object.keys(addresses);
         addressPaths.forEach((path) => {
           const address = addresses[path];
-          importAddress(address, walletId);
+          this.importAddress(address, walletId);
         });
       }
     } else if (type === 'Array') {

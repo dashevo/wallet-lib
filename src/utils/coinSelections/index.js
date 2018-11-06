@@ -1,5 +1,6 @@
 const is = require('../../utils/is');
 const STRATEGIES = require('./strategies');
+const { InvalidUTXO } = require('../../errors');
 
 module.exports = function coinSelection(utxosList, outputsList, deductFee = false, feeCategory = 'normal', strategyName = 'simpleAccumulator') {
   if (!utxosList) { throw new Error('Require a utxosList to select from'); }
@@ -8,7 +9,8 @@ module.exports = function coinSelection(utxosList, outputsList, deductFee = fals
   let utxosValue = 0;
   utxosList.forEach((utxo) => {
     if (!is.utxo(utxo)) {
-      throw new Error(`Invalid utxo in utxosList ${JSON.stringify(utxo)}`);
+      console.log(utxo)
+      throw new InvalidUTXO(utxo);
     }
     utxosValue += utxo.satoshis;
   });

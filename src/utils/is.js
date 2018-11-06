@@ -26,10 +26,11 @@ const is = {
   HDPrivateKey: hdKey => is.type(hdKey, 'HDPrivateKey') || (is.string(hdKey) && HDPrivateKey.isValidSerialized(hdKey)),
   seed: seed => is.string(seed) || is.privateKey(seed) || is.HDPrivateKey(seed) || is.mnemonic(seed),
   address: addr => is.string(addr) || is.type(addr, 'Address'),
-  transaction: tx => is.obj(tx) && tx.vin && is.arr(tx.vin) && tx.vout && is.arr(tx.vout),
+  addressObj: addrObj => is.type(addrObj.address, 'Address') || (is.string(addrObj.address) && is.string(addrObj.path)),
+  transaction: tx => is.obj(tx) && is.txid(tx.txid) && tx.vin && is.arr(tx.vin) && tx.vout && is.arr(tx.vout),
   feeRate: feeRate => is.obj(feeRate) && is.string(feeRate.type) && is.int(feeRate.value),
-  txid: txid => is.string(txid),
-  utxo: utxo => is.obj(utxo) && is.txid(utxo.txId) && is.num(utxo.outputIndex) && is.num(utxo.satoshis) && is.string(utxo.scriptPubKey),
+  txid: txid => is.string(txid) && txid.length === 64,
+  utxo: utxo => is.obj(utxo) && is.txid(utxo.txid) && is.num(utxo.outputIndex) && is.num(utxo.satoshis) && is.string(utxo.scriptPubKey),
   output: output => is.obj(output) && is.num(output.satoshis) && is.address(output.address),
 };
 module.exports = is;

@@ -21,7 +21,7 @@ const calculateInputsSize = (inputs, tx) => {
     const scriptSig = new Script(_input.scriptSig);
 
     const input = Input.fromObject({
-      prevTxId: _input.txId,
+      prevTxId: _input.txid,
       output,
       outputIndex: _input.outputIndex,
       script: scriptSig,

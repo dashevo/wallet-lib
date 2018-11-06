@@ -118,8 +118,8 @@ class SyncWorker extends Worker {
         console.log('TransactionINFO', transactionInfo);
         self.storage.importTransactions(transactionInfo);
         console.log('TransactionINFO', transactionInfo);
-        self.events.emit(EVENTS.BALANCE_CHANGED, {delta:transactionInfo.satoshis});
-        self.events.emit(EVENTS.BALANCE_CHANGED, {delta:transactionInfo.satoshis});
+        self.events.emit(EVENTS.BALANCE_CHANGED, { delta: transactionInfo.satoshis });
+        self.events.emit(EVENTS.BALANCE_CHANGED, { delta: transactionInfo.satoshis });
       }
     };
     await self.transport.subscribeToAddresses(subscribedAddress, getTransactionAndStore);
@@ -162,10 +162,11 @@ class SyncWorker extends Worker {
     // console.log(responses)
     responses.forEach((addrInfo) => {
       try {
+        // eslint-disable-next-line no-param-reassign
+        if (!addrInfo.utxos) addrInfo.utxos = [];
         self.storage.updateAddress(addrInfo, self.walletId);
         if (addrInfo.balanceSat > 0) {
-          self.events.emit(EVENTS.BALANCE_CHANGED, {delta:addrInfo.balanceSat});
-          self.events.emit(EVENTS.BALANCE_CHANGED, {delta:addrInfo.balanceSat});
+          self.events.emit(EVENTS.BALANCE_CHANGED, { delta: addrInfo.balanceSat });
         }
       } catch (e) {
         self.events.emit(EVENTS.ERROR_UPDATE_ADDRESS, e);
@@ -218,12 +219,10 @@ class SyncWorker extends Worker {
     toFetchTransactions.forEach((transactionObj) => {
       const p = fetchTransactionInfo(transactionObj)
         .then((transactionInfo) => {
-          self.storage.updateTransaction(transactionInfo);
+          self.storage.importTransaction(transactionInfo);
           // todo : should fire only if really changed.
-          console.log(transactionInfo)
-          self.events.emit(EVENTS.BALANCE_CHANGED, {delta:transactionInfo.satoshis});
-          self.events.emit(EVENTS.BALANCE_CHANGED, {delta:transactionInfo.satoshis});
-          self.events.emit(EVENTS.BALANCE_CHANGED, {delta:transactionInfo.satoshis});
+          // console.log(transactionInfo)
+          // self.events.emit(EVENTS.BALANCE_CHANGED, {delta:transactionInfo.satoshis});
         });
       promises.push(p);
     });

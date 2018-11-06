@@ -333,7 +333,7 @@ describe('Account - Transports, Workers', function suite() {
         outputIndex: 0,
         satoshis: 100000000,
         script: '76a914f8c2652847720ab6d401291e5a48e2c8fe5d3c9f88ac',
-        txId: 'dd7afaadedb5f022cec6e33f1c8520aac897df152bd9f876842f3723ab9614bc',
+        txid: 'dd7afaadedb5f022cec6e33f1c8520aac897df152bd9f876842f3723ab9614bc',
       },
     ];
     expect(utxos).to.deep.equal(expectedUtxos);

@@ -1,7 +1,9 @@
+/* eslint-disable no-unused-expressions */
 const { expect } = require('chai');
 const { Networks } = require('@dashevo/dashcore-lib');
 const Storage = require('../src/Storage');
 const InMem = require('../src/adapters/InMem');
+const { TransactionNotInStore } = require('../src/errors');
 
 const adapter = new InMem();
 const storageOpts = {
@@ -9,6 +11,7 @@ const storageOpts = {
 };
 
 const miscFixture = require('./fixtures/misc');
+const figurebridgeFixture = require('./fixtures/figurebridge');
 
 describe('Storage', function suite() {
   this.timeout(50000);
@@ -43,6 +46,24 @@ describe('Storage', function suite() {
     const result = store.importTransactions(tx);
     expect(result).to.equal(true);
     expect(store.store.transactions[tx.txid]).to.deep.equal(tx);
+
+    store.stopWorker();
+  });
+
+  it('should getTransaction', () => {
+    const store = new Storage(storageOpts);
+    const tx = miscFixture['9ab39713e9ce713d41ca6974db83e57bced02402e9516b8a662ed60d5c08f6d1'];
+
+    const result = store.importTransactions(tx);
+    expect(result).to.equal(true);
+
+    expect(store.getTransaction(tx.txid)).to.deep.equal(tx);
+    store.stopWorker();
+  });
+  it('should deal with unexisting tx', () => {
+    const store = new Storage(storageOpts);
+    const tx = miscFixture['9ab39713e9ce713d41ca6974db83e57bced02402e9516b8a662ed60d5c08f6d1'];
+    expect(() => store.getTransaction(tx.txid)).to.throw(TransactionNotInStore, '9ab39713e9ce713d41ca6974db83e57bced02402e9516b8a662ed60d5c08f6d1');
     store.stopWorker();
   });
 
@@ -77,6 +98,7 @@ describe('Storage', function suite() {
       "m/44'/1'/0'/0/18": {
         address: '"yTf25xm2t4PeppBpuuGEJktQTYnCaBZ7zE"',
         balanceSat: 0,
+        index: 18,
         fetchedLast: 1533527600644,
         path: "m/44'/1'/0'/0/18",
         transactions:
@@ -86,6 +108,7 @@ describe('Storage', function suite() {
       "m/44'/1'/0'/0/19": {
         address: 'yLmv6uX1jmn14pCDpc83YCsA8wHVtcbaNw',
         balanceSat: 0,
+        index: 19,
         fetchedLast: 1533527600644,
         path: "m/44'/1'/0'/0/19",
         transactions:
@@ -95,6 +118,7 @@ describe('Storage', function suite() {
       "m/44'/1'/0'/1/0": {
         address: 'yihFsR46sPoFgs43hW652Uw9gm1QmvcWor',
         balanceSat: 0,
+        index: 0,
         fetchedLast: 1533527600689,
         path: "m/44'/1'/0'/1/0",
         transactions: [],
@@ -103,6 +127,7 @@ describe('Storage', function suite() {
       "m/44'/1'/0'/4/19": {
         address: 'misc',
         balanceSat: 0,
+        index: 19,
         fetchedLast: 1533527600644,
         path: "m/44'/1'/0'/4/19",
         transactions:
@@ -235,7 +260,7 @@ describe('Storage', function suite() {
   });
   it('should fail on import invalid address', () => {
     const store = new Storage(storageOpts);
-    const expected = 'Expected path to import an address';
+    const expected = 'Address should have property path of type string';
     expect(() => store.importAddresses({ aw: {} }, 'fad183cbf7')).to.throw(expected);
     store.stopWorker();
   });
@@ -249,13 +274,13 @@ describe('Storage', function suite() {
   });
   it('should fail on import transaction', () => {
     const store = new Storage(storageOpts);
-    const expected = 'Can\'t import this transaction. Invalid structure.';
+    const expected = 'Transaction should have property txid of type txid';
     expect(() => store.importTransactions({ aw: { txid: 'aw' } })).to.throw(expected);
     store.stopWorker();
   });
   it('should fail on update address', () => {
     const store = new Storage(storageOpts);
-    const expected = 'Expected path to update an address';
+    const expected = 'Address should have property path of type string';
     const expected2 = 'Expected walletId to update an address';
     expect(() => store.updateAddress({ aw: {} }, 'fad183cbf7')).to.throw(expected);
     expect(() => store.updateAddress({ aw: {} })).to.throw(expected2);
@@ -267,10 +292,10 @@ describe('Storage', function suite() {
     expect(() => store.updateTransaction()).to.throw(expected);
     store.stopWorker();
   });
-  it('should fail on addNewtxtoAddress', () => {
+  it('should fail on importTransactions', () => {
     const store = new Storage(storageOpts);
-    const expected = 'Invalid tx to add : tx';
-    expect(() => store.addNewTxToAddress({ aw: {} }), 'fad183cbf7').to.throw(expected);
+    const expected = 'Transaction should have property txid of type txid';
+    expect(() => store.importTransactions({ aw: {} }), 'fad183cbf7').to.throw(expected);
     store.stopWorker();
   });
   it('should not create a wallet twice', () => {
@@ -281,7 +306,44 @@ describe('Storage', function suite() {
     expect(store.createWallet(wid2)).to.equal(true);
     store.stopWorker();
   });
-  it('should', () => {
-    console.log();
+  it('should importTransaction spread new tx in address in the store', () => {
+    const store = new Storage(storageOpts);
+
+    // We add known addresses;
+    const { addresses, walletId, transactions } = figurebridgeFixture;
+    const importAddrInternal = store.importAddresses(addresses.internal, walletId);
+    const importAddrExternal = store.importAddresses(addresses.external, walletId);
+
+    // We add tx that are associated (spendings)
+    const expectedTxIds = Object.keys(transactions);
+    const expectedTx = [];
+    expectedTxIds.forEach(txid => expectedTx.push(transactions[txid]));
+
+    const result = store.importTransactions(transactions);
+    expect(result).to.equal(true);
+
+    const existingTxStore = store.store.transactions;
+    const existingTxIds = Object.keys(existingTxStore);
+    const existingTx = [];
+
+    // We use this occasion to verify that everything is good
+    existingTxIds.forEach(txid => existingTx.push(existingTxStore[txid]));
+    expect(existingTx).to.deep.equal(expectedTx);
+
+    // We check the spreading
+    const affectedExternalAddr = store.store.wallets[walletId].addresses.external['m/44\'/1\'/0\'/0/0'];
+    expect(affectedExternalAddr.address).to.be.equal('ySFxfdLGzwSM5pcr5gFF4DJ6uuNTXrKaFP');
+    expect(affectedExternalAddr.used).to.be.equal(true);
+    expect(affectedExternalAddr.transactions).to.be.deep.equal([
+      '56150e17895255d178eb4d3da0ccd580fdf50233a3767e1f562e05f00b48cf79',
+    ]);
+
+    const affectedInternalAddr = store.store.wallets[walletId].addresses.internal['m/44\'/1\'/0\'/1/0'];
+    expect(affectedInternalAddr.address).to.be.equal('yQNPm4nmJT7voxyK8W8XcNUid1hr6vWHHK');
+    expect(affectedInternalAddr.used).to.be.equal(true);
+    expect(affectedInternalAddr.utxo).to.be.deep.equal();
+    expect(affectedInternalAddr.transactions).to.be.deep.equal([
+      '56150e17895255d178eb4d3da0ccd580fdf50233a3767e1f562e05f00b48cf79',
+    ]);
   });
 });
