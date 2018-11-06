@@ -24,6 +24,7 @@ const defaultOptions = {
   mode: 'full',
   cacheTx: true,
   subscribe: true,
+  forceUnsafePlugins: false,
   plugins: [],
   injectDefaultPlugins: true,
 };
@@ -115,9 +116,10 @@ class Account {
       }
       this.injectPlugin(SyncWorker, true);
     }
+    const forceUnsafePlugins = _.has(opts, 'forceUnsafePlugins') ? opts.forceUnsafePlugins : defaultOptions.forceUnsafePlugins
     if (_.has(opts, 'plugins') && is.arr(opts.plugins)) {
       opts.plugins.forEach((plugin) => {
-        this.injectPlugin(plugin);
+        this.injectPlugin(plugin, forceUnsafePlugins);
       });
     }
 
@@ -702,9 +704,7 @@ class Account {
     //   const fee = inputs.length * FEES.NORMAL;
     //   tx.fee(fee);
     // }
-    console.log(tx.toObject())
-    tx.fee(100000);
-    console.log(tx.toObject());
+    tx.fee(estimatedFee);
     const addressList = selectedUTXOs.map(el => ((el.address)));
     const privateKeys = _.has(opts, 'privateKeys') ? opts.privateKeys : this.getPrivateKeys(addressList);
     const transformedPrivateKeys = [];
@@ -850,7 +850,7 @@ class Account {
         if (_.has(self, dependencyName)) {
           plugin.inject(dependencyName, self[dependencyName], force);
         } else if (typeof self[dependencyName] === 'function') {
-          plugin.inject(dependencyName, self[dependencyName].bind(self));
+          plugin.inject(dependencyName, self[dependencyName].bind(self), force);
         } else {
           const loweredDependencyName = dependencyName.toLowerCase();
           if (injectedPlugins.includes(loweredDependencyName)) {

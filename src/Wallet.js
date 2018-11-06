@@ -19,6 +19,7 @@ const defaultOptions = {
   plugins: [],
   passphrase: null,
   injectDefaultPlugins: true,
+  forceUnsafePlugins: false,
 };
 const { WALLET_TYPES } = require('./CONSTANTS');
 
@@ -45,6 +46,7 @@ class Wallet {
     const passphrase = _.has(opts, 'passphrase') ? opts.passphrase : defaultOptions.passphrase;
     this.passphrase = passphrase;
 
+    this.forceUnsafePlugins = _.has(opts, 'forceUnsafePlugins') ? opts.forceUnsafePlugins : defaultOptions.forceUnsafePlugins;
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
     this.injectPluginsList = opts.plugins || [];
 
@@ -159,6 +161,10 @@ class Wallet {
     if (this.injectDefaultPlugins === false && !_.has(accountOpts, 'injectDefaultPlugins')) {
     // eslint-disable-next-line
       accountOpts.injectDefaultPlugins = this.injectDefaultPlugins;
+    }
+    if (this.forceUnsafePlugins === true && !_.has(accountOpts, 'forceUnsafePlugins')) {
+    // eslint-disable-next-line
+      accountOpts.forceUnsafePlugins = this.forceUnsafePlugins;
     }
     return new Account(this, accountOpts);
   }

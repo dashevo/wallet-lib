@@ -1,8 +1,8 @@
 const StandardPlugin = require('./StandardPlugin');
 
 class DAP extends StandardPlugin {
-  constructor() {
-    super('DAP');
+  constructor(opts) {
+    super(Object.assign({ type: 'DAP' }, opts));
     this.isValid = false;
   }
 
