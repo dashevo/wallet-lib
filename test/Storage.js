@@ -345,5 +345,6 @@ describe('Storage', function suite() {
     expect(affectedInternalAddr.transactions).to.be.deep.equal([
       '56150e17895255d178eb4d3da0ccd580fdf50233a3767e1f562e05f00b48cf79',
     ]);
+    store.stopWorker();
   });
 });

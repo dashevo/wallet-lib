@@ -12,6 +12,7 @@
           "1d8f924bef2e24d945d7de2ac66e98c8625e4cefeee4e07db2ea334ce17f9c35",
           "7ae825f4ecccd1e04e6c123e0c55d236c79cd04c6ab64e839aed2ae0af3003e6"
         ],
+        "index":0,
         "unconfirmedBalanceSat": 0,
         "used": true,
         "utxos": [

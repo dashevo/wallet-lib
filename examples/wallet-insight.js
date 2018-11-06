@@ -1,4 +1,6 @@
 const { Wallet, EVENTS } = require('../index');
+const dashcore = require('@dashevo/dashcore-lib');
+
 
 const wallet = new Wallet({
    //mnemonic: 'wisdom claim quote stadium input danger planet angry crucial cargo struggle medal',
@@ -15,20 +17,20 @@ const account = wallet.getAccount();
 // throw new Error();
 const start = async () => {
   console.log('ready!');
-  // const txHistory = await account.getTransactionHistory();
+  const txHistory = await account.getTransactionHistory();
   // console.log('Transaction History', txHistory);
 
   // console.log('WalletID', wallet.walletId);
   // console.log('TX 1', JSON.stringify(account.storage.getTransaction('56150e17895255d178eb4d3da0ccd580fdf50233a3767e1f562e05f00b48cf79')));
   // console.log('TX 1', JSON.stringify(account.storage.getTransaction('3428f0c29370d1293b4706ffd0f8b0c84a5b7c1c217d319e5ef4722354000c6e')));
-  // console.log('Store', account.storage.getStore().wallets[wallet.walletId].addresses.external[`m/44'/1'/0'/0/1`]);
+  console.log('Store', account.storage.getStore().wallets[wallet.walletId].addresses.internal[`m/44'/1'/0'/1/0`]);
   // console.log('Store', Object.keys(account.storage.getStore().transactions));
   // console.log('Plugins', account.plugins.workers.syncworker);
 
   // console.log(account.storage.store.wallets['7793436096'].addresses.external)
   // console.log(wallet.exportWallet());
   const balance = account.getBalance();
-  // console.log('Balance', balance);
+  console.log('Balance', balance);
 
   const { address } = account.getUnusedAddress(true);
   // console.log('Send half balance a child addr:', address);
@@ -45,7 +47,11 @@ const start = async () => {
     isInstantSend: isIs,
   });
   console.log('Created rawtx', rawTx);
-  // const txid = await account.broadcastTransaction(rawTx, true);
+
+  // const tx = new dashcore.Transaction(rawTx);
+  // console.log(tx.toObject(), tx._estimateSize());
+
+  // const txid = await account.broadcastTransaction(rawTx, isIs);
   // console.log('Broadcasted:', txid);
 };
 account.events.on(EVENTS.BALANCE_CHANGED, (info) => { console.log('Balance Changed',info, info.delta); });
@@ -55,3 +61,4 @@ account.events.on(EVENTS.READY, () => start());
 // account.events.on(EVENTS.FETCHED_TRANSACTIONS, info => console.log(EVENTS.FETCHED_TRANSACTIONS, info));
 account.events.on(EVENTS.PREFETCHED, () => { console.log(EVENTS.PREFETCHED); });
 account.events.on(EVENTS.DISCOVERY_STARTED, () => console.log(EVENTS.PREFETCHED));
+

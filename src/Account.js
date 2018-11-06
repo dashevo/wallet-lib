@@ -135,6 +135,7 @@ class Account {
         try {
           this.storage.importTransactions(opts.cache.transactions);
         } catch (e) {
+          console.log(e);
           this.disconnect();
           throw e;
         }
@@ -154,7 +155,6 @@ class Account {
         }
       });
       if (readyWorkers === watchedWorkers.length) {
-        console.log('EMIT READY');
         self.events.emit(EVENTS.READY);
         self.isReady = true;
         clearInterval(readinessInterval);
@@ -397,7 +397,7 @@ class Account {
         }
       }
       // Generate extra address when needed. BIP44 should take care of that.
-      console.error('getUnusedAddress had to generate new address.', i, skipped);
+      console.warn('getUnusedAddress had to generate new address.', i, skipped);
     }
 
     if (skipped < skip) {
@@ -646,17 +646,9 @@ class Account {
     }
     const deductFee = _.has(opts, 'deductFee')
       ? opts.deductFee
-      : false;
+      : true;
 
     const outputs = [{ address: opts.to, satoshis }];
-
-    outputs.forEach((output) => {
-      tx.to(output.address, output.satoshis);
-    });
-
-    if (outputs[0].satoshis > this.getBalance(true)) {
-      throw new Error('Not enought fund');
-    }
 
     const utxosList = this.getUTXOS();
 
@@ -669,14 +661,17 @@ class Account {
       return utxo;
     });
 
-    const selection = coinSelection(utxosList, outputs, deductFee);
+    const feeCategory = (opts.isInstantSend) ? 'instant' : 'normal';
+    const selection = coinSelection(utxosList, outputs, deductFee, feeCategory);
     const selectedUTXOs = selection.utxos;
-    // const selectedOutputs = selection.outputs;
+    const selectedOutputs = selection.outputs;
     const {
       // feeCategory,
       estimatedFee,
-      // selectedUTXOsValue
     } = selection;
+    console.log(selection)
+
+    tx.to(selectedOutputs);
 
     // We parse our inputs, transform them into a Dashcore UTXO object.
     const inputs = selectedUTXOs.reduce((accumulator, current) => {
@@ -707,9 +702,9 @@ class Account {
     //   const fee = inputs.length * FEES.NORMAL;
     //   tx.fee(fee);
     // }
-
-    tx.fee(estimatedFee);
-
+    console.log(tx.toObject())
+    tx.fee(100000);
+    console.log(tx.toObject());
     const addressList = selectedUTXOs.map(el => ((el.address)));
     const privateKeys = _.has(opts, 'privateKeys') ? opts.privateKeys : this.getPrivateKeys(addressList);
     const transformedPrivateKeys = [];
@@ -721,6 +716,7 @@ class Account {
     });
     try {
       const signedTx = this.keychain.sign(tx, transformedPrivateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
+      // console.log(signedTx.verify())
       return signedTx.toString();
     } catch (e) {
       if (e.message === 'Not fully signed transaction') {

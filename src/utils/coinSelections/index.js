@@ -9,7 +9,6 @@ module.exports = function coinSelection(utxosList, outputsList, deductFee = fals
   let utxosValue = 0;
   utxosList.forEach((utxo) => {
     if (!is.utxo(utxo)) {
-      console.log(utxo)
       throw new InvalidUTXO(utxo);
     }
     utxosValue += utxo.satoshis;

@@ -32,7 +32,7 @@ const simplyAccumulateUtxos = (utxos, thresholdSatoshis) => {
 
  */
 const simpleAccumulator = (utxosList, outputsList, deductFee = false, feeCategory = 'normal') => {
-  const txEstimator = new TransactionEstimator();
+  const txEstimator = new TransactionEstimator(feeCategory);
 
   // We add our outputs, theses will change only in case deductfee being true
   txEstimator.addOutputs(outputsList);
@@ -48,13 +48,14 @@ const simpleAccumulator = (utxosList, outputsList, deductFee = false, feeCategor
   txEstimator.addInputs(simplyAccumulatedUtxos);
 
   const estimatedFee = txEstimator.getFeeEstimate();
-
   if (deductFee === true) {
     // Then we check that we will be able to do it
     const inValue = txEstimator.getInValue();
     const outValue = txEstimator.getOutValue();
-    if (inValue < outValue + estimatedFee) throw new Error('Not implemented, inVal<out+fee');
-    else {
+    if (inValue < outValue + estimatedFee) {
+      // We don't have enought change for fee, so we remove from outValue
+      txEstimator.reduceFeeFromOutput((outValue + estimatedFee) - inValue);
+    } else {
       // TODO : Here we can add some process to check up that we clearly have enough to deduct fee
     }
   }

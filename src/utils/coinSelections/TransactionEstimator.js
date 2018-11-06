@@ -60,11 +60,17 @@ const defaultOpts = {
   scriptType: 'P2PKH', // We only support that for now;
 };
 class TransactionEstimator {
-  constructor() {
+  constructor(feeCategory) {
     this.state = {
       outputs: [],
       inputs: [],
     };
+    this.feeCategory = feeCategory;
+  }
+
+  reduceFeeFromOutput(amoutToReduce) {
+    const output = this.state.outputs[0];
+    output.satoshis -= amoutToReduce;
   }
 
   getOutputs() {
@@ -89,7 +95,7 @@ class TransactionEstimator {
     if (inputs.length < 1) return false;
 
     const addInputs = (input) => {
-      if (!_.has(input, 'script') && !_.has(input,'scriptPubKey')) throw new Error('Expected script to add input');
+      if (!_.has(input, 'script') && !_.has(input, 'scriptPubKey')) throw new Error('Expected script to add input');
       self.state.inputs.push(input);
     };
 
@@ -121,6 +127,7 @@ class TransactionEstimator {
     size += VERSION_BYTES;
     size += calculateInputsSize(this.state.inputs, tx);
     size += calculateOutputsSize(this.state.outputs, tx);
+    size += 16;
     size += N_LOCKTIME_BYTES;
 
     return size;
@@ -140,7 +147,11 @@ class TransactionEstimator {
 
   estimateFees() {
     const bytesSize = this.getSize();
-    return (bytesSize / 1000 * FEES.NORMAL);
+    if (this.feeCategory === 'instant') {
+      const inputNb = this.getInputs().length;
+      return (inputNb * FEES.INSTANT_FEE_PER_INPUTS);
+    }
+    return (bytesSize / 1000 * FEES[this.feeCategory.toUpperCase()]);
   }
 
   debug() {

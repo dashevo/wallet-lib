@@ -112,7 +112,7 @@ class SyncWorker extends Worker {
     const getTransactionAndStore = async function (tx) {
       console.log(tx);
       if (tx.address && tx.txid) {
-        console.log('TransactionINFO', transactionInfo);
+        console.log('TransactionINFO', tx);
         self.storage.addNewTxToAddress(tx, self.walletId);
         const transactionInfo = await self.transport.getTransaction(tx.txid);
         console.log('TransactionINFO', transactionInfo);
@@ -250,7 +250,7 @@ class SyncWorker extends Worker {
         this.events.emit(EVENTS.BLOCKHEIGHT_CHANGED);
         break;
       default:
-        console.error('Not implemented, announce of ', type, el);
+        console.warn('Not implemented, announce of ', type, el);
     }
   }
 }

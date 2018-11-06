@@ -90,7 +90,7 @@ describe('Wallet', () => {
     wallet.disconnect();
   });
 
-  it('should not be able to getAddressSummary with fake transport', () => {
+  it('should not be able to getAddressSummary with fake transport', async () => {
     const network = 'testnet';
     const config = {
       seed: privateHDKey1,
@@ -107,16 +107,13 @@ describe('Wallet', () => {
     expect(wallet.transport).to.be.a('object');
     expect(wallet.transport.isValid).to.equal(false);
     expect(wallet.transport.type).to.equal('String');
-
     expect(wallet.HDPrivateKey.toString()).to.equal(privateHDKey1.toString());
-    wallet.transport.getAddressSummary('fake').then(
-      () => Promise.reject(new Error('Expected method to reject.')),
-      err => expect(err).to.be.a('Error').with.property('message', 'this.transport.getAddressSummary is not a function'),
-    );
+    const addrSum = await wallet.transport.getAddressSummary('fake');
+    expect(addrSum).to.be.equal(false);
     wallet.disconnect();
   });
 
-  it('should not be able to getAddressSummary with invalid address', () => {
+  it('should not be able to getAddressSummary with invalid address', async () => {
     const network = 'testnet';
     const config = {
       seed: privateHDKey1,
@@ -133,19 +130,12 @@ describe('Wallet', () => {
     expect(wallet.transport.isValid).to.equal(false);
     expect(wallet.transport.type).to.equal('String');
     expect(wallet.HDPrivateKey.toString()).to.equal(privateHDKey1.toString());
-    wallet.transport.getAddressSummary(123).then(
-      () => Promise.reject(new Error('Expected method to reject.')),
-      err => expect(err).to.be.a('Error').with.property('message', 'Received an invalid address to fetch'),
-    );
+    const addrSum = await wallet.transport.getAddressSummary(123);
+    expect(addrSum).to.be.equal(false);
     wallet.disconnect();
   });
 
-  it('should reject without network', () => {
-    const conf = {
-      mnemonic: mnemonic1,
-    };
-    expect(() => new Wallet(conf)).to.throw('Expected a valid network (typeof Network or String');
-  });
+
   it('should reject with invalid mnemonic: true', () => {
     const conf = {
       mnemonic: true,
@@ -319,10 +309,16 @@ describe('Wallet', () => {
             }],
             vout: [{
               value: '2.00000000',
+              scriptPubKey: {
+                hex: '76a914df128447b46f9c81edbf13494d12aabca066b65688ac', asm: 'OP_DUP OP_HASH160 df128447b46f9c81edbf13494d12aabca066b656 OP_EQUALVERIFY OP_CHECKSIG', addresses: ['ygewiYb7ZJxU4uuNGEVzbbA3wZEpEQJKhr'], type: 'pubkeyhash',
+              },
               spentTxId: '6b90bf01b10a0c6cac018d376823f6b330edf2cbb783cc3d02004f8706bbc311',
               spentIndex: 7,
             }, {
               value: '810.46609083',
+              scriptPubKey: {
+                hex: '76a914f67b2c4f47ea0a2bae829d3816a01cc486463d7988ac', asm: 'OP_DUP OP_HASH160 f67b2c4f47ea0a2bae829d3816a01cc486463d79 OP_EQUALVERIFY OP_CHECKSIG', addresses: ['yinidcHwrfzb4bEJDSq3wtQyxRAgQxsQia'], type: 'pubkeyhash',
+              },
               spentTxId: '22c368e09ad8b36553b383c6a4ae989f91d1f66622b2b685262580c8a45175a4',
               spentIndex: 0,
             }],

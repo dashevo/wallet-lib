@@ -43,6 +43,8 @@ class Wallet {
   constructor(opts = defaultOptions) {
     const network = _.has(opts, 'network') ? opts.network : defaultOptions.network;
     const passphrase = _.has(opts, 'passphrase') ? opts.passphrase : defaultOptions.passphrase;
+    this.passphrase = passphrase;
+
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
     this.injectPluginsList = opts.plugins || [];
 
@@ -61,8 +63,6 @@ class Wallet {
 
     // Notice : Most of the time, wallet id is deterministic
     this.generateNewWalletId();
-    this.passphrase = passphrase;
-
     this.adapter = (opts.adapter) ? opts.adapter : new InMem();
     this.adapter.config();
     this.storage = new Storage({

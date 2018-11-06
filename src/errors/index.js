@@ -16,9 +16,9 @@ class InjectionErrorCannotInject extends WalletLibError {}
 class InjectionErrorCannotInjectUnknownDependency extends WalletLibError {}
 class ValidTransportLayerRequired extends WalletLibError {
   constructor(method, transportInfo = {}) {
-    console.error('------- Transport -----');
-    console.error('Triggered by ', method);
-    console.error('Transport status:', transportInfo);
+    console.warn('------- Transport -----');
+    console.warn('Triggered by ', method);
+    console.warn('Transport status:', transportInfo);
     super();
   }
 }
@@ -28,7 +28,7 @@ class InvalidAddressObject extends WalletLibError {
     const getErrorMessageOf = (addressErrors) => {
       if (!is.arr(addressErrors) || addressErrors.length === 0) return false;
       const err = addressErrors[0];
-      return `Address should have property ${err[0]} of type ${err[1]}`;
+      return `Address should have property ${err[0]} of type ${err[1]} ${JSON.stringify(addressObject)}`;
     };
 
     const evaluateAddressObjectError = (addrObj) => {

@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint src/*",
     "lint:fix": "eslint . --fix",
-    "test": "nyc --check-coverage --reporter=html --reporter=text mocha test/ --recursive"
+    "test": "nyc mocha test/ --recursive"
   },
   "repository": {
     "type": "git",
