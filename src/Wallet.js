@@ -115,7 +115,7 @@ class Wallet {
     this.type = WALLET_TYPES.SINGLE_ADDRESS;
     this.mnemonic = null;
     this.privateKey = privateKey;
-    this.keychain = new KeyChain({ privateKey });
+    this.keyChain = new KeyChain({ privateKey });
   }
 
   fromSeed(seed) {
@@ -123,7 +123,7 @@ class Wallet {
     this.type = WALLET_TYPES.HDWALLET;
     this.mnemonic = null;
     this.HDPrivateKey = seed;
-    this.keychain = new KeyChain({ HDRootKey: seed });
+    this.keyChain = new KeyChain({ HDRootKey: seed });
   }
 
   fromMnemonic(mnemonic) {
@@ -134,7 +134,7 @@ class Wallet {
     this.type = WALLET_TYPES.HDWALLET;
     this.mnemonic = trimmedMnemonic; // todo : What about without this ?
     this.HDPrivateKey = mnemonicToHDPrivateKey(trimmedMnemonic, this.network, this.passphrase);
-    this.keychain = new KeyChain({ HDRootKey: this.HDPrivateKey });
+    this.keyChain = new KeyChain({ HDRootKey: this.HDPrivateKey });
   }
 
   // TODO : Add tests

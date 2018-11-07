@@ -94,7 +94,7 @@ class Account {
       }, this.walletId);
     }
 
-    this.keychain = wallet.keychain;
+    this.keyChain = wallet.keyChain;
     this.mode = (opts.mode) ? opts.mode : defaultOptions.mode;
 
     this.cacheTx = (opts.cacheTx) ? opts.cacheTx : defaultOptions.cacheTx;
@@ -261,7 +261,7 @@ class Account {
   }
 
   sign(object, privateKeys, sigType) {
-    return this.keychain.sign(object, privateKeys, sigType);
+    return this.keyChain.sign(object, privateKeys, sigType);
   }
 
   /**
@@ -517,7 +517,7 @@ class Account {
     if (!path) throw new Error('Expected path to generate an address');
     const index = path.split('/')[5];
 
-    const privateKey = this.keychain.getKeyForPath(path);
+    const privateKey = this.keyChain.getKeyForPath(path);
 
     const address = new Dashcore.Address(privateKey.publicKey.toAddress(), this.network).toString();
 
@@ -619,7 +619,7 @@ class Account {
 
     const addressList = utxos.map(el => ((el.address)));
     const privateKeys = _.has(opts, 'privateKeys') ? opts.privateKeys : this.getPrivateKeys(addressList);
-    const signedTx = this.keychain.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
+    const signedTx = this.keyChain.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
     return signedTx.toString();
   }
 
@@ -715,7 +715,7 @@ class Account {
       else console.log('Unexpected pk type', pk, pk.constructor.name, pk instanceof Dashcore.HDPrivateKey);
     });
     try {
-      const signedTx = this.keychain.sign(tx, transformedPrivateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
+      const signedTx = this.keyChain.sign(tx, transformedPrivateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
       // console.log(signedTx.verify())
       return signedTx.toString();
     } catch (e) {
@@ -747,7 +747,7 @@ class Account {
       paths.forEach((path) => {
         const address = self.store.wallets[walletId].addresses[subwallet][path];
         if (addresses.includes(address.address)) {
-          const privateKey = self.keychain.getKeyForPath(path);
+          const privateKey = self.keyChain.getKeyForPath(path);
           privKeys = privKeys.concat([privateKey]);
         }
       });
