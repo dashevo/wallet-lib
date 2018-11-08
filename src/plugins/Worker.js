@@ -27,18 +27,19 @@ class Worker extends StandardPlugin {
       : defaultOpts.workerIntervalTime;
   }
 
-  startWorker() {
+  async startWorker() {
     const self = this;
     if (this.worker) this.stopWorker();
     // every minutes, check the pool
     this.worker = setInterval(this.execWorker.bind(self), this.workerIntervalTime);
-    this.events.emit(`WORKER/${this.constructor.name.toUpperCase()}/STARTED`);
     if (this.execDuringStart) {
-      this.execDuringStart();
+      await this.execDuringStart();
     }
     if (this.executeOnStart === true) {
-      this.execWorker();
+      await this.execWorker();
     }
+    this.events.emit(`WORKER/${this.constructor.name.toUpperCase()}/STARTED`);
+
   }
 
   stopWorker() {

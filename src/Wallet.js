@@ -66,7 +66,7 @@ class Wallet {
     // Notice : Most of the time, wallet id is deterministic
     this.generateNewWalletId();
     this.adapter = (opts.adapter) ? opts.adapter : new InMem();
-    this.adapter.config();
+    if(this.adapter.config) this.adapter.config();
     this.storage = new Storage({
       adapter: this.adapter,
       walletId: this.walletId,

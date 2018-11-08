@@ -1,7 +1,9 @@
 const { cloneDeep, merge, has } = require('lodash');
 const { Networks } = require('@dashevo/dashcore-lib');
 const { is, hasProp, dashToDuffs } = require('./utils');
-const { TransactionNotInStore, InvalidAddressObject, InvalidTransaction } = require('./errors');
+const {
+  TransactionNotInStore, InvalidAddressObject, InvalidTransaction, InvalidUTXO,
+} = require('./errors');
 
 const defaultOpts = {
   rehydrate: true,
@@ -91,16 +93,21 @@ class Storage {
    */
   async rehydrateState() {
     if (this.rehydrate && this.lastRehydrate === null) {
-      const transactions = (this.adapter && hasProp(this.adapter, 'getItem'))
-        ? (await this.adapter.getItem('transactions') || this.store.transactions)
-        : this.store.transactions;
-      const wallets = (this.adapter && hasProp(this.adapter, 'getItem'))
-        ? (await this.adapter.getItem('wallets') || this.store.wallets)
-        : this.store.wallets;
+      try {
+        const transactions = (this.adapter && hasProp(this.adapter, 'getItem'))
+          ? (await this.adapter.getItem('transactions') || this.store.transactions)
+          : this.store.transactions;
+        const wallets = (this.adapter && hasProp(this.adapter, 'getItem'))
+          ? (await this.adapter.getItem('wallets') || this.store.wallets)
+          : this.store.wallets;
 
-      this.store.transactions = mergeHelper(this.store.transactions, transactions);
-      this.store.wallets = mergeHelper(this.store.wallets, wallets);
-      this.lastRehydrate = +new Date();
+        this.store.transactions = mergeHelper(this.store.transactions, transactions);
+        this.store.wallets = mergeHelper(this.store.wallets, wallets);
+        this.lastRehydrate = +new Date();
+      } catch (e) {
+        console.log('Storage rehydrateState err', e);
+        throw e;
+      }
     }
     await this.saveState();
   }
@@ -112,10 +119,15 @@ class Storage {
   async saveState() {
     if (this.autosave && this.adapter && this.adapter.setItem) {
       const self = this;
-      await this.adapter.setItem('transactions', { ...self.store.transactions });
-      await this.adapter.setItem('wallets', { ...self.store.wallets });
-      this.lastSave = +new Date();
-      return true;
+      try {
+        await this.adapter.setItem('transactions', { ...self.store.transactions });
+        await this.adapter.setItem('wallets', { ...self.store.wallets });
+        this.lastSave = +new Date();
+        return true;
+      } catch (e) {
+        console.log('Storage saveState err', e);
+        throw e;
+      }
     }
     return false;
   }
@@ -170,7 +182,7 @@ class Storage {
         this.addUTXOToAddress(_utxo, address);
       });
     }
-    if (!is.utxo(utxo)) throw new Error('Invalid utxo');
+    if (!is.utxo(utxo)) throw new InvalidUTXO(utxo);
     const searchAddr = this.searchAddress(address);
     if (searchAddr.found) {
       const newAddr = Object.assign({}, searchAddr.result);

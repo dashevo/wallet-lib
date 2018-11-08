@@ -9,13 +9,13 @@ const defaultOpts = {
   uris: {
     insight: {
       livenet: 'https://insight.dashevo.org/insight-api-dash',
-      // testnet: 'https://testnet-insight.dashevo.org/insight-api-dash',
-      testnet: 'http://localhost:3001/insight-api',
+      testnet: 'https://testnet-insight.dashevo.org/insight-api-dash',
+      // testnet: 'http://localhost:3001/insight-api',
     },
     sockets: {
       livenet: 'https://insight.dashevo.org/',
-      // testnet: 'https://testnet-insight.dashevo.org/',
-      testnet: 'http://localhost:3001/',
+      testnet: 'https://testnet-insight.dashevo.org/',
+      // testnet: 'http://localhost:3001/',
     },
   },
   network: 'testnet',
