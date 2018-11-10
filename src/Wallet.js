@@ -141,7 +141,7 @@ class Wallet {
   updateNetwork(network) {
     if (is.network(network) && network !== this.network) {
       this.network = Dashcore.Networks[network];
-      this.transport.updateNetwork(network);
+      // this.transport.updateNetwork(network);
       this.accounts.forEach((acc) => {
         acc.updateNetwork(network);
       });
@@ -184,7 +184,9 @@ class Wallet {
     if (this.type === WALLET_TYPES.SINGLE_ADDRESS) { baseOpts.privateKey = this.privateKey; }
 
     const opts = Object.assign(baseOpts, accountOpts);
-    return (acc[0]) || this.createAccount(opts);
+    const account = (acc[0]) || this.createAccount(opts);
+    this.storage.events = account.events;
+    return account;
   }
 
   /**
