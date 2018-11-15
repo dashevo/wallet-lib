@@ -19,6 +19,7 @@ describe('Storage', function suite() {
     const store = new Storage();
     expect(store).to.exist;
     expect(store.store).to.deep.equal({
+      chains: {},
       wallets: {},
       transactions: {},
     });
@@ -30,6 +31,7 @@ describe('Storage', function suite() {
     expect(store).to.exist;
     expect(store.adapter).to.deep.equal(adapter);
     expect(store.store).to.deep.equal({
+      chains: {},
       wallets: {},
       transactions: {},
     });
@@ -98,6 +100,7 @@ describe('Storage', function suite() {
       "m/44'/1'/0'/0/18": {
         address: '"yTf25xm2t4PeppBpuuGEJktQTYnCaBZ7zE"',
         balanceSat: 0,
+        unconfirmedBalanceSat: 0,
         index: 18,
         fetchedLast: 1533527600644,
         path: "m/44'/1'/0'/0/18",
@@ -108,6 +111,7 @@ describe('Storage', function suite() {
       "m/44'/1'/0'/0/19": {
         address: 'yLmv6uX1jmn14pCDpc83YCsA8wHVtcbaNw',
         balanceSat: 0,
+        unconfirmedBalanceSat: 0,
         index: 19,
         fetchedLast: 1533527600644,
         path: "m/44'/1'/0'/0/19",
@@ -118,6 +122,7 @@ describe('Storage', function suite() {
       "m/44'/1'/0'/1/0": {
         address: 'yihFsR46sPoFgs43hW652Uw9gm1QmvcWor',
         balanceSat: 0,
+        unconfirmedBalanceSat: 0,
         index: 0,
         fetchedLast: 1533527600689,
         path: "m/44'/1'/0'/1/0",
@@ -127,6 +132,7 @@ describe('Storage', function suite() {
       "m/44'/1'/0'/4/19": {
         address: 'misc',
         balanceSat: 0,
+        unconfirmedBalanceSat: 0,
         index: 19,
         fetchedLast: 1533527600644,
         path: "m/44'/1'/0'/4/19",
@@ -203,6 +209,12 @@ describe('Storage', function suite() {
     const result = store.getStore();
 
     const expectedResult = {
+      chains: {
+        testnet: {
+          blockheight: -1,
+          name: 'testnet',
+        },
+      },
       transactions: {},
       wallets: {
         fad183cbf7: {
@@ -252,6 +264,7 @@ describe('Storage', function suite() {
     const result = store.getStore();
 
     const expected = {
+      chains: {},
       transactions: {},
       wallets: {},
     };
@@ -274,7 +287,7 @@ describe('Storage', function suite() {
   });
   it('should fail on import transaction', () => {
     const store = new Storage(storageOpts);
-    const expected = 'Transaction should have property txid of type txid';
+    const expected = 'Transaction txid: aw should have property txid of type txid';
     expect(() => store.importTransactions({ aw: { txid: 'aw' } })).to.throw(expected);
     store.stopWorker();
   });
@@ -294,7 +307,7 @@ describe('Storage', function suite() {
   });
   it('should fail on importTransactions', () => {
     const store = new Storage(storageOpts);
-    const expected = 'Transaction should have property txid of type txid';
+    const expected = 'Transaction txid: unknown should have property txid of type txid';
     expect(() => store.importTransactions({ aw: {} }), 'fad183cbf7').to.throw(expected);
     store.stopWorker();
   });
