@@ -1,5 +1,6 @@
 const { utils, plugins } = require('../../src');
 const Dashcore = require('@dashevo/dashcore-lib');
+const dashPaySchema = require('./dashPaySchema.json');
 
 const coinSelection = utils.coinSelection;
 const DAP = plugins.DAP;
@@ -16,6 +17,10 @@ class DashPayDAP extends DAP {
         'keyChain',
       ],
     });
+  }
+
+  async registerSchema() {
+    return false;
   }
 
   /**

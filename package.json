@@ -29,7 +29,6 @@
     "axios": "^0.18.0",
     "localforage": "^1.7.2",
     "lodash": "^4.17.4",
-    "moment": "^2.22.2",
     "socket.io-client": "^2.0.3"
   },
   "devDependencies": {

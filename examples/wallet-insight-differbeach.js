@@ -7,7 +7,8 @@ const wallet = new Wallet({
   //mnemonic: 'vicious small purity purpose maze scatter library second parent lake ask boil',
   // mnemonic: 'stumble airport enact ladder replace desert wire volcano custom warrior shrug save', // Dashpay Wallet common
   // mnemonic: 'figure bridge cupboard reduce note fatal idea agent uphold media almost announce',//500 dash
-  mnemonic: "degree resemble there spoon tape stage chat entry tortoise narrow list awake",//Generated 7-Nov-2018
+  //mnemonic: "degree resemble there spoon tape stage chat entry tortoise narrow list awake",//Generated 7-Nov-2018
+  mnemonic: "differ beach latin proof gorilla aisle apple brain goddess crash dolphin wine",//DPW used one
   network: 'testnet',
   transport: 'insight',
 });

@@ -36,7 +36,9 @@ class WalletConsolidator extends StandardPlugin {
             return rawtx;
           },
           broadcast:async ()=>{
-            return self.broadcastTransaction(rawtx);
+            console.log('TRIED TO BROADCAST', rawtx);
+            return rawtx;
+            // return self.broadcastTransaction(rawtx);
           }
         }
       }

@@ -32,7 +32,7 @@ const startService = () => {
   // get 10 unused address
   for(let i = 0; i<10; i++){
     const skip = i;
-    addrPool.push(account.getUnusedAddress(isExternal, skip))
+    addrPool.push(account.getUnusedAddress('external', skip))
   }
   console.log("Pool of unused addr", addrPool);
 

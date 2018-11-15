@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const moment = require('moment');
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
 const SyncWorker = require('./plugins/Workers/SyncWorker');
