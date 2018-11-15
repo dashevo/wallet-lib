@@ -23,7 +23,7 @@ const startService = () => {
 
   // Generate a batch of all 200 first addreses
   const poolAddresses = [];
-  for (let i = 0; i <= 10; i += 1) {
+  for (let i = 0; i <= 200; i += 1) {
     poolAddresses.push(account.getAddress(i).address);
   }
   console.log("Pregenerated pool of addr", poolAddresses);
