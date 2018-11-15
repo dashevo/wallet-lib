@@ -1,6 +1,57 @@
 const { Worker } = require('../');
 const { BIP44_ADDRESS_GAP } = require('../../CONSTANTS');
+const is = require('../../utils/is');
 
+const isContiguousPath = (currPath, prevPath) => {
+  if (is.undef(currPath)) return false;
+  const splitedCurrPath = currPath.split('/');
+  const currIndex = parseInt(splitedCurrPath[5], 10);
+  if (is.undef(prevPath)) {
+    if (currIndex !== 0) return false;
+    return true;
+  }
+  const splitedPrevPath = prevPath.split('/');
+  const prevIndex = parseInt(splitedPrevPath[5], 10);
+  if (prevIndex !== currIndex - 1) return false;
+  return true;
+};
+const getMissingIndexes = (paths, fromOrigin = true) => {
+  if (!is.arr(paths)) return false;
+
+  let sortedIndexes = [];
+
+  paths.forEach((path) => {
+    const splitedPath = path.split('/');
+    const index = parseInt(splitedPath[5], 10);
+    sortedIndexes.push(index);
+  });
+
+  sortedIndexes = sortedIndexes.sort((a, b) => a - b);
+
+  let missingIndex = sortedIndexes.reduce((acc, cur, ind, arr) => {
+    const diff = cur - arr[ind - 1];
+    if (diff > 1) {
+      let i = 1;
+      while (i < diff) {
+        acc.push(arr[ind - 1] + i);
+        i += 1;
+      }
+    }
+    return acc;
+  }, []);
+
+  // Will fix missing index before our first known indexes
+  if (fromOrigin) {
+    if (sortedIndexes[0] > 0) {
+      for (let i = sortedIndexes[0] - 1; i >= 0; i -= 1) {
+        missingIndex.push(i);
+      }
+    }
+  }
+
+  missingIndex = missingIndex.sort((a, b) => a - b);
+  return missingIndex;
+};
 class BIP44Worker extends Worker {
   constructor() {
     super({
@@ -12,59 +63,55 @@ class BIP44Worker extends Worker {
     });
   }
 
-  execute() {
-    const { addresses } = this.storage.store.wallets[this.walletId];
-    const externalPaths = Object.keys(addresses.external);
-    let externalUnused = 0;
+  ensureEnoughAddress() {
+    let unusedAddress = 0;
+    const addresses = this.storage.getStore().wallets[this.walletId].addresses.external;
+    let addressesPaths = Object.keys(addresses);
 
-    externalPaths.forEach((path) => {
-      const el = addresses.external[path];
-      if (el.transactions.length === 0) {
-        externalUnused += 1;
-      }
+    let prevPath;
+
+    // Ensure that all our above paths are contiguous
+    const missingIndexes = getMissingIndexes(addressesPaths);
+
+    missingIndexes.forEach((index) => {
+      this.getAddress(index, 'external');
+      this.getAddress(index, 'internal');
     });
 
-    let externalMissingNb = 0;
-    if (BIP44_ADDRESS_GAP > externalUnused) {
-      externalMissingNb = BIP44_ADDRESS_GAP - externalUnused;
-      const { external } = this.storage.store.wallets[this.walletId].addresses;
-      const addressKeys = Object.keys(external);
-      // console.log(addressKeys)
-      const lastElem = external[addressKeys[addressKeys.length - 1]];
-      // console.log(BIP44_ADDRESS_GAP, externalUnused, lastElem, addressKeys)
+    addressesPaths = Object
+      .keys(this.storage.getStore().wallets[this.walletId].addresses.external)
+      .sort((a, b) => parseInt(a.split('/')[5], 10) - parseInt(b.split('/')[5], 10));
 
-      const addressIndex = (!lastElem) ? -1 : parseInt(lastElem.index, 10);
+    // Scan already generated addresse and count how many are unused
+    addressesPaths.forEach((path) => {
+      const el = addresses[path];
+      if (!el.used && el.transactions.length > 0) {
+        throw new Error(`Conflicting information ${JSON.stringify(el)}`);
+      }
+      if (!el.used) unusedAddress += 1;
+      if (!isContiguousPath(path, prevPath)) {
+        throw new Error('Should be contiguous');
+      }
+      prevPath = path;
+    });
 
-      for (let i = addressIndex + 1; i < addressIndex + 1 + externalMissingNb; i += 1) {
-        this.getAddress(i);
-        this.getAddress(i, false);
+    const addressToGenerate = BIP44_ADDRESS_GAP - unusedAddress;
+    if (addressToGenerate > 0) {
+      const lastElem = addresses[addressesPaths[addressesPaths.length - 1]];
+      const index = (is.def(lastElem)) ? lastElem.index + 1 : 0;
+      for (let i = index; i <= addressToGenerate; i += 1) {
+        this.getAddress(i, 'external');
+        this.getAddress(i, 'internal');
       }
     }
-
-    // Work as a verifier, will check that index are contiguous or create them
-    const nonContinuousIndexes = this.getNonContinuousIndexes();
-    nonContinuousIndexes.forEach((index) => {
-      this.getAddress(index);
-      this.getAddress(index, false);
-    });
+    return true;
   }
 
-  getNonContinuousIndexes(type = 'external') {
-    const nonContinuousIndexes = [];
-    const addresses = this.storage.getStore().wallets[this.walletId].addresses[type];
-    const paths = Object.keys(addresses);
-    if (paths.length > 0) {
-      const basePath = paths[0].substring(0, paths[0].length - paths[0].split('/')[5].length);
-      const totalNbAddresses = paths.length;
-      for (let i = 0, foundAddresses = 0; i < 100 && foundAddresses < totalNbAddresses; i += 1) {
-        const path = `${basePath}${i}`;
-        if (!addresses[path]) {
-          nonContinuousIndexes.push(i);
-        }
-        foundAddresses += 1;
-      }
-    }
-    return nonContinuousIndexes;
+  execute() {
+    // Following BIP44 Account Discovery section, we will scan the external chain of this account.
+    // We do not need to scan the internal as it's linked to external's one
+    // So we just seek for 1:1 internal of external.
+    this.ensureEnoughAddress();
   }
 }
 module.exports = BIP44Worker;

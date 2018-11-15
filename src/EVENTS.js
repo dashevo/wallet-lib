@@ -1,5 +1,6 @@
 module.exports = {
   PREFETCHED: 'prefetched',
+  CREATED: 'created',
   STARTED: 'started',
   READY: 'ready',
   BALANCE_CHANGED: 'balance_changed',
@@ -9,4 +10,5 @@ module.exports = {
   FETCHED_ADDRESS: 'FETCHED/ADDRESS',
   ERROR_UPDATE_ADDRESS: 'ERROR/UPDATE_ADDRESS',
   FETCHED_TRANSACTIONS: 'FETCHED/TRANSACTIONS',
+  GENERATED_ADDRESS: 'GENERATED_ADDRESS',
 };

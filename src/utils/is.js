@@ -4,7 +4,7 @@ const { PrivateKey, HDPrivateKey } = require('@dashevo/dashcore-lib');
 
 const is = {
   // Primitives
-  arr: arr => Array.isArray(arr) || arr.constructor.name === 'Array',
+  arr: arr => is.def(arr) && (Array.isArray(arr) || arr.constructor.name === 'Array'),
   num: num => !Number.isNaN(num) && typeof num === 'number',
   float: (float => is.num(float) && Math.floor(float) !== float),
   int: int => Number.isInteger(int) || (is.num(int) && Math.floor(int) === int),
@@ -33,4 +33,7 @@ const is = {
   utxo: utxo => is.obj(utxo) && is.txid(utxo.txid) && is.num(utxo.outputIndex) && is.num(utxo.satoshis) && is.string(utxo.scriptPubKey),
   output: output => is.obj(output) && is.num(output.satoshis) && is.address(output.address),
 };
+// aliases
+is.array = is.arr;
+
 module.exports = is;

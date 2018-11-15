@@ -1,7 +1,9 @@
 const _ = require('lodash');
+const moment = require('moment');
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
 const SyncWorker = require('./plugins/Workers/SyncWorker');
+const ChainWorker = require('./plugins/Workers/ChainWorker');
 const BIP44Worker = require('./plugins/Workers/BIP44Worker');
 const {
   BIP44_LIVENET_ROOT_PATH, BIP44_TESTNET_ROOT_PATH, FEES, WALLET_TYPES,
@@ -17,6 +19,7 @@ const {
   InjectionErrorCannotInject,
   InjectionErrorCannotInjectUnknownDependency,
   ValidTransportLayerRequired,
+  CreateTransactionError,
 } = require('./errors');
 
 const defaultOptions = {
@@ -59,6 +62,7 @@ class Account {
     this.events = new EventEmitter();
     this.isReady = false;
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
+    this.forceUnsafePlugins = _.has(opts, 'forceUnsafePlugins') ? opts.forceUnsafePlugins : defaultOptions.forceUnsafePlugins;
 
     this.type = wallet.type;
 
@@ -98,11 +102,6 @@ class Account {
     this.mode = (opts.mode) ? opts.mode : defaultOptions.mode;
 
     this.cacheTx = (opts.cacheTx) ? opts.cacheTx : defaultOptions.cacheTx;
-    this.plugins = wallet.plugins;
-    Object.keys(this.plugins).forEach((pluginName) => {
-      const item = this.plugins[pluginName];
-      if (item.init) item.init(this);
-    });
 
     this.plugins = {
       workers: {},
@@ -110,18 +109,6 @@ class Account {
       standard: {},
       watchers: {},
     };
-    if (this.injectDefaultPlugins) {
-      if (this.type === WALLET_TYPES.HDWALLET) {
-        this.injectPlugin(BIP44Worker, true);
-      }
-      this.injectPlugin(SyncWorker, true);
-    }
-    const forceUnsafePlugins = _.has(opts, 'forceUnsafePlugins') ? opts.forceUnsafePlugins : defaultOptions.forceUnsafePlugins
-    if (_.has(opts, 'plugins') && is.arr(opts.plugins)) {
-      opts.plugins.forEach((plugin) => {
-        this.injectPlugin(plugin, forceUnsafePlugins);
-      });
-    }
 
     // Handle import of cache
     if (opts.cache) {
@@ -144,11 +131,39 @@ class Account {
       }
     }
 
-    const self = this;
-    self.events.emit(EVENTS.STARTED);
+    this.events.emit(EVENTS.CREATED);
     addAccountToWallet(this, wallet);
 
-    const readinessInterval = setInterval(() => {
+
+    this.initialize(wallet.plugins);
+  }
+
+  async initialize(userUnsafePlugins) {
+    const self = this;
+
+    if (this.injectDefaultPlugins) {
+      // TODO: Should check in other accounts if a similar is setup already
+      // TODO: We want to sort them by dependencies and deal with the await this way
+      // await parent if child has it in dependency
+      // if not, then is it marked as requiring a first exec
+      // if yes add to watcher list.
+      this.injectPlugin(ChainWorker, true);
+
+      if (this.type === WALLET_TYPES.HDWALLET) {
+        // Ideally we should move out from worker to event based
+        this.injectPlugin(BIP44Worker, true);
+      }
+      if (this.type === WALLET_TYPES.SINGLE_ADDRESS) {
+        this.getAddress('0'); // We force what is usually done by the BIP44Worker.
+      }
+      this.injectPlugin(SyncWorker, true);
+    }
+
+    _.each(userUnsafePlugins, (UnsafePlugin) => {
+      this.injectPlugin(UnsafePlugin, this.forceUnsafePlugins);
+    });
+
+    this.readinessInterval = setInterval(() => {
       const watchedWorkers = Object.keys(this.plugins.watchers);
       let readyWorkers = 0;
       watchedWorkers.forEach((workerName) => {
@@ -159,9 +174,10 @@ class Account {
       if (readyWorkers === watchedWorkers.length) {
         self.events.emit(EVENTS.READY);
         self.isReady = true;
-        clearInterval(readinessInterval);
+        clearInterval(self.readinessInterval);
       }
     }, 600);
+    self.events.emit(EVENTS.STARTED);
   }
 
   getPlugin(pluginName) {
@@ -256,8 +272,14 @@ class Account {
   }
 
   async fetchStatus() {
-    if (!this.transport.isValid) throw new ValidTransportLayerRequired('status');
-    return (this.transport) ? this.transport.getStatus() : false;
+    if (!this.transport.isValid) throw new ValidTransportLayerRequired('fetchStatus');
+    const status = { blocks: -1 };
+
+    const getStatus = await this.transport.getStatus();
+    if (getStatus !== false) return getStatus;
+    status.blocks = await this.transport.getBestBlockHeight();
+
+    return status;
   }
 
   sign(object, privateKeys, sigType) {
@@ -271,37 +293,6 @@ class Account {
    * @return {Promise<addrInfo>}
    */
   async fetchAddressInfo(addressObj, fetchUtxo = true) {
-    if (!this.transport.isValid) throw new ValidTransportLayerRequired('fetchAddressInfo');
-    const self = this;
-    const { address, path } = addressObj;
-    const {
-      balanceSat, unconfirmedBalanceSat, transactions,
-    } = await this.transport.getAddressSummary(address);
-
-    const addrInfo = {
-      address,
-      path,
-      balanceSat,
-      unconfirmedBalanceSat,
-      transactions,
-      fetchedLast: +new Date(),
-    };
-    addrInfo.used = (transactions.length > 0);
-    if (transactions.length > 0) {
-      // If we have cacheTx, then we will check if we know this transactions
-      if (self.cacheTx) {
-        transactions.forEach(async (tx) => {
-          const knownTx = Object.keys(self.store.transactions);
-
-          if (!knownTx.includes(tx)) {
-            const txInfo = await self.fetchTransactionInfo(tx);
-            // console.log(txInfo)
-            await self.storage.importTransactions(txInfo);
-          }
-        });
-      }
-    }
-
     // We do not need to fetch UTXO if we don't have any money there :)
     function parseUTXO(utxos) {
       const parsedUtxos = [];
@@ -312,23 +303,67 @@ class Account {
           address: utxo.address,
           outputIndex: utxo.vout,
           scriptPubKey: utxo.scriptPubKey,
-          scriptSig: utxo.scriptSig,
+          // scriptSig: utxo.scriptSig,
         }));
       });
       return parsedUtxos;
     }
 
-    if (fetchUtxo) {
-      const originalUtxo = (await self.transport.getUTXO(address));
-      if (originalUtxo.length > 0) {
-      }
-      const utxo = (balanceSat > 0) ? parseUTXO(originalUtxo) : [];
-      if (utxo.length > 0) {
-        self.storage.addUTXOToAddress(utxo, addressObj.address);
-      }
-    }
+    if (!this.transport.isValid) throw new ValidTransportLayerRequired('fetchAddressInfo');
+    const self = this;
+    const { address, path } = addressObj;
 
-    return addrInfo;
+    try {
+      const addrSum = await this.transport.getAddressSummary(address);
+      if (!addrSum) return false;
+      const {
+        balanceSat, unconfirmedBalanceSat, transactions,
+      } = addrSum;
+
+      if (is.undef(balanceSat)
+        || is.undef(unconfirmedBalanceSat)
+        || !is.arr(transactions)) {
+        return false;
+      }
+
+      const addrInfo = {
+        address,
+        path,
+        balanceSat,
+        unconfirmedBalanceSat,
+        transactions,
+        fetchedLast: +new Date(),
+      };
+      addrInfo.used = (transactions.length > 0);
+      if (transactions.length > 0) {
+        // If we have cacheTx, then we will check if we know this transactions
+        if (self.cacheTx) {
+          transactions.forEach(async (tx) => {
+            const knownTx = Object.keys(self.store.transactions);
+
+            if (!knownTx.includes(tx)) {
+              const txInfo = await self.fetchTransactionInfo(tx);
+              // console.log(txInfo)
+              await self.storage.importTransactions(txInfo);
+            }
+          });
+        }
+      }
+      if (fetchUtxo) {
+        const originalUtxo = (await self.transport.getUTXO(address));
+        const utxos = (balanceSat > 0) ? parseUTXO(originalUtxo) : [];
+        if (utxos.length > 0) {
+          utxos.forEach((utxo) => {
+            self.storage.addUTXOToAddress(utxo, addressObj.address);
+          });
+        }
+      }
+
+      return addrInfo;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
   }
 
   /**
@@ -341,55 +376,64 @@ class Account {
 
   /**
    * Get all the addresses from the store from a given type
-   * @param external - Default: true, return either external or internal type addresses
+   * @param type - default: external - Type of the address (external, internal, misc)
    * @return {Object} address - All address matching the type
    */
-  getAddresses(external = true) {
-    const type = (external) ? 'external' : 'internal';
+  getAddresses(_type = 'external') {
+    const type = (this.type === WALLET_TYPES.SINGLE_ADDRESS)
+      ? 'misc'
+      : ((_type) || 'external');
+
     return this.store.wallets[this.walletId].addresses[type];
   }
 
   /**
    * Get a specific addresss based on the index and type of address.
    * @param index - The index on the type
-   * @param external - Type of the address (external, internal,...)
+   * @param type - default: external - Type of the address (external, internal, misc)
    * @return <AddressInfo>
    */
-  getAddress(index = 0, external = true) {
-  // eslint-disable-next-line no-nested-ternary
+  getAddress(index = 0, _type = 'external') {
+    // eslint-disable-next-line no-nested-ternary
+    // console.log(index, _type)
     const type = (this.type === WALLET_TYPES.SINGLE_ADDRESS)
       ? 'misc'
-      : ((external) ? 'external' : 'internal');
+      : ((_type) || 'external');
 
     // eslint-disable-next-line no-nested-ternary
     const path = (type === 'misc')
       ? '0'
-      : ((external === true) ? `${this.BIP44PATH}/0/${index}` : `${this.BIP44PATH}/1/${index}`);
+      : ((_type === 'external') ? `${this.BIP44PATH}/0/${index}` : `${this.BIP44PATH}/1/${index}`);
 
     const { wallets } = this.storage.getStore();
     const addressType = wallets[this.walletId].addresses[type];
+    // console.log(type, path)
+    // console.log(addressType, path)
     return (addressType[path]) ? addressType[path] : this.generateAddress(path);
   }
 
   /**
    * Get an unused address from the store
-   * @param external - (default: true) - Type of the requested usused address
+   * @param type - (default: 'external') - Type of the requested usused address
    * @param skip
    * @return {*}
    */
-  getUnusedAddress(external = true, skip = 0) {
-    const type = (external) ? 'external' : 'internal';
+  getUnusedAddress(type = 'external', skip = 0) {
     let unused = {
       address: '',
     };
-    const skipped = 0;
+    let skipped = 0;
     const { walletId } = this;
+
     const keys = Object.keys(this.store.wallets[walletId].addresses[type]);
 
-
-    for (let i = 0, skipped = 0; i < keys.length; i++) {
+    for (let i = 0; i < keys.length; i += 1) {
       const key = keys[i];
       const el = (this.store.wallets[walletId].addresses[type][key]);
+
+      if (!el || !el.address || el.address === '') {
+        console.warn('getUnusedAddress received an empty one.', el, i, skipped);
+      }
       unused = el;
       if (el.used === false) {
         if (skipped < skip) {
@@ -398,15 +442,13 @@ class Account {
           break;
         }
       }
-      // Generate extra address when needed. BIP44 should take care of that.
-      console.warn('getUnusedAddress had to generate new address.', i, skipped);
     }
 
     if (skipped < skip) {
       unused = this.getAddress(skipped);
     }
     if (unused.address === '') {
-      return this.getAddress(0, external);
+      return this.getAddress(0, type);
     }
     return unused;
   }
@@ -498,14 +540,19 @@ class Account {
     return history;
   }
 
-  /**
-   * Use the transport layer to fetch a specific transaction matchin a txid
-   * @param txid
-   * @return {Promise<*>}
-   */
+
   async getTransaction(txid = null) {
-    const self = this;
-    return (txid !== null && self.transport) ? (self.transport.getTransaction(txid)) : [];
+    const search = await this.storage.searchTransaction(txid);
+    if (search.found) {
+      return search.result;
+    }
+    const tx = await this.fetchTransactionInfo(txid);
+    try {
+      await this.storage.importTransactions(tx);
+    } catch (e) {
+      console.error(e);
+    }
+    return tx;
   }
 
   /**
@@ -515,10 +562,12 @@ class Account {
    * */
   generateAddress(path) {
     if (!path) throw new Error('Expected path to generate an address');
-    const index = path.split('/')[5];
-
+    let index = 0;
+    if (this.type === WALLET_TYPES.HDWALLET) {
+      // eslint-disable-next-line prefer-destructuring
+      index = path.split('/')[5];
+    }
     const privateKey = this.keyChain.getKeyForPath(path);
-
     const address = new Dashcore.Address(privateKey.publicKey.toAddress(), this.network).toString();
 
     const addressData = {
@@ -534,6 +583,8 @@ class Account {
       used: false,
     };
     this.storage.importAddresses(addressData, this.walletId);
+    this.events.emit(EVENTS.GENERATED_ADDRESS, path);
+    // console.log('gen', address,path)
     return addressData;
   }
 
@@ -581,6 +632,7 @@ class Account {
             if (utxo.length > 0) {
               const modifiedUtxo = Array.from(utxo);
               modifiedUtxo.forEach((el) => {
+                // eslint-disable-next-line no-param-reassign
                 el.address = address.address;
               });
               utxos = utxos.concat(modifiedUtxo);
@@ -618,7 +670,9 @@ class Account {
     tx.fee(FEES.DEFAULT_FEE);
 
     const addressList = utxos.map(el => ((el.address)));
-    const privateKeys = _.has(opts, 'privateKeys') ? opts.privateKeys : this.getPrivateKeys(addressList);
+    const privateKeys = _.has(opts, 'privateKeys')
+      ? opts.privateKeys
+      : this.getPrivateKeys(addressList);
     const signedTx = this.keyChain.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
     return signedTx.toString();
   }
@@ -658,20 +712,26 @@ class Account {
       const utxoTx = self.storage.searchTransaction(utxo.txid);
       if (utxoTx.found) {
         // eslint-disable-next-line no-param-reassign
-        utxo.scriptSig = utxoTx.result.vin[0].scriptSig.hex;
+        // console.log(utxoTx.result.vin);
+        // utxo.scriptSig = utxoTx.result.vin[0].scriptSig.hex;
       }
       return utxo;
     });
 
     const feeCategory = (opts.isInstantSend) ? 'instant' : 'normal';
-    const selection = coinSelection(utxosList, outputs, deductFee, feeCategory);
+    let selection;
+    try {
+      selection = coinSelection(utxosList, outputs, deductFee, feeCategory);
+    } catch (e) {
+      throw new CreateTransactionError(e);
+    }
+
     const selectedUTXOs = selection.utxos;
     const selectedOutputs = selection.outputs;
     const {
       // feeCategory,
       estimatedFee,
     } = selection;
-    console.log(selection)
 
     tx.to(selectedOutputs);
 
@@ -688,7 +748,7 @@ class Account {
     tx.from(inputs);
 
     // In case or excessive fund, we will get that to an address in our possession
-    const addressChange = this.getUnusedAddress(false, 1).address;
+    const addressChange = this.getUnusedAddress('internal', 1).address;
     tx.change(addressChange);
 
 
@@ -705,23 +765,30 @@ class Account {
     //   tx.fee(fee);
     // }
     tx.fee(estimatedFee);
+    console.log('fee', estimatedFee);
     const addressList = selectedUTXOs.map(el => ((el.address)));
-    const privateKeys = _.has(opts, 'privateKeys') ? opts.privateKeys : this.getPrivateKeys(addressList);
+    const privateKeys = _.has(opts, 'privateKeys')
+      ? opts.privateKeys
+      : this.getPrivateKeys(addressList);
     const transformedPrivateKeys = [];
     privateKeys.forEach((pk) => {
       if (pk.constructor.name === 'PrivateKey') {
         transformedPrivateKeys.push(pk);
       } else if (pk.constructor.name === 'HDPrivateKey') transformedPrivateKeys.push(pk.privateKey);
-      else console.log('Unexpected pk type', pk, pk.constructor.name, pk instanceof Dashcore.HDPrivateKey);
+      else {
+        console.log('Unexpected pk type', pk, pk.constructor.name);
+      }
     });
     try {
-      const signedTx = this.keyChain.sign(tx, transformedPrivateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
+      const signedTx = this.keyChain.sign(
+        tx,
+        transformedPrivateKeys,
+        Dashcore.crypto.Signature.SIGHASH_ALL,
+      );
       // console.log(signedTx.verify())
       return signedTx.toString();
     } catch (e) {
-      if (e.message === 'Not fully signed transaction') {
-        console.log(tx, transformedPrivateKeys);
-      }
+      // if (e.message === 'Not fully signed transaction') {}
       return e;
     }
   }
@@ -792,9 +859,10 @@ class Account {
    * @return {Boolean}
    */
   disconnect() {
-    if (this.transport.isValid) {
+    if (this.transport.isValid && this.transport.disconnect) {
       this.transport.disconnect();
     }
+
     if (this.plugins.workers) {
       const workersKey = Object.keys(this.plugins.workers);
       workersKey.forEach((key) => {
@@ -804,6 +872,9 @@ class Account {
     if (this.storage) {
       this.storage.saveState();
       this.storage.stopWorker();
+    }
+    if (this.readinessInterval) {
+      clearInterval(this.readinessInterval);
     }
     return true;
   }
@@ -830,7 +901,7 @@ class Account {
 
   async injectPlugin(UnsafePlugin, force = false) {
     const self = this;
-    return new Promise((res, rej) => {
+    return new Promise(async (res, rej) => {
       const isInit = !(typeof UnsafePlugin === 'function');
       const plugin = (isInit) ? UnsafePlugin : new UnsafePlugin();
       if (_.isEmpty(plugin)) rej(new InjectionErrorCannotInject('Empty plugin'));
@@ -862,6 +933,7 @@ class Account {
       });
       switch (pluginType) {
         case 'Worker':
+          self.plugins.workers[pluginName] = plugin;
           if (plugin.executeOnStart === true) {
             if (plugin.firstExecutionRequired === true) {
               const watcher = {
@@ -870,9 +942,10 @@ class Account {
               };
               self.plugins.watchers[pluginName] = watcher;
 
-
-              const startWatcher = watcher => watcher.started = true;
-              const setReadyWatch = watcher => watcher.ready = true;
+              // eslint-disable-next-line no-return-assign,no-param-reassign
+              const startWatcher = _watcher => _watcher.started = true;
+              // eslint-disable-next-line no-return-assign,no-param-reassign
+              const setReadyWatch = _watcher => _watcher.ready = true;
 
               const onStartedEvent = () => startWatcher(watcher);
               const onExecuteEvent = () => setReadyWatch(watcher);
@@ -880,9 +953,8 @@ class Account {
               self.events.on(`WORKER/${pluginName.toUpperCase()}/STARTED`, onStartedEvent);
               self.events.on(`WORKER/${pluginName.toUpperCase()}/EXECUTED`, onExecuteEvent);
             }
-            plugin.startWorker();
+            await plugin.startWorker();
           }
-          self.plugins.workers[pluginName] = plugin;
           break;
         case 'DAP':
           self.plugins.daps[pluginName] = plugin;

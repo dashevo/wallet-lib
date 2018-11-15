@@ -55,15 +55,18 @@ class Worker extends StandardPlugin {
     if (this.isWorkerRunning) {
       return false;
     }
-    if (this.workerMaxPass!==null && this.workerPass >= this.workerMaxPass) {
-      console.log('Max pass, shutting down');
+    if (this.workerMaxPass !== null && this.workerPass >= this.workerMaxPass) {
       this.stopWorker();
       return false;
     }
     this.isWorkerRunning = true;
 
     if (this.execute) {
-      await this.execute();
+      try {
+        await this.execute();
+      } catch (e) {
+        console.log(e);
+      }
     } else {
       console.error(`${this.constructor.name} : Missing execute function`);
     }

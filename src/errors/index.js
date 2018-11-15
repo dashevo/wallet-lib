@@ -1,3 +1,4 @@
+const { has } = require('lodash');
 const is = require('../utils/is');
 
 class WalletLibError extends Error {
@@ -15,11 +16,8 @@ class InjectionToPluginUnallowed extends WalletLibError {}
 class InjectionErrorCannotInject extends WalletLibError {}
 class InjectionErrorCannotInjectUnknownDependency extends WalletLibError {}
 class ValidTransportLayerRequired extends WalletLibError {
-  constructor(method, transportInfo = {}) {
-    console.warn('------- Transport -----');
-    console.warn('Triggered by ', method);
-    console.warn('Transport status:', transportInfo);
-    super();
+  constructor(method) {
+    super(`A transport layer is needed to perform a ${method}`);
   }
 }
 class TransactionNotInStore extends WalletLibError {}
@@ -57,7 +55,8 @@ class InvalidTransaction extends WalletLibError {
     const getErrorMessageOf = (transactionErrors) => {
       if (!is.arr(transactionErrors) || transactionErrors.length === 0) return false;
       const err = transactionErrors[0];
-      return `Transaction should have property ${err[0]} of type ${err[1]}`;
+      const txid = has(transactionObj, 'txid') ? transactionObj.txid : 'unknown';
+      return `Transaction txid: ${txid} should have property ${err[0]} of type ${err[1]}`;
     };
 
     const evaluateTransactionObjectError = (_txObj) => {
@@ -72,7 +71,7 @@ class InvalidTransaction extends WalletLibError {
         const key = prop[0];
         const type = prop[1];
         if (handledTypeVerification.includes(type)) {
-          if (!is[type](_txObj[key])) {
+          if ((!has(_txObj, key) || !is[type](_txObj[key]))) {
             addressErrors.push(prop);
           }
         }
@@ -87,7 +86,8 @@ class InvalidUTXO extends WalletLibError {
     const getErrorMessageOf = (utxoErrors) => {
       if (!is.arr(utxoErrors) || utxoErrors.length === 0) return false;
       const err = utxoErrors[0];
-      return `UTXO should have property ${err[0]} of type ${err[1]}`;
+      const txid = (has(utxo, 'txid')) ? utxo.txid : 'unknown';
+      return `UTXO txid:${txid} should have property ${err[0]} of type ${err[1]}`;
     };
 
     const evaluateUTXOObjectError = (_utxo) => {
@@ -113,7 +113,57 @@ class InvalidUTXO extends WalletLibError {
     super(getErrorMessageOf(evaluateUTXOObjectError(utxo)));
   }
 }
+class InvalidOutput extends WalletLibError {
+  constructor(output) {
+    const getErrorMessageOf = (utxoErrors) => {
+      if (!is.arr(utxoErrors) || utxoErrors.length === 0) return false;
+      const err = utxoErrors[0];
+      const txid = (has(output, 'txid')) ? output.txid : 'unknown';
+      const address = (has(output, 'address')) ? output.address : 'unknown';
+      return `Output txid:${txid} address: ${address} should have property ${err[0]} of type ${err[1]}`;
+    };
 
+    const evaluateUTXOObjectError = (_utxo) => {
+      const utxosErrors = [];
+      const expectedProps = [
+        ['address', 'string'],
+        ['satoshis', 'num'],
+      ];
+      const handledTypeVerification = Object.keys(is);
+      expectedProps.forEach((prop) => {
+        const key = prop[0];
+        const type = prop[1];
+        if (handledTypeVerification.includes(type)) {
+          if (!is[type](_utxo[key])) {
+            utxosErrors.push(prop);
+          }
+        }
+      });
+      return utxosErrors;
+    };
+    super(getErrorMessageOf(evaluateUTXOObjectError(output)));
+  }
+}
+
+class CoinSelectionUnsufficientUTXOS extends WalletLibError {
+  constructor(info) {
+    const getErrorMessageOf = (_info) => {
+      const { utxosValue, outputValue } = _info;
+      const diff = utxosValue - outputValue;
+      return `Unsufficient utxos (${utxosValue}) to cover the output : ${outputValue}. Diff : ${diff}`;
+    };
+    super(getErrorMessageOf(info));
+  }
+}
+class CreateTransactionError extends WalletLibError {
+  constructor(e) {
+    if (e instanceof CoinSelectionUnsufficientUTXOS) {
+      super('Unsufficient funds to cover the output');
+    } else {
+      super(e);
+    }
+  }
+}
 module.exports = {
   WalletLibError,
   UnknownPlugin,
@@ -126,4 +176,7 @@ module.exports = {
   InvalidAddressObject,
   InvalidTransaction,
   InvalidUTXO,
+  InvalidOutput,
+  CreateTransactionError,
+  CoinSelectionUnsufficientUTXOS,
 };

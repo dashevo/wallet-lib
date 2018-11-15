@@ -1,6 +1,6 @@
 const is = require('../../utils/is');
 const STRATEGIES = require('./strategies');
-const { InvalidUTXO } = require('../../errors');
+const { InvalidUTXO, InvalidOutput, CoinSelectionUnsufficientUTXOS } = require('../../errors');
 
 module.exports = function coinSelection(utxosList, outputsList, deductFee = false, feeCategory = 'normal', strategyName = 'simpleAccumulator') {
   if (!utxosList) { throw new Error('Require a utxosList to select from'); }
@@ -22,12 +22,12 @@ module.exports = function coinSelection(utxosList, outputsList, deductFee = fals
   let outputValue = 0;
   outputsList.forEach((output) => {
     if (!is.output(output)) {
-      throw new Error(`Invalid output in outputsList ${JSON.stringify(output)}`);
+      throw new InvalidOutput(output);
     }
     outputValue += output.satoshis;
   });
   if (utxosValue < outputValue) {
-    throw new Error('Unsufficient utxos to cover the output');
+    throw new CoinSelectionUnsufficientUTXOS({ utxosValue, outputValue });
   }
 
   return STRATEGIES[strategyName](utxosList, outputsList, deductFee, feeCategory);

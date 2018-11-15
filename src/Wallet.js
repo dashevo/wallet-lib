@@ -48,7 +48,6 @@ class Wallet {
 
     this.forceUnsafePlugins = _.has(opts, 'forceUnsafePlugins') ? opts.forceUnsafePlugins : defaultOptions.forceUnsafePlugins;
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
-    this.injectPluginsList = opts.plugins || [];
 
     if (!(is.network(network))) throw new Error('Expected a valid network (typeof Network or String)');
     this.network = Dashcore.Networks[network];
@@ -66,7 +65,7 @@ class Wallet {
     // Notice : Most of the time, wallet id is deterministic
     this.generateNewWalletId();
     this.adapter = (opts.adapter) ? opts.adapter : new InMem();
-    if(this.adapter.config) this.adapter.config();
+    if (this.adapter.config) this.adapter.config();
     this.storage = new Storage({
       adapter: this.adapter,
       walletId: this.walletId,
@@ -152,40 +151,30 @@ class Wallet {
 
   /**
    * Will derivate to a new account.
-   * @param {object} account options
+   * @param {object} accountOpts - options to pass, will autopopulate some
    * @return {account} - account object
    */
   createAccount(accountOpts) {
-    // if(this.accounts[])
-    // Auto-populate this.accounts, probably not what we want ?
-    if (this.injectDefaultPlugins === false && !_.has(accountOpts, 'injectDefaultPlugins')) {
-    // eslint-disable-next-line
-      accountOpts.injectDefaultPlugins = this.injectDefaultPlugins;
-    }
-    if (this.forceUnsafePlugins === true && !_.has(accountOpts, 'forceUnsafePlugins')) {
-    // eslint-disable-next-line
-      accountOpts.forceUnsafePlugins = this.forceUnsafePlugins;
-    }
-    return new Account(this, accountOpts);
+    const { injectDefaultPlugins, plugins, forceUnsafePlugins } = this;
+    const baseOpts = { injectDefaultPlugins, forceUnsafePlugins, plugins };
+    if (this.type === WALLET_TYPES.SINGLE_ADDRESS) { baseOpts.privateKey = this.privateKey; }
+    const opts = Object.assign(baseOpts, accountOpts);
+    return new Account(this, opts);
   }
 
 
   /**
    * Get a specific account per accountIndex
    * @param accountIndex - Default: 0, set a specific index to get
-   * @param accountOpts - If we can't get, we create passing these arg to createAccount method
+   * @param accountOpts - If the account doesn't exist yet, we create it passing these options
    * @return {*|account}
    */
   getAccount(accountIndex = 0, accountOpts) {
-    const { injectDefaultPlugins } = this;
-    const plugins = this.injectPluginsList;
     const acc = this.accounts.filter(el => el.accountIndex === accountIndex);
-    const baseOpts = { accountIndex, injectDefaultPlugins, plugins };
-    if (this.type === WALLET_TYPES.SINGLE_ADDRESS) { baseOpts.privateKey = this.privateKey; }
-
+    const baseOpts = { accountIndex };
     const opts = Object.assign(baseOpts, accountOpts);
     const account = (acc[0]) || this.createAccount(opts);
-    this.storage.events = account.events;
+    account.storage.attachEvents(account.events);
     return account;
   }
 

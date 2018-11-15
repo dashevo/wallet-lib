@@ -29,6 +29,7 @@
     "axios": "^0.18.0",
     "localforage": "^1.7.2",
     "lodash": "^4.17.4",
+    "moment": "^2.22.2",
     "socket.io-client": "^2.0.3"
   },
   "devDependencies": {
@@ -38,7 +39,7 @@
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.10.0",
-    "nyc": "^11.9.0",
-    "mocha": "^5.2.0"
+    "mocha": "^5.2.0",
+    "nyc": "^11.9.0"
   }
 }

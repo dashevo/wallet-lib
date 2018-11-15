@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const { Worker } = require('../');
-const { ValidTransportLayerRequired } = require('../../errors');
+const { ValidTransportLayerRequired, InvalidTransaction } = require('../../errors');
 const EVENTS = require('../../EVENTS');
 
 const defaultOpts = {
@@ -28,47 +28,16 @@ class SyncWorker extends Worker {
     this.bloomfilters = [];
   }
 
-  async execDuringStart() {
-    this.execStatusFetch();
-  }
-
   async execute() {
     // Todo : Ensure the performance impact of this.
     // We would love to have a small perf footprint and this seems improvable.
-    await this.execBlockListener();
     await this.execAddressFetching();
+
     await this.execAddressListener();
+
     await this.execTransactionsFetching();
+
     await this.execAddressBloomfilter();
-  }
-
-  async execStatusFetch() {
-    try {
-      const res = await this.fetchStatus();
-      if (!res) {
-        return false;
-      }
-      const { blocks } = res;
-      this.storage.store.wallets[this.walletId].blockheight = blocks;
-      this.events.emit(EVENTS.BLOCKHEIGHT_CHANGED);
-      return true;
-    } catch (e) {
-      if (e instanceof ValidTransportLayerRequired) {
-        console.log('invalid');
-      }
-      return e;
-    }
-  }
-
-  async execBlockListener() {
-    const self = this;
-    const cb = async function (block) {
-      self.storage.store.wallets[self.walletId].blockheight += 1;
-      self.announce(EVENTS.BLOCK, block);
-    };
-    if (self.transport.isValid) {
-      self.transport.subscribeToEvent(EVENTS.BLOCK, cb);
-    }
   }
 
   async execAddressListener() {
@@ -110,16 +79,10 @@ class SyncWorker extends Worker {
     }, []);
 
     const getTransactionAndStore = async function (tx) {
-      console.log(tx);
       if (tx.address && tx.txid) {
-        console.log('TransactionINFO', tx);
         self.storage.addNewTxToAddress(tx, self.walletId);
         const transactionInfo = await self.transport.getTransaction(tx.txid);
-        console.log('TransactionINFO', transactionInfo);
         self.storage.importTransactions(transactionInfo);
-        console.log('TransactionINFO', transactionInfo);
-        self.events.emit(EVENTS.BALANCE_CHANGED, { delta: transactionInfo.satoshis });
-        self.events.emit(EVENTS.BALANCE_CHANGED, { delta: transactionInfo.satoshis });
       }
     };
     await self.transport.subscribeToAddresses(subscribedAddress, getTransactionAndStore);
@@ -153,21 +116,20 @@ class SyncWorker extends Worker {
       const p = fetchAddressInfo(addressObj)
         .catch((e) => {
           if (e instanceof ValidTransportLayerRequired) return false;
-          return e;
+          throw e;
         });
       promises.push(p);
     });
 
     const responses = await Promise.all(promises);
-    // console.log(responses)
     responses.forEach((addrInfo) => {
       try {
-        // eslint-disable-next-line no-param-reassign
-        if (!addrInfo.utxos) addrInfo.utxos = [];
-        self.storage.updateAddress(addrInfo, self.walletId);
-        if (addrInfo.balanceSat > 0) {
-          self.events.emit(EVENTS.BALANCE_CHANGED, { delta: addrInfo.balanceSat });
+        const prev = self.storage.searchAddress(addrInfo.address);
+        if (prev.found && !addrInfo.utxos) {
+          // eslint-disable-next-line no-param-reassign
+          addrInfo.utxos = prev.result.utxos;
         }
+        self.storage.updateAddress(addrInfo, self.walletId);
       } catch (e) {
         self.events.emit(EVENTS.ERROR_UPDATE_ADDRESS, e);
       }
@@ -220,15 +182,16 @@ class SyncWorker extends Worker {
       const p = fetchTransactionInfo(transactionObj)
         .then((transactionInfo) => {
           self.storage.importTransaction(transactionInfo);
-          // todo : should fire only if really changed.
-          // console.log(transactionInfo)
-          // self.events.emit(EVENTS.BALANCE_CHANGED, {delta:transactionInfo.satoshis});
+        }).catch((e) => {
+          if (e instanceof ValidTransportLayerRequired) return false;
+          if (e instanceof InvalidTransaction) return false;
+          throw e;
         });
       promises.push(p);
     });
 
-    await Promise.all(promises);
-    this.events.emit(EVENTS.FETCHED_TRANSACTIONS, promises);
+    const resolvedPromised = await Promise.all(promises);
+    this.events.emit(EVENTS.FETCHED_TRANSACTIONS, resolvedPromised);
     return true;
   }
 
@@ -246,10 +209,13 @@ class SyncWorker extends Worker {
   announce(type, el) {
     switch (type) {
       case EVENTS.BLOCK:
-        this.events.emit(EVENTS.BLOCK);
-        this.events.emit(EVENTS.BLOCKHEIGHT_CHANGED);
+        this.events.emit(EVENTS.BLOCK, el);
+        break;
+      case EVENTS.BLOCKHEIGHT_CHANGED:
+        this.events.emit(EVENTS.BLOCKHEIGHT_CHANGED, el);
         break;
       default:
+        this.events.emit(type, el);
         console.warn('Not implemented, announce of ', type, el);
     }
   }

@@ -196,6 +196,8 @@ Miscellaneous :
 - [ ] Log tool to be able to help for decentralized debugging
 - [ ] [docs/plugins](Plugins.md) support (Worker, DAP)
 - [ ] CoinSelection strategy as a plugins.
+- [ ] Account network and plugins independants from each other.
+
 Transports :
 
 - [ ] DAPI-Client : [https://github.com/dashevo/dapi-client]
@@ -206,6 +208,7 @@ Transports :
 Adapters (help from community welcomed) :
 
 - [x] [LocalForage](https://github.com/localForage/localForage)
+- [x] [ReactNative AsyncStorage](https://facebook.github.io/react-native/docs/asyncstorage)
 - [ ] LocalStorage
 - [ ] SecureStorage
 - [ ] LevelDB

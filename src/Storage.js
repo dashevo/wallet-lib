@@ -1,5 +1,8 @@
-const { cloneDeep, merge, has } = require('lodash');
+const {
+  cloneDeep, merge, clone,
+} = require('lodash');
 const { Networks } = require('@dashevo/dashcore-lib');
+const EVENTS = require('./EVENTS');
 const { is, hasProp, dashToDuffs } = require('./utils');
 const {
   TransactionNotInStore, InvalidAddressObject, InvalidTransaction, InvalidUTXO,
@@ -13,6 +16,7 @@ const defaultOpts = {
 const initialStore = {
   wallets: {},
   transactions: {},
+  chains: {},
 };
 const mergeHelper = (initial = {}, additional = {}) => merge(initial, additional);
 /**
@@ -46,6 +50,10 @@ class Storage {
     }, 1);
   }
 
+  attachEvents(events) {
+    this.events = events;
+  }
+
   /**
    * Allow to clear the working interval (worker).
    * @return {boolean}
@@ -68,6 +76,17 @@ class Storage {
     await this.rehydrateState();
   }
 
+  createChain(network) {
+    if (!hasProp(this.store.chains, network.toString())) {
+      this.store.chains[network.toString()] = {
+        name: network.toString(),
+        blockheight: -1,
+      };
+      return true;
+    }
+    return false;
+  }
+
   createWallet(walletId, network = Networks.testnet, mnemonic = null, type = null) {
     if (!hasProp(this.store.wallets, walletId)) {
       this.store.wallets[walletId] = {
@@ -82,6 +101,7 @@ class Storage {
           misc: {},
         },
       };
+      this.createChain(network);
       return true;
     }
     return false;
@@ -132,43 +152,6 @@ class Storage {
     return false;
   }
 
-  updateAddressUTXO(address, utxos) {
-    if (!is.address(address)) throw new Error('Expected address to update');
-    const {
-      result, found, type, walletId,
-    } = this.searchAddress(address);
-
-    if (found === true) {
-      const el = this.store.wallets[walletId].addresses[type][result.path];
-      el.utxos = utxos;
-      const txs = el.transactions;
-
-      // Also add the transactions if not present
-      utxos.forEach((utxo) => {
-        if (!txs.includes(utxo.txid)) {
-          txs.push(utxo.txid);
-        }
-      });
-      this.recalculateBalance(address);
-      return el;
-    }
-    return false;
-  }
-
-  recalculateBalance(address) {
-    if (!is.address(address)) throw new Error('Expected address to update');
-    const {
-      result, found, type, walletId,
-    } = this.searchAddress(address);
-
-    if (found === true) {
-      const el = this.store.wallets[walletId].addresses[type][result.path];
-      el.balanceSat = el.utxos.reduce((prev, curr) => prev + curr.satoshis, 0);
-      return el;
-    }
-    return false;
-  }
-
   getTransaction(txid) {
     const { transactions } = this.store;
     if (!transactions[txid]) throw new TransactionNotInStore(txid);
@@ -198,7 +181,6 @@ class Storage {
         newAddr.utxos.push(utxo);
         newAddr.used = true;
         this.updateAddress(newAddr, searchAddr.walletId);
-        this.recalculateBalance(searchAddr.result.address);
       }
     }
   }
@@ -346,7 +328,6 @@ class Storage {
 
   /**
    * Update a specific address information in the store
-   * It do not handle any merging right now and write over previous data.
    * @param addressObj
    * @param walletId
    * @return {boolean}
@@ -368,8 +349,81 @@ class Storage {
       default:
         type = 'misc';
     }
-    const addressesStore = this.store.wallets[walletId].addresses;
-    addressesStore[type][path] = addressObj;
+    const walletStore = this.store.wallets[walletId];
+    const addressesStore = walletStore.addresses;
+    const previousObject = clone(addressesStore[type][path]);
+
+    const newObject = clone(addressObj);
+    // We do not autorize to alter UTXO using this
+    // if(newObject.utxos.length==0 && previousObject.utxos.length>0){
+    //
+    // }
+
+    const currentBlockHeight = this.store.chains[walletStore.network.toString()].blockheight;
+    // Recalculate balanceSat and unconfirmedBalanceSat
+    let { balanceSat, unconfirmedBalanceSat } = newObject;
+    const { utxos } = newObject;
+
+    // TODO : Right now we recalculate all everytime, would be nice to only calculate the diff...
+    balanceSat = 0;
+    unconfirmedBalanceSat = 0;
+
+    if (utxos.length > 0) {
+      utxos.forEach((utxo) => {
+        try {
+          const { blockheight } = this.getTransaction(utxo.txid);
+          if (currentBlockHeight - blockheight >= 6) balanceSat += utxo.satoshis;
+          else unconfirmedBalanceSat += utxo.satoshis;
+        } catch (e) {
+          if (e instanceof TransactionNotInStore) {
+            console.warn('Could not get tx ', utxo.txid, '. Considering utxo mature');
+            balanceSat += utxo.satoshis;
+          } else throw e;
+        }
+      });
+    }
+
+    if (previousObject === undefined) {
+      if (newObject.balanceSat > 0) {
+        this.announce(
+          EVENTS.BALANCE_CHANGED,
+          {
+            currentValue: newObject.balanceSat,
+            delta: newObject.balanceSat,
+          },
+        );
+      }
+      if (newObject.unconfirmedBalanceSat > 0) {
+        this.announce(
+          EVENTS.UNCONFIRMED_BALANCE_CHANGED,
+          { currentValue: newObject.unconfirmedBalanceSat, delta: newObject.unconfirmedBalanceSat },
+        );
+      }
+    } else {
+      if (previousObject.balanceSat !== newObject.balanceSat) {
+        this.announce(
+          EVENTS.BALANCE_CHANGED,
+          {
+            delta: newObject.balanceSat - previousObject.balanceSat,
+            currentValue: newObject.balanceSat,
+          },
+        );
+      }
+      if (previousObject.unconfirmedBalanceSat !== newObject.unconfirmedBalanceSat) {
+        this.announce(EVENTS.UNCONFIRMED_BALANCE_CHANGED,
+          {
+            delta: newObject.unconfirmedBalanceSat - previousObject.unconfirmedBalanceSat,
+            currentValue: newObject.unconfirmedBalanceSat,
+          });
+      }
+    }
+    newObject.balanceSat = balanceSat;
+    newObject.unconfirmedBalanceSat = unconfirmedBalanceSat;
+
+    // Check if there is a balance but no utxo.
+
+
+    addressesStore[type][path] = newObject;
     this.lastModified = Date.now();
     return true;
   }
@@ -586,6 +640,20 @@ class Storage {
       throw new Error('Not implemented. Please create an issue on github if needed.');
     } else {
       throw new Error('Not implemented. Please create an issue on github if needed.');
+    }
+    return true;
+  }
+
+  announce(type, el) {
+    if (!this.events) return false;
+    switch (type) {
+      case EVENTS.BALANCE_CHANGED:
+      case EVENTS.UNCONFIRMED_BALANCE_CHANGED:
+        this.events.emit(type, el);
+        break;
+      default:
+        this.events.emit(type, el);
+        console.warn('Not implemented, announce of ', type, el);
     }
     return true;
   }
