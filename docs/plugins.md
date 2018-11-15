@@ -1,9 +1,12 @@
 ## Plugins
 
-The Wallet-Library is able to handle plugins. 
-There are particular structured code that can perform action on your wallet.
+In order to add features and logic to the Wallet-library and be able to share independant module and request them together. 
+Wallet-lib can be passed some plugins at his instantiation. 
+Plugins are particular shaped class that can perform action on your wallet.
 
-By default, two plugins are injected : BIP44Worker, and SyncWorker. 
+By default, three plugins are injected : BIP44Worker, SyncWorker and ChainWorker. 
+
+They handle respectively with maintaining your address pool, getting you in sync with the blockchain and maintaining some knowledge about the chain (blockheight). 
 You can disable them by adding `injectDefaultPlugins:false` at the initialization parameter of your wallet object.
  
 For more granularity, you could do it as a parameter of `getAccount(accId, accOpts)`.
@@ -12,8 +15,7 @@ For more granularity, you could do it as a parameter of `getAccount(accId, accOp
 
 There is different type of plugins that can be used in the wallet-library : 
 
-- Workers : A worker plugins is a plugin that inherits from Worker class. It distinguish itself by having a init, startWorker, execWorker and stopWorker methods.
-Except if clearly asked
+- Workers : A worker plugins is a plugin that inherits from Worker class. It distinguish itself by having a execute method that will be executed each `workerIntervalTime`.
 - DAP :  A DAP plugins inherits from DAP class and is only require to have a init method. 
 - Standard : These are mostly enhancers of the wallet library functionalities.
   
@@ -34,3 +36,12 @@ class MyPlugin extends StandardPlugin {
 ```
 
 Will allow to access the walletId property, same thing is doable with account function. 
+
+### Accessing a plugin / DAP
+
+
+```
+const account = wallet.getAccount(0);
+account.getPlugin('pluginName');
+account.getDAP('dapName');
+```
