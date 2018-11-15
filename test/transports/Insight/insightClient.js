@@ -235,6 +235,7 @@ describe('Transport : Insight Client', function suite() {
     ).then(() => { transport.closeSocket(); });
   });
   */
+  /*
   it('should get a transactions History', () => {
     const expected = [{
       type: 'sent', txid: 'e66474bfe8ae3d91b2784864fc09e0bd615cbfbf4a2164e46b970bcc488a938f', time: 1529233103, from: ['yRdxQQpXYh9Xkd91peJ7FJxpEzoRb6droH'], to: { address: 'yf6qYQzQoCzpF7gJYAa7s3n5rBK89RoaCQ', amount: '50.00000000' },
@@ -253,7 +254,7 @@ describe('Transport : Insight Client', function suite() {
     }];
 
     return account.getTransactionHistory().then(result => expect(result).to.deep.equal(expected));
-  });
+  });*/
   /*
   it('should get transaction', () => {
     const expected = {

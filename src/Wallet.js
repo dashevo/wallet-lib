@@ -95,6 +95,7 @@ class Wallet {
     this.savedBackup = false; // When true, we delete mnemonic from internals
   }
 
+
   generateNewWalletId() {
     const { type } = this;
     switch (type) {
@@ -172,6 +173,7 @@ class Wallet {
   getAccount(accountIndex = 0, accountOpts) {
     const acc = this.accounts.filter(el => el.accountIndex === accountIndex);
     const baseOpts = { accountIndex };
+
     const opts = Object.assign(baseOpts, accountOpts);
     const account = (acc[0]) || this.createAccount(opts);
     account.storage.attachEvents(account.events);

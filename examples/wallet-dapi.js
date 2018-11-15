@@ -26,7 +26,12 @@ const wallet = new Wallet({
   // "mnemonic": "crack spice venue ticket vacant steak next stomach amateur review okay curtain",
   // "mnemonic": "sunny soccer know title act build split soccer leaf tomato symbol name",
 
-});
+  const wallet = new Wallet({
+    network: 'testnet',
+    transport,
+    mnemonic: 'protect cave garden achieve hand vacant clarify atom finish outer waste sword',
+  });
+  console.log('New Clients :', peersIP);
 
 console.log('Random generated mnemonic:', wallet.exportWallet());
 const account = wallet.getAccount(0);

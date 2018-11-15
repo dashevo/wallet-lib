@@ -426,11 +426,11 @@ it('should be able to get all address', () => {
 
   const addressesInternalData = account.getAddresses('internal');
   const internalDataKeys = Object.keys(addressesInternalData);
-  expect(internalDataKeys.length).to.equal(1);// Because in previous test we access getAddr(0,ext);
+  expect(internalDataKeys.length).to.equal(21);
 
-  expect(account.getUnusedAddress('internal').address).to.deep.equal('yjSivd8eWH1vVywaeePiHBLXqMbHFXxxXE');
+  console.log(account.getUnusedAddress('internal'))
+  expect(account.getUnusedAddress('internal').address).to.deep.equal('yTM7nPiekjMBkMCU6cPmFD2KReeFUeVwCp');
 
-  expect(Object.keys(account.getAddresses('internal')).length).to.equal(1);
 });
 
 it('should be able to get a unused address', () => {
