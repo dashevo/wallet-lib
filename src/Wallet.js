@@ -104,7 +104,7 @@ class Wallet {
         break;
       case WALLET_TYPES.HDWALLET:
       default:
-        if (!this.HDPrivateKey) throw new Error('Cannot generate a walletId : Do not find any HDPrivateKey');
+        if (!this.HDPrivateKey) throw new Error('Cannot generate a walletId : No HDPrivateKey found');
         this.walletId = mnemonicToWalletId(this.HDPrivateKey);
         break;
     }
