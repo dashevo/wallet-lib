@@ -1,17 +1,34 @@
+const _ = require('lodash');
 const Dashcore = require('@dashevo/dashcore-lib');
 const { EventEmitter } = require('events');
-const { BIP44_LIVENET_ROOT_PATH, BIP44_TESTNET_ROOT_PATH } = require('./Constants');
+const SyncWorker = require('./plugins/Workers/SyncWorker');
+const ChainWorker = require('./plugins/Workers/ChainWorker');
+const BIP44Worker = require('./plugins/Workers/BIP44Worker');
 const {
-  feeCalculation, is, dashToDuffs, duffsToDash, coinSelection,
+  BIP44_LIVENET_ROOT_PATH, BIP44_TESTNET_ROOT_PATH, FEES, WALLET_TYPES,
+} = require('./CONSTANTS');
+const {
+  is, dashToDuffs, duffsToDash, coinSelection,
 } = require('./utils/');
-const SyncWorker = require('./plugins/SyncWorker');
-const BIP44Worker = require('./plugins/BIP44Worker');
+const EVENTS = require('./EVENTS');
+
+const {
+  UnknownPlugin,
+  UnknownDAP,
+  InjectionErrorCannotInject,
+  InjectionErrorCannotInjectUnknownDependency,
+  ValidTransportLayerRequired,
+  CreateTransactionError,
+} = require('./errors');
 
 const defaultOptions = {
   network: 'testnet',
   mode: 'full',
   cacheTx: true,
   subscribe: true,
+  forceUnsafePlugins: false,
+  plugins: [],
+  injectDefaultPlugins: true,
 };
 
 /**
@@ -37,19 +54,25 @@ const getNetwork = function (network) {
 };
 class Account {
   constructor(wallet, opts = defaultOptions) {
+    if (!wallet || wallet.constructor.name !== 'Wallet') throw new Error('Expected wallet to be created and passed as param');
+    if (!_.has(wallet, 'walletId')) throw new Error('Missing walletID to create an account');
+    this.walletId = wallet.walletId;
+
     this.events = new EventEmitter();
     this.isReady = false;
+    this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
+    this.forceUnsafePlugins = _.has(opts, 'forceUnsafePlugins') ? opts.forceUnsafePlugins : defaultOptions.forceUnsafePlugins;
 
-    if (!wallet || wallet.constructor.name !== 'Wallet') throw new Error('Expected wallet to be created and passed as param');
+    this.type = wallet.type;
 
     const accountIndex = (opts.accountIndex) ? opts.accountIndex : wallet.accounts.length;
     this.accountIndex = accountIndex;
 
     this.network = getNetwork(wallet.network.toString());
+
     this.BIP44PATH = getBIP44Path(this.network, accountIndex);
 
     this.transactions = {};
-    this.walletId = wallet.walletId;
 
     this.label = (opts && opts.label && is.string(opts.label)) ? opts.label : null;
 
@@ -59,78 +82,35 @@ class Account {
     this.store = wallet.storage.store;
     this.storage = wallet.storage;
 
-    this.storage.importAccounts({
-      label: this.label,
-      path: this.BIP44PATH,
-      network: this.network,
-    }, this.walletId);
-    this.keychain = wallet.keychain;
+    if (this.type === WALLET_TYPES.HDWALLET) {
+      this.storage.importAccounts({
+        label: this.label,
+        path: this.BIP44PATH,
+        network: this.network,
+      }, this.walletId);
+    }
+    if (this.type === WALLET_TYPES.SINGLE_ADDRESS) {
+      this.storage.importSingleAddress({
+        label: this.label,
+        path: '0',
+        network: this.network,
+      }, this.walletId);
+    }
+
+    this.keyChain = wallet.keyChain;
     this.mode = (opts.mode) ? opts.mode : defaultOptions.mode;
 
     this.cacheTx = (opts.cacheTx) ? opts.cacheTx : defaultOptions.cacheTx;
-    this.workers = {};
 
-    // List of events we are waiting for before firing a ready
-    // If we do have a bip44 enabled, generating the 20 address can take up to (10*20*2)ms
-    const workersWatcher = {
-      interval: null,
-      clearInterval() {
-        clearInterval(this.interval);
-      },
-      isReadyYet() {
-        let isReady = true;
-        const excludedKeys = ['isReadyYet', 'interval', 'clearInterval'];
-        const keys = Object.keys(this).filter(_ => !excludedKeys.includes(_));
-        keys.forEach((key) => {
-          if (!this[key].ready) {
-            isReady = false;
-          }
-        });
-        return isReady;
-      },
+    this.plugins = {
+      workers: {},
+      daps: {},
+      standard: {},
+      watchers: {},
     };
-
-    // As per BIP44, we prefetch 20 address
-    if (this.mode === 'full') {
-      workersWatcher.bip44 = { ready: false, started: false };
-      this.events.on('WORKER/BIP44/STARTED', () => { workersWatcher.bip44.started = true; });
-      this.events.on('WORKER/BIP44/EXECUTED', () => { workersWatcher.bip44.ready = true; });
-      this.workers.bip44 = new BIP44Worker({
-        events: this.events,
-        storage: this.storage,
-        getAddress: this.getAddress.bind(this),
-        walletId: this.walletId,
-      });
-      this.workers.bip44.startWorker();
-    }
-
-    if (this.transport && this.transport.isValid) {
-      workersWatcher.sync = { ready: false, started: false };
-      this.events.on('WORKER/SYNC/STARTED', () => { workersWatcher.sync.started = true; });
-      this.events.on('WORKER/SYNC/EXECUTED', () => { workersWatcher.sync.ready = true; });
-      this.workers.sync = new SyncWorker({
-        events: this.events,
-        storage: this.storage,
-        fetchAddressInfo: this.fetchAddressInfo.bind(this),
-        fetchTransactionInfo: this.fetchTransactionInfo.bind(this),
-        fetchStatus: this.fetchStatus.bind(this),
-        transport: this.transport,
-        walletId: this.walletId,
-
-      });
-      this.workers.sync.startWorker();
-    }
 
     // Handle import of cache
     if (opts.cache) {
-      if (opts.cache.transactions) {
-        try {
-          this.storage.importTransactions(opts.cache.transactions);
-        } catch (e) {
-          this.disconnect();
-          throw e;
-        }
-      }
       if (opts.cache.addresses) {
         try {
           this.storage.importAddresses(opts.cache.addresses, this.walletId);
@@ -139,18 +119,82 @@ class Account {
           throw e;
         }
       }
+      if (opts.cache.transactions) {
+        try {
+          this.storage.importTransactions(opts.cache.transactions);
+        } catch (e) {
+          console.log(e);
+          this.disconnect();
+          throw e;
+        }
+      }
     }
+
+    this.events.emit(EVENTS.CREATED);
+    addAccountToWallet(this, wallet);
+
+
+    this.initialize(wallet.plugins);
+  }
+
+  async initialize(userUnsafePlugins) {
     const self = this;
 
-    self.events.emit('started');
-    addAccountToWallet(this, wallet);
-    workersWatcher.interval = setInterval(() => {
-      if (workersWatcher.isReadyYet()) {
-        self.events.emit('ready');
-        this.isReady = true;
-        workersWatcher.clearInterval();
+    if (this.injectDefaultPlugins) {
+      // TODO: Should check in other accounts if a similar is setup already
+      // TODO: We want to sort them by dependencies and deal with the await this way
+      // await parent if child has it in dependency
+      // if not, then is it marked as requiring a first exec
+      // if yes add to watcher list.
+      this.injectPlugin(ChainWorker, true);
+
+      if (this.type === WALLET_TYPES.HDWALLET) {
+        // Ideally we should move out from worker to event based
+        this.injectPlugin(BIP44Worker, true);
       }
-    }, 20);
+      if (this.type === WALLET_TYPES.SINGLE_ADDRESS) {
+        this.getAddress('0'); // We force what is usually done by the BIP44Worker.
+      }
+      this.injectPlugin(SyncWorker, true);
+    }
+
+    _.each(userUnsafePlugins, (UnsafePlugin) => {
+      this.injectPlugin(UnsafePlugin, this.forceUnsafePlugins);
+    });
+
+    this.readinessInterval = setInterval(() => {
+      const watchedWorkers = Object.keys(this.plugins.watchers);
+      let readyWorkers = 0;
+      watchedWorkers.forEach((workerName) => {
+        if (this.plugins.watchers[workerName].ready === true) {
+          readyWorkers += 1;
+        }
+      });
+      if (readyWorkers === watchedWorkers.length) {
+        self.events.emit(EVENTS.READY);
+        self.isReady = true;
+        clearInterval(self.readinessInterval);
+      }
+    }, 600);
+    self.events.emit(EVENTS.STARTED);
+  }
+
+  getPlugin(pluginName) {
+    const loweredPluginName = pluginName.toLowerCase();
+    const stdPluginsList = Object.keys(this.plugins.standard).map(key => key.toLowerCase());
+    if (stdPluginsList.includes(loweredPluginName)) {
+      return this.plugins.standard[loweredPluginName];
+    }
+    throw new UnknownPlugin(loweredPluginName);
+  }
+
+  getDAP(dapName) {
+    const loweredDapName = dapName.toLowerCase();
+    const dapsList = Object.keys(this.plugins.daps).map(key => key.toLowerCase());
+    if (dapsList.includes(loweredDapName)) {
+      return this.plugins.daps[loweredDapName];
+    }
+    throw new UnknownDAP(loweredDapName);
   }
 
   /**
@@ -160,7 +204,7 @@ class Account {
    * @return {Promise<*>}
    */
   async broadcastTransaction(rawtx, isIs = false) {
-    if (!this.transport.isValid) throw new Error('A transport layer is needed to perform a broadcast');
+    if (!this.transport.isValid) throw new ValidTransportLayerRequired('broadcast');
 
     const txid = await this.transport.sendRawTransaction(rawtx, isIs);
     if (is.txid(txid)) {
@@ -183,7 +227,7 @@ class Account {
         const address = this.storage.store.wallets[this.walletId].addresses[type][path];
         const cleanedUtxos = [];
         address.utxos.forEach((utxo) => {
-          if (utxo.txId === affectedtxid) {
+          if (utxo.txid === affectedtxid) {
             totalSatoshis -= utxo.satoshis;
             address.balanceSat -= utxo.satoshis;
           } else {
@@ -193,7 +237,7 @@ class Account {
         address.utxos = cleanedUtxos;
         console.log('Broadcast totalSatoshi', totalSatoshis);
         // this.storage.store.addresses[type][path].fetchedLast = 0;// In order to trigger a refresh
-        this.events.emit('balance_changed');
+        this.events.emit(EVENTS.BALANCE_CHANGED, { delta: -totalSatoshis });
       });
     }
     return txid;
@@ -205,13 +249,12 @@ class Account {
    * @return {Promise<{txid, blockhash, blockheight, blocktime, fees, size, vout, vin, txlock}>}
    */
   async fetchTransactionInfo(transactionid) {
-    if (!this.transport.isValid) throw new Error('A transport layer is needed to fetch tx info');
+    if (!this.transport.isValid) throw new ValidTransportLayerRequired('fetchTransactionInfo');
 
     // valueIn, valueOut,
     const {
       txid, blockhash, blockheight, blocktime, fees, size, vin, vout, txlock,
     } = await this.transport.getTransaction(transactionid);
-
 
     const feesInSat = is.float(fees) ? dashToDuffs(fees) : (fees);
     return {
@@ -228,69 +271,98 @@ class Account {
   }
 
   async fetchStatus() {
-    if (!this.transport.isValid) throw new Error('A transport layer is needed to fetch status');
-    return (this.transport) ? this.transport.getStatus() : false;
+    if (!this.transport.isValid) throw new ValidTransportLayerRequired('fetchStatus');
+    const status = { blocks: -1 };
+
+    const getStatus = await this.transport.getStatus();
+    if (getStatus !== false) return getStatus;
+    status.blocks = await this.transport.getBestBlockHeight();
+
+    return status;
   }
 
   sign(object, privateKeys, sigType) {
-    return this.keychain.sign(object, privateKeys, sigType);
+    return this.keyChain.sign(object, privateKeys, sigType);
   }
 
   /**
    * Fetch a specific address from the transport layer
    * @param addressObj - AddressObject having an address and a path
    * @param fetchUtxo - If we also query the utxo (default: yes)
-   * @return {Promise<addressInfo>}
+   * @return {Promise<addrInfo>}
    */
   async fetchAddressInfo(addressObj, fetchUtxo = true) {
-    if (!this.transport.isValid) throw new Error('A transport layer is needed to fetch addr info');
-    const self = this;
-    const { address, path } = addressObj;
-    const {
-      balanceSat, unconfirmedBalanceSat, transactions,
-    } = await this.transport.getAddressSummary(address);
-    const addrInfo = {
-      address,
-      path,
-      balanceSat,
-      unconfirmedBalanceSat,
-      transactions,
-      fetchedLast: +new Date(),
-    };
-    addrInfo.used = (transactions.length > 0);
-    if (transactions.length > 0) {
-      // If we have cacheTx, then we will check if we know this transactions
-      if (self.cacheTx) {
-        transactions.forEach(async (tx) => {
-          const knownTx = Object.keys(self.store.transactions);
-          if (!knownTx.includes(tx)) {
-            const txInfo = await self.fetchTransactionInfo(tx);
-            await self.storage.importTransactions(txInfo);
-          }
-        });
-      }
-    }
-
     // We do not need to fetch UTXO if we don't have any money there :)
     function parseUTXO(utxos) {
       const parsedUtxos = [];
       utxos.forEach((utxo) => {
         parsedUtxos.push(Object.assign({}, {
-          script: utxo.scriptPubKey,
           satoshis: utxo.satoshis,
-          txId: utxo.txid,
+          txid: utxo.txid,
           address: utxo.address,
           outputIndex: utxo.vout,
+          scriptPubKey: utxo.scriptPubKey,
+          // scriptSig: utxo.scriptSig,
         }));
       });
       return parsedUtxos;
     }
-    if (fetchUtxo) {
-      const originalUtxo = (await self.transport.getUTXO(address));
-      const utxo = (balanceSat > 0) ? parseUTXO(originalUtxo) : [];
-      addrInfo.utxos = utxo;
+
+    if (!this.transport.isValid) throw new ValidTransportLayerRequired('fetchAddressInfo');
+    const self = this;
+    const { address, path } = addressObj;
+
+    try {
+      const addrSum = await this.transport.getAddressSummary(address);
+      if (!addrSum) return false;
+      const {
+        balanceSat, unconfirmedBalanceSat, transactions,
+      } = addrSum;
+
+      if (is.undef(balanceSat)
+        || is.undef(unconfirmedBalanceSat)
+        || !is.arr(transactions)) {
+        return false;
+      }
+
+      const addrInfo = {
+        address,
+        path,
+        balanceSat,
+        unconfirmedBalanceSat,
+        transactions,
+        fetchedLast: +new Date(),
+      };
+      addrInfo.used = (transactions.length > 0);
+      if (transactions.length > 0) {
+        // If we have cacheTx, then we will check if we know this transactions
+        if (self.cacheTx) {
+          transactions.forEach(async (tx) => {
+            const knownTx = Object.keys(self.store.transactions);
+
+            if (!knownTx.includes(tx)) {
+              const txInfo = await self.fetchTransactionInfo(tx);
+              // console.log(txInfo)
+              await self.storage.importTransactions(txInfo);
+            }
+          });
+        }
+      }
+      if (fetchUtxo) {
+        const originalUtxo = (await self.transport.getUTXO(address));
+        const utxos = (balanceSat > 0) ? parseUTXO(originalUtxo) : [];
+        if (utxos.length > 0) {
+          utxos.forEach((utxo) => {
+            self.storage.addUTXOToAddress(utxo, addressObj.address);
+          });
+        }
+      }
+
+      return addrInfo;
+    } catch (e) {
+      console.log(e);
+      return false;
     }
-    return addrInfo;
   }
 
   /**
@@ -303,55 +375,79 @@ class Account {
 
   /**
    * Get all the addresses from the store from a given type
-   * @param external - Default: true, return either external or internal type addresses
+   * @param type - default: external - Type of the address (external, internal, misc)
    * @return {Object} address - All address matching the type
    */
-  getAddresses(external = true) {
-    const type = (external) ? 'external' : 'internal';
+  getAddresses(_type = 'external') {
+    const type = (this.type === WALLET_TYPES.SINGLE_ADDRESS)
+      ? 'misc'
+      : ((_type) || 'external');
+
     return this.store.wallets[this.walletId].addresses[type];
   }
 
   /**
    * Get a specific addresss based on the index and type of address.
    * @param index - The index on the type
-   * @param external - Type of the address (external, internal,...)
+   * @param type - default: external - Type of the address (external, internal, misc)
    * @return <AddressInfo>
    */
-  getAddress(index = 0, external = true) {
-    const type = (external) ? 'external' : 'internal';
-    const path = (external) ? `${this.BIP44PATH}/0/${index}` : `${this.BIP44PATH}/1/${index}`;
+  getAddress(index = 0, _type = 'external') {
+    // eslint-disable-next-line no-nested-ternary
+    // console.log(index, _type)
+    const type = (this.type === WALLET_TYPES.SINGLE_ADDRESS)
+      ? 'misc'
+      : ((_type) || 'external');
+
+    // eslint-disable-next-line no-nested-ternary
+    const path = (type === 'misc')
+      ? '0'
+      : ((_type === 'external') ? `${this.BIP44PATH}/0/${index}` : `${this.BIP44PATH}/1/${index}`);
+
     const { wallets } = this.storage.getStore();
     const addressType = wallets[this.walletId].addresses[type];
+    // console.log(type, path)
+    // console.log(addressType, path)
     return (addressType[path]) ? addressType[path] : this.generateAddress(path);
   }
 
   /**
    * Get an unused address from the store
-   * @param external - (default: true) - Type of the requested usused address
+   * @param type - (default: 'external') - Type of the requested usused address
    * @param skip
    * @return {*}
    */
-  getUnusedAddress(external = true, skip = 0) {
-    const type = (external) ? 'external' : 'internal';
+  getUnusedAddress(type = 'external', skip = 0) {
     let unused = {
       address: '',
     };
     let skipped = 0;
     const { walletId } = this;
+
     const keys = Object.keys(this.store.wallets[walletId].addresses[type]);
 
-    // eslint-disable-next-line array-callback-return
-    keys.some((key) => {
+    for (let i = 0; i < keys.length; i += 1) {
+      const key = keys[i];
       const el = (this.store.wallets[walletId].addresses[type][key]);
-      if (!el.used) {
-        if (skipped === skip) {
-          unused = el;
-        }
-        skipped += 1;
+
+      if (!el || !el.address || el.address === '') {
+        console.warn('getUnusedAddress received an empty one.', el, i, skipped);
       }
-    });
+      unused = el;
+      if (el.used === false) {
+        if (skipped < skip) {
+          skipped += 1;
+        } else {
+          break;
+        }
+      }
+    }
+
+    if (skipped < skip) {
+      unused = this.getAddress(skipped);
+    }
     if (unused.address === '') {
-      return this.getAddress(0, external);
+      return this.getAddress(0, type);
     }
     return unused;
   }
@@ -381,10 +477,10 @@ class Account {
     txs = txs.filter((item, pos, txslist) => txslist.indexOf(item) === pos);
     const p = [];
 
-    txs.forEach((txId) => {
-      const search = self.storage.searchTransaction(txId);
+    txs.forEach((txid) => {
+      const search = self.storage.searchTransaction(txid);
       if (!search.found) {
-        p.push(self.getTransaction(txId));
+        p.push(self.getTransaction(txid));
       } else {
         p.push(search.result);
       }
@@ -443,14 +539,19 @@ class Account {
     return history;
   }
 
-  /**
-   * Use the transport layer to fetch a specific transaction matchin a txid
-   * @param txid
-   * @return {Promise<*>}
-   */
+
   async getTransaction(txid = null) {
-    const self = this;
-    return (txid !== null && self.transport) ? (self.transport.getTransaction(txid)) : [];
+    const search = await this.storage.searchTransaction(txid);
+    if (search.found) {
+      return search.result;
+    }
+    const tx = await this.fetchTransactionInfo(txid);
+    try {
+      await this.storage.importTransactions(tx);
+    } catch (e) {
+      console.error(e);
+    }
+    return tx;
   }
 
   /**
@@ -460,10 +561,12 @@ class Account {
    * */
   generateAddress(path) {
     if (!path) throw new Error('Expected path to generate an address');
-    const index = path.split('/')[5];
-
-    const privateKey = this.keychain.getKeyForPath(path);
-
+    let index = 0;
+    if (this.type === WALLET_TYPES.HDWALLET) {
+      // eslint-disable-next-line prefer-destructuring
+      index = path.split('/')[5];
+    }
+    const privateKey = this.keyChain.getKeyForPath(path);
     const address = new Dashcore.Address(privateKey.publicKey.toAddress(), this.network).toString();
 
     const addressData = {
@@ -479,6 +582,8 @@ class Account {
       used: false,
     };
     this.storage.importAddresses(addressData, this.walletId);
+    this.events.emit(EVENTS.GENERATED_ADDRESS, path);
+    // console.log('gen', address,path)
     return addressData;
   }
 
@@ -488,23 +593,20 @@ class Account {
    * @return {number} Balance in dash
    */
   getBalance(unconfirmed = true, displayDuffs = true) {
+    const self = this;
     let totalSat = 0;
-    const { addresses } = this.storage.getStore().wallets[this.walletId];
-    const { external, internal } = addresses;
-    const externalPaths = (external && Object.keys(external)) || [];
-    const internalPaths = (internal && Object.keys(internal)) || [];
-    if (externalPaths.length > 0) {
-      externalPaths.forEach((path) => {
-        const { unconfirmedBalanceSat, balanceSat } = external[path];
+    const { walletId, storage } = this;
+    const { addresses } = storage.getStore().wallets[walletId];
+    const subwallets = Object.keys(addresses);
+    subwallets.forEach((subwallet) => {
+      const paths = Object.keys(self.store.wallets[walletId].addresses[subwallet]);
+      paths.forEach((path) => {
+        const address = self.store.wallets[walletId].addresses[subwallet][path];
+        const { unconfirmedBalanceSat, balanceSat } = address;
         totalSat += (unconfirmed) ? unconfirmedBalanceSat + balanceSat : balanceSat;
       });
-    }
-    if (externalPaths.length > 0) {
-      internalPaths.forEach((path) => {
-        const { unconfirmedBalanceSat, balanceSat } = internal[path];
-        totalSat += (unconfirmed) ? unconfirmedBalanceSat + balanceSat : balanceSat;
-      });
-    }
+    });
+
     return (displayDuffs) ? totalSat : duffsToDash(totalSat);
   }
 
@@ -526,25 +628,68 @@ class Account {
         if (address.utxos) {
           if (!(onlyAvailable && address.locked)) {
             const utxo = address.utxos;
-            utxos = utxos.concat(utxo);
+            if (utxo.length > 0) {
+              const modifiedUtxo = Array.from(utxo);
+              modifiedUtxo.forEach((el) => {
+                // eslint-disable-next-line no-param-reassign
+                el.address = address.address;
+              });
+              utxos = utxos.concat(modifiedUtxo);
+            }
           }
         }
       });
     });
     utxos = utxos.sort((a, b) => b.satoshis - a.satoshis);
+
     return utxos;
   }
 
   /**
-   * Create a transaction based on the passed information
+   * Create a transaction based around a provided utxos
+   * @param opts - Options object
+   * @return {string}
+   */
+  createTransactionFromUTXOS(opts) {
+    const tx = new Dashcore.Transaction();
+    if (!opts || (!opts.utxos) || opts.utxos.length === 0) {
+      throw new Error('A utxos set is needed');
+    }
+    if (!opts || (!opts.recipient)) {
+      throw new Error('A recipient is expected to create a transaction');
+    }
+    const { recipient, utxos } = opts;
+
+    tx.from(utxos);
+
+    // eslint-disable-next-line no-underscore-dangle
+    tx.to(recipient, tx._getInputAmount());
+
+    tx.change(recipient);
+    tx.fee(FEES.DEFAULT_FEE);
+
+    const addressList = utxos.map(el => ((el.address)));
+    const privateKeys = _.has(opts, 'privateKeys')
+      ? opts.privateKeys
+      : this.getPrivateKeys(addressList);
+    const signedTx = this.keyChain.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
+    return signedTx.toString();
+  }
+
+  /**
+   * Create a transaction based around on the provided information
    * @param opts - Options object
    * @param opts.amount - Amount in dash that you want to send
    * @param opts.satoshis - Amount in satoshis
    * @param opts.to - Address of the recipient
    * @param opts.isInstantSend - If you want to use IS or stdTx.
+   * @param opts.deductFee - Deduct fee
+   * @param opts.privateKeys - Overwrite default behavior : auto-searching local matching keys.
+   * @param opts.privateKeys - Overwrite default behavior : auto-searching local matching keys.
    * @return {String} - rawTx
    */
   createTransaction(opts) {
+    const self = this;
     const tx = new Dashcore.Transaction();
 
     if (!opts || (!opts.amount && !opts.satoshis)) {
@@ -554,20 +699,43 @@ class Account {
     if (!opts || (!opts.to)) {
       throw new Error('A recipient is expected to create a transaction');
     }
+    const deductFee = _.has(opts, 'deductFee')
+      ? opts.deductFee
+      : true;
 
     const outputs = [{ address: opts.to, satoshis }];
-    outputs.forEach((output) => {
-      tx.to(output.address, output.satoshis);
-    });
-
-    if (outputs[0].satoshis > this.getBalance(true)) {
-      throw new Error('Not enought fund');
-    }
 
     const utxosList = this.getUTXOS();
-    const utxos = coinSelection(utxosList, outputs);
 
-    const inputs = utxos.utxos.reduce((accumulator, current) => {
+    utxosList.map((utxo) => {
+      const utxoTx = self.storage.searchTransaction(utxo.txid);
+      if (utxoTx.found) {
+        // eslint-disable-next-line no-param-reassign
+        // console.log(utxoTx.result.vin);
+        // utxo.scriptSig = utxoTx.result.vin[0].scriptSig.hex;
+      }
+      return utxo;
+    });
+
+    const feeCategory = (opts.isInstantSend) ? 'instant' : 'normal';
+    let selection;
+    try {
+      selection = coinSelection(utxosList, outputs, deductFee, feeCategory);
+    } catch (e) {
+      throw new CreateTransactionError(e);
+    }
+
+    const selectedUTXOs = selection.utxos;
+    const selectedOutputs = selection.outputs;
+    const {
+      // feeCategory,
+      estimatedFee,
+    } = selection;
+
+    tx.to(selectedOutputs);
+
+    // We parse our inputs, transform them into a Dashcore UTXO object.
+    const inputs = selectedUTXOs.reduce((accumulator, current) => {
       const unspentoutput = new Dashcore.Transaction.UnspentOutput(current);
       accumulator.push(unspentoutput);
 
@@ -575,27 +743,53 @@ class Account {
     }, []);
 
     if (!inputs) return tx;
+    // We can now add direction our inputs to the Dashcore TX object
     tx.from(inputs);
 
-    const addressChange = this.getUnusedAddress(false, 1).address;
+    // In case or excessive fund, we will get that to an address in our possession
+    const addressChange = this.getUnusedAddress('internal', 1).address;
     tx.change(addressChange);
 
-    const feeRate = (opts.isInstantSend) ? feeCalculation('instantSend') : feeCalculation();
-    if (feeRate.type === 'perBytes') {
-      // console.log(feeRate.value * tx.size)
-      // tx.feePerKb(feeRate.value * 10);
-      tx.fee(10000);
-    }
-    if (feeRate.type === 'perInputs') {
-      const fee = inputs.length * feeRate.value;
-      tx.fee(fee);
-    }
 
-    const addressList = utxos.utxos.map(el => ((el.address)));
-    const privateKeys = this.getPrivateKeys(addressList);
-    const signedTx = this.keychain.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
+    // TODO : Deduct fee operation should happen here ?
 
-    return signedTx.toString();
+    // const feeRate = (opts.isInstantSend) ? feeCalculation('instantSend') : feeCalculation();
+    // if (feeRate.type === 'perBytes') {
+    // console.log(feeRate.value * tx.size)
+    // tx.feePerKb(feeRate.value * 10);
+    // tx.fee(FEES.DEFAULT_FEE);
+    // }
+    // if (feeRate.type === 'perInputs') {
+    //   const fee = inputs.length * FEES.NORMAL;
+    //   tx.fee(fee);
+    // }
+    tx.fee(estimatedFee);
+    console.log('fee', estimatedFee);
+    const addressList = selectedUTXOs.map(el => ((el.address)));
+    const privateKeys = _.has(opts, 'privateKeys')
+      ? opts.privateKeys
+      : this.getPrivateKeys(addressList);
+    const transformedPrivateKeys = [];
+    privateKeys.forEach((pk) => {
+      if (pk.constructor.name === 'PrivateKey') {
+        transformedPrivateKeys.push(pk);
+      } else if (pk.constructor.name === 'HDPrivateKey') transformedPrivateKeys.push(pk.privateKey);
+      else {
+        console.log('Unexpected pk type', pk, pk.constructor.name);
+      }
+    });
+    try {
+      const signedTx = this.keyChain.sign(
+        tx,
+        transformedPrivateKeys,
+        Dashcore.crypto.Signature.SIGHASH_ALL,
+      );
+      // console.log(signedTx.verify())
+      return signedTx.toString();
+    } catch (e) {
+      // if (e.message === 'Not fully signed transaction') {}
+      return e;
+    }
   }
 
 
@@ -619,7 +813,7 @@ class Account {
       paths.forEach((path) => {
         const address = self.store.wallets[walletId].addresses[subwallet][path];
         if (addresses.includes(address.address)) {
-          const { privateKey } = self.keychain.getKeyForPath(address.path);
+          const privateKey = self.keyChain.getKeyForPath(path);
           privKeys = privKeys.concat([privateKey]);
         }
       });
@@ -660,24 +854,117 @@ class Account {
   /**
    * This method will disconnect from all the opened streams, will stop all running workers
    * and force a saving of the state.
-   * You want to use this method at the end of your user usage of this lib.
+   * You want to use this method at the end of your life cycle of this lib.
    * @return {Boolean}
    */
   disconnect() {
-    if (this.transport.isValid) {
+    if (this.transport.isValid && this.transport.disconnect) {
       this.transport.disconnect();
     }
-    if (this.workers) {
-      const workersKey = Object.keys(this.workers);
+
+    if (this.plugins.workers) {
+      const workersKey = Object.keys(this.plugins.workers);
       workersKey.forEach((key) => {
-        this.workers[key].stopWorker();
+        this.plugins.workers[key].stopWorker();
       });
     }
     if (this.storage) {
       this.storage.saveState();
       this.storage.stopWorker();
     }
+    if (this.readinessInterval) {
+      clearInterval(this.readinessInterval);
+    }
     return true;
+  }
+
+  /**
+   * This method will connect to all streams and workers available
+   * @return {Boolean}
+   */
+  connect() {
+    if (this.transport.isValid) {
+      this.transport.connect();
+    }
+    if (this.plugins.workers) {
+      const workersKey = Object.keys(this.plugins.workers);
+      workersKey.forEach((key) => {
+        this.plugins.workers[key].startWorker();
+      });
+    }
+    if (this.storage) {
+      this.storage.startWorker();
+    }
+    return true;
+  }
+
+  async injectPlugin(UnsafePlugin, force = false) {
+    const self = this;
+    return new Promise(async (res, rej) => {
+      const isInit = !(typeof UnsafePlugin === 'function');
+      const plugin = (isInit) ? UnsafePlugin : new UnsafePlugin();
+      if (_.isEmpty(plugin)) rej(new InjectionErrorCannotInject('Empty plugin'));
+
+      // All plugins will require the event object
+      const { pluginType } = plugin;
+
+      const pluginName = plugin.constructor.name.toLowerCase();
+      plugin.inject('events', self.events);
+
+      // Check for dependencies
+      const deps = plugin.dependencies || [];
+
+      const injectedPlugins = Object.keys(this.plugins.standard).map(key => key.toLowerCase());
+      const injectedDaps = Object.keys(this.plugins.daps).map(key => key.toLowerCase());
+      deps.forEach((dependencyName) => {
+        if (_.has(self, dependencyName)) {
+          plugin.inject(dependencyName, self[dependencyName], force);
+        } else if (typeof self[dependencyName] === 'function') {
+          plugin.inject(dependencyName, self[dependencyName].bind(self), force);
+        } else {
+          const loweredDependencyName = dependencyName.toLowerCase();
+          if (injectedPlugins.includes(loweredDependencyName)) {
+            plugin.inject(dependencyName, this.plugins.standard[loweredDependencyName], true);
+          } else if (injectedDaps.includes(loweredDependencyName)) {
+            plugin.inject(dependencyName, this.plugins.daps[loweredDependencyName], true);
+          } else rej(new InjectionErrorCannotInjectUnknownDependency(dependencyName));
+        }
+      });
+      switch (pluginType) {
+        case 'Worker':
+          self.plugins.workers[pluginName] = plugin;
+          if (plugin.executeOnStart === true) {
+            if (plugin.firstExecutionRequired === true) {
+              const watcher = {
+                ready: false,
+                started: false,
+              };
+              self.plugins.watchers[pluginName] = watcher;
+
+              // eslint-disable-next-line no-return-assign,no-param-reassign
+              const startWatcher = _watcher => _watcher.started = true;
+              // eslint-disable-next-line no-return-assign,no-param-reassign
+              const setReadyWatch = _watcher => _watcher.ready = true;
+
+              const onStartedEvent = () => startWatcher(watcher);
+              const onExecuteEvent = () => setReadyWatch(watcher);
+
+              self.events.on(`WORKER/${pluginName.toUpperCase()}/STARTED`, onStartedEvent);
+              self.events.on(`WORKER/${pluginName.toUpperCase()}/EXECUTED`, onExecuteEvent);
+            }
+            await plugin.startWorker();
+          }
+          break;
+        case 'DAP':
+          self.plugins.daps[pluginName] = plugin;
+          break;
+        case 'StandardPlugin':
+        default:
+          self.plugins.standard[pluginName] = plugin;
+          break;
+      }
+      res(plugin);
+    });
   }
 }
 

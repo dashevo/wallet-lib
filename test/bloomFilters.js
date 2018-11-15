@@ -1,5 +1,5 @@
 // const { expect } = require('chai');
-// const Mnemonic = require('@dashevo/dashcore-mnemonic');
+// const {Mnemonic} = require('@dashevo/dashcore-lib');
 // const { HDPrivateKey } = require('@dashevo/dashcore-lib');
 
 // const passphase = require('./fixtures').mnemonicString1;

@@ -1,12 +1,11 @@
-const _ = require('lodash')
+const DAPIClient = require('@dashevo/dapi-client');
 const { is, hasProp } = require('../utils/index');
 const InsightClient = require('../transports/Insight/insightClient');
-const DAPIClient = require('../transports/DAPI/DapiClient');
 
 
 const transportList = {
   insight: InsightClient,
-  dapiclient: DAPIClient,
+  dapi: DAPIClient,
 };
 
 function isValidTransport(transport) {
@@ -22,7 +21,7 @@ function isValidTransport(transport) {
     ];
     expectedKeys.forEach((key) => {
       if (!transport[key]) {
-        console.log('missing', key)
+        console.log('missing', key);
         valid = false;
       }
     });
@@ -34,18 +33,23 @@ function isValidTransport(transport) {
 class Transporter {
   constructor(transportArg) {
     this.isValid = false;
+    this.canConnect = true;
     this.type = null;
     this.transport = null;
 
+    if (is.undef(transportArg)) {
+      // eslint-disable-next-line no-param-reassign
+      transportArg = 'dapi';
+    }
     if (transportArg) {
       let transport = transportArg;
-      if (is.string(transportArg)){
-        let loweredTransportName = transportArg.toString().toLowerCase();
-        if(Object.keys(transportList).includes(loweredTransportName)){
+      if (is.string(transportArg)) {
+        const loweredTransportName = transportArg.toString().toLowerCase();
+        if (Object.keys(transportList).includes(loweredTransportName)) {
           transport = new transportList[loweredTransportName]();
           this.isValid = isValidTransport(loweredTransportName);
         }
-      }else{
+      } else {
         this.isValid = isValidTransport(transportArg);
       }
       this.type = transport.type || transport.constructor.name;
@@ -53,34 +57,77 @@ class Transporter {
     }
   }
 
-  async getStatus() {
-    if(typeof this.transport.getStatus==='function'){
-      const data = await this.transport
-        .getStatus()
-        .catch((err) => {
-          throw new Error(err);
-        });
-      return data.info;
+  handleError(e) {
+    const self = this;
+    if (!e) {
+      return false;
+    }
+    if (e.code) {
+      switch (e.code) {
+        case 'ECONNREFUSED':
+          if (self.canConnect === true) {
+            self.canConnect = false;
+            return e;
+          }
+          break;
+        default:
+          console.log('E.code', e.code);
+          return e;
+      }
+    } else if (e.response.data) {
+      const { status, error } = e.response.data;
+      switch (status) {
+        case 429:
+          if (error === 'Rate limit exceeded') {
+            self.canConnect = false;
+            console.error('Rate limit exceeded');
+            return e;
+          }
+          break;
+        default:
+          console.log('e.response.data', e.response.data);
+          return e;
+      }
+    } else {
+      throw e;
+    }
+    return e;
+  }
+
+  hasSupportFor(fnName) {
+    return typeof this.transport[fnName] === 'function';
+  }
+
+  async fetchAndReturn(methodName, params) {
+    const self = this;
+    if (!this.isValid || !this.canConnect) return false;
+    if (!methodName) throw new Error(`Invalid method${methodName}`);
+    if (this.hasSupportFor(methodName)) {
+      const data = await this.transport[methodName](params).catch(self.handleError.bind(self));
+      return data;
     }
     return false;
   }
 
+  async getBestBlockHeight() {
+    return this.fetchAndReturn('getBestBlockHeight');
+  }
+
+  async getStatus() {
+    return this.fetchAndReturn('getStatus');
+  }
+
   async getAddressSummary(address) {
     if (!is.address(address)) throw new Error('Received an invalid address to fetch');
-    const data = await this
-      .transport
-      .getAddressSummary(address)
-      .catch((err) => {
-        throw new Error(err);
-      });
-    return data;
+    return this.fetchAndReturn('getAddressSummary', address);
   }
 
   async getTransaction(txid) {
     if (!is.txid(txid)) throw new Error(`Received an invalid txid to fetch : ${txid}`);
-    const data = await this.transport.getTransaction(txid).catch((err) => {
-      throw new Error(err);
-    });
+    const data = await this.fetchAndReturn('getTransaction', txid);
+    if (!data) {
+      return false;
+    }
     if (data.confirmations) {
       delete data.confirmations;
     }
@@ -89,14 +136,11 @@ class Transporter {
 
   async getUTXO(address) {
     if (!is.address(address)) throw new Error('Received an invalid address to fetch');
-    const data = await this.transport.getUTXO(address).catch((err) => {
-      throw new Error(err);
-    });
-    return data;
+    return this.fetchAndReturn('getUTXO', address);
   }
 
   async subscribeToAddresses(addresses, cb) {
-    if (addresses.length > 0 && _.has(this.transport, 'subscribeToAddresses')) {
+    if (addresses.length > 0 && this.hasSupportFor('subscribeToAddresses')) {
       // todo verify if valid addresses
       // if (!is.address(address)) throw new Error('Received an invalid address to fetch');
       return this.transport.subscribeToAddresses(addresses, cb);
@@ -105,7 +149,7 @@ class Transporter {
   }
 
   async subscribeToEvent(eventName, cb) {
-    if (is.string(eventName) && _.has(this.transport, 'subscribeToEvent')) {
+    if (is.string(eventName) && this.hasSupportFor('subscribeToEvent')) {
       return this.transport.subscribeToEvent(eventName, cb);
     }
     return false;

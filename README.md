@@ -87,7 +87,7 @@ Most of the time, here is what configuration you will be using :
 ```
 const { Wallet } = require('@dashevo/wallet-lib');
 const { DAPIClient } = require('@dashevo/dapi-client');
-const { Mnemonic } = require('@dashevo/dashcore-mnemonic');
+const { Mnemonic } = require('@dashevo/dashcore-lib');
 const localForage = require('localforage');
 
 
@@ -194,6 +194,9 @@ Miscellaneous :
 - [ ] Compatibility with old format (BIP32)
 - [ ] Paper-sweep wallet
 - [ ] Log tool to be able to help for decentralized debugging
+- [ ] [docs/plugins](Plugins.md) support (Worker, DAP)
+- [ ] CoinSelection strategy as a plugins.
+- [ ] Account network and plugins independants from each other.
 
 Transports :
 
@@ -205,6 +208,7 @@ Transports :
 Adapters (help from community welcomed) :
 
 - [x] [LocalForage](https://github.com/localForage/localForage)
+- [x] [ReactNative AsyncStorage](https://facebook.github.io/react-native/docs/asyncstorage)
 - [ ] LocalStorage
 - [ ] SecureStorage
 - [ ] LevelDB

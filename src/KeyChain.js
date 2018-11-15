@@ -1,13 +1,13 @@
 const { PrivateKey, crypto } = require('@dashevo/dashcore-lib');
+const { has } = require('lodash');
 
-const {has} = require('lodash');
 class KeyChain {
   constructor(opts) {
-    if(!opts) throw new Error('Expect some parameters to construct keychain');
-    if(has(opts,'HDRootKey')){
+    if (!opts) throw new Error('Expect some parameters to construct keychain');
+    if (has(opts, 'HDRootKey')) {
       this.type = 'HDRootKey';
       this.HDRootKey = opts.HDRootKey;
-    }else if(has(opts, 'privateKey')){
+    } else if (has(opts, 'privateKey')) {
       this.type = 'privateKey';
       this.privateKey = opts.privateKey;
     }
@@ -22,13 +22,18 @@ class KeyChain {
    * @return HDPrivateKey
    */
   generateKeyForPath(path) {
-    // const derivedKey = this.HDRootKey.derive(path);
-    // return derivedKey;
-    return (this.type==='HDRootKey') ? this.HDRootKey.derive(path) : null;
+    return (this.type === 'HDRootKey') ? this.HDRootKey.derive(path) : null;
   }
 
-  getPrivateKey(){
-    return PrivateKey(this.privateKey);
+  getPrivateKey() {
+    let pk;
+    if (this.type === 'HDRootKey') {
+      pk = PrivateKey(this.HDRootKey);
+    }
+    if (this.type === 'privateKey') {
+      pk = PrivateKey(this.privateKey);
+    }
+    return pk;
   }
 
   /**
@@ -38,16 +43,16 @@ class KeyChain {
    */
   getKeyForPath(path) {
     if (!this.keys[path]) {
-      if(this.type==='HDRootKey'){
+      if (this.type === 'HDRootKey') {
         this.keys[path] = this.generateKeyForPath(path);
       }
-      if(this.type==='privateKey'){
+      if (this.type === 'privateKey') {
         this.keys[path] = this.getPrivateKey(path);
       }
     }
+
     return this.keys[path];
   }
-
 
   /**
    * Allow to sign any transaction or a transition object from a valid privateKeys list

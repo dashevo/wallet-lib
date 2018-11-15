@@ -1,14 +1,14 @@
 const { expect } = require('chai');
 const Transporter = require('../../src/transports/Transporter');
-const DAPIClient = require('../../src/transports/DAPI/DapiClient');
+const DAPIClient = require('@dashevo/dapi-client');
 const InsightClient = require('../../src/transports/Insight/insightClient');
 
 const pluginRequiredKeys = ['getAddressSummary', 'getTransaction', 'getUTXO', 'subscribeToAddresses', 'closeSocket', 'sendRawTransaction'];
 
 describe('Transporter', () => {
   it('should create a new transporter', () => {
-    const transporterDAPI = new Transporter('DAPIClient');
-    const transporterInsight = new Transporter('Insight');
+    const transporterDAPI = new Transporter('dapi');
+    const transporterInsight = new Transporter('insight');
 
     expect(transporterDAPI.isValid).to.equal(true);
     expect(transporterInsight.isValid).to.equal(true);
@@ -46,7 +46,7 @@ describe('Transporter', () => {
     transporterInsight2.disconnect();
   });
   it('should handle invalid transporter', () => {
-    const empty = new Transporter();
+    const empty = new Transporter('tirelipinpon');
     expect(empty.isValid).to.equal(false);
     const invalid = new Transporter('invalidName');
     expect(invalid.isValid).to.equal(false);
@@ -65,7 +65,6 @@ describe('Transporter', () => {
     const insightClient = new InsightClient();
     const transport = new Transporter(insightClient);
     expect(transport.getNetwork().toString()).to.equal('testnet');
-    console.log(transport);
     transport.updateNetwork('livenet');
     expect(transport.getNetwork().toString()).to.equal('livenet');
     transport.disconnect();

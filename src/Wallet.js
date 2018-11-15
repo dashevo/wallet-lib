@@ -1,4 +1,5 @@
 const Dashcore = require('@dashevo/dashcore-lib');
+const _ = require('lodash');
 const InMem = require('./adapters/InMem');
 const Storage = require('./Storage');
 const KeyChain = require('./KeyChain');
@@ -11,16 +12,16 @@ const {
 } = require('./utils/index');
 
 const Account = require('./Account');
-const SingleAddress = require('./SingleAddress');
 const Transporter = require('./transports/Transporter');
 
 const defaultOptions = {
   network: 'testnet',
+  plugins: [],
+  passphrase: null,
+  injectDefaultPlugins: true,
+  forceUnsafePlugins: false,
 };
-const TYPES = {
-  'SINGLE_ADDRESS':'single_address',
-  "HDWALLET":'hdwallet'
-};
+const { WALLET_TYPES } = require('./CONSTANTS');
 
 
 /**
@@ -28,9 +29,10 @@ const TYPES = {
  * A wallet is able to spawn up all preliminary steps toward the creation of a Account with
  * it's own transactions
  *
- * A wallet can be of multiple types, which some method. Type are attributed in function of opts (mnemonic, seed,...)
+ * A wallet can be of multiple types, which some method.
+ * Type are attributed in function of opts (mnemonic, seed,...)
  *
- * Types :
+ * WALLET_TYPES :
  *     - address : opts.privateKey is provided. Allow to handle a single address object.
  *     - hdwallet : opts.mnemonic or opts.seed is provided. Handle a HD Wallet with it's account.
  */
@@ -40,9 +42,15 @@ class Wallet {
    * @param opts
    */
   constructor(opts = defaultOptions) {
-    if (!(opts.network && is.network(opts.network))) throw new Error('Expected a valid network (typeof Network or String)');
-    this.passphrase = (opts.passphrase) ? (opts.passphrase) : null;
-    this.network = Dashcore.Networks[opts.network];
+    const network = _.has(opts, 'network') ? opts.network : defaultOptions.network;
+    const passphrase = _.has(opts, 'passphrase') ? opts.passphrase : defaultOptions.passphrase;
+    this.passphrase = passphrase;
+
+    this.forceUnsafePlugins = _.has(opts, 'forceUnsafePlugins') ? opts.forceUnsafePlugins : defaultOptions.forceUnsafePlugins;
+    this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
+
+    if (!(is.network(network))) throw new Error('Expected a valid network (typeof Network or String)');
+    this.network = Dashcore.Networks[network];
 
     if ('mnemonic' in opts) {
       this.fromMnemonic(opts.mnemonic);
@@ -54,20 +62,22 @@ class Wallet {
       this.fromMnemonic(generateNewMnemonic());
     }
 
-    //Notice : Most of the time, wallet id is deterministic
+    // Notice : Most of the time, wallet id is deterministic
     this.generateNewWalletId();
-
     this.adapter = (opts.adapter) ? opts.adapter : new InMem();
-    this.adapter.config();
-
+    if (this.adapter.config) this.adapter.config();
     this.storage = new Storage({
       adapter: this.adapter,
       walletId: this.walletId,
       network: this.network,
-      mnemonic:this.mnemonic,
-      type:this.type
+      mnemonic: this.mnemonic,
+      type: this.type,
     });
     this.store = this.storage.store;
+    const plugins = opts.plugins || defaultOptions.plugins;
+    this.plugins = {};
+    // eslint-disable-next-line no-return-assign
+    plugins.map(item => this.plugins[item.name] = item);
 
     // Handle import of cache
     if (opts.cache) {
@@ -80,55 +90,58 @@ class Wallet {
     }
 
     this.transport = (opts.transport) ? new Transporter(opts.transport) : new Transporter();
-
     this.accounts = [];
     this.interface = opts.interface;
     this.savedBackup = false; // When true, we delete mnemonic from internals
   }
-  generateNewWalletId(){
-    const type = this.type;
+
+
+  generateNewWalletId() {
+    const { type } = this;
     switch (type) {
-      case TYPES.SINGLE_ADDRESS:
-        this.walletId =  mnemonicToWalletId(this.privateKey);
+      case WALLET_TYPES.SINGLE_ADDRESS:
+        this.walletId = mnemonicToWalletId(this.privateKey);
         break;
-      case TYPES.HDWALLET:
+      case WALLET_TYPES.HDWALLET:
       default:
-        if(!this.HDPrivateKey) throw new Error('Cannot generate a walletId : Do not find any HDPrivateKey');
+        if (!this.HDPrivateKey) throw new Error('Cannot generate a walletId : No HDPrivateKey found');
         this.walletId = mnemonicToWalletId(this.HDPrivateKey);
         break;
     }
-
   }
-  fromPrivateKey(privateKey){
+
+  fromPrivateKey(privateKey) {
     if (!is.privateKey(privateKey)) throw new Error('Expected a valid private key (typeof PrivateKey or String)');
-    this.type = TYPES.SINGLE_ADDRESS;
+    this.type = WALLET_TYPES.SINGLE_ADDRESS;
     this.mnemonic = null;
     this.privateKey = privateKey;
-    this.keychain = new KeyChain({privateKey:privateKey});
-
+    this.keyChain = new KeyChain({ privateKey });
   }
-  fromSeed(seed){
+
+  fromSeed(seed) {
     if (!is.seed(seed)) throw new Error('Expected a valid seed (typeof HDPrivateKey or String)');
-    this.type = TYPES.HDWALLET;
+    this.type = WALLET_TYPES.HDWALLET;
     this.mnemonic = null;
     this.HDPrivateKey = seed;
-    this.keychain = new KeyChain({HDRootKey:seed});
+    this.keyChain = new KeyChain({ HDRootKey: seed });
   }
-  fromMnemonic(mnemonic){
+
+  fromMnemonic(mnemonic) {
     if (!is.mnemonic(mnemonic)) {
       throw new Error('Expected a valid mnemonic (typeof String or Mnemonic)');
     }
     const trimmedMnemonic = mnemonic.toString().trim();
-    this.type = TYPES.HDWALLET;
+    this.type = WALLET_TYPES.HDWALLET;
     this.mnemonic = trimmedMnemonic; // todo : What about without this ?
-    this.HDPrivateKey=mnemonicToHDPrivateKey(trimmedMnemonic, this.network, this.passphrase);
-    this.keychain = new KeyChain({HDRootKey:this.HDPrivateKey});
+    this.HDPrivateKey = mnemonicToHDPrivateKey(trimmedMnemonic, this.network, this.passphrase);
+    this.keyChain = new KeyChain({ HDRootKey: this.HDPrivateKey });
   }
+
   // TODO : Add tests
   updateNetwork(network) {
     if (is.network(network) && network !== this.network) {
       this.network = Dashcore.Networks[network];
-      this.transport.updateNetwork(network);
+      // this.transport.updateNetwork(network);
       this.accounts.forEach((acc) => {
         acc.updateNetwork(network);
       });
@@ -139,34 +152,32 @@ class Wallet {
 
   /**
    * Will derivate to a new account.
-   * @param {object} account options
+   * @param {object} accountOpts - options to pass, will autopopulate some
    * @return {account} - account object
    */
   createAccount(accountOpts) {
-    // if(this.accounts[])
-    // Auto-populate this.accounts, probably not what we want ?
-    return new Account(this, accountOpts);
+    const { injectDefaultPlugins, plugins, forceUnsafePlugins } = this;
+    const baseOpts = { injectDefaultPlugins, forceUnsafePlugins, plugins };
+    if (this.type === WALLET_TYPES.SINGLE_ADDRESS) { baseOpts.privateKey = this.privateKey; }
+    const opts = Object.assign(baseOpts, accountOpts);
+    return new Account(this, opts);
   }
 
-  /**
-   *
-   */
-  createSingleAddress(singleAddressOpts){
-    return new SingleAddress(this, singleAddressOpts);
-  }
+
   /**
    * Get a specific account per accountIndex
    * @param accountIndex - Default: 0, set a specific index to get
-   * @param accountOpts - If we can't get, we create passing these arg to createAccount method
+   * @param accountOpts - If the account doesn't exist yet, we create it passing these options
    * @return {*|account}
    */
   getAccount(accountIndex = 0, accountOpts) {
-    if(this.type===TYPES.SINGLE_ADDRESS){
-      return this.createSingleAddress({privateKey:this.privateKey});
-    }
     const acc = this.accounts.filter(el => el.accountIndex === accountIndex);
-    const opts = Object.assign({ accountIndex }, accountOpts);
-    return (acc[0]) || this.createAccount(opts);
+    const baseOpts = { accountIndex };
+
+    const opts = Object.assign(baseOpts, accountOpts);
+    const account = (acc[0]) || this.createAccount(opts);
+    account.storage.attachEvents(account.events);
+    return account;
   }
 
   /**
@@ -180,17 +191,15 @@ class Wallet {
       return mnemonic.toString();
     }
 
-    if(toHDPrivateKey){
+    if (toHDPrivateKey) {
       return this.HDPrivateKey;
     }
     switch (this.type) {
-      case TYPES.SINGLE_ADDRESS:
-        if(!this.privateKey) throw new Error('Nothing to export');
+      case WALLET_TYPES.SINGLE_ADDRESS:
+        if (!this.privateKey) throw new Error('Nothing to export');
         return this.privateKey;
-        break;
-      case TYPES.HDWALLET:
-        return exportMnemonic(this.mnemonic)
-        break;
+      case WALLET_TYPES.HDWALLET:
+        return exportMnemonic(this.mnemonic);
       default:
         throw new Error('Nothing to export');
     }

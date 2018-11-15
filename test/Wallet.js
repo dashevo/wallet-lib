@@ -1,19 +1,28 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
-const Mnemonic = require('@dashevo/dashcore-mnemonic');
+const { Mnemonic } = require('@dashevo/dashcore-lib');
 const { Wallet } = require('../src/index');
 const { mnemonicString1, invalidMnemonicString1 } = require('./fixtures.json');
 
 const mnemonic1 = new Mnemonic(mnemonicString1);
 const privateHDKey1 = mnemonic1.toHDPrivateKey('', 'testnet');
+const fakeTransport = {
+  getAddressSummary: async () => false,
+  getTransaction: async () => false,
+  getUTXO: async () => false,
+  sendRawTransaction: async () => false,
+  updateNetwork: () => false,
+};
 
 
 describe('Wallet', () => {
+
   it('should create a wallet from a HDPrivateKey', () => {
     const network = 'testnet';
     const config = {
       seed: privateHDKey1,
       network,
+      injectDefaultPlugins: false,
     };
     const wallet = new Wallet(config);
     // eslint-disable-next-line no-unused-expressions
@@ -24,11 +33,13 @@ describe('Wallet', () => {
     expect(wallet.HDPrivateKey.toString()).to.equal(privateHDKey1.toString());
     wallet.disconnect();
   });
+
   it('should create a wallet from a mnemonic string', () => {
     const network = Dashcore.Networks.testnet;
     const config = {
       mnemonic: mnemonicString1,
       network,
+      injectDefaultPlugins: false,
     };
     const wallet = new Wallet(config);
     const hdKey = mnemonic1.toHDPrivateKey('', network);
@@ -45,6 +56,7 @@ describe('Wallet', () => {
     const config = {
       mnemonic: mnemonic1,
       network,
+      injectDefaultPlugins: false,
     };
     const wallet = new Wallet(config);
     const hdKey = mnemonic1.toHDPrivateKey('', network);
@@ -60,6 +72,7 @@ describe('Wallet', () => {
     const network = Dashcore.Networks.testnet;
     const config = {
       network,
+      injectDefaultPlugins: false,
     };
     const wallet = new Wallet(config);
     // eslint-disable-next-line no-unused-expressions
@@ -69,14 +82,16 @@ describe('Wallet', () => {
     expect(wallet.transport).to.not.equal(null);
     wallet.disconnect();
   });
+
   it('should be able to create a wallet', () => {
     const wallet = new Wallet({
       mnemonic: mnemonicString1,
       network: Dashcore.Networks.testnet,
+      injectDefaultPlugins: false,
     });
 
-    const acc1 = wallet.createAccount({ mode: 'light' });
-    const acc2 = wallet.createAccount({ mode: 'light' });
+    const acc1 = wallet.createAccount({ injectDefaultPlugins: false });
+    const acc2 = wallet.createAccount({ injectDefaultPlugins: false });
 
     [acc1, acc2].forEach((el, i) => {
       // eslint-disable-next-line no-unused-expressions
@@ -90,7 +105,7 @@ describe('Wallet', () => {
     wallet.disconnect();
   });
 
-  it('should not be able to getAddressSummary with fake transport', () => {
+  it('should not be able to getAddressSummary with fake transport', async () => {
     const network = 'testnet';
     const config = {
       seed: privateHDKey1,
@@ -107,16 +122,13 @@ describe('Wallet', () => {
     expect(wallet.transport).to.be.a('object');
     expect(wallet.transport.isValid).to.equal(false);
     expect(wallet.transport.type).to.equal('String');
-
     expect(wallet.HDPrivateKey.toString()).to.equal(privateHDKey1.toString());
-    wallet.transport.getAddressSummary('fake').then(
-      () => Promise.reject(new Error('Expected method to reject.')),
-      err => expect(err).to.be.a('Error').with.property('message', 'this.transport.getAddressSummary is not a function'),
-    );
+    const addrSum = await wallet.transport.getAddressSummary('fake');
+    expect(addrSum).to.be.equal(false);
     wallet.disconnect();
   });
 
-  it('should not be able to getAddressSummary with invalid address', () => {
+  it('should not be able to getAddressSummary with invalid address', async () => {
     const network = 'testnet';
     const config = {
       seed: privateHDKey1,
@@ -133,19 +145,14 @@ describe('Wallet', () => {
     expect(wallet.transport.isValid).to.equal(false);
     expect(wallet.transport.type).to.equal('String');
     expect(wallet.HDPrivateKey.toString()).to.equal(privateHDKey1.toString());
-    wallet.transport.getAddressSummary(123).then(
-      () => Promise.reject(new Error('Expected method to reject.')),
-      err => expect(err).to.be.a('Error').with.property('message', 'Received an invalid address to fetch'),
-    );
-    wallet.disconnect();
+
+    return wallet.transport.getAddressSummary(123)
+      .then(
+        () => Promise.reject(new Error('Expected method to reject.')),
+        err => expect(err).to.be.a('Error').with.property('message', 'Received an invalid address to fetch'),
+      ).then(wallet.disconnect.bind(wallet));
   });
 
-  it('should reject without network', () => {
-    const conf = {
-      mnemonic: mnemonic1,
-    };
-    expect(() => new Wallet(conf)).to.throw('Expected a valid network (typeof Network or String');
-  });
   it('should reject with invalid mnemonic: true', () => {
     const conf = {
       mnemonic: true,
@@ -234,6 +241,7 @@ describe('Wallet', () => {
     expect(exported).to.deep.equal(privateHDKey1);
     walletTestnet.disconnect();
   });
+
   it('should not be able to export with seed', () => {
     const network = 'testnet';
     const config = {
@@ -275,6 +283,7 @@ describe('Wallet', () => {
     expect(accountSpecificIndex.accountIndex).to.equal(42);
     walletTestnet.disconnect();
   });
+
   it('should be able to get an account at a specific index', () => {
     const network = Dashcore.Networks.testnet;
     const passphrase = 'Evolution';
@@ -297,6 +306,7 @@ describe('Wallet', () => {
     expect(walletTestnet.accounts.length).to.equal(3);
     walletTestnet.disconnect();
   });
+
   it('should be able to import a cache', () => {
     const network = Dashcore.Networks.testnet;
     const passphrase = 'Evolution';
@@ -319,10 +329,16 @@ describe('Wallet', () => {
             }],
             vout: [{
               value: '2.00000000',
+              scriptPubKey: {
+                hex: '76a914df128447b46f9c81edbf13494d12aabca066b65688ac', asm: 'OP_DUP OP_HASH160 df128447b46f9c81edbf13494d12aabca066b656 OP_EQUALVERIFY OP_CHECKSIG', addresses: ['ygewiYb7ZJxU4uuNGEVzbbA3wZEpEQJKhr'], type: 'pubkeyhash',
+              },
               spentTxId: '6b90bf01b10a0c6cac018d376823f6b330edf2cbb783cc3d02004f8706bbc311',
               spentIndex: 7,
             }, {
               value: '810.46609083',
+              scriptPubKey: {
+                hex: '76a914f67b2c4f47ea0a2bae829d3816a01cc486463d7988ac', asm: 'OP_DUP OP_HASH160 f67b2c4f47ea0a2bae829d3816a01cc486463d79 OP_EQUALVERIFY OP_CHECKSIG', addresses: ['yinidcHwrfzb4bEJDSq3wtQyxRAgQxsQia'], type: 'pubkeyhash',
+              },
               spentTxId: '22c368e09ad8b36553b383c6a4ae989f91d1f66622b2b685262580c8a45175a4',
               spentIndex: 0,
             }],

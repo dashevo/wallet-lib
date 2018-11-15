@@ -1,4 +1,4 @@
-const Mnemonic = require('@dashevo/dashcore-mnemonic');
+const { Mnemonic } = require('@dashevo/dashcore-lib');
 const { hash256 } = require('./crypto');
 
 function generateNewMnemonic() {
