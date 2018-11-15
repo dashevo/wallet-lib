@@ -13,16 +13,15 @@ For more granularity, you could do it as a parameter of `getAccount(accId, accOp
 
 ### Type of plugins 
 
-There is different type of plugins that can be used in the wallet-library : 
+There are three different types of plugins that can be used in the wallet-library:
 
 - Workers : A worker plugins is a plugin that inherits from Worker class. It distinguish itself by having a execute method that will be executed each `workerIntervalTime`.
 - DAP :  A DAP plugins inherits from DAP class and is only require to have a init method. 
 - Standard : These are mostly enhancers of the wallet library functionalities.
-  
+
 ### Dependencies
 
-In order for a plugin to have the ability to access the data, you have to explicitely 
-notice about it in the constructor. 
+In order for a plugin to have the ability to access wallet data, you have to add a dependency in the constructor.
 
 ```
 class MyPlugin extends StandardPlugin { 
@@ -35,7 +34,7 @@ class MyPlugin extends StandardPlugin {
 }
 ```
 
-Will allow to access the walletId property, same thing is doable with account function. 
+This will allow to access the walletId property; the same thing is doable with the account function.
 
 ### Accessing a plugin / DAP
 
