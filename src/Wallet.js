@@ -1,5 +1,6 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const _ = require('lodash');
+const localforage = require('localforage');
 const InMem = require('./adapters/InMem');
 const Storage = require('./Storage');
 const KeyChain = require('./KeyChain');
@@ -23,6 +24,17 @@ const defaultOptions = {
 };
 const { WALLET_TYPES } = require('./CONSTANTS');
 
+const getDefaultAdapter = (walletId) => {
+  let adapter;
+  try {
+    adapter = localforage.createInstance({ name: 'wallet-lib' });
+  } catch (e) {
+    console.error(e);
+    adapter = new InMem();
+  }
+
+  return adapter;
+};
 
 /**
  * Instantiate a basic Wallet object,
@@ -63,9 +75,9 @@ class Wallet {
     }
 
     // Notice : Most of the time, wallet id is deterministic
-    this.generateNewWalletId();
-    this.adapter = (opts.adapter) ? opts.adapter : new InMem();
-    if (this.adapter.config) this.adapter.config();
+    const walletId = this.generateNewWalletId();
+    this.adapter = (opts.adapter) ? opts.adapter : getDefaultAdapter(walletId);
+    if (this.adapter.config && this.adapter.constructor.name === 'localForage') this.adapter.config();
     this.storage = new Storage({
       adapter: this.adapter,
       walletId: this.walletId,
@@ -108,6 +120,7 @@ class Wallet {
         this.walletId = mnemonicToWalletId(this.HDPrivateKey);
         break;
     }
+    return this.walletId;
   }
 
   fromPrivateKey(privateKey) {

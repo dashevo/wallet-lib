@@ -16,7 +16,7 @@ class SyncWorker extends Worker {
       workerIntervalTime: defaultOpts.workerIntervalTime,
       fetchThreshold: defaultOpts.fetchThreshold,
       dependencies: [
-        'storage', 'transport', 'fetchStatus', 'fetchAddressInfo', 'fetchTransactionInfo', 'walletId', 'getBalance',
+        'storage', 'transport', 'fetchStatus', 'fetchAddressInfo', 'fetchTransactionInfo', 'walletId', 'getBalance', 'getUnusedAddress',
       ],
     }, opts);
     super(params);
@@ -29,14 +29,19 @@ class SyncWorker extends Worker {
   }
 
   async execute() {
-    // Todo : Ensure the performance impact of this.
-    // We would love to have a small perf footprint and this seems improvable.
+    // Mostly in order to get our history in sync when we are not listening for new events.
+    // We will fetch address summary of our addresses that :
+    // - Didn't fetched new update for a bigger period than fetchThreshold (concern all addresses)
+    // - If we have an unconfirmed balance
+    // - Have more chance to have new tx coming in
+    //    (typically the result of getUnusedAddress, and preemptively in case of us not receiving the tx from listeners)
     await this.execAddressFetching();
 
-    await this.execAddressListener();
-
+    // We execute a fetching of all the transactions that are unknown
     await this.execTransactionsFetching();
 
+
+    await this.execAddressListener();
     await this.execAddressBloomfilter();
   }
 
@@ -113,6 +118,8 @@ class SyncWorker extends Worker {
     const promises = [];
 
     toFetchAddresses.forEach((addressObj) => {
+      // We set at false so we don't autofetch utxos. This part will be done in the tx fetching time
+      // const p = fetchAddressInfo(addressObj, false)
       const p = fetchAddressInfo(addressObj)
         .catch((e) => {
           if (e instanceof ValidTransportLayerRequired) return false;
@@ -121,11 +128,14 @@ class SyncWorker extends Worker {
       promises.push(p);
     });
 
+    // console.log('fetching addr', toFetchAddresses);
+    // console.log(promises)
     const responses = await Promise.all(promises);
+
     responses.forEach((addrInfo) => {
       try {
         const prev = self.storage.searchAddress(addrInfo.address);
-        if (prev.found && !addrInfo.utxos) {
+        if (prev.found && (!addrInfo.utxos || Object.keys(addrInfo).length === 0)) {
           // eslint-disable-next-line no-param-reassign
           addrInfo.utxos = prev.result.utxos;
         }

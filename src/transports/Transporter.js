@@ -46,7 +46,12 @@ class Transporter {
       if (is.string(transportArg)) {
         const loweredTransportName = transportArg.toString().toLowerCase();
         if (Object.keys(transportList).includes(loweredTransportName)) {
-          transport = new transportList[loweredTransportName]();
+          // TODO : Remove me toward release
+          if (transportArg === 'dapi') {
+            transport = new DAPIClient({ seeds: [{ ip: '54.191.116.37', port: 3000 }] });
+          } else {
+            transport = new transportList[loweredTransportName]();
+          }
           this.isValid = isValidTransport(loweredTransportName);
         }
       } else {

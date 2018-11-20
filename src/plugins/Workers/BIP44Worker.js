@@ -86,6 +86,7 @@ class BIP44Worker extends Worker {
     addressesPaths.forEach((path) => {
       const el = addresses[path];
       if (!el.used && el.transactions.length > 0) {
+        el.used = true;
         throw new Error(`Conflicting information ${JSON.stringify(el)}`);
       }
       if (!el.used) unusedAddress += 1;
