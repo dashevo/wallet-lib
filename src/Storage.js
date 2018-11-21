@@ -216,22 +216,24 @@ class Storage {
       // VOUT
       const vouts = transaction.vout;
       vouts.forEach((vout) => {
-
-        vout.scriptPubKey.addresses.forEach((addr) => {
-          const search = self.searchAddress(addr);
-          if (search.found) {
-            const isSpent = !!vout.spentTxId;
-            if (!isSpent) {
-              const utxo = {
-                txid: transaction.txid,
-                outputIndex: vout.n,
-                satoshis: dashToDuffs(parseFloat(vout.value)),
-                scriptPubKey: vout.scriptPubKey.hex,
-              };
-              self.addUTXOToAddress(utxo, search.result.address);
+        if(vout && vout.scriptPubKey && vout.scriptPubKey.addresses){
+          vout.scriptPubKey.addresses.forEach((addr) => {
+            const search = self.searchAddress(addr);
+            if (search.found) {
+              const isSpent = !!vout.spentTxId;
+              if (!isSpent) {
+                const utxo = {
+                  txid: transaction.txid,
+                  outputIndex: vout.n,
+                  satoshis: dashToDuffs(parseFloat(vout.value)),
+                  scriptPubKey: vout.scriptPubKey.hex,
+                };
+                self.addUTXOToAddress(utxo, search.result.address);
+              }
             }
-          }
-        });
+          });
+        }
+
       });
       this.lastModified = +new Date();
     } else {
