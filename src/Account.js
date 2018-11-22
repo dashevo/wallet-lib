@@ -710,7 +710,7 @@ class Account {
    * @param opts - Options object
    * @param opts.amount - Amount in dash that you want to send
    * @param opts.satoshis - Amount in satoshis
-   * @param opts.to - Address of the recipient
+   * @param opts.recipient - Address of the recipient
    * @param opts.isInstantSend - If you want to use IS or stdTx.
    * @param opts.deductFee - Deduct fee
    * @param opts.privateKeys - Overwrite default behavior : auto-searching local matching keys.
@@ -725,7 +725,7 @@ class Account {
       throw new Error('An amount in dash or in satoshis is expected to create a transaction');
     }
     const satoshis = (opts.amount && !opts.satoshis) ? dashToDuffs(opts.amount) : opts.satoshis;
-    if (!opts || (!opts.to)) {
+    if (!opts || (!opts.recipient)) {
       throw new Error('A recipient is expected to create a transaction');
     }
     const deductFee = _.has(opts, 'deductFee')
