@@ -26,7 +26,7 @@ const defaultOptions = {
   mode: 'full',
   cacheTx: true,
   subscribe: true,
-  forceUnsafePlugins: false,
+  allowSensitiveOperations: false,
   plugins: [],
   injectDefaultPlugins: true,
 };
@@ -61,7 +61,7 @@ class Account {
     this.events = new EventEmitter();
     this.isReady = false;
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
-    this.forceUnsafePlugins = _.has(opts, 'forceUnsafePlugins') ? opts.forceUnsafePlugins : defaultOptions.forceUnsafePlugins;
+    this.allowSensitiveOperations = _.has(opts, 'allowSensitiveOperations') ? opts.allowSensitiveOperations : defaultOptions.allowSensitiveOperations;
 
     this.type = wallet.type;
 
@@ -157,7 +157,7 @@ class Account {
     }
 
     _.each(userUnsafePlugins, (UnsafePlugin) => {
-      this.injectPlugin(UnsafePlugin, this.forceUnsafePlugins);
+      this.injectPlugin(UnsafePlugin, this.allowSensitiveOperations);
     });
 
     this.readinessInterval = setInterval(() => {

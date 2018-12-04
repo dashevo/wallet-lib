@@ -20,7 +20,7 @@ const defaultOptions = {
   plugins: [],
   passphrase: null,
   injectDefaultPlugins: true,
-  forceUnsafePlugins: false,
+  allowSensitiveOperations: false,
 };
 const { WALLET_TYPES } = require('./CONSTANTS');
 
@@ -58,7 +58,7 @@ class Wallet {
     const passphrase = _.has(opts, 'passphrase') ? opts.passphrase : defaultOptions.passphrase;
     this.passphrase = passphrase;
 
-    this.forceUnsafePlugins = _.has(opts, 'forceUnsafePlugins') ? opts.forceUnsafePlugins : defaultOptions.forceUnsafePlugins;
+    this.allowSensitiveOperations = _.has(opts, 'allowSensitiveOperations') ? opts.allowSensitiveOperations : defaultOptions.allowSensitiveOperations;
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
 
     if (!(is.network(network))) throw new Error('Expected a valid network (typeof Network or String)');
@@ -169,8 +169,8 @@ class Wallet {
    * @return {account} - account object
    */
   createAccount(accountOpts) {
-    const { injectDefaultPlugins, plugins, forceUnsafePlugins } = this;
-    const baseOpts = { injectDefaultPlugins, forceUnsafePlugins, plugins };
+    const { injectDefaultPlugins, plugins, allowSensitiveOperations } = this;
+    const baseOpts = { injectDefaultPlugins, allowSensitiveOperations, plugins };
     if (this.type === WALLET_TYPES.SINGLE_ADDRESS) { baseOpts.privateKey = this.privateKey; }
     const opts = Object.assign(baseOpts, accountOpts);
     return new Account(this, opts);
