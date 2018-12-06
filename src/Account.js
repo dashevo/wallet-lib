@@ -732,7 +732,7 @@ class Account {
       ? opts.deductFee
       : true;
 
-    const outputs = [{ address: opts.to, satoshis }];
+    const outputs = [{ address: opts.recipient, satoshis }];
 
     const utxosList = this.getUTXOS();
 
