@@ -17,8 +17,8 @@ describe('Wallet - generateNewWalletId', () => {
     expect(() => generateNewWalletId.call(mockOpts3)).to.throw(exceptedException3);
   });
   it('should generate a wallet id from HDWallet', () => {
-    const mockOptsMainnet = { HDPrivateKey: knifeMnemonic.HDPrivateKeyMainnet };
-    const mockOptsTestnet = { HDPrivateKey: knifeMnemonic.HDPrivateKeyTestnet };
+    const mockOptsMainnet = { HDPrivateKey: knifeMnemonic.HDRootPrivateKeyMainnet };
+    const mockOptsTestnet = { HDPrivateKey: knifeMnemonic.HDRootPrivateKeyTestnet };
 
     const walletId1 = generateNewWalletId.call(mockOptsMainnet);
     expect(walletId1).to.length(10);
@@ -36,6 +36,6 @@ describe('Wallet - generateNewWalletId', () => {
 
     const walletId = generateNewWalletId.call(mockOpts);
     expect(walletId).to.length(10);
-    expect(walletId).to.equal(cR4t6ePrivateKey.walletId);
+    expect(walletId).to.equal(cR4t6ePrivateKey.walletIdTestnet);
   });
 });
