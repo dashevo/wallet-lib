@@ -98,7 +98,7 @@ describe('Account - Basics', function suite() {
     expect(account.label).to.equal(null);
     expect(account.cacheTx).to.equal(true);
     expect(account.injectDefaultPlugins).to.be.equal(true);
-    expect(account.forceUnsafePlugins).to.be.equal(false);
+    expect(account.allowSensitiveOperations).to.be.equal(false);
     expect(account.type).to.be.equal('hdwallet');
     expect(account.accountIndex).to.be.equal(0);
     expect(account.plugins).to.be.a('object');
@@ -129,7 +129,7 @@ describe('Account - Basics', function suite() {
     expect(account.label).to.equal(null);
     expect(account.cacheTx).to.equal(true);
     expect(account.injectDefaultPlugins).to.be.equal(true);
-    expect(account.forceUnsafePlugins).to.be.equal(false);
+    expect(account.allowSensitiveOperations).to.be.equal(false);
     expect(account.type).to.be.equal('hdwallet');
     expect(account.accountIndex).to.be.equal(0);
     expect(account.plugins).to.be.a('object');

@@ -1,5 +1,5 @@
 const {
-  cloneDeep, merge, clone,
+  cloneDeep, merge, clone, difference, each, xor, includes,
 } = require('lodash');
 const { Networks } = require('@dashevo/dashcore-lib');
 const EVENTS = require('./EVENTS');
@@ -43,7 +43,10 @@ class Storage {
       if (this.lastModified > this.lastSave) {
         this.saveState();
       }
-    }, 30 * 1000);
+    }, 10 * 1000);
+
+    // Map an address to it's walletid/path/type schema (used by searchAddress for speedup)
+    this.mappedAddress = {};
 
     setTimeout(() => {
       this.init();
@@ -69,7 +72,7 @@ class Storage {
    * @return {{} & any}
    */
   getStore() {
-    return Object.assign({}, this.store);
+    return cloneDeep(this.store);
   }
 
   async init() {
@@ -143,6 +146,7 @@ class Storage {
         await this.adapter.setItem('transactions', { ...self.store.transactions });
         await this.adapter.setItem('wallets', { ...self.store.wallets });
         this.lastSave = +new Date();
+
         return true;
       } catch (e) {
         console.log('Storage saveState err', e);
@@ -164,21 +168,19 @@ class Storage {
       utxo.forEach((_utxo) => {
         this.addUTXOToAddress(_utxo, address);
       });
+      return false;
     }
     if (!is.utxo(utxo)) throw new InvalidUTXO(utxo);
     const searchAddr = this.searchAddress(address);
+
     if (searchAddr.found) {
-      const newAddr = Object.assign({}, searchAddr.result);
+      const newAddr = cloneDeep(searchAddr.result);
       if (!newAddr.transactions.includes(utxo.txid)) {
         newAddr.transactions.push(utxo.txid);
       }
-      let utxoExist = false;
-      newAddr.utxos.forEach((_utxo) => {
-        if (_utxo.txid === utxo.txid) utxoExist = true;
-      });
-
-      if (!utxoExist) {
-        newAddr.utxos.push(utxo);
+      // If the received utxo does not exist
+      if (!!newAddr.utxos[utxo.txid] === false) {
+        newAddr.utxos[utxo.txid] = utxo;
         newAddr.used = true;
         this.updateAddress(newAddr, searchAddr.walletId);
       }
@@ -196,12 +198,13 @@ class Storage {
       transactionStore[transaction.txid] = transaction;
 
       // We should now also check if it concern one of our address
+
       // VIN
       const vins = transaction.vin;
       vins.forEach((vin) => {
         const search = self.searchAddress(vin.addr);
         if (search.found) {
-          const newAddr = Object.assign({}, search.result);
+          const newAddr = cloneDeep(search.result);
           if (!newAddr.transactions.includes(transaction.txid)) {
             newAddr.transactions.push(transaction.txid);
             newAddr.used = true;
@@ -209,24 +212,28 @@ class Storage {
           }
         }
       });
+
       // VOUT
       const vouts = transaction.vout;
       vouts.forEach((vout) => {
-        vout.scriptPubKey.addresses.forEach((addr) => {
-          const search = self.searchAddress(addr);
-          if (search.found) {
-            const isSpent = !!vout.spentTxId;
-            if (!isSpent) {
-              const utxo = {
-                txid: transaction.txid,
-                outputIndex: vout.n,
-                satoshis: dashToDuffs(parseFloat(vout.value)),
-                scriptPubKey: vout.scriptPubKey.hex,
-              };
-              self.addUTXOToAddress(utxo, search.result.address);
+        if(vout && vout.scriptPubKey && vout.scriptPubKey.addresses){
+          vout.scriptPubKey.addresses.forEach((addr) => {
+            const search = self.searchAddress(addr);
+            if (search.found) {
+              const isSpent = !!vout.spentTxId;
+              if (!isSpent) {
+                const utxo = {
+                  txid: transaction.txid,
+                  outputIndex: vout.n,
+                  satoshis: dashToDuffs(parseFloat(vout.value)),
+                  scriptPubKey: vout.scriptPubKey.hex,
+                };
+                self.addUTXOToAddress(utxo, search.result.address);
+              }
             }
-          }
-        });
+          });
+        }
+
       });
       this.lastModified = +new Date();
     } else {
@@ -351,33 +358,38 @@ class Storage {
     }
     const walletStore = this.store.wallets[walletId];
     const addressesStore = walletStore.addresses;
-    const previousObject = clone(addressesStore[type][path]);
+    const previousObject = cloneDeep(addressesStore[type][path]);
 
-    const newObject = clone(addressObj);
+    const newObject = cloneDeep(addressObj);
     // We do not autorize to alter UTXO using this
     // if(newObject.utxos.length==0 && previousObject.utxos.length>0){
     //
     // }
 
     const currentBlockHeight = this.store.chains[walletStore.network.toString()].blockheight;
-    // Recalculate balanceSat and unconfirmedBalanceSat
+
+    // We calculate here the balanceSat and unconfirmedBalanceSat of our addressObj
+    // We do that to avoid getBalance to be slow, so we have to keep that in mind or then
+    // Move that to an event type of calculation or somth
     let { balanceSat, unconfirmedBalanceSat } = newObject;
     const { utxos } = newObject;
 
-    // TODO : Right now we recalculate all everytime, would be nice to only calculate the diff...
-    balanceSat = 0;
-    unconfirmedBalanceSat = 0;
+    const newObjectUtxosKeys = Object.keys(utxos);
+    if (newObjectUtxosKeys.length > 0) {
+      // we compare the diff between the two utxos sets
 
-    if (utxos.length > 0) {
-      utxos.forEach((utxo) => {
+      const newUtxos = xor(newObjectUtxosKeys, Object.keys(previousObject.utxos));
+      newUtxos.forEach((txid) => {
+        const utxo = utxos[txid];
         try {
           const { blockheight } = this.getTransaction(utxo.txid);
           if (currentBlockHeight - blockheight >= 6) balanceSat += utxo.satoshis;
           else unconfirmedBalanceSat += utxo.satoshis;
         } catch (e) {
+          // console.log(e);
           if (e instanceof TransactionNotInStore) {
-            console.warn('Could not get tx ', utxo.txid, '. Considering utxo mature');
-            balanceSat += utxo.satoshis;
+            // TODO : We consider unconfirmed a transaction that we don't know of, should we ?
+            unconfirmedBalanceSat += utxo.satoshis;
           } else throw e;
         }
       });
@@ -417,14 +429,12 @@ class Storage {
           });
       }
     }
-    newObject.balanceSat = balanceSat;
-    newObject.unconfirmedBalanceSat = unconfirmedBalanceSat;
 
     // Check if there is a balance but no utxo.
-
-
     addressesStore[type][path] = newObject;
     this.lastModified = Date.now();
+
+    if (!this.mappedAddress[newObject.address]) this.mappedAddress[newObject.address] = { walletId, type, path };
     return true;
   }
 
@@ -448,34 +458,46 @@ class Storage {
   /**
    * Search a specific address in the store
    * @param address
+   * @param forceLoop - boolean - default : false - When set at true, for a search instead of using map
    * @return {{address: *, type: null, found: boolean}}
    */
-  searchAddress(address) {
+  searchAddress(address, forceLoop = false) {
     const search = {
       address,
       type: null,
       found: false,
     };
-    const store = this.getStore();
-
-    // Look up by looping over all addresses todo:optimisation
-    const existingWallets = Object.keys(store.wallets);
-    existingWallets.forEach((walletId) => {
-      const existingTypes = Object.keys(store.wallets[walletId].addresses);
-      existingTypes.forEach((type) => {
-        const existingPaths = Object.keys(store.wallets[walletId].addresses[type]);
-        existingPaths.forEach((path) => {
-          const el = store.wallets[walletId].addresses[type][path];
-          if (el.address === search.address) {
-            search.path = path;
-            search.type = type;
-            search.found = true;
-            search.result = el;
-            search.walletId = walletId;
-          }
+    const { store } = this;
+    if (forceLoop === true) {
+      // Look up by looping over all addresses todo:optimisation
+      const existingWallets = Object.keys(store.wallets);
+      existingWallets.forEach((walletId) => {
+        const existingTypes = Object.keys(store.wallets[walletId].addresses);
+        existingTypes.forEach((type) => {
+          const existingPaths = Object.keys(store.wallets[walletId].addresses[type]);
+          existingPaths.forEach((path) => {
+            const el = store.wallets[walletId].addresses[type][path];
+            if (el.address === search.address) {
+              search.path = path;
+              search.type = type;
+              search.found = true;
+              search.result = el;
+              search.walletId = walletId;
+            }
+          });
         });
       });
-    });
+    } else if (this.mappedAddress[address]) {
+      const { path, type, walletId } = this.mappedAddress[address];
+      const el = store.wallets[walletId].addresses[type][path];
+
+      search.path = path;
+      search.type = type;
+      search.found = true;
+      search.result = el;
+      search.walletId = walletId;
+    }
+
 
     return search;
   }
@@ -587,7 +609,7 @@ class Storage {
     if (is.undef(walletId)) throw new Error('Expected walletId to import an address');
     if (!is.addressObj(addressObj)) throw new InvalidAddressObject(addressObj);
     const { path } = addressObj;
-    const modifiedAddressObject = Object.assign({}, addressObj);
+    const modifiedAddressObject = cloneDeep(addressObj);
     const index = parseInt(path.split('/')[5], 10);
     const typeInt = path.split('/')[4];
     let type;

@@ -1,8 +1,7 @@
-const { utils, plugins } = require('../../src');
+const { utils, plugins, CONSTANTS } = require('../../src');
 const Dashcore = require('@dashevo/dashcore-lib');
 const dashPaySchema = require('./dashPaySchema.json');
 
-const coinSelection = utils.coinSelection;
 const DAP = plugins.DAP;
 
 class DashPayDAP extends DAP {
@@ -15,6 +14,8 @@ class DashPayDAP extends DAP {
         'sign',
         'broadcastTransaction',
         'keyChain',
+        'getPrivateKeys',
+        'transport',
       ],
     });
   }
@@ -24,38 +25,77 @@ class DashPayDAP extends DAP {
   }
 
   /**
-   * @param {string} rawRegistration - hex string representing user registration data
+   * @param {string} blockchainUsername - string representation of the user desired username
    * @param {number} [funding] - default funding for the account in duffs. Optional.
-   If left empty,
-   * funding will be 0.
+   * If left empty funding will be 10000.
    * @return {string} - user id
    */
-  async registerUsername(blockchainUsername) {
+  async registerUsername(blockchainUsername, funding = 10000) {
     const { address } = this.getUnusedAddress();
     const balance = await this.getBalance();
 
+    if (balance === 0) throw new Error('Insufficient funds');
+
+    // Utxos are returned sorted
     const utxos = await this.getUTXOS();
-    const outputsList = [{ address, satoshis: balance }];
-    const inputs = coinSelection(utxos, outputsList, false);
+    if (utxos.length === 0) throw new Error('Insufficient funds');
 
-    const privateKey = this.keyChain.getKeyForPath('m/2/0');
-    console.log('PrivateKey', privateKey);
+    // CoinSelection won't calculate anything related to BU as well as the size calculation (TODO)
+    // So for now we just do a simple selection and basic fee estimation
 
-    const txOpts = {
-      type: Dashcore.Transaction.TYPES.TRANSACTION_SUBTX_REGISTER,
-      outputs: outputsList,
+    const txFee = CONSTANTS.FEES.PRIORITY;
+    const requiredSatoshisForFees = funding + txFee;
+
+    // Let's parse our utxos up to us having at least enought to cover for the fees.
+    const filteredUtxosList = [];
+
+    const isEnougthOutputForFees = (list, totalFee) => {
+      const total = list.reduce((acc, cur) => acc + cur.satoshis, 0);
+      return total >= totalFee;
     };
-    const transaction = new Dashcore.Transaction(txOpts).from(inputs);
-    transaction
-      .extraPayload
+
+    for (let i = utxos.length - 1; i >= 0; i++) {
+      const utxo = utxos[i];
+      filteredUtxosList.push(utxo);
+      if (isEnougthOutputForFees(filteredUtxosList, requiredSatoshisForFees)) break;
+      if (i === 0) throw new Error('Missing enough utxos to cover the funding fee');
+    }
+
+    const availableSat = filteredUtxosList.reduce((acc, cur) => acc + cur.satoshis, 0);
+
+    // We send back to ourself the remaining units that won't be used for funding
+    const outputSat = availableSat - requiredSatoshisForFees;
+    const outputsList = [{ address, satoshis: outputSat }];
+
+    const { privateKey } = this.keyChain.getKeyForPath('m/2/0');
+    const transaction = Dashcore.Transaction().from(filteredUtxosList).to(outputsList);
+    transaction.feePerKb(CONSTANTS.FEES.PRIORITY);
+
+    // Prepare the SubRegTx payload
+    const payload = new Dashcore.Transaction.Payload.SubTxRegisterPayload()
       .setUserName(blockchainUsername)
-      .setPubKeyIdFromPrivateKey(privateKey);
-    const signedTransaction = this.sign(transaction);
-    // await this.broadcastTransaction(signTransaction)
-    return signedTransaction;
+      .setPubKeyIdFromPrivateKey(privateKey)
+      .sign(privateKey);
+
+    // Attach payload to transaction object
+    transaction
+      .setType(Dashcore.Transaction.TYPES.TRANSACTION_SUBTX_REGISTER)
+      .setExtraPayload(payload)
+      .addFundingOutput(funding);
+
+    const privateKeys = this.getPrivateKeys(filteredUtxosList
+      .map(item => item.address))
+      .map(hdpk => hdpk.privateKey);
+
+    const signedTransaction = transaction.sign(privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
+
+    const txid = await this.broadcastTransaction(signedTransaction.toString());
+    return txid;
   }
 
-  async searchUsername(pattern) { throw new Error('Not implemented.'); }
+  async searchUsername(pattern) {
+    return this.transport.transport.searchUsers(pattern);
+  }
 
   async topUpUserCredit(userId, amount) { throw new Error('Not implemented.'); }
 

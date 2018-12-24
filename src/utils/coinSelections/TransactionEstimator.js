@@ -5,44 +5,34 @@ const {
 
 const { Input, Output } = Transaction;
 const {
-  FEES, VERSION_BYTES, TXOUT_DUFFS_VALUE_BYTES, N_LOCKTIME_BYTES,
+  FEES, VERSION_BYTES, TXOUT_DUFFS_VALUE_BYTES, N_LOCKTIME_BYTES, TXIN_OUTPOINT_TXID_BYTES, TXIN_OUTPOINT_INDEX_BYTES, TXIN_SEQUENCE_BYTES,
 } = require('../../CONSTANTS');
 const is = require('../is');
 const { varIntSizeBytesFromLength } = require('../varInt');
 
-const calculateInputsSize = (inputs, tx) => {
+const calculateInputsSize = (inputs) => {
   let inputsSize = 0;
   inputs.forEach((_input) => {
-  // eslint-disable-next-line new-cap
-    const output = new Output.fromObject({
-      satoshis: _input.satoshis,
-      script: _input.scriptPubKey,
-    });
-    const scriptSig = new Script(_input.scriptSig);
+    // eslint-disable-next-line new-cap
+    const scriptPubKeyBytes = 100;// On average it's ~80
+    const scriptPubKeyLengthBytes = varIntSizeBytesFromLength(scriptPubKeyBytes);
 
-    const input = Input.fromObject({
-      prevTxId: _input.txid,
-      output,
-      outputIndex: _input.outputIndex,
-      script: scriptSig,
-    });
+    const inputBytes = TXIN_OUTPOINT_TXID_BYTES
+      + TXIN_OUTPOINT_INDEX_BYTES
+      + scriptPubKeyLengthBytes
+      + scriptPubKeyBytes
+      + TXIN_SEQUENCE_BYTES;
 
-    const inputBuff = input.toBufferWriter().toBuffer();
-    const inputBytes = inputBuff.length;
-    tx.addInput(input);
-
-    inputsSize = +inputBytes;
+    inputsSize += inputBytes;
   });
-
   return varIntSizeBytesFromLength(inputs.length) + inputsSize;
 };
 const calculateOutputsSize = (outputs, tx) => {
   let outputsBytes = 0;
   outputs.forEach((output) => {
-    const pkScript = Script.buildPublicKeyHashOut(Address.fromString(output.address));
-    const pkScriptSigBytes = pkScript.toBuffer().length;
+    const pkScript = Script.buildPublicKeyHashOut(Address.fromString(output.address)).toBuffer();
+    const pkScriptSigBytes = pkScript.length;
     const pkScriptLengthBytes = varIntSizeBytesFromLength(pkScriptSigBytes);
-
     // eslint-disable-next-line new-cap
     tx.addOutput(new Output.fromObject({
       satoshis: output.satoshis,
@@ -53,6 +43,7 @@ const calculateOutputsSize = (outputs, tx) => {
       + pkScriptLengthBytes
       + pkScriptSigBytes);
   });
+
   return varIntSizeBytesFromLength(outputs.length) + outputsBytes;
 };
 
@@ -125,9 +116,13 @@ class TransactionEstimator {
 
     let size = 0;
     size += VERSION_BYTES;
+    // DIP3
+    // size += VERSION_BYTES_DIP3
+    // size += TYPE_BYTES_DIP3
     size += calculateInputsSize(this.state.inputs, tx);
     size += calculateOutputsSize(this.state.outputs, tx);
     size += 16;
+    // size += calculateExtraPayload(this.state.extraPayload);
     size += N_LOCKTIME_BYTES;
 
     return size;

@@ -1,5 +1,6 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const _ = require('lodash');
+const localforage = require('localforage');
 const InMem = require('./adapters/InMem');
 const Storage = require('./Storage');
 const KeyChain = require('./KeyChain');
@@ -19,10 +20,21 @@ const defaultOptions = {
   plugins: [],
   passphrase: null,
   injectDefaultPlugins: true,
-  forceUnsafePlugins: false,
+  allowSensitiveOperations: false,
 };
 const { WALLET_TYPES } = require('./CONSTANTS');
 
+const getDefaultAdapter = (walletId) => {
+  let adapter;
+  try {
+    adapter = localforage.createInstance({ name: 'wallet-lib' });
+  } catch (e) {
+    console.error(e);
+    adapter = new InMem();
+  }
+
+  return adapter;
+};
 
 /**
  * Instantiate a basic Wallet object,
@@ -46,7 +58,7 @@ class Wallet {
     const passphrase = _.has(opts, 'passphrase') ? opts.passphrase : defaultOptions.passphrase;
     this.passphrase = passphrase;
 
-    this.forceUnsafePlugins = _.has(opts, 'forceUnsafePlugins') ? opts.forceUnsafePlugins : defaultOptions.forceUnsafePlugins;
+    this.allowSensitiveOperations = _.has(opts, 'allowSensitiveOperations') ? opts.allowSensitiveOperations : defaultOptions.allowSensitiveOperations;
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
 
     if (!(is.network(network))) throw new Error('Expected a valid network (typeof Network or String)');
@@ -63,9 +75,9 @@ class Wallet {
     }
 
     // Notice : Most of the time, wallet id is deterministic
-    this.generateNewWalletId();
-    this.adapter = (opts.adapter) ? opts.adapter : new InMem();
-    if (this.adapter.config) this.adapter.config();
+    const walletId = this.generateNewWalletId();
+    this.adapter = (opts.adapter) ? opts.adapter : getDefaultAdapter(walletId);
+    if (this.adapter.config && this.adapter.constructor.name === 'localForage') this.adapter.config();
     this.storage = new Storage({
       adapter: this.adapter,
       walletId: this.walletId,
@@ -108,6 +120,7 @@ class Wallet {
         this.walletId = mnemonicToWalletId(this.HDPrivateKey);
         break;
     }
+    return this.walletId;
   }
 
   fromPrivateKey(privateKey) {
@@ -156,8 +169,8 @@ class Wallet {
    * @return {account} - account object
    */
   createAccount(accountOpts) {
-    const { injectDefaultPlugins, plugins, forceUnsafePlugins } = this;
-    const baseOpts = { injectDefaultPlugins, forceUnsafePlugins, plugins };
+    const { injectDefaultPlugins, plugins, allowSensitiveOperations } = this;
+    const baseOpts = { injectDefaultPlugins, allowSensitiveOperations, plugins };
     if (this.type === WALLET_TYPES.SINGLE_ADDRESS) { baseOpts.privateKey = this.privateKey; }
     const opts = Object.assign(baseOpts, accountOpts);
     return new Account(this, opts);

@@ -26,7 +26,7 @@ const defaultOptions = {
   mode: 'full',
   cacheTx: true,
   subscribe: true,
-  forceUnsafePlugins: false,
+  allowSensitiveOperations: false,
   plugins: [],
   injectDefaultPlugins: true,
 };
@@ -61,7 +61,7 @@ class Account {
     this.events = new EventEmitter();
     this.isReady = false;
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
-    this.forceUnsafePlugins = _.has(opts, 'forceUnsafePlugins') ? opts.forceUnsafePlugins : defaultOptions.forceUnsafePlugins;
+    this.allowSensitiveOperations = _.has(opts, 'allowSensitiveOperations') ? opts.allowSensitiveOperations : defaultOptions.allowSensitiveOperations;
 
     this.type = wallet.type;
 
@@ -132,8 +132,6 @@ class Account {
 
     this.events.emit(EVENTS.CREATED);
     addAccountToWallet(this, wallet);
-
-
     this.initialize(wallet.plugins);
   }
 
@@ -159,7 +157,7 @@ class Account {
     }
 
     _.each(userUnsafePlugins, (UnsafePlugin) => {
-      this.injectPlugin(UnsafePlugin, this.forceUnsafePlugins);
+      this.injectPlugin(UnsafePlugin, this.allowSensitiveOperations);
     });
 
     this.readinessInterval = setInterval(() => {
@@ -225,13 +223,14 @@ class Account {
       affectedTxs.forEach((affectedtxid) => {
         const { path, type } = this.storage.searchAddressWithTx(affectedtxid);
         const address = this.storage.store.wallets[this.walletId].addresses[type][path];
-        const cleanedUtxos = [];
-        address.utxos.forEach((utxo) => {
+        const cleanedUtxos = {};
+        Object.keys(address.utxos).forEach((utxoTxId) => {
+          const utxo = address.utxos[utxoTxId];
           if (utxo.txid === affectedtxid) {
             totalSatoshis -= utxo.satoshis;
             address.balanceSat -= utxo.satoshis;
           } else {
-            cleanedUtxos.push(utxo);
+            cleanedUtxos[utxoTxId] = (utxo);
           }
         });
         address.utxos = cleanedUtxos;
@@ -292,22 +291,6 @@ class Account {
    * @return {Promise<addrInfo>}
    */
   async fetchAddressInfo(addressObj, fetchUtxo = true) {
-    // We do not need to fetch UTXO if we don't have any money there :)
-    function parseUTXO(utxos) {
-      const parsedUtxos = [];
-      utxos.forEach((utxo) => {
-        parsedUtxos.push(Object.assign({}, {
-          satoshis: utxo.satoshis,
-          txid: utxo.txid,
-          address: utxo.address,
-          outputIndex: utxo.vout,
-          scriptPubKey: utxo.scriptPubKey,
-          // scriptSig: utxo.scriptSig,
-        }));
-      });
-      return parsedUtxos;
-    }
-
     if (!this.transport.isValid) throw new ValidTransportLayerRequired('fetchAddressInfo');
     const self = this;
     const { address, path } = addressObj;
@@ -334,27 +317,39 @@ class Account {
         fetchedLast: +new Date(),
       };
       addrInfo.used = (transactions.length > 0);
+
       if (transactions.length > 0) {
         // If we have cacheTx, then we will check if we know this transactions
         if (self.cacheTx) {
-          transactions.forEach(async (tx) => {
+          const promises = [];
+          transactions.forEach((tx) => {
             const knownTx = Object.keys(self.store.transactions);
-
             if (!knownTx.includes(tx)) {
-              const txInfo = await self.fetchTransactionInfo(tx);
-              // console.log(txInfo)
-              await self.storage.importTransactions(txInfo);
+              const promise = self.fetchTransactionInfo(tx).then((txInfo) => {
+                self.storage.importTransaction(txInfo);
+              });
             }
           });
+          await Promise.all(promises);
         }
       }
       if (fetchUtxo) {
         const originalUtxo = (await self.transport.getUTXO(address));
-        const utxos = (balanceSat > 0) ? parseUTXO(originalUtxo) : [];
-        if (utxos.length > 0) {
-          utxos.forEach((utxo) => {
-            self.storage.addUTXOToAddress(utxo, addressObj.address);
+        const utxos = [];
+        if (balanceSat > 0) {
+          originalUtxo.forEach((utxo) => {
+            utxos.push({
+              satoshis: utxo.satoshis,
+              txid: utxo.txid,
+              address: utxo.address,
+              outputIndex: utxo.vout,
+              scriptPubKey: utxo.scriptPubKey,
+              // scriptSig: utxo.scriptSig,
+            });
           });
+        }
+        if (utxos.length > 0) {
+          self.storage.addUTXOToAddress(utxos, addressObj.address);
         }
       }
 
@@ -577,7 +572,7 @@ class Account {
       transactions: [],
       balanceSat: 0,
       unconfirmedBalanceSat: 0,
-      utxos: [],
+      utxos: {},
       fetchedLast: 0,
       used: false,
     };
@@ -627,14 +622,15 @@ class Account {
         const address = self.store.wallets[walletId].addresses[subwallet][path];
         if (address.utxos) {
           if (!(onlyAvailable && address.locked)) {
-            const utxo = address.utxos;
-            if (utxo.length > 0) {
-              const modifiedUtxo = Array.from(utxo);
-              modifiedUtxo.forEach((el) => {
+            const addrUtxo = address.utxos;
+            const addrUtxoIds = Object.keys(addrUtxo);
+            if (addrUtxoIds.length > 0) {
+              Object.keys(addrUtxo).forEach((utxoid)=>{
+                const modifiedUtxo = _.cloneDeep(addrUtxo[utxoid]);
                 // eslint-disable-next-line no-param-reassign
-                el.address = address.address;
-              });
-              utxos = utxos.concat(modifiedUtxo);
+                modifiedUtxo.address = address.address;
+                utxos = utxos.concat(modifiedUtxo);
+              })
             }
           }
         }
@@ -648,6 +644,11 @@ class Account {
   /**
    * Create a transaction based around a provided utxos
    * @param opts - Options object
+   * @param opts.utxos - Array - A utxo set
+   * @param opts.recipient - String - A valid Dash address
+   * @param opts.amount - number - Optional, satoshi value
+   * @param opts.deductFee - bool - Optional - Default : true
+   * @param opts.isInstantSend - bool - Optional - Default : false
    * @return {string}
    */
   createTransactionFromUTXOS(opts) {
@@ -660,18 +661,46 @@ class Account {
     }
     const { recipient, utxos } = opts;
 
-    tx.from(utxos);
 
     // eslint-disable-next-line no-underscore-dangle
-    tx.to(recipient, tx._getInputAmount());
+    // console.log(utxos.map(utxo => utxo.satoshis).reduce((a,b)=>a+=b));
+    const amount = (is.num(opts.amount)) ? opts.amount : utxos.map(utxo => utxo.satoshis).reduce((acc, curr) => acc + curr);
+
+    const deductFee = _.has(opts, 'deductFee')
+      ? opts.deductFee
+      : true;
+
+    const feeCategory = (opts.isInstantSend) ? 'instant' : 'normal';
+    let selection;
+    try {
+      selection = coinSelection(utxos, [{ address: recipient, satoshis: amount }], deductFee, feeCategory);
+    } catch (e) {
+      throw new CreateTransactionError(e);
+    }
+
+    // We parse our inputs, transform them into a Dashcore UTXO object.
+    const inputs = selection.utxos.reduce((accumulator, current) => {
+      const unspentoutput = new Dashcore.Transaction.UnspentOutput(current);
+      accumulator.push(unspentoutput);
+
+      return accumulator;
+    }, []);
+
+    tx.from(inputs);
+    tx.to(selection.outputs);
 
     tx.change(recipient);
-    tx.fee(FEES.DEFAULT_FEE);
+    tx.fee(selection.estimatedFee);
 
-    const addressList = utxos.map(el => ((el.address)));
+    const addressList = utxos.map(el => Dashcore.Script
+      .fromHex(el.scriptPubKey)
+      .toAddress(this.network)
+      .toString());
+
     const privateKeys = _.has(opts, 'privateKeys')
       ? opts.privateKeys
       : this.getPrivateKeys(addressList);
+
     const signedTx = this.keyChain.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
     return signedTx.toString();
   }
@@ -681,7 +710,7 @@ class Account {
    * @param opts - Options object
    * @param opts.amount - Amount in dash that you want to send
    * @param opts.satoshis - Amount in satoshis
-   * @param opts.to - Address of the recipient
+   * @param opts.recipient - Address of the recipient
    * @param opts.isInstantSend - If you want to use IS or stdTx.
    * @param opts.deductFee - Deduct fee
    * @param opts.privateKeys - Overwrite default behavior : auto-searching local matching keys.
@@ -696,14 +725,14 @@ class Account {
       throw new Error('An amount in dash or in satoshis is expected to create a transaction');
     }
     const satoshis = (opts.amount && !opts.satoshis) ? dashToDuffs(opts.amount) : opts.satoshis;
-    if (!opts || (!opts.to)) {
+    if (!opts || (!opts.recipient)) {
       throw new Error('A recipient is expected to create a transaction');
     }
     const deductFee = _.has(opts, 'deductFee')
       ? opts.deductFee
       : true;
 
-    const outputs = [{ address: opts.to, satoshis }];
+    const outputs = [{ address: opts.recipient, satoshis }];
 
     const utxosList = this.getUTXOS();
 
@@ -717,11 +746,13 @@ class Account {
       return utxo;
     });
 
-    const feeCategory = (opts.isInstantSend) ? 'instant' : 'normal';
+    const feeCategory = (opts.isInstantSend) ? 'instant' : 'PRIORITY';
     let selection;
     try {
+
       selection = coinSelection(utxosList, outputs, deductFee, feeCategory);
     } catch (e) {
+      console.log(e);
       throw new CreateTransactionError(e);
     }
 
@@ -733,6 +764,7 @@ class Account {
     } = selection;
 
     tx.to(selectedOutputs);
+
 
     // We parse our inputs, transform them into a Dashcore UTXO object.
     const inputs = selectedUTXOs.reduce((accumulator, current) => {
@@ -764,7 +796,6 @@ class Account {
     //   tx.fee(fee);
     // }
     tx.fee(estimatedFee);
-    console.log('fee', estimatedFee);
     const addressList = selectedUTXOs.map(el => ((el.address)));
     const privateKeys = _.has(opts, 'privateKeys')
       ? opts.privateKeys

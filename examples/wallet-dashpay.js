@@ -1,18 +1,13 @@
 const DAPIClient = require('@dashevo/dapi-client');
 const { Wallet, plugins, utils } = require('../src');
 const DashPayDAP = require('./daps/DashPayDAP');
-
-const transport = new DAPIClient({ seeds: [{ ip: '54.191.116.37', port: 3000 }] });
-transport.getTransaction = transport.getTransactionById;
-transport.MNDiscovery.getMNList().then((mnList) => {
-  const peersIP = mnList.map(el => ({ ip } = el.ip));
-  console.log('List of known peer', peersIP);
-});
+const nodeforage = require('nodeforage');
 
 const wallet = new Wallet({
   network: 'testnet',
-  transport,
-  mnemonic: 'swap slam aisle trend wing lawn profit ill town duty choice garage',
+  adapter: nodeforage.createInstance({ name: 'nodeforage-1' }),
+  // mnemonic: 'swap slam aisle trend wing lawn profit ill town duty choice garage',
+  mnemonic: 'smart rug aspect stuff auction bridge title virtual illegal enact black since', // Werner - dev (10 Nov)
   plugins: [DashPayDAP],
   // because of accessing to keyChain... We can later on make the same exception
   // than with already default plugins we are using
@@ -21,7 +16,9 @@ const wallet = new Wallet({
 
 const account = wallet.getAccount();
 
+
 const start = async () => {
+
   const balance = account.getBalance();
   console.log('Balance', balance);
 
@@ -31,6 +28,9 @@ const start = async () => {
   const dashpayDap = account.getDAP('DashPayDAP');
 
   const user = await dashpayDap.registerUsername('DashPayTeam');
-  console.log(user);
+  console.log('Created User', user);
+
+  const search3 = await dashpayDap.searchUsername('DashPayTeam3');
+  console.log(search3);
 };
 account.events.on('ready', start);
