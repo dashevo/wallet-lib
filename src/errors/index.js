@@ -20,7 +20,15 @@ class ValidTransportLayerRequired extends WalletLibError {
     super(`A transport layer is needed to perform a ${method}`);
   }
 }
-class TransactionNotInStore extends WalletLibError {}
+class TransactionNotInStore extends WalletLibError {
+  constructor(txid) {
+    const getErrorMessageOf = () => {
+      return `Transaction is not in store : ${txid} `;
+    };
+
+    super(getErrorMessageOf((txid)));
+  }
+}
 class InvalidAddressObject extends WalletLibError {
   constructor(addressObject) {
     const getErrorMessageOf = (addressErrors) => {
