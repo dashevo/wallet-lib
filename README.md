@@ -1,27 +1,22 @@
 # Wallet Library
 
-
 [![NPM Package](https://img.shields.io/npm/v/@dashevo/wallet-lib.svg?style=flat-square)](https://www.npmjs.org/package/@dashevo/wallet--lib)
 [![Build Status](https://img.shields.io/travis/dashevo/wallet-lib.svg?branch=master&style=flat-square)](https://travis-ci.org/dashevo/wallet-lib)
 [![Coverage Status](https://img.shields.io/coveralls/dashevo/wallet-lib.svg?style=flat-square)](https://coveralls.io/github/dashevo/wallet-lib?branch=master)
 
-A pure JavaScript Wallet Library for Dash - BIP44 Derivation, Coin/Utxo Selection/optimisation, transactions, multi-account...
-
-See also for specific Layer 2 needs (DashDrive/DAPs) : [DAP-SDK](https://github.com/dashevo/dap-sdk)
+A pure and extensible JavaScript Wallet Library for Dash.
 
 ## State
 
-NOT SUITABLE FOR PRODUCTION. Under active development.  
-As date of writing (Sep 18), we still miss a proper testing/QA.  
-Help from the community is also welcomed :)  
+Under active development. Usage for production discouraged.  
+Help from the community is also welcomed.  
  
-Things to look up :
-- We aren't sure on what is the storage/memory cost in a usage over multiples days.
-- We didn't ran it enought to be sure we cover all edges case
-- Mutating objects
-- Perfomance optimisation (probably on the workers)
-- TODOs in the code :)
-
+Things to look up for :
+- Proper testings is needed. More complex and edge cases.
+- Handling of differents transactions type + DIP002
+- Storage/memory cost on a usage over multiples days.
+- Optimisation allowing to work for a faucet priv Key (with a lot of inc/out tx)
+- Others TODOs in the code :)
 
 ## Table of Contents
 
@@ -51,13 +46,23 @@ Dash is a powerful new peer-to-peer platform for the next generation of financia
 The decentralized nature of the Dash network allows for highly resilient Dash infrastructure,  
 and the developer community needs reliable, open-source tools to implement Dash apps and services.    
 
-
 ## Getting Started
 
 In order to use this library, you will need to add it to your project as a dependency.  
 
 Having [NodeJS](https://nodejs.org/) installed, just type : `npm install @dashevo/wallet-lib` in your terminal.  
-and add `const { Wallet } = require('@dashevo/wallet-lib');` on top of the file that will create and handle your wallet object.  
+
+In your file, where you want to execute it : 
+
+```
+const { Wallet } = require('@dashevo/wallet-lib');
+
+const wallet = new Wallet()
+const account = wallet.getAccount();
+
+// Do something with account.
+```
+
 
 ## Some rules of thumb
 
@@ -88,7 +93,7 @@ Most of the time, here is what configuration you will be using :
 const { Wallet } = require('@dashevo/wallet-lib');
 const { DAPIClient } = require('@dashevo/dapi-client');
 const { Mnemonic } = require('@dashevo/dashcore-lib');
-const localForage = require('localforage');
+const localForage = require('localforage'); //Browser-only storage
 
 
 const mnemonic = 'my mnemonic in 12 or 24 words;'; //Can also be an instance of Mnemonic
@@ -113,7 +118,6 @@ The Wallet object can generate multiple account for you, theses accounts follow 
 
 ```
 const opts = {
-    mode: 'full', //BIP44 Worker (prederive addresses)
     cacheTx: true
 }
 const account = wallet.createAccount(opts);
@@ -229,6 +233,9 @@ Adapters (help from community welcomed) :
 - [BIP44Worker](/docs/BIP44Worker.md)
 - [SyncWorker](/docs/SyncWorker.md)
 
+### Plugins 
+
+- [DashPay DAP](https://github.com/dashevo/dashpay-dap) : 
 ## Examples
 
 You can see here, some [Examples](/docs/examples.md).
