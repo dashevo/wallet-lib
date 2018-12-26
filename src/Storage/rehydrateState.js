@@ -16,9 +16,13 @@ const rehydrateState = async function () {
       const wallets = (this.adapter && hasProp(this.adapter, 'getItem'))
         ? (await this.adapter.getItem('wallets') || this.store.wallets)
         : this.store.wallets;
+      const chains = (this.adapter && hasProp(this.adapter, 'getItem'))
+        ? (await this.adapter.getItem('chains') || this.store.chains)
+        : this.store.chains;
 
       this.store.transactions = mergeHelper(this.store.transactions, transactions);
       this.store.wallets = mergeHelper(this.store.wallets, wallets);
+      this.store.wallechainsts = mergeHelper(this.store.chains, chains);
       this.lastRehydrate = +new Date();
     } catch (e) {
       console.log('Storage rehydrateState err', e);

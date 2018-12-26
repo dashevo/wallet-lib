@@ -8,6 +8,7 @@ const saveState = async function () {
     try {
       await this.adapter.setItem('transactions', { ...self.store.transactions });
       await this.adapter.setItem('wallets', { ...self.store.wallets });
+      await this.adapter.setItem('chains', { ...self.store.chains });
       this.lastSave = +new Date();
 
       return true;
