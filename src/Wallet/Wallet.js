@@ -22,25 +22,16 @@ const defaultOptions = {
   injectDefaultPlugins: true,
   allowSensitiveOperations: false,
 };
-const { WALLET_TYPES } = require('../CONSTANTS');
 
-const getDefaultAdapter = (walletId) => {
-  let adapter;
-  try {
-    adapter = localforage.createInstance({ name: 'wallet-lib' });
-  } catch (e) {
-    adapter = new InMem();
-  }
-
-  return adapter;
-};
-
-const fromMnemonic = require('./fromMnemonic');
-const fromSeed = require('./fromSeed');
-const fromPrivateKey = require('./fromPrivateKey');
-const updateNetwork = require('./updateNetwork');
+const createAccount = require('./createAccount');
+const disconnect = require('./disconnect');
 const exportWallet = require('./exportWallet');
+const fromMnemonic = require('./fromMnemonic');
+const fromPrivateKey = require('./fromPrivateKey');
+const fromSeed = require('./fromSeed');
 const generateNewWalletId = require('./generateNewWalletId');
+const getAccount = require('./getAccount');
+const updateNetwork = require('./updateNetwork');
 
 /**
  * Instantiate a basic Wallet object,
@@ -61,9 +52,16 @@ class Wallet {
    */
   constructor(opts = defaultOptions) {
     Object.assign(Wallet.prototype, {
-      fromMnemonic, fromSeed, fromPrivateKey, generateNewWalletId, updateNetwork, exportWallet,
+      createAccount,
+      disconnect,
+      getAccount,
+      fromMnemonic,
+      fromSeed,
+      fromPrivateKey,
+      generateNewWalletId,
+      updateNetwork,
+      exportWallet,
     });
-
 
     const network = _.has(opts, 'network') ? opts.network : defaultOptions.network;
     const passphrase = _.has(opts, 'passphrase') ? opts.passphrase : defaultOptions.passphrase;
@@ -86,11 +84,10 @@ class Wallet {
     }
 
     // Notice : Most of the time, wallet id is deterministic
-    const walletId = this.generateNewWalletId();
-    this.adapter = (opts.adapter) ? opts.adapter : getDefaultAdapter(walletId);
-    if (this.adapter.config && this.adapter.constructor.name === 'localForage') this.adapter.config();
+    this.generateNewWalletId();
+
     this.storage = new Storage({
-      adapter: this.adapter,
+      adapter: opts.adapter,
       walletId: this.walletId,
       network: this.network,
       mnemonic: this.mnemonic,
@@ -116,51 +113,6 @@ class Wallet {
     this.accounts = [];
     this.interface = opts.interface;
     this.savedBackup = false; // When true, we delete mnemonic from internals
-  }
-
-  /**
-   * Will derivate to a new account.
-   * @param {object} accountOpts - options to pass, will autopopulate some
-   * @return {account} - account object
-   */
-  createAccount(accountOpts) {
-    const { injectDefaultPlugins, plugins, allowSensitiveOperations } = this;
-    const baseOpts = { injectDefaultPlugins, allowSensitiveOperations, plugins };
-    if (this.type === WALLET_TYPES.SINGLE_ADDRESS) { baseOpts.privateKey = this.privateKey; }
-    const opts = Object.assign(baseOpts, accountOpts);
-    return new Account(this, opts);
-  }
-
-
-  /**
-   * Get a specific account per accountIndex
-   * @param accountIndex - Default: 0, set a specific index to get
-   * @param accountOpts - If the account doesn't exist yet, we create it passing these options
-   * @return {*|account}
-   */
-  getAccount(accountIndex = 0, accountOpts) {
-    const acc = this.accounts.filter(el => el.accountIndex === accountIndex);
-    const baseOpts = { accountIndex };
-
-    const opts = Object.assign(baseOpts, accountOpts);
-    const account = (acc[0]) || this.createAccount(opts);
-    account.storage.attachEvents(account.events);
-    return account;
-  }
-
-  /**
-   * Disconnect all the storage worker and process all account to disconnect their endpoint too.
-   */
-  disconnect() {
-    if (this.storage) {
-      this.storage.stopWorker();
-    }
-    if (this.accounts) {
-      const accountPath = Object.keys(this.accounts);
-      accountPath.forEach((path) => {
-        this.accounts[path].disconnect();
-      });
-    }
   }
 }
 
