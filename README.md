@@ -39,7 +39,7 @@ Things to look up :
     - [Adapters](#adapters)
 - [API](#api)
     - [Workers](#workers)
-- [Exemples](#exemples)
+- [Examples](#examples)
 - [Road map](#road-map)
 - [License](#license)
 - [Credits](#credits)
@@ -64,7 +64,7 @@ and add `const { Wallet } = require('@dashevo/wallet-lib');` on top of the file 
 - There is multiple event listeners(socker sync,...), running intervals (service worker,...),  
 therefore a good way to quit an instance would be to call `account.disconnect()` which will care to  
 call `clearWorker(), closeSocket()` of the differents elements. You can still decide to remove them by hand if you want.  
-- Some classic exemples of usage can be seen here : [Exemples](/docs/exemples.md)  
+- Some classic examples of usage can be seen here : [Examples](/docs/examples.md)  
 
 ## Creating a Wallet
 
