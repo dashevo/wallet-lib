@@ -65,7 +65,8 @@ class BIP44Worker extends Worker {
 
   ensureEnoughAddress() {
     let unusedAddress = 0;
-    const addresses = this.storage.getStore().wallets[this.walletId].addresses.external;
+    const store = this.storage.getStore();
+    const addresses = store.wallets[this.walletId].addresses.external;
     let addressesPaths = Object.keys(addresses);
 
     let prevPath;
@@ -79,7 +80,7 @@ class BIP44Worker extends Worker {
     });
 
     addressesPaths = Object
-      .keys(this.storage.getStore().wallets[this.walletId].addresses.external)
+      .keys(store.wallets[this.walletId].addresses.external)
       .sort((a, b) => parseInt(a.split('/')[5], 10) - parseInt(b.split('/')[5], 10));
 
     // Scan already generated addresse and count how many are unused
@@ -91,7 +92,7 @@ class BIP44Worker extends Worker {
       }
       if (!el.used) unusedAddress += 1;
       if (!isContiguousPath(path, prevPath)) {
-        throw new Error('Should be contiguous');
+        throw new Error('Addresses are expected to be contiguous');
       }
       prevPath = path;
     });
