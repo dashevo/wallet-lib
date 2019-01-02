@@ -1,18 +1,11 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const _ = require('lodash');
-const localforage = require('localforage');
-const InMem = require('../adapters/InMem');
-const Storage = require('../Storage');
-const KeyChain = require('../KeyChain');
-// const { Registration, TopUp } = Dashcore.Transaction.SubscriptionTransactions;
+const Storage = require('../Storage/Storage');
 const {
   generateNewMnemonic,
-  mnemonicToHDPrivateKey,
-  mnemonicToWalletId,
   is,
 } = require('../utils/index');
 
-const Account = require('../Account/Account');
 const Transporter = require('../transports/Transporter');
 
 const defaultOptions = {
@@ -25,12 +18,12 @@ const defaultOptions = {
 
 const createAccount = require('./createAccount');
 const disconnect = require('./disconnect');
+const getAccount = require('./getAccount');
 const exportWallet = require('./exportWallet');
 const fromMnemonic = require('./fromMnemonic');
 const fromPrivateKey = require('./fromPrivateKey');
 const fromSeed = require('./fromSeed');
 const generateNewWalletId = require('./generateNewWalletId');
-const getAccount = require('./getAccount');
 const updateNetwork = require('./updateNetwork');
 
 /**
@@ -87,12 +80,18 @@ class Wallet {
     this.generateNewWalletId();
 
     this.storage = new Storage({
+      rehydrate: true,
+      autosave: true,
+    });
+
+    this.storage.configure({
       adapter: opts.adapter,
       walletId: this.walletId,
       network: this.network,
       mnemonic: this.mnemonic,
       type: this.type,
     });
+
     this.store = this.storage.store;
     const plugins = opts.plugins || defaultOptions.plugins;
     this.plugins = {};
@@ -112,7 +111,7 @@ class Wallet {
     this.transport = (opts.transport) ? new Transporter(opts.transport) : new Transporter();
     this.accounts = [];
     this.interface = opts.interface;
-    this.savedBackup = false; // When true, we delete mnemonic from internals
+    this.savedBackup = false; // TODO: When true, we delete mnemonic from internals
   }
 }
 
