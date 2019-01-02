@@ -2,6 +2,7 @@ const { merge } = require('lodash');
 const { hasProp } = require('../utils');
 
 const mergeHelper = (initial = {}, additional = {}) => merge(initial, additional);
+const { REHYDRATE_STATE_FAILED, REHYDRATE_STATE_SUCCESS } = require('../EVENTS');
 
 /**
  * Fetch the state from the persistance adapter
@@ -22,10 +23,13 @@ const rehydrateState = async function () {
 
       this.store.transactions = mergeHelper(this.store.transactions, transactions);
       this.store.wallets = mergeHelper(this.store.wallets, wallets);
-      this.store.wallechainsts = mergeHelper(this.store.chains, chains);
+      this.store.chains = mergeHelper(this.store.chains, chains);
       this.lastRehydrate = +new Date();
+      this.events.emit(REHYDRATE_STATE_SUCCESS);
+
     } catch (e) {
       console.log('Storage rehydrateState err', e);
+      this.events.emit(REHYDRATE_STATE_FAILED, e);
       throw e;
     }
   }

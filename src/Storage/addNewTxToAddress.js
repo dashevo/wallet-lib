@@ -4,6 +4,7 @@
 * @return {boolean}
   */
 const addNewTxToAddress = function (tx, walletId) {
+  console.log(tx, walletId)
   if (tx.address && tx.txid) {
     const { type, path, found } = this.searchAddress(tx.address);
     if (!found) {

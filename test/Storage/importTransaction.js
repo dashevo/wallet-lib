@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const importTransaction = require('../../src/Storage/importTransaction');
+const { fd7c727155ef67fd5c1d54b73dea869e9690c439570063d6e96fec1d3bba450e } = require('../fixtures/transactions').valid;
 
 describe('Storage - importTransaction', () => {
   it('should throw on failed import', () => {
@@ -39,5 +40,9 @@ describe('Storage - importTransaction', () => {
     };
 
     expect(self).to.be.deep.equal(expectedSelf);
+
+    importTransaction.call(self, fd7c727155ef67fd5c1d54b73dea869e9690c439570063d6e96fec1d3bba450e);
+    console.log(fd7c727155ef67fd5c1d54b73dea869e9690c439570063d6e96fec1d3bba450e)
+    expect(self.store.transactions['fd7c727155ef67fd5c1d54b73dea869e9690c439570063d6e96fec1d3bba450e']).to.deep.equal(fd7c727155ef67fd5c1d54b73dea869e9690c439570063d6e96fec1d3bba450e);
   });
 });

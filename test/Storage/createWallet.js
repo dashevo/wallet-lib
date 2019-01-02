@@ -28,4 +28,27 @@ describe('Storage - createWallet', () => {
     };
     expect(self.store).to.be.deep.equal(expected);
   });
+  it('should create a wallet without any walletId', () => {
+    const self = {
+      store: { wallets: {}, chains: {} },
+      createChain,
+    };
+
+    createWallet.call(self);
+
+    const expected = {
+      wallets: {
+        squawk7700: {
+          accounts: {},
+          network: Dashcore.Networks.testnet,
+          mnemonic: null,
+          type: null,
+          blockheight: 0,
+          addresses: { external: {}, internal: {}, misc: {} },
+        },
+      },
+      chains: { testnet: { name: 'testnet', blockheight: -1 } },
+    };
+    expect(self.store).to.be.deep.equal(expected);
+  });
 });

@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const updateTransaction = require('../../src/Storage/updateTransaction');
+const orangeWStore = require('../fixtures/walletStore').valid.orange.store;
 
 describe('Storage - updateTransaction', () => {
   it('should throw on failed update', () => {

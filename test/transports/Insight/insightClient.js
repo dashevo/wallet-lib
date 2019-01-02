@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
-const Wallet = require('../../../src/Wallet');
+const Wallet = require('../../../src/Wallet/Wallet');
 const { mnemonicString1 } = require('../../fixtures.json');
 const InsightClient = require('../../../src/transports/Insight/insightClient');
 

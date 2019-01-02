@@ -1,5 +1,5 @@
 const {
-  cloneDeep, merge, clone, difference, each, xor, includes,
+  cloneDeep, merge, clone, difference, each, xor, includes, has,
 } = require('lodash');
 const { Networks } = require('@dashevo/dashcore-lib');
 const EVENTS = require('./EVENTS');
@@ -19,6 +19,16 @@ const initialStore = {
   chains: {},
 };
 const mergeHelper = (initial = {}, additional = {}) => merge(initial, additional);
+const testStorage = async (adapter) => {
+  if (!adapter.getItem || !adapter.setItem) {
+    throw new Error('Invalid Storage Adapter, expected getItem/setItem methods');
+  }
+  try {
+    await adapter.getItem('dummy');
+  } catch (e) {
+    throw new Error(`Invalid Storage Adapter : ${e}`);
+  }
+};
 /**
  * Handle all the storage logic, it's a wrapper around the adapters
  * So all the needed methods should be provided by the Storage class and the access to the adapter
@@ -26,7 +36,14 @@ const mergeHelper = (initial = {}, additional = {}) => merge(initial, additional
  * */
 class Storage {
   constructor(opts = defaultOpts) {
-    this.adapter = opts.adapter;
+    let adapter = opts.adapter;
+    if (adapter.constructor.name === 'Function') {
+      adapter = new adapter();
+    }
+    testStorage(adapter);
+
+
+    this.adapter = adapter;
 
     this.events = opts.events;
     this.store = cloneDeep(initialStore);
@@ -216,7 +233,7 @@ class Storage {
       // VOUT
       const vouts = transaction.vout;
       vouts.forEach((vout) => {
-        if(vout && vout.scriptPubKey && vout.scriptPubKey.addresses){
+        if (vout && vout.scriptPubKey && vout.scriptPubKey.addresses) {
           vout.scriptPubKey.addresses.forEach((addr) => {
             const search = self.searchAddress(addr);
             if (search.found) {
@@ -233,7 +250,6 @@ class Storage {
             }
           });
         }
-
       });
       this.lastModified = +new Date();
     } else {
@@ -378,7 +394,8 @@ class Storage {
     if (newObjectUtxosKeys.length > 0) {
       // we compare the diff between the two utxos sets
 
-      const newUtxos = xor(newObjectUtxosKeys, Object.keys(previousObject.utxos));
+      const previousUTXOS = (previousObject !== undefined) ? previousObject.utxos : [];
+      const newUtxos = xor(newObjectUtxosKeys, Object.keys(previousUTXOS));
       newUtxos.forEach((txid) => {
         const utxo = utxos[txid];
         try {
@@ -515,26 +532,7 @@ class Storage {
     return search;
   }
 
-  /**
-   * Search a specific txid in the store
-   * @param txid
-   * @return {{txid: *, found: boolean}}
-   */
-  searchTransaction(txid) {
-    const search = {
-      txid,
-      found: false,
-    };
-    const store = this.getStore();
-    if (store.transactions[txid]) {
-      const tx = store.transactions[txid];
-      if (tx.txid === txid) {
-        search.found = true;
-        search.result = tx;
-      }
-    }
-    return search;
-  }
+
 
   /**
    * Search an address having a specific txid

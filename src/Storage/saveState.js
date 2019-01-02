@@ -1,3 +1,5 @@
+const { SAVE_STATE_SUCCESS, SAVE_STATE_FAILED } = require('../EVENTS');
+
 /**
  * Force persistance of the state to the adapter
  * @return {Promise<boolean>}
@@ -10,10 +12,12 @@ const saveState = async function () {
       await this.adapter.setItem('wallets', { ...self.store.wallets });
       await this.adapter.setItem('chains', { ...self.store.chains });
       this.lastSave = +new Date();
-
+      this.events.emit(SAVE_STATE_SUCCESS);
       return true;
     } catch (e) {
       console.log('Storage saveState err', e);
+      this.events.emit(SAVE_STATE_FAILED, e);
+
       throw e;
     }
   }
