@@ -22,9 +22,7 @@ class ValidTransportLayerRequired extends WalletLibError {
 }
 class TransactionNotInStore extends WalletLibError {
   constructor(txid) {
-    const getErrorMessageOf = () => {
-      return `Transaction is not in store : ${txid} `;
-    };
+    const getErrorMessageOf = () => `Transaction is not in store : ${txid} `;
 
     super(getErrorMessageOf((txid)));
   }
@@ -121,6 +119,13 @@ class InvalidUTXO extends WalletLibError {
     super(getErrorMessageOf(evaluateUTXOObjectError(utxo)));
   }
 }
+class InvalidRawTransaction extends WalletLibError {
+  constructor(rawtx) {
+    const getErrorMessageOf = () => 'InvalidRawTransaction';
+    super(getErrorMessageOf((rawtx)));
+  }
+}
+
 class InvalidOutput extends WalletLibError {
   constructor(output) {
     const getErrorMessageOf = (utxoErrors) => {
@@ -183,6 +188,7 @@ module.exports = {
   TransactionNotInStore,
   InvalidAddressObject,
   InvalidTransaction,
+  InvalidRawTransaction,
   InvalidUTXO,
   InvalidOutput,
   CreateTransactionError,

@@ -1,8 +1,6 @@
 const _ = require('lodash');
 const { EventEmitter } = require('events');
-const SyncWorker = require('../plugins/Workers/SyncWorker');
-const ChainWorker = require('../plugins/Workers/ChainWorker');
-const BIP44Worker = require('../plugins/Workers/BIP44Worker');
+
 const { WALLET_TYPES } = require('../CONSTANTS');
 const { is } = require('../utils/index');
 const EVENTS = require('../EVENTS');
@@ -17,7 +15,9 @@ const defaultOptions = {
 };
 
 
-const addAccountToWallet = require('./addAccountToWallet');
+const _addAccountToWallet = require('./_addAccountToWallet');
+const _initializeAccount = require('./_initializeAccount');
+
 const broadcastTransaction = require('./broadcastTransaction');
 const connect = require('./connect');
 const createTransaction = require('./createTransaction');
@@ -73,7 +73,7 @@ class Account {
       sign,
       updateNetwork,
     });
-    if (!wallet || wallet.constructor.name !== 'Wallet') throw new Error('Expected wallet to be created and passed as param');
+    if (!wallet || wallet.constructor.name !== 'Wallet') throw new Error('Expected wallet to be passed as param');
     if (!_.has(wallet, 'walletId')) throw new Error('Missing walletID to create an account');
     this.walletId = wallet.walletId;
 
@@ -149,50 +149,8 @@ class Account {
     }
 
     this.events.emit(EVENTS.CREATED);
-    addAccountToWallet(this, wallet);
-    this.initialize(wallet.plugins);
-  }
-
-  async initialize(userUnsafePlugins) {
-    const self = this;
-
-    if (this.injectDefaultPlugins) {
-      // TODO: Should check in other accounts if a similar is setup already
-      // TODO: We want to sort them by dependencies and deal with the await this way
-      // await parent if child has it in dependency
-      // if not, then is it marked as requiring a first exec
-      // if yes add to watcher list.
-      this.injectPlugin(ChainWorker, true);
-
-      if (this.type === WALLET_TYPES.HDWALLET) {
-        // Ideally we should move out from worker to event based
-        this.injectPlugin(BIP44Worker, true);
-      }
-      if (this.type === WALLET_TYPES.SINGLE_ADDRESS) {
-        this.getAddress('0'); // We force what is usually done by the BIP44Worker.
-      }
-      this.injectPlugin(SyncWorker, true);
-    }
-
-    _.each(userUnsafePlugins, (UnsafePlugin) => {
-      this.injectPlugin(UnsafePlugin, this.allowSensitiveOperations);
-    });
-
-    this.readinessInterval = setInterval(() => {
-      const watchedWorkers = Object.keys(this.plugins.watchers);
-      let readyWorkers = 0;
-      watchedWorkers.forEach((workerName) => {
-        if (this.plugins.watchers[workerName].ready === true) {
-          readyWorkers += 1;
-        }
-      });
-      if (readyWorkers === watchedWorkers.length) {
-        self.events.emit(EVENTS.READY);
-        self.isReady = true;
-        clearInterval(self.readinessInterval);
-      }
-    }, 600);
-    self.events.emit(EVENTS.STARTED);
+    _addAccountToWallet(this, wallet);
+    _initializeAccount(this, wallet.plugins);
   }
 }
 

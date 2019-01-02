@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const Dashcore = require('@dashevo/dashcore-lib');
 const { CreateTransactionError } = require('../errors');
 const { dashToDuffs, coinSelection } = require('../utils');
@@ -23,7 +24,7 @@ function createTransaction(opts) {
   const satoshis = (opts.amount && !opts.satoshis) ? dashToDuffs(opts.amount) : opts.satoshis;
   if (!opts || (!opts.recipient)) {
     throw new Error('A recipient is expected to create a transaction');
-  }
+  05}
   const deductFee = _.has(opts, 'deductFee')
     ? opts.deductFee
     : true;
@@ -47,7 +48,6 @@ function createTransaction(opts) {
   try {
     selection = coinSelection(utxosList, outputs, deductFee, feeCategory);
   } catch (e) {
-    console.log(e);
     throw new CreateTransactionError(e);
   }
 

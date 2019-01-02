@@ -3,7 +3,8 @@
  * @param account
  * @param wallet
  */
-const addAccountToWallet = function (account, wallet) {
+// eslint-disable-next-line no-underscore-dangle
+const _addAccountToWallet = function (account, wallet) {
   const { accounts } = wallet;
 
   const existAlready = accounts.filter(el => el.accountIndex === wallet.accountIndex).length > 0;
@@ -11,4 +12,4 @@ const addAccountToWallet = function (account, wallet) {
     wallet.accounts.push(account);
   }
 };
-module.exports = addAccountToWallet;
+module.exports = _addAccountToWallet;

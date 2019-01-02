@@ -19,7 +19,12 @@ const getMockedWalletInstance = () => new class Wallet {
     this.storage = { store: {}, getStore: () => {} };
   }
 }();
+
 describe('Account - class', () => {
+  it('should be specify on missing params', () => {
+    const expectedException1 = 'Expected wallet to be passed as param';
+    expect(() => new Account()).to.throw(expectedException1);
+  });
   it('should create an account', () => {
     const mockWallet = getMockedWalletInstance();
     const account = new Account(mockWallet, { injectDefaultPlugins: false });

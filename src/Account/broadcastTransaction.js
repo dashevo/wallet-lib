@@ -2,6 +2,7 @@ const Dashcore = require('@dashevo/dashcore-lib');
 const { is } = require('../utils')
 const {
   ValidTransportLayerRequired,
+  InvalidRawTransaction
 } = require('../errors/index');
 const EVENTS = require('../EVENTS');
 /**
@@ -13,7 +14,9 @@ const EVENTS = require('../EVENTS');
 async function broadcastTransaction(rawtx, isIs = false) {
   if (!this.transport.isValid) throw new ValidTransportLayerRequired('broadcast');
 
+  if (!is.rawtx(rawtx)) throw new InvalidRawTransaction(rawtx);
   const txid = await this.transport.sendRawTransaction(rawtx, isIs);
+
   if (is.txid(txid)) {
     const {
       inputs, outputs,
