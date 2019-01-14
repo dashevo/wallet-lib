@@ -85,7 +85,7 @@ class SyncWorker extends Worker {
 
     const getTransactionAndStore = async function (tx) {
       if (tx.address && tx.txid) {
-        self.storage.addNewTxToAddress(tx, self.walletId);
+        self.storage.addNewTxToAddress(tx, tx.address);
         const transactionInfo = await self.transport.getTransaction(tx.txid);
         self.storage.importTransactions(transactionInfo);
       }
