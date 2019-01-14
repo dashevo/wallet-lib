@@ -3,7 +3,7 @@
  * @param transactions
  * @return {boolean}
  * */
-const importTransactions = function(transactions) {
+const importTransactions = function (transactions) {
   const type = transactions.constructor.name;
   const self = this;
 

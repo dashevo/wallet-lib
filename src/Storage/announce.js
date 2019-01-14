@@ -1,5 +1,11 @@
 const EVENTS = require('../EVENTS');
 
+/**
+ * Used to announce some events.
+ * @param type
+ * @param el
+ * @return {boolean}
+ */
 const announce = function (type, el) {
   if (!this.events) return false;
   switch (type) {

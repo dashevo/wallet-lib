@@ -1,5 +1,5 @@
-const { hasProp } = require('../utils');
 const Dashcore = require('@dashevo/dashcore-lib');
+const { hasProp } = require('../utils');
 
 const { testnet } = Dashcore.Networks;
 const createWallet = function (walletId = 'squawk7700', network = testnet, mnemonic = null, type = null) {

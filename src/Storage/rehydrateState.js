@@ -26,9 +26,7 @@ const rehydrateState = async function () {
       this.store.chains = mergeHelper(this.store.chains, chains);
       this.lastRehydrate = +new Date();
       this.events.emit(REHYDRATE_STATE_SUCCESS);
-
     } catch (e) {
-      console.log('Storage rehydrateState err', e);
       this.events.emit(REHYDRATE_STATE_FAILED, e);
       throw e;
     }

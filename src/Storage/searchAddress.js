@@ -1,7 +1,7 @@
 /**
  * Search a specific address in the store
  * @param address
- * @param forceLoop - boolean - default : false - When set at true, for a search instead of using map
+ * @param forceLoop - boolean - default : false - When set at true, will force a full search
  * @return {{address: *, type: null, found: boolean}}
  */
 const searchAddress = function (address, forceLoop = false) {

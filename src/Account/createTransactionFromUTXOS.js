@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const Dashcore = require('@dashevo/dashcore-lib');
 const { is, coinSelection } = require('../utils');
 const { CreateTransactionError } = require('../errors')

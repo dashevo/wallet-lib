@@ -1,8 +1,13 @@
+const { cloneDeep } = require('lodash');
 const { InvalidTransaction } = require('../errors');
 const { is, dashToDuffs } = require('../utils');
-const { cloneDeep } = require('lodash');
 
+/**
+ * This method is used to import a transaction in Store.
+ * @param transaction - A valid Transaction
+ */
 const importTransaction = function (transaction) {
+  // console.log('tx', JSON.stringify(transaction))
   const self = this;
   if (!is.transaction(transaction)) throw new InvalidTransaction(transaction);
   const transactionStore = this.store.transactions;

@@ -2,6 +2,12 @@ const { cloneDeep } = require('lodash');
 const { InvalidUTXO } = require('../errors');
 const { is } = require('../utils');
 
+/**
+ * Allow to add a specific UTXO to a specific address
+ * @param utxo - A valid UTXO
+ * @param address - A valid Address.
+ * @return {boolean}
+ */
 const addUTXOToAddress = function (utxo, address) {
   if (!is.address(address)) throw new Error('Invalid address');
   if (is.arr(utxo)) {
@@ -23,7 +29,9 @@ const addUTXOToAddress = function (utxo, address) {
       newAddr.utxos[utxo.txid] = utxo;
       newAddr.used = true;
       this.updateAddress(newAddr, searchAddr.walletId);
+      return true;
     }
   }
+  return false;
 };
 module.exports = addUTXOToAddress;

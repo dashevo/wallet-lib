@@ -40,7 +40,6 @@ const updateAddress = function (addressObj, walletId) {
   // We calculate here the balanceSat and unconfirmedBalanceSat of our addressObj
   // We do that to avoid getBalance to be slow, so we have to keep that in mind or then
   // Move that to an event type of calculation or somth
-  let { balanceSat, unconfirmedBalanceSat } = newObject;
   const { utxos } = newObject;
 
   const newObjectUtxosKeys = Object.keys(utxos);
@@ -53,13 +52,13 @@ const updateAddress = function (addressObj, walletId) {
       const utxo = utxos[txid];
       try {
         const { blockheight } = this.getTransaction(utxo.txid);
-        if (currentBlockHeight - blockheight >= 6) balanceSat += utxo.satoshis;
-        else unconfirmedBalanceSat += utxo.satoshis;
+        if (currentBlockHeight - blockheight >= 6) newObject.balanceSat += utxo.satoshis;
+        else newObject.unconfirmedBalanceSat += utxo.satoshis;
       } catch (e) {
         // console.log(e);
         if (e instanceof TransactionNotInStore) {
           // TODO : We consider unconfirmed a transaction that we don't know of, should we ?
-          unconfirmedBalanceSat += utxo.satoshis;
+          newObject.unconfirmedBalanceSat += utxo.satoshis;
         } else throw e;
       }
     });

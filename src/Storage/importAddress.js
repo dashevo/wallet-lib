@@ -1,5 +1,5 @@
-const { InvalidAddressObject } = require('../errors');
 const { cloneDeep } = require('lodash');
+const { InvalidAddressObject } = require('../errors');
 const { is } = require('../utils');
 /**
  * Import one address to the store
