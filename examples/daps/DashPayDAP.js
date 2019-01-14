@@ -25,7 +25,7 @@ class DashPayDAP extends DAP {
   }
 
   /**
-   * @param {string} blockchainUsername - string representation of the user desired username
+   * @param {string} blockchainUsername - string representation of the user's desired username
    * @param {number} [funding] - default funding for the account in duffs. Optional.
    * If left empty funding will be 10000.
    * @return {string} - user id
@@ -46,10 +46,10 @@ class DashPayDAP extends DAP {
     const txFee = CONSTANTS.FEES.PRIORITY;
     const requiredSatoshisForFees = funding + txFee;
 
-    // Let's parse our utxos up to us having at least enought to cover for the fees.
+    // Let's parse our utxos until we have at least enough to cover for the fees.
     const filteredUtxosList = [];
 
-    const isEnougthOutputForFees = (list, totalFee) => {
+    const isEnoughOutputForFees = (list, totalFee) => {
       const total = list.reduce((acc, cur) => acc + cur.satoshis, 0);
       return total >= totalFee;
     };
@@ -57,13 +57,13 @@ class DashPayDAP extends DAP {
     for (let i = utxos.length - 1; i >= 0; i++) {
       const utxo = utxos[i];
       filteredUtxosList.push(utxo);
-      if (isEnougthOutputForFees(filteredUtxosList, requiredSatoshisForFees)) break;
+      if (isEnoughOutputForFees(filteredUtxosList, requiredSatoshisForFees)) break;
       if (i === 0) throw new Error('Missing enough utxos to cover the funding fee');
     }
 
     const availableSat = filteredUtxosList.reduce((acc, cur) => acc + cur.satoshis, 0);
 
-    // We send back to ourself the remaining units that won't be used for funding
+    // We send back to ourselves the remaining units that won't be used for funding
     const outputSat = availableSat - requiredSatoshisForFees;
     const outputsList = [{ address, satoshis: outputSat }];
 
