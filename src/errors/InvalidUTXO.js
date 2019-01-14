@@ -1,6 +1,5 @@
 const WalletLibError = require('./WalletLibError');
 
-
 class InvalidUTXO extends WalletLibError {
   constructor(utxo) {
     const getErrorMessageOf = (utxoErrors) => {

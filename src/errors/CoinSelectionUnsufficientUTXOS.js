@@ -1,6 +1,5 @@
 const WalletLibError = require('./WalletLibError');
 
-
 class CoinSelectionUnsufficientUTXOS extends WalletLibError {
   constructor(info) {
     const getErrorMessageOf = (_info) => {

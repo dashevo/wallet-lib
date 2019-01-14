@@ -1,3 +1,4 @@
+const WalletLibError = require('./WalletLibError');
 const CoinSelectionUnsufficientUTXOS = require('./CoinSelectionUnsufficientUTXOS');
 
 class CreateTransactionError extends WalletLibError {
@@ -8,4 +9,5 @@ class CreateTransactionError extends WalletLibError {
       super(e);
     }
   }
-}
+};
+module.exports = CreateTransactionError;
