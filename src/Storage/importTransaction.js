@@ -9,7 +9,7 @@ const { is, dashToDuffs } = require('../utils');
 const importTransaction = function (transaction) {
   // console.log('tx', JSON.stringify(transaction))
   const self = this;
-  if (!is.transaction(transaction)) throw new InvalidTransaction(transaction);
+  if (!is.transactionObj(transaction)) throw new InvalidTransaction(transaction);
   const transactionStore = this.store.transactions;
   const transactionsIds = Object.keys(transactionStore);
 

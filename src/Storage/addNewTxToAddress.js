@@ -1,3 +1,4 @@
+const { InvalidAddress, InvalidTransactionObject, StorageUnableToAddTransaction } = require('../errors');
 const { is } = require('../utils');
 
 /**
@@ -7,17 +8,16 @@ const { is } = require('../utils');
 * @return {boolean}
   */
 const addNewTxToAddress = function (tx, address) {
-  if (!is.address(address)) throw new Error('Invalid address');
-  if (!is.transaction(tx)) throw new Error('Invalid Transaction');
+  if (!is.address(address)) throw new InvalidAddress(address);
+  if (!is.transactionObj(tx)) throw new InvalidTransactionObject(tx);
 
   const searchAddr = this.searchAddress(address);
   const { walletId } = searchAddr;
 
-
   if (tx.address && tx.txid) {
     const { type, path, found } = this.searchAddress(tx.address);
     if (!found) {
-      throw new Error('Invalid tx to add : tx');
+      throw new StorageUnableToAddTransaction(tx);
     }
     this.store.wallets[walletId].addresses[type][path].transactions.push(tx.txid);
     // Because of the unclear state will force a refresh
@@ -25,6 +25,6 @@ const addNewTxToAddress = function (tx, address) {
     this.lastModified = +new Date();
     return true;
   }
-  throw new Error('Invalid tx to add : tx');
+  throw new StorageUnableToAddTransaction(tx);
 };
 module.exports = addNewTxToAddress;

@@ -219,15 +219,15 @@ describe('Utils', () => {
     const invalidtxid = '00000';
     expect(is.txid(invalidtxid)).to.be.equal(false);
   });
-  it('should is.transaction work', () => {
+  it('should is.transactionObj work', () => {
     const validTransaction = figureBridgeFixture.transactions['3428f0c29370d1293b4706ffd0f8b0c84a5b7c1c217d319e5ef4722354000c6e']
-    expect(is.transaction(validTransaction)).to.be.equal(true);
+    expect(is.transactionObj(validTransaction)).to.be.equal(true);
 
     const invalidTransaction = {
       vin: [],
       vout: [],
     };
-    expect(is.transaction(invalidTransaction)).to.be.equal(false);
+    expect(is.transactionObj(invalidTransaction)).to.be.equal(false);
   });
   it('should is.feeRate work', () => {
     const feeRate = {

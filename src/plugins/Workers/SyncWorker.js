@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const { Worker } = require('../');
-const { ValidTransportLayerRequired, InvalidTransaction } = require('../../errors');
+const { ValidTransportLayerRequired, InvalidTransactionObject } = require('../../errors');
 const EVENTS = require('../../EVENTS');
 
 const defaultOpts = {
@@ -194,7 +194,7 @@ class SyncWorker extends Worker {
           self.storage.importTransaction(transactionInfo);
         }).catch((e) => {
           if (e instanceof ValidTransportLayerRequired) return false;
-          if (e instanceof InvalidTransaction) return false;
+          if (e instanceof InvalidTransactionObject) return false;
           throw e;
         });
       promises.push(p);

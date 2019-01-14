@@ -4,7 +4,7 @@ const is = require('../utils/is');
 const WalletLibError = require('./WalletLibError');
 
 
-class InvalidTransaction extends WalletLibError {
+class InvalidTransactionObject extends WalletLibError {
   constructor(transactionObj) {
     const getErrorMessageOf = (transactionErrors) => {
       if (!is.arr(transactionErrors) || transactionErrors.length === 0) return false;
@@ -35,4 +35,4 @@ class InvalidTransaction extends WalletLibError {
     super(getErrorMessageOf(evaluateTransactionObjectError(transactionObj)));
   }
 }
-module.exports = InvalidTransaction;
+module.exports = InvalidTransactionObject;

@@ -1,3 +1,5 @@
+const { InvalidStorageAdapter } = require('../errors');
+
 module.exports = async function configureAdapter(argAdapter) {
   let adapter;
   if (!argAdapter) throw new Error('Expected an adapter to configure');
@@ -6,8 +8,13 @@ module.exports = async function configureAdapter(argAdapter) {
   // In case of an adapter being a function, we assume it being a class non instanciated
   if (argAdapterContructorName === 'Function') {
     adapter = new argAdapter();
-    if (adapter.config) await adapter.config({ name: 'dashevo-wallet-lib' });
-    else if (adapter.createInstance) await adapter.createInstance({ name: 'dashevo-wallet-lib' });
+    if (adapter.config) {
+      try {
+        await adapter.config({ name: 'dashevo-wallet-lib' });
+      } catch (e) {
+        console.error('Tried to config the adapter. Failed', e.message);
+      }
+    } else if (adapter.createInstance) await adapter.createInstance({ name: 'dashevo-wallet-lib' });
   } else if (argAdapterContructorName === 'Object') {
     if (argAdapter.createInstance) throw new Error('Adapter instance not created');
     adapter = argAdapter;
@@ -17,12 +24,12 @@ module.exports = async function configureAdapter(argAdapter) {
   }
   // Testing the storage
   if (!adapter.getItem || !adapter.setItem) {
-    throw new Error('Invalid Storage Adapter, expected getItem/setItem methods');
+    throw new InvalidStorageAdapter('expected getItem/setItem methods');
   }
   try {
     await adapter.getItem('dummy');
   } catch (e) {
-    throw new Error(`Invalid Storage Adaptesr : ${e}`);
+    throw new InvalidStorageAdapter(e.message);
   }
   return adapter;
 };
