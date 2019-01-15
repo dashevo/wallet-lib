@@ -48,7 +48,7 @@ async function broadcastTransaction(rawtx, isIs = false) {
       address.utxos = cleanedUtxos;
       console.log('Broadcast totalSatoshi', totalSatoshis);
       // this.storage.store.addresses[type][path].fetchedLast = 0;// In order to trigger a refresh
-      this.events.emit(EVENTS.BALANCE_CHANGED, { delta: -totalSatoshis });
+      this.events.emit(EVENTS.UNCONFIRMED_BALANCE_CHANGED, { delta: -totalSatoshis, txid});
     });
   }
   return txid;
