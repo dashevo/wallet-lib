@@ -54,7 +54,7 @@ class DashPayDAP extends DAP {
       return total >= totalFee;
     };
 
-    for (let i = utxos.length - 1; i >= 0; i++) {
+    for (let i = utxos.length - 1; i >= 0; i--) {
       const utxo = utxos[i];
       filteredUtxosList.push(utxo);
       if (isEnougthOutputForFees(filteredUtxosList, requiredSatoshisForFees)) break;
