@@ -25,7 +25,7 @@
   "homepage": "https://github.com/dashevo/wallet-lib#readme",
   "dependencies": {
     "@dashevo/dapi-client": "git+ssh://git@github.com/dashevo/dapi-client.git#develop",
-    "@dashevo/dashcore-lib": "git+ssh://git@github.com/dashevo/dashcore-lib.git#v1.0.0-alpha.19",
+    "@dashevo/dashcore-lib": "^0.16.5",
     "axios": "^0.18.0",
     "localforage": "^1.7.2",
     "lodash": "^4.17.4",
