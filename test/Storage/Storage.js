@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const nodeForage = require('nodeforage');
+
 const localForage = require('localforage');
 const Storage = require('../../src/Storage/Storage');
 const { CONFIGURED } = require('../../src/EVENTS');
@@ -29,8 +29,8 @@ describe('Storage - constructor', () => {
     storage.stopWorker();
   });
   it('should handle bad adapter', async () => {
-    const expectedException1 = 'Adapter instance not created';
-    const storageOpts1 = { adapter: nodeForage };
+    const expectedException1 = 'Invalid Storage Adapter : No available storage method found.';
+    const storageOpts1 = { adapter: localForage };
     const storage = new Storage();
     return storage.configure(storageOpts1).then(
       () => Promise.reject(new Error('Expected method to reject.')),
