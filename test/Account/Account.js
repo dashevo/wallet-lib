@@ -9,6 +9,7 @@ const Dashcore = require('@dashevo/dashcore-lib');
 
 const mocks = {
   adapter: inMem,
+  offlineMode: true,
 };
 
 const getMockedWalletInstance = () => new class Wallet {

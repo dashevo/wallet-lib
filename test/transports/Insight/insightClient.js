@@ -14,21 +14,21 @@ const insightClientOpts = {
 
 describe('Transport : Insight Client', function suite() {
   this.timeout(20000);
-  before((done) => {
-    const insight = new InsightClient(insightClientOpts);
-    const config = {
-      transport: insight,
-      mnemonic: mnemonicString1,
-      network: Dashcore.Networks.testnet,
-    };
-
-    wallet = new Wallet(config);
-    account = wallet.createAccount();
-    console.log('Account created');
-    account.events.on('ready', () => {
-      done();
-    });
-  });
+  // before((done) => {
+  //   const insight = new InsightClient(insightClientOpts);
+  //   const config = {
+  //     transport: insight,
+  //     mnemonic: mnemonicString1,
+  //     network: Dashcore.Networks.testnet,
+  //   };
+  //
+  //   wallet = new Wallet(config);
+  //   account = wallet.createAccount();
+  //   console.log('Account created');
+  //   account.events.on('ready', () => {
+  //     done();
+  //   });
+  // });
   /*
   it('should be able to setNetwork', () => {
     expect(account.updateNetwork('livenet')).to.equal(true);

@@ -13,7 +13,7 @@ describe('Storage - importAccounts', function suite() {
     expect(() => importAccounts.call({}, walletId)).to.throw(exceptedException1);
   });
   it('should create a wallet if not existing', () => {
-    const wallet = new Wallet();
+    const wallet = new Wallet({offlineMode:true});
     const acc = wallet.getAccount();
     let called = 0;
 
@@ -30,7 +30,7 @@ describe('Storage - importAccounts', function suite() {
     acc.disconnect();
   });
   it('should import an account', () => {
-    const wallet = new Wallet();
+    const wallet = new Wallet({offlineMode: true});
     const acc = wallet.getAccount();
     let called = 0;
 
