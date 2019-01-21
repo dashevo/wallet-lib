@@ -17,4 +17,4 @@ module.exports = function updateNetwork(network) {
     }
   }
   return false;
-}
+};

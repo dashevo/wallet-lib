@@ -34,7 +34,8 @@ class SyncWorker extends Worker {
     // - Didn't fetched new update for a bigger period than fetchThreshold (concern all addresses)
     // - If we have an unconfirmed balance
     // - Have more chance to have new tx coming in
-    //    (typically the result of getUnusedAddress, and preemptively in case of us not receiving the tx from listeners)
+    // (typically the result of getUnusedAddress,
+    // and preemptively in case of us not receiving the tx from listeners)
     await this.execAddressFetching();
 
     // We execute a fetching of all the transactions that are unknown

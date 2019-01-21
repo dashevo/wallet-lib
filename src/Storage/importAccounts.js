@@ -31,10 +31,16 @@ const importAccounts = function (accounts, walletId) {
       });
     }
   } else if (type === 'Array') {
-    throw new Error('Not implemented. Please create an issue on github if needed.');
+    accounts.forEach((account) => {
+      importAccounts.call(this, account, walletId);
+    });
   } else if (type === 'Account') {
-    // TODO
-    throw new Error('Account import not implemented. Please create an issue on github if needed.');
+    const accObj = {
+      label: accounts.label,
+      path: accounts.BIP44PATH,
+      network: accounts.network,
+    };
+    return importAccounts.call(this, accObj, walletId);
   } else {
     throw new Error('Invalid account. Cannot import.');
   }

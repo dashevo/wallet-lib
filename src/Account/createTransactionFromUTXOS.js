@@ -1,7 +1,8 @@
-const _ = require('lodash')
+const _ = require('lodash');
 const Dashcore = require('@dashevo/dashcore-lib');
 const { is, coinSelection } = require('../utils');
-const { CreateTransactionError } = require('../errors')
+const { CreateTransactionError } = require('../errors');
+
 /**
  * Create a transaction based around a provided utxos
  * @param opts - Options object
@@ -22,10 +23,11 @@ function createTransactionFromUTXOS(opts) {
   }
   const { recipient, utxos } = opts;
 
-
   // eslint-disable-next-line no-underscore-dangle
   // console.log(utxos.map(utxo => utxo.satoshis).reduce((a,b)=>a+=b));
-  const amount = (is.num(opts.amount)) ? opts.amount : utxos.map(utxo => utxo.satoshis).reduce((acc, curr) => acc + curr);
+  const amount = (is.num(opts.amount))
+    ? opts.amount
+    : utxos.map(utxo => utxo.satoshis).reduce((acc, curr) => acc + curr);
 
   const deductFee = _.has(opts, 'deductFee')
     ? opts.deductFee
@@ -34,7 +36,10 @@ function createTransactionFromUTXOS(opts) {
   const feeCategory = (opts.isInstantSend) ? 'instant' : 'normal';
   let selection;
   try {
-    selection = coinSelection(utxos, [{ address: recipient, satoshis: amount }], deductFee, feeCategory);
+    selection = coinSelection(utxos, [{
+      address: recipient,
+      satoshis: amount,
+    }], deductFee, feeCategory);
   } catch (e) {
     throw new CreateTransactionError(e);
   }
@@ -64,5 +69,6 @@ function createTransactionFromUTXOS(opts) {
 
   const signedTx = this.keyChain.sign(tx, privateKeys, Dashcore.crypto.Signature.SIGHASH_ALL);
   return signedTx.toString();
-};
+}
+
 module.exports = createTransactionFromUTXOS;

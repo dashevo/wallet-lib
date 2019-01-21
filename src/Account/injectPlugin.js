@@ -1,12 +1,12 @@
+const _ = require('lodash');
 const {
   InjectionErrorCannotInject,
   InjectionErrorCannotInjectUnknownDependency,
 } = require('../errors/index');
-const _ = require('lodash');
 /**
  * Will try to inject a given plugin. If needed, it will construct the object first (new).
  * @param UnsafePlugin - Either a child object, or it's parent class to inject
- * @param allowSensitiveOperations - Default : false. When set at true, force injection discarding unsafeOp checks.
+ * @param allowSensitiveOperations (false) - When true, force injection discarding unsafeOp checks.
  * @return {Promise<*>}
  */
 module.exports = async function injectPlugin(UnsafePlugin, allowSensitiveOperations = false) {
@@ -78,4 +78,4 @@ module.exports = async function injectPlugin(UnsafePlugin, allowSensitiveOperati
     }
     res(plugin);
   });
-}
+};

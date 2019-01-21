@@ -15,5 +15,5 @@ async function getTransaction(txid = null) {
     console.error(e);
   }
   return tx;
-};
+}
 module.exports = getTransaction;

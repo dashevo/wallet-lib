@@ -7,6 +7,7 @@ module.exports = async function configureAdapter(argAdapter) {
 
   // In case of an adapter being a function, we assume it being a class non instanciated
   if (argAdapterContructorName === 'Function') {
+    // eslint-disable-next-line new-cap
     adapter = new argAdapter();
     if (adapter.config) {
       try {

@@ -37,5 +37,5 @@ function getUnusedAddress(type = 'external', skip = 0) {
     return this.getAddress(0, type);
   }
   return unused;
-};
+}
 module.exports = getUnusedAddress;

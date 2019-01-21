@@ -11,5 +11,5 @@ function disconnect() {
       this.accounts[path].disconnect();
     });
   }
-};
+}
 module.exports = disconnect;

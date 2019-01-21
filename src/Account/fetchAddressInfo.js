@@ -45,6 +45,7 @@ async function fetchAddressInfo(addressObj, fetchUtxo = true) {
             const promise = self.fetchTransactionInfo(tx).then((txInfo) => {
               self.storage.importTransaction(txInfo);
             });
+            promises.push(promise);
           }
         });
         await Promise.all(promises);
@@ -75,5 +76,5 @@ async function fetchAddressInfo(addressObj, fetchUtxo = true) {
     console.log(e);
     return false;
   }
-};
+}
 module.exports = fetchAddressInfo;

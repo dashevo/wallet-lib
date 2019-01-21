@@ -3,16 +3,22 @@ const {
   Address, Script, Transaction,
 } = require('@dashevo/dashcore-lib');
 
-const { Input, Output } = Transaction;
+const { Output } = Transaction;
 const {
-  FEES, VERSION_BYTES, TXOUT_DUFFS_VALUE_BYTES, N_LOCKTIME_BYTES, TXIN_OUTPOINT_TXID_BYTES, TXIN_OUTPOINT_INDEX_BYTES, TXIN_SEQUENCE_BYTES,
+  FEES,
+  VERSION_BYTES,
+  TXOUT_DUFFS_VALUE_BYTES,
+  N_LOCKTIME_BYTES,
+  TXIN_OUTPOINT_TXID_BYTES,
+  TXIN_OUTPOINT_INDEX_BYTES,
+  TXIN_SEQUENCE_BYTES,
 } = require('../../CONSTANTS');
 const is = require('../is');
 const { varIntSizeBytesFromLength } = require('../varInt');
 
 const calculateInputsSize = (inputs) => {
   let inputsSize = 0;
-  inputs.forEach((_input) => {
+  inputs.forEach(() => {
     // eslint-disable-next-line new-cap
     const scriptPubKeyBytes = 100;// On average it's ~80
     const scriptPubKeyLengthBytes = varIntSizeBytesFromLength(scriptPubKeyBytes);

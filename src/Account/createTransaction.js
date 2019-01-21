@@ -24,7 +24,7 @@ function createTransaction(opts) {
   const satoshis = (opts.amount && !opts.satoshis) ? dashToDuffs(opts.amount) : opts.satoshis;
   if (!opts || (!opts.recipient)) {
     throw new Error('A recipient is expected to create a transaction');
-  05}
+  }
   const deductFee = _.has(opts, 'deductFee')
     ? opts.deductFee
     : true;

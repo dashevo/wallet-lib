@@ -1,4 +1,4 @@
-const _ = require('lodash')
+const _ = require('lodash');
 /**
  * Return all the utxos (unspendable included)
  * @param {Boolean} onlyAvailable - Only return available utxos (spendable)
@@ -33,5 +33,5 @@ function getUTXOS(onlyAvailable = true) {
   utxos = utxos.sort((a, b) => b.satoshis - a.satoshis);
 
   return utxos;
-};
+}
 module.exports = getUTXOS;

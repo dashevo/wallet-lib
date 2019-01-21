@@ -2,12 +2,13 @@ const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
 const createTransaction = require('../../src/Account/createTransaction');
 const addressesFixtures = require('../fixtures/addresses.json');
-const validStore = require('../fixtures/walletStore').valid.orange.store
+const validStore = require('../fixtures/walletStore').valid.orange.store;
+
 describe('Account - createTransaction', () => {
   it('sould warn on missing inputs', () => {
     const self = {
       store: validStore,
-      walletId: "a3771aaf93",
+      walletId: 'a3771aaf93',
       getUTXOS: require('../../src/Account/getUTXOS'),
     };
 

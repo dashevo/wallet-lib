@@ -5,4 +5,4 @@ const { cloneDeep } = require('lodash');
  */
 module.exports = function getStore() {
   return cloneDeep(this.store);
-}
+};

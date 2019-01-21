@@ -15,7 +15,9 @@ const defaultOptions = {
 };
 
 
+// eslint-disable-next-line no-underscore-dangle
 const _addAccountToWallet = require('./_addAccountToWallet');
+// eslint-disable-next-line no-underscore-dangle
 const _initializeAccount = require('./_initializeAccount');
 
 const broadcastTransaction = require('./broadcastTransaction');

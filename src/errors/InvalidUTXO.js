@@ -1,4 +1,6 @@
+const { has } = require('lodash');
 const WalletLibError = require('./WalletLibError');
+const is = require('../utils/is');
 
 class InvalidUTXO extends WalletLibError {
   constructor(utxo) {

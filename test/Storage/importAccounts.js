@@ -2,7 +2,8 @@ const { expect } = require('chai');
 const importAccounts = require('../../src/Storage/importAccounts');
 const Wallet = require('../../src/Wallet/Wallet');
 
-describe('Storage - importAccounts', () => {
+describe('Storage - importAccounts', function suite() {
+  this.timeout(5000);
   it('should throw on failed import', () => {
     const mockOpts1 = { };
     const walletId = '123ae';
@@ -19,27 +20,32 @@ describe('Storage - importAccounts', () => {
     const self = {
       searchWallet: () => ({ found: false }),
       createWallet: () => (called += 1),
-      store: { wallets: {  } },
+      store: { wallets: { } },
     };
-    self.store.wallets[wallet.walletId] = {accounts: {}};
+    self.store.wallets[wallet.walletId] = { accounts: {} };
     importAccounts.call(self, acc, wallet.walletId);
-    expect(called).to.be.equal(1);
+    // Called twice because of recursivity. We have a Acc Instance here.
+    expect(called).to.be.equal(2);
+    wallet.disconnect();
+    acc.disconnect();
   });
   it('should import an account', () => {
     const wallet = new Wallet();
     const acc = wallet.getAccount();
+    let called = 0;
 
     const self = {
       searchWallet: () => ({ found: false }),
+      createWallet: () => (called += 1),
+      store: { wallets: { } },
     };
+    acc.label = 'Heya!';
+    self.store.wallets[wallet.walletId] = { accounts: {} };
     importAccounts.call(self, acc, wallet.walletId);
-
-    console.log(self);
-    // const self = {};
-    // const acc = wallet.ge();
-    // console.log(acc);
-    // console.log(wallet)
-    // importAddress.call(self, {});
-    // console.log(self);
+    const walletsKeys = Object.keys(self.store.wallets);
+    expect(walletsKeys.length).to.equal(1);
+    expect(self.store.wallets[walletsKeys[0]].accounts['m/44\'/1\'/0\''].label).to.equal('Heya!');
+    wallet.disconnect();
+    acc.disconnect();
   });
 });

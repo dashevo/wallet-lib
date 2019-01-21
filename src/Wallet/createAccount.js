@@ -11,5 +11,5 @@ function createAccount(accountOpts) {
   if (this.type === WALLET_TYPES.SINGLE_ADDRESS) { baseOpts.privateKey = this.privateKey; }
   const opts = Object.assign(baseOpts, accountOpts);
   return new Account(this, opts);
-};
+}
 module.exports = createAccount;

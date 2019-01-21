@@ -4,7 +4,7 @@
  * @param wallet
  */
 // eslint-disable-next-line no-underscore-dangle
-const _addAccountToWallet = function (account, wallet) {
+const _addAccountToWallet = function addAccountToWallet(account, wallet) {
   const { accounts } = wallet;
 
   const existAlready = accounts.filter(el => el.accountIndex === wallet.accountIndex).length > 0;

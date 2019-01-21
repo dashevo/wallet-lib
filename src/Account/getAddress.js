@@ -23,5 +23,5 @@ function getAddress(index = 0, _type = 'external') {
   // console.log(type, path)
   // console.log(addressType, path)
   return (addressType[path]) ? addressType[path] : this.generateAddress(path);
-};
+}
 module.exports = getAddress;

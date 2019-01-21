@@ -254,7 +254,7 @@ describe('Transport : Insight Client', function suite() {
     }];
 
     return account.getTransactionHistory().then(result => expect(result).to.deep.equal(expected));
-  });*/
+  }); */
   /*
   it('should get transaction', () => {
     const expected = {
@@ -320,7 +320,7 @@ describe('Transport : Insight Client', function suite() {
       data => expect(data).to.be.a('String'),
       err => expect(err).to.be.a('Error').with.property('message', 'Error: Request failed with status code 400'),
     );
-  });*/
+  }); */
   after((done) => {
     account.disconnect();
     account = null;

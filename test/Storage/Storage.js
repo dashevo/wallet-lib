@@ -16,6 +16,7 @@ describe('Storage - constructor', () => {
     expect(storage.lastRehydrate).to.equal(null);
     expect(storage.lastSave).to.equal(null);
     expect(storage.lastModified).to.equal(null);
+    storage.stopWorker();
   });
   it('should configure a storage with default adapter', async () => {
     const storage = new Storage();
@@ -25,6 +26,7 @@ describe('Storage - constructor', () => {
     expect(storage.adapter).to.exist;
     expect(storage.adapter.constructor.name).to.equal('InMem');
     expect(configuredEvent).to.equal(true);
+    storage.stopWorker();
   });
   it('should handle bad adapter', async () => {
     const expectedException1 = 'Adapter instance not created';
@@ -33,7 +35,9 @@ describe('Storage - constructor', () => {
     return storage.configure(storageOpts1).then(
       () => Promise.reject(new Error('Expected method to reject.')),
       err => expect(err).to.be.a('Error').with.property('message', expectedException1),
-    );
+    ).then(() => {
+      storage.stopWorker();
+    });
   });
   it('should work on usage', async () => {
     const storage = new Storage();
@@ -59,11 +63,11 @@ describe('Storage - constructor', () => {
       transactions: {},
       chains: { testnet: { name: 'testnet', blockheight: -1 } },
     };
-    expect(storage.getStore()).to.deep.equal(expectedStore2)
-    expect(storage.store).to.deep.equal(expectedStore2)
+    expect(storage.getStore()).to.deep.equal(expectedStore2);
+    expect(storage.store).to.deep.equal(expectedStore2);
 
     const account = {};
     await storage.importAccounts(account, defaultWalletId);
-    console.log(JSON.stringify(storage.getStore()));
+    storage.stopWorker();
   });
 });

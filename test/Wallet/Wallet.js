@@ -130,7 +130,7 @@ describe('Wallet - Get/Create Account', () => {
       passphrase,
       network,
     };
-    const walletTestnet = new Wallet(Object.assign(config,mocks));
+    const walletTestnet = new Wallet(Object.assign(config, mocks));
     const encryptedHDPriv = walletTestnet.exportWallet(true);
     const expectedHDPriv = 'tprv8ZgxMBicQKsPcuZMDBeTL2qaBF7gyUPt2wbqbJG2yp8s7yzRE1cRcjRnG3Xmdv3sELwtLGz186VX3EeHQ5we1xr1qH95QN6FRopP6FZqBUJ';
     expect(encryptedHDPriv.toString()).to.equal(expectedHDPriv);
@@ -144,13 +144,18 @@ describe('Wallet - Get/Create Account', () => {
       passphrase,
       network,
     };
-    const walletTestnet = new Wallet(Object.assign(config,mocks));
+    const walletTestnet = new Wallet(Object.assign(config, mocks));
     const account = walletTestnet.createAccount();
     // eslint-disable-next-line no-unused-expressions
     expect(account).to.exist;
+    expect(account.BIP44PATH.split('/')[3]).to.equal('0\'');
+    expect(account.accountIndex).to.equal(0);
+
+
     const accountSpecificIndex = walletTestnet.createAccount({ accountIndex: 42 });
     expect(accountSpecificIndex.BIP44PATH.split('/')[3]).to.equal('42\'');
     expect(accountSpecificIndex.accountIndex).to.equal(42);
+
     walletTestnet.disconnect();
   });
 });

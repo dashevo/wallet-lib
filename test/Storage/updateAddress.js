@@ -7,7 +7,7 @@ describe('Storage - updateAddress', () => {
     const self = {};
     expect(() => updateAddress.call(self)).to.throw('Expected walletId to update an address');
 
-    expect(() => updateAddress.call(self, {}, '123ae')).to.throw('Address should have property path of type string {}');
+    expect(() => updateAddress.call(self, {}, '123ae')).to.throw('Address should have property path of type string');
   });
   it('should update an address', () => {
     const self = { store: orangeWStore, mappedAddress: {} };

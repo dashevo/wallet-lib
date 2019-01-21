@@ -9,5 +9,5 @@ class CreateTransactionError extends WalletLibError {
       super(e);
     }
   }
-};
+}
 module.exports = CreateTransactionError;

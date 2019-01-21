@@ -1,6 +1,6 @@
 const { expect } = require('chai');
-const Transporter = require('../../src/transports/Transporter');
 const DAPIClient = require('@dashevo/dapi-client');
+const Transporter = require('../../src/transports/Transporter');
 const InsightClient = require('../../src/transports/Insight/insightClient');
 
 const pluginRequiredKeys = ['getAddressSummary', 'getTransaction', 'getUTXO', 'subscribeToAddresses', 'closeSocket', 'sendRawTransaction'];

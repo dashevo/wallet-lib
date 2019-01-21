@@ -36,17 +36,18 @@ async function getTransactionHistory() {
   const resolvedPromises = await Promise.all(p) || [];
 
   function cleanUnknownAddr(data, wId) {
+    const selfStore = self.storage.getStore();
     const knownAddr = [];
-    Object.keys(self.store.wallets[wId].addresses.external).forEach((key) => {
-      const el = self.store.wallets[wId].addresses.external[key];
+    Object.keys(selfStore.wallets[wId].addresses.external).forEach((key) => {
+      const el = selfStore.wallets[wId].addresses.external[key];
       knownAddr.push(el.address);
     });
-    Object.keys(self.store.wallets[wId].addresses.internal).forEach((key) => {
-      const el = self.store.wallets[wId].addresses.internal[key];
+    Object.keys(selfStore.wallets[wId].addresses.internal).forEach((key) => {
+      const el = selfStore.wallets[wId].addresses.internal[key];
       knownAddr.push(el.address);
     });
-    Object.keys(self.store.wallets[wId].addresses.misc).forEach((key) => {
-      const el = self.store.wallets[wId].addresses.misc[key];
+    Object.keys(selfStore.wallets[wId].addresses.misc).forEach((key) => {
+      const el = selfStore.wallets[wId].addresses.misc[key];
       knownAddr.push(el.address);
     });
 

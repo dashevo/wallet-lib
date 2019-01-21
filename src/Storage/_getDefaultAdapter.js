@@ -3,6 +3,7 @@ const InMem = require('../adapters/InMem');
 
 module.exports = async function getDefaultAdapter() {
   const isBrowser = (typeof document !== 'undefined');
+  // eslint-disable-next-line no-undef
   const isReactNative = (typeof navigator !== 'undefined' && navigator.product === 'ReactNative');
   const isNode = !isBrowser && !isReactNative;
 

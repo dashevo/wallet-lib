@@ -23,4 +23,4 @@ module.exports = function exportWallet(toHDPrivateKey = false) {
     default:
       throw new Error('Trying to export from an unknown wallet type');
   }
-}
+};

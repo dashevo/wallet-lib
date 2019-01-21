@@ -1,5 +1,5 @@
 const { EventEmitter } = require('events');
-const { cloneDeep } = require('lodash');
+const { cloneDeep, has } = require('lodash');
 
 const addNewTxToAddress = require('./addNewTxToAddress');
 const addUTXOToAddress = require('./addUTXOToAddress');
@@ -74,8 +74,8 @@ class Storage {
 
     this.events = new EventEmitter();
     this.store = cloneDeep(initialStore);
-    this.rehydrate = defaultOpts.rehydrate;
-    this.autosave = defaultOpts.autosave;
+    this.rehydrate = has(opts, 'rehydrate') ? opts.rehydrate : defaultOpts.rehydrate;
+    this.autosave = has(opts, 'autosave') ? opts.autosave : defaultOpts.autosave;
     this.lastRehydrate = null;
     this.lastSave = null;
     this.lastModified = null;

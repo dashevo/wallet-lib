@@ -1,5 +1,5 @@
 const { cloneDeep } = require('lodash');
-const { InvalidTransaction } = require('../errors');
+const { InvalidTransactionObject } = require('../errors');
 const { is, dashToDuffs } = require('../utils');
 
 /**
@@ -7,9 +7,8 @@ const { is, dashToDuffs } = require('../utils');
  * @param transaction - A valid Transaction
  */
 const importTransaction = function (transaction) {
-  // console.log('tx', JSON.stringify(transaction))
   const self = this;
-  if (!is.transactionObj(transaction)) throw new InvalidTransaction(transaction);
+  if (!is.transactionObj(transaction)) throw new InvalidTransactionObject(transaction);
   const transactionStore = this.store.transactions;
   const transactionsIds = Object.keys(transactionStore);
 
