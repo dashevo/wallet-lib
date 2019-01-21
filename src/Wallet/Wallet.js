@@ -9,6 +9,7 @@ const {
 const Transporter = require('../transports/Transporter');
 
 const defaultOptions = {
+  offlineMode: false,
   network: 'testnet',
   plugins: [],
   passphrase: null,
@@ -59,7 +60,7 @@ class Wallet {
     const network = _.has(opts, 'network') ? opts.network : defaultOptions.network;
     const passphrase = _.has(opts, 'passphrase') ? opts.passphrase : defaultOptions.passphrase;
     this.passphrase = passphrase;
-
+    this.offlineMode = _.has(opts, 'offlineMode') ? opts.offlineMode : defaultOptions.offlineMode;
     this.allowSensitiveOperations = _.has(opts, 'allowSensitiveOperations') ? opts.allowSensitiveOperations : defaultOptions.allowSensitiveOperations;
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
 
@@ -107,8 +108,11 @@ class Wallet {
         this.storage.importAddresses(opts.cache.addresses, this.walletId);
       }
     }
-
-    this.transport = (opts.transport) ? new Transporter(opts.transport) : new Transporter();
+    if (this.offlineMode) {
+      this.transport = { isValid: false };
+    } else {
+      this.transport = (opts.transport) ? new Transporter(opts.transport) : new Transporter();
+    }
     this.accounts = [];
     this.interface = opts.interface;
     this.savedBackup = false; // TODO: When true, we delete mnemonic from internals

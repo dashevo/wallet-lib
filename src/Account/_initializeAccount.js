@@ -15,7 +15,10 @@ async function _initializeAccount(account, userUnsafePlugins) {
     // await parent if child has it in dependency
     // if not, then is it marked as requiring a first exec
     // if yes add to watcher list.
-    account.injectPlugin(ChainWorker, true);
+
+    if (!account.offlineMode) {
+      account.injectPlugin(ChainWorker, true);
+    }
 
     if (account.type === WALLET_TYPES.HDWALLET) {
       // Ideally we should move out from worker to event based
@@ -24,7 +27,9 @@ async function _initializeAccount(account, userUnsafePlugins) {
     if (account.type === WALLET_TYPES.SINGLE_ADDRESS) {
       account.getAddress('0'); // We force what is usually done by the BIP44Worker.
     }
-    account.injectPlugin(SyncWorker, true);
+    if (!account.offlineMode) {
+      account.injectPlugin(SyncWorker, true);
+    }
   }
 
   _.each(userUnsafePlugins, (UnsafePlugin) => {

@@ -85,6 +85,7 @@ class Account {
     this.allowSensitiveOperations = _.has(opts, 'allowSensitiveOperations') ? opts.allowSensitiveOperations : defaultOptions.allowSensitiveOperations;
 
     this.type = wallet.type;
+    this.offlineMode = wallet.offlineMode;
 
     const accountIndex = (opts.accountIndex) ? opts.accountIndex : wallet.accounts.length;
     this.accountIndex = accountIndex;
