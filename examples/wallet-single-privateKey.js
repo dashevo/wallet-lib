@@ -1,9 +1,8 @@
 const Wallet = require('../src/Wallet/Wallet');
 
 const transport = 'insight';
-const privateKey = 'cN1QZtX4wvx7MUmFt5hY3Nkrveeu7FipRciAcffsYBFmmwkBdzXa';
+const privateKey = '9488797ee0018994d5ae22640e25210f65b1a450a0adcfa428cb5ffb29faa24b';
 const network = 'testnet';
-
 const start = async () => {
   const wallet = new Wallet({
     network,
@@ -23,7 +22,7 @@ const start = async () => {
     console.log('balance :', balance);
 
     const rawtx = account.createTransaction({
-      to: address,
+      recipient: address,
       satoshis: balance - 10000,
       isInstantSend: true,
     });

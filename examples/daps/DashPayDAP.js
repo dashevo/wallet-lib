@@ -1,4 +1,3 @@
-const { utils, plugins, CONSTANTS } = require('../../src');
 const Dashcore = require('@dashevo/dashcore-lib');
 const dashPaySchema = require('./dashPaySchema.json');
 
@@ -95,6 +94,10 @@ class DashPayDAP extends DAP {
 
   async searchUsername(pattern) {
     return this.transport.transport.searchUsers(pattern);
+  }
+
+  async getUser(username) {
+    return this.transport.transport.getUserByName(username);
   }
 
   async topUpUserCredit(userId, amount) { throw new Error('Not implemented.'); }

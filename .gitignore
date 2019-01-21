@@ -94,3 +94,5 @@ atlassian-ide-plugin.xml
 
 # nodeForage
 *.db.json
+
+*.ungit.js
