@@ -219,14 +219,20 @@ Miscellaneous :
 - [ ] CoinSelection strategy as a plugins.
 - [ ] Account network and plugins independants from each other.
 
-Transports :
 
-- [ ] DAPI-Client : [https://github.com/dashevo/dapi-client]
+## Plugins 
+
+##### DAP
+- [DashPay DAP](https://github.com/dashevo/dashpay-dap) : 
+
+##### Transports :
+
+- [X] DAPI-Client : [https://github.com/dashevo/dapi-client]
 - [x] Insight- Client : [src/transports/Insight/insightClient.js]
 - [ ] Dash-P2P : [src/transports/Protocol/protocolClient.js]
 - [ ] DashcoreRPC : [src/transports/RPC/rpcClient.js]
 
-Adapters (help from community welcomed) :
+##### Adapters (help from community welcomed) :
 
 - [x] [LocalForage](https://github.com/localForage/localForage)
 - [x] [ReactNative AsyncStorage](https://facebook.github.io/react-native/docs/asyncstorage)
@@ -242,6 +248,7 @@ Adapters (help from community welcomed) :
 - [Wallet](/docs/wallet.md)
 - [Account](/docs/account.md)
 - [KeyChain](/docs/keychain.md)
+- [Plugins](/docs/plugins.md)
 - [Storage](/docs/storage.md)
 - [CoinSelection](/docs/coinSelection.md)
 
@@ -249,10 +256,6 @@ Adapters (help from community welcomed) :
 
 - [BIP44Worker](/docs/BIP44Worker.md)
 - [SyncWorker](/docs/SyncWorker.md)
-
-### Plugins 
-
-- [DashPay DAP](https://github.com/dashevo/dashpay-dap) : 
 
 ## Examples
 

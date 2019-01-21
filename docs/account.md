@@ -6,7 +6,8 @@ This Account hold all the method that one might want to use, from creating a tra
 ## Create an Account
 
 ```
-const account = wallet.createAccount(wallet, [opts]);
+const account = wallet.createAccount([opts]);
+const account = new Account(wallet, [opts]);
 ```
 
 ##### options
