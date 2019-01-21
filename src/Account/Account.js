@@ -8,7 +8,6 @@ const EVENTS = require('../EVENTS');
 const defaultOptions = {
   network: 'testnet',
   cacheTx: true,
-  subscribe: true,
   allowSensitiveOperations: false,
   plugins: [],
   injectDefaultPlugins: true,

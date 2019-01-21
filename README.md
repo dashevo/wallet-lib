@@ -12,11 +12,12 @@ Under active development. Usage for production discouraged.
 Help from the community is also welcomed.  
  
 Things to look up for :
-- Proper testings is needed. More complex and edge cases.
+- More complex and edge cases for testing.
 - Handling of differents transactions type + DIP002
 - Storage/memory cost on a usage over multiples days.
 - Optimisation allowing to work for a faucet priv Key (with a lot of inc/out tx)
-- Others TODOs in the code :)
+- Ready event expectation in a unsuccessful initialization (timeout for instance)
+- Others TODOs and FIXMEs in the code :)
 
 ## Table of Contents
 
@@ -63,6 +64,22 @@ const account = wallet.getAccount();
 // Do something with account.
 ```
 
+Wallet will by default connects to DAPI and use either localforage (browser based device) or a InMem adapter.  
+Account will by default be on expected BIP44 path (...0/0).  
+
+It is suggested to wait for the ready event thrown by the account to ensure every is ready to be used (in sync with plugin loaded)
+
+```
+const { Wallet, EVENTS } = require('@dashevo/wallet-lib');
+
+const wallet = new Wallet();
+const start = () => {
+    const account = wallet.getAccount();
+    // Do something with account.
+}
+account.events.on(EVENTS.READY, start);
+
+```
 
 ## Some rules of thumb
 
@@ -70,8 +87,8 @@ const account = wallet.getAccount();
 therefore a good way to quit an instance would be to call `account.disconnect()` which will care to  
 call `clearWorker(), closeSocket()` of the differents elements. You can still decide to remove them by hand if you want.  
 - Some classic exemples of usage can be seen here : [Exemples](/docs/exemples.md)  
-
 ## Creating a Wallet
+
 
 The goal of this library is to offer you all the helpers that you will need to handle a Wallet and it's logic.  
 Therefore, the only real object you want to instantiate will be a wallet object.
@@ -146,12 +163,12 @@ account.events.on('ready', doFancyStuff());
 
 ```
 
-For more informations about the differents methods and options of the Account class, look at the [Wallet documentation](/docs/account.md).
+For more informations about the differents methods and options of the Account class, look at the [Account documentation](/docs/account.md).
 
 ### Pay to an address
 ```
 const options = {
-    to: "yizmJb63ygipuJaRgYtpWCV2erQodmaZt8",
+    recipient: "yizmJb63ygipuJaRgYtpWCV2erQodmaZt8",
     satoshis:100000,
     isInstantSend:false
 };
@@ -171,7 +188,7 @@ BIPS Supports :
 
 Miscellaneous :
 
-- [ ] DAPI Support
+- [X] DAPI Support
 - [ ] Protocol Support
 - [x] Persistance interface
     - [x] In-mem support
@@ -198,7 +215,7 @@ Miscellaneous :
 - [ ] Compatibility with old format (BIP32)
 - [ ] Paper-sweep wallet
 - [ ] Log tool to be able to help for decentralized debugging
-- [ ] [docs/plugins](Plugins.md) support (Worker, DAP)
+- [X] [docs/plugins](Plugins.md) support (Worker, DAP)
 - [ ] CoinSelection strategy as a plugins.
 - [ ] Account network and plugins independants from each other.
 
@@ -236,17 +253,10 @@ Adapters (help from community welcomed) :
 ### Plugins 
 
 - [DashPay DAP](https://github.com/dashevo/dashpay-dap) : 
+
 ## Examples
 
 You can see here, some [Examples](/docs/examples.md).
-
-## Road map
-
-- DAPIClient : (09/18)
-- DAPI Support (09/18)
-- Improved coinSelection (10/18)
-- Compatibility with old format and paper sweep wallet (10/18)
-- Protocol Support (06/19)
 
 ## License
 

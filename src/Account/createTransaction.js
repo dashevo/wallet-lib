@@ -11,7 +11,6 @@ const { dashToDuffs, coinSelection } = require('../utils');
  * @param opts.isInstantSend - If you want to use IS or stdTx.
  * @param opts.deductFee - Deduct fee
  * @param opts.privateKeys - Overwrite default behavior : auto-searching local matching keys.
- * @param opts.privateKeys - Overwrite default behavior : auto-searching local matching keys.
  * @return {String} - rawTx
  */
 function createTransaction(opts) {

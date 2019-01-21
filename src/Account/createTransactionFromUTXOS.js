@@ -3,6 +3,8 @@ const Dashcore = require('@dashevo/dashcore-lib');
 const { is, coinSelection } = require('../utils');
 const { CreateTransactionError } = require('../errors');
 
+// TODO : I'm 100% sure we can merge than in createTransaction :)
+
 /**
  * Create a transaction based around a provided utxos
  * @param opts - Options object
