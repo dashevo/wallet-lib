@@ -69,6 +69,7 @@ async function getTransactionHistory() {
       type: (isSent) ? 'sent' : 'receive',
       txid: el.txid,
       time: el.time || el.blocktime || 0,
+      fees: el.fees,
       from: (el.vin) ? el.vin.map(vin => vin.addr) : 'unknown',
     };
     if (el.vout) {
