@@ -31,6 +31,5 @@ const rehydrateState = async function () {
       throw e;
     }
   }
-  await this.saveState();
 };
 module.exports = rehydrateState;
