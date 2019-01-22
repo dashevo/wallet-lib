@@ -22,7 +22,6 @@ const _initializeAccount = require('./_initializeAccount');
 const broadcastTransaction = require('./broadcastTransaction');
 const connect = require('./connect');
 const createTransaction = require('./createTransaction');
-const createTransactionFromUTXOS = require('./createTransactionFromUTXOS');
 const disconnect = require('./disconnect');
 const fetchAddressInfo = require('./fetchAddressInfo');
 const fetchStatus = require('./fetchStatus');
@@ -52,7 +51,6 @@ class Account {
       broadcastTransaction,
       connect,
       createTransaction,
-      createTransactionFromUTXOS,
       disconnect,
       fetchAddressInfo,
       fetchStatus,

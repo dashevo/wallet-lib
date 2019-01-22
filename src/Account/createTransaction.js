@@ -9,6 +9,7 @@ const { dashToDuffs, coinSelection } = require('../utils');
  * @param opts.satoshis - Amount in satoshis
  * @param opts.recipient - Address of the recipient
  * @param opts.change - String - A valid Dash address - optional
+ * @param opts.utxos - Array - A utxo set - optional
  * @param opts.isInstantSend - If you want to use IS or stdTx.
  * @param opts.deductFee - Deduct fee
  * @param opts.privateKeys - Overwrite default behavior : auto-searching local matching keys.
@@ -31,7 +32,7 @@ function createTransaction(opts) {
 
   const outputs = [{ address: opts.recipient, satoshis }];
 
-  const utxosList = this.getUTXOS();
+  const utxosList = _.has(opts, 'utxos') ? opts.utxos : this.getUTXOS();
 
   utxosList.map((utxo) => {
     const utxoTx = self.storage.searchTransaction(utxo.txid);
@@ -82,7 +83,14 @@ function createTransaction(opts) {
   const finalFees = Math.ceil(estimatedFee + (deltaChangeSize * estimatedFee / preChangeSize));
 
   tx.fee(finalFees);
-  const addressList = selectedUTXOs.map(el => ((el.address)));
+  const addressList = selectedUTXOs.map((el) => {
+    if (el.address) return el.address;
+    return Dashcore.Script
+      .fromHex(el.scriptPubKey)
+      .toAddress(this.network)
+      .toString();
+  });
+
   const privateKeys = _.has(opts, 'privateKeys')
     ? opts.privateKeys
     : this.getPrivateKeys(addressList);

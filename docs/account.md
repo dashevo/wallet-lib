@@ -109,15 +109,7 @@ To broadcast a transaction, used the `broadcastTransaction()` method.
 
 > **privateKeys** : Array[PrivateKey] : Will overwrite the behavior of autosearching for keys and sign using those instead.
 
----
-
-### Create Transaction From UTXOS
-
-`const rawtx = account.createTransactionFromUTXOS(opts)`
-
-Similar than standard one with the exception of an expected passed utxos list instead of searching locally.
-
-> **opts.utxos** : Array[utxos] - UTXOS from where spend. Allow granular control.
+> **opts.utxos** : Array[utxos] (def: all known available utxos) - UTXOS from where spend. Allow granular control. - optional
 
 ---
 
