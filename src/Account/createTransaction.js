@@ -8,6 +8,7 @@ const { dashToDuffs, coinSelection } = require('../utils');
  * @param opts.amount - Amount in dash that you want to send
  * @param opts.satoshis - Amount in satoshis
  * @param opts.recipient - Address of the recipient
+ * @param opts.change - String - A valid Dash address - optional
  * @param opts.isInstantSend - If you want to use IS or stdTx.
  * @param opts.deductFee - Deduct fee
  * @param opts.privateKeys - Overwrite default behavior : auto-searching local matching keys.
@@ -75,24 +76,11 @@ function createTransaction(opts) {
   // In case or excessive fund, we will get that to an address in our possession
   // and determine the finalFees
   const preChangeSize = tx._estimateSize();
-  const addressChange = this.getUnusedAddress('internal', 1).address;
-  tx.change(addressChange);
+  const changeAddress = _.has(opts, 'change') ? opts.change : this.getUnusedAddress('internal', 1).address;
+  tx.change(changeAddress);
   const deltaChangeSize = tx._estimateSize() - preChangeSize;
   const finalFees = Math.ceil(estimatedFee + (deltaChangeSize * estimatedFee / preChangeSize));
 
-
-  // TODO : Deduct fee operation should happen here ?
-
-  // const feeRate = (opts.isInstantSend) ? feeCalculation('instantSend') : feeCalculation();
-  // if (feeRate.type === 'perBytes') {
-  // console.log(feeRate.value * tx.size)
-  // tx.feePerKb(feeRate.value * 10);
-  // tx.fee(FEES.DEFAULT_FEE);
-  // }
-  // if (feeRate.type === 'perInputs') {
-  //   const fee = inputs.length * FEES.NORMAL;
-  //   tx.fee(fee);
-  // }
   tx.fee(finalFees);
   const addressList = selectedUTXOs.map(el => ((el.address)));
   const privateKeys = _.has(opts, 'privateKeys')

@@ -10,6 +10,7 @@ const { CreateTransactionError } = require('../errors');
  * @param opts - Options object
  * @param opts.utxos - Array - A utxo set
  * @param opts.recipient - String - A valid Dash address
+ * @param opts.change - String - A valid Dash address - optional
  * @param opts.amount - number - Optional, satoshi value
  * @param opts.deductFee - bool - Optional - Default : true
  * @param opts.isInstantSend - bool - Optional - Default : false
@@ -57,8 +58,10 @@ function createTransactionFromUTXOS(opts) {
   tx.from(inputs);
   tx.to(selection.outputs);
 
-  tx.change(recipient);
+  // In case or excessive fund, we will get that to an address in our possession
   tx.fee(selection.estimatedFee);
+  const changeAddress = _.has(opts, 'change') ? opts.change : this.getUnusedAddress('internal', 1).address;
+  tx.change(changeAddress);
 
   const addressList = utxos.map(el => Dashcore.Script
     .fromHex(el.scriptPubKey)

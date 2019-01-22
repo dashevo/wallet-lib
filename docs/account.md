@@ -101,6 +101,8 @@ To broadcast a transaction, used the `broadcastTransaction()` method.
 
 > **recipient** : Address - Address of the recipient
 
+> **change** : Address(def: First internal unused) - Address where remaining will be sent
+
 > **isInstantSend** : Bool (def:false) -- If you want to use IS or stdTx.
 
 > **deductFee** : Bool (def: True) - Specify if you want to deduct fee from the coinSelection process

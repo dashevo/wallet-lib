@@ -27,4 +27,7 @@ describe('Account - createTransaction', () => {
     expect(() => createTransaction.call(self, mockOpts2)).to.throw(expectedException2);
     expect(() => createTransaction.call(self, mockOpts3)).to.throw(expectedException3);
   });
+  it('should be able to have a passed change address', ()=>{
+
+  })
 });
