@@ -42,7 +42,7 @@ function createTransaction(opts) {
     return utxo;
   });
 
-  const feeCategory = (opts.isInstantSend) ? 'instant' : 'PRIORITY';
+  const feeCategory = (opts.isInstantSend) ? 'instant' : 'normal';
   let selection;
   try {
     selection = coinSelection(utxosList, outputs, deductFee, feeCategory);
@@ -73,8 +73,12 @@ function createTransaction(opts) {
   tx.from(inputs);
 
   // In case or excessive fund, we will get that to an address in our possession
+  // and determine the finalFees
+  const preChangeSize = tx._estimateSize();
   const addressChange = this.getUnusedAddress('internal', 1).address;
   tx.change(addressChange);
+  const deltaChangeSize = tx._estimateSize() - preChangeSize;
+  const finalFees = Math.ceil(estimatedFee + (deltaChangeSize * estimatedFee / preChangeSize));
 
 
   // TODO : Deduct fee operation should happen here ?
@@ -89,7 +93,7 @@ function createTransaction(opts) {
   //   const fee = inputs.length * FEES.NORMAL;
   //   tx.fee(fee);
   // }
-  tx.fee(estimatedFee);
+  tx.fee(finalFees);
   const addressList = selectedUTXOs.map(el => ((el.address)));
   const privateKeys = _.has(opts, 'privateKeys')
     ? opts.privateKeys
