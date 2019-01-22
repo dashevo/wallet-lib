@@ -1,48 +1,46 @@
-const {StandardPlugin} = require('../../src/plugins/index');
+const { StandardPlugin } = require('../../src/plugins/index');
 
 class WalletConsolidator extends StandardPlugin {
-  constructor(){
+  constructor() {
     super({
-      //When true, the wallet object will only fire "ready"
-      firstExecutionRequired:false,
-      //Describe if we execute it first on startup of an account.
-      executeOnStart:false,
-      //Methods and function that we would want to use
+      // When true, the wallet object will only fire "ready"
+      firstExecutionRequired: false,
+      // Describe if we execute it first on startup of an account.
+      executeOnStart: false,
+      // Methods and function that we would want to use
       dependencies: [
         'getUTXOS',
         'getUnusedAddress',
         'getBalance',
         'createTransactionFromUTXOS',
-        'broadcastTransaction'
-      ]
+        'broadcastTransaction',
+      ],
     });
-
   }
-  consolidateWallet(address = this.getUnusedAddress().address, utxos = this.getUTXOS()){
+
+  consolidateWallet(address = this.getUnusedAddress().address, utxos = this.getUTXOS()) {
     const self = this;
     return {
-      prepareTransaction: ()=>{
-        if(!utxos || utxos.length===0){
-          throw new Error('There is nothing to consolidate')
+      prepareTransaction: () => {
+        if (!utxos || utxos.length === 0) {
+          throw new Error('There is nothing to consolidate');
         }
         const opts = {
           utxos,
-          recipient:address
+          recipient: address,
         };
 
         const rawtx = this.createTransactionFromUTXOS(opts);
         return {
-          toString:()=>{
-            return rawtx;
-          },
-          broadcast:async ()=>{
+          toString: () => rawtx,
+          broadcast: async () => {
             console.log('TRIED TO BROADCAST', rawtx);
             return rawtx;
             // return self.broadcastTransaction(rawtx);
-          }
-        }
-      }
-    }
+          },
+        };
+      },
+    };
   }
-};
+}
 module.exports = WalletConsolidator;

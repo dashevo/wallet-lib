@@ -16,13 +16,13 @@ class StandardPlugin {
     });
   }
 
-  inject(name, obj, force = false) {
+  inject(name, obj, allowSensitiveOperations = false) {
     const PLUGINS_NAME_LIST = [];
     if (SAFE_FUNCTIONS.includes(name) || SAFE_PROPERTIES.includes(name)) {
       this[name] = obj;
     } else if (PLUGINS_NAME_LIST.includes(name)) {
       throw new Error('Inter-plugin support yet to come');
-    } else if (force === true) {
+    } else if (allowSensitiveOperations === true) {
       this[name] = obj;
     } else {
       throw new InjectionToPluginUnallowed(name);

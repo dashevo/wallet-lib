@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const { Worker } = require('../');
-const { ValidTransportLayerRequired, InvalidTransaction } = require('../../errors');
+const { ValidTransportLayerRequired, InvalidTransactionObject } = require('../../errors');
 const EVENTS = require('../../EVENTS');
 
 const defaultOpts = {
@@ -34,7 +34,8 @@ class SyncWorker extends Worker {
     // - Didn't fetched new update for a bigger period than fetchThreshold (concern all addresses)
     // - If we have an unconfirmed balance
     // - Have more chance to have new tx coming in
-    //    (typically the result of getUnusedAddress, and preemptively in case of us not receiving the tx from listeners)
+    // (typically the result of getUnusedAddress,
+    // and preemptively in case of us not receiving the tx from listeners)
     await this.execAddressFetching();
 
     // We execute a fetching of all the transactions that are unknown
@@ -85,7 +86,7 @@ class SyncWorker extends Worker {
 
     const getTransactionAndStore = async function (tx) {
       if (tx.address && tx.txid) {
-        self.storage.addNewTxToAddress(tx, self.walletId);
+        self.storage.addNewTxToAddress(tx, tx.address);
         const transactionInfo = await self.transport.getTransaction(tx.txid);
         self.storage.importTransactions(transactionInfo);
       }
@@ -194,7 +195,7 @@ class SyncWorker extends Worker {
           self.storage.importTransaction(transactionInfo);
         }).catch((e) => {
           if (e instanceof ValidTransportLayerRequired) return false;
-          if (e instanceof InvalidTransaction) return false;
+          if (e instanceof InvalidTransactionObject) return false;
           throw e;
         });
       promises.push(p);

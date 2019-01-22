@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
-const Wallet = require('../../../src/Wallet');
+const Wallet = require('../../../src/Wallet/Wallet');
 const { mnemonicString1 } = require('../../fixtures.json');
 const InsightClient = require('../../../src/transports/Insight/insightClient');
 
@@ -14,21 +14,21 @@ const insightClientOpts = {
 
 describe('Transport : Insight Client', function suite() {
   this.timeout(20000);
-  before((done) => {
-    const insight = new InsightClient(insightClientOpts);
-    const config = {
-      transport: insight,
-      mnemonic: mnemonicString1,
-      network: Dashcore.Networks.testnet,
-    };
-
-    wallet = new Wallet(config);
-    account = wallet.createAccount();
-    console.log('Account created');
-    account.events.on('ready', () => {
-      done();
-    });
-  });
+  // before((done) => {
+  //   const insight = new InsightClient(insightClientOpts);
+  //   const config = {
+  //     transport: insight,
+  //     mnemonic: mnemonicString1,
+  //     network: Dashcore.Networks.testnet,
+  //   };
+  //
+  //   wallet = new Wallet(config);
+  //   account = wallet.createAccount();
+  //   console.log('Account created');
+  //   account.events.on('ready', () => {
+  //     done();
+  //   });
+  // });
   /*
   it('should be able to setNetwork', () => {
     expect(account.updateNetwork('livenet')).to.equal(true);
@@ -254,7 +254,7 @@ describe('Transport : Insight Client', function suite() {
     }];
 
     return account.getTransactionHistory().then(result => expect(result).to.deep.equal(expected));
-  });*/
+  }); */
   /*
   it('should get transaction', () => {
     const expected = {
@@ -320,7 +320,7 @@ describe('Transport : Insight Client', function suite() {
       data => expect(data).to.be.a('String'),
       err => expect(err).to.be.a('Error').with.property('message', 'Error: Request failed with status code 400'),
     );
-  });*/
+  }); */
   after((done) => {
     account.disconnect();
     account = null;

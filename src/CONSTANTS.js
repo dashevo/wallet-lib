@@ -72,6 +72,9 @@ const CONSTANTS = {
       'walletId',
     ],
   },
+  STORAGE: {
+    autosaveInterval: 10 * 1000,
+  },
   TXIN_OUTPOINT_TXID_BYTES: 36,
   TXIN_OUTPOINT_INDEX_BYTES: 4,
   TXIN_SEQUENCE_BYTES: 4,

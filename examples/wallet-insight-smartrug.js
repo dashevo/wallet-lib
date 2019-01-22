@@ -4,11 +4,10 @@ const wallet = new Wallet({
   mnemonic: 'smart rug aspect stuff auction bridge title virtual illegal enact black since', // Werner - dev (10 Nov)
   network: 'testnet',
   transport: 'insight',
-  injectDefaultPlugins: true
 });
 
-const account = wallet.getAccount();
 
+const account = wallet.getAccount();
 const start = async () => {
   console.log('Balance Conf', await account.getBalance(false, false));
   console.log('Balance Unconf', await account.getBalance(true, false));

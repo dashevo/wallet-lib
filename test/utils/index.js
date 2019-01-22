@@ -9,8 +9,8 @@ const {
   hasProp,
   getBytesOf,
 } = require('../../src/utils/index');
-const knifeEasilyFixture = require('../fixtures/knifeeasily')
-const figureBridgeFixture = require('../fixtures/figurebridge')
+const knifeEasilyFixture = require('../fixtures/knifeeasily');
+const figureBridgeFixture = require('../fixtures/figurebridge');
 
 describe('Utils', () => {
   it('should handle dash2Duff', () => {
@@ -32,7 +32,7 @@ describe('Utils', () => {
     const network = Networks.testnet;
     const seed = mnemonicToHDPrivateKey(knifeEasilyFixture.mnemonic, network);
     expect(seed).to.be.a('object');
-    expect(seed.toString()).to.equal(knifeEasilyFixture.HDPrivateKeyTestnet);
+    expect(seed.toString()).to.equal(knifeEasilyFixture.HDRootPrivateKeyTestnet);
   });
   it('should throw error when mnemonic is not provided in mnemonicToHDPrivateKey', () => {
     const network = Networks.testnet;
@@ -219,15 +219,15 @@ describe('Utils', () => {
     const invalidtxid = '00000';
     expect(is.txid(invalidtxid)).to.be.equal(false);
   });
-  it('should is.transaction work', () => {
-    const validTransaction = figureBridgeFixture.transactions['3428f0c29370d1293b4706ffd0f8b0c84a5b7c1c217d319e5ef4722354000c6e']
-    expect(is.transaction(validTransaction)).to.be.equal(true);
+  it('should is.transactionObj work', () => {
+    const validTransaction = figureBridgeFixture.transactions['3428f0c29370d1293b4706ffd0f8b0c84a5b7c1c217d319e5ef4722354000c6e'];
+    expect(is.transactionObj(validTransaction)).to.be.equal(true);
 
     const invalidTransaction = {
       vin: [],
       vout: [],
     };
-    expect(is.transaction(invalidTransaction)).to.be.equal(false);
+    expect(is.transactionObj(invalidTransaction)).to.be.equal(false);
   });
   it('should is.feeRate work', () => {
     const feeRate = {

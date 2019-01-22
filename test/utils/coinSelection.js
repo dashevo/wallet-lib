@@ -26,13 +26,13 @@ const outputs = {
 };
 describe('Utils - coinSelection', () => {
   it('should require a utxosList', () => {
-    expect(() => coinSelection()).to.throw('Require a utxosList to select from');
+    expect(() => coinSelection()).to.throw('A utxosList is required');
   });
   it('should require a utxosList as an array', () => {
-    expect(() => coinSelection({})).to.throw('Require utxosList to be an array of utxos');
+    expect(() => coinSelection({})).to.throw('UtxosList is expected to be an array of utxos');
   });
   it('should require a utxosList with at least one utxo', () => {
-    expect(() => coinSelection([])).to.throw('Require utxosList to contains at least 1 utxo');
+    expect(() => coinSelection([])).to.throw('utxosList must contain at least 1 utxo');
   });
 
   it('should require a utxosList with valid utxo', () => {
@@ -43,13 +43,13 @@ describe('Utils - coinSelection', () => {
 
 
   it('should require a outputsList', () => {
-    expect(() => coinSelection(utxosList)).to.throw('Require a outputsList to perform a selection for');
+    expect(() => coinSelection(utxosList)).to.throw('An outputsList is required in order to perform a selection');
   });
   it('should require a outputsList as an array', () => {
-    expect(() => coinSelection(utxosList, {})).to.throw('Require outputsList to be an array of outputs');
+    expect(() => coinSelection(utxosList, {})).to.throw('outputsList must be an array of outputs');
   });
   it('should require a outputsList with at least one output', () => {
-    expect(() => coinSelection(utxosList, [])).to.throw('Require outputsList to contains at least 1 output');
+    expect(() => coinSelection(utxosList, [])).to.throw('outputsList must contains at least 1 output');
   });
 
   it('should require a outputsList with valid outputs', () => {
@@ -66,7 +66,7 @@ describe('Utils - coinSelection', () => {
       }],
       outputs: [{ satoshis: 100000000, address: 'ybefxSHaEbDATvq5gVCxjV375NWus3ttV7', scriptType: 'P2PKH' }],
       feeCategory: 'normal',
-      estimatedFee: 101,
+      estimatedFee: 205,
       utxosValue: 999990000,
     };
 
@@ -85,7 +85,7 @@ describe('Utils - coinSelection', () => {
       }],
       outputs: [{ satoshis: 2500000000, address: 'ybefxSHaEbDATvq5gVCxjV375NWus3ttV7', scriptType: 'P2PKH' }],
       feeCategory: 'normal',
-      estimatedFee: 101,
+      estimatedFee: 495,
       utxosValue: 2549960000,
     };
 
@@ -116,7 +116,7 @@ describe('Utils - coinSelection', () => {
       }],
       outputs: [{ satoshis: 4500000000, address: 'ybefxSHaEbDATvq5gVCxjV375NWus3ttV7', scriptType: 'P2PKH' }],
       feeCategory: 'normal',
-      estimatedFee: 101,
+      estimatedFee: 1365,
       utxosValue: 4549960000,
     };
 

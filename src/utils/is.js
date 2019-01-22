@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 // Todo : Some validators here are really proto type of methods, urgent impr is needed here.
-const { PrivateKey, HDPrivateKey } = require('@dashevo/dashcore-lib');
+const { PrivateKey, HDPrivateKey, Transaction } = require('@dashevo/dashcore-lib');
 
 const is = {
   // Primitives
@@ -27,11 +27,12 @@ const is = {
   seed: seed => is.string(seed) || is.privateKey(seed) || is.HDPrivateKey(seed) || is.mnemonic(seed),
   address: addr => is.string(addr) || is.type(addr, 'Address'),
   addressObj: addrObj => is.type(addrObj.address, 'Address') || (is.string(addrObj.address) && is.string(addrObj.path)),
-  transaction: tx => is.obj(tx) && is.txid(tx.txid) && tx.vin && is.arr(tx.vin) && tx.vout && is.arr(tx.vout),
+  transactionObj: tx => is.obj(tx) && is.txid(tx.txid) && tx.vin && is.arr(tx.vin) && tx.vout && is.arr(tx.vout),
   feeRate: feeRate => is.obj(feeRate) && is.string(feeRate.type) && is.int(feeRate.value),
   txid: txid => is.string(txid) && txid.length === 64,
   utxo: utxo => is.obj(utxo) && is.txid(utxo.txid) && is.num(utxo.outputIndex) && is.num(utxo.satoshis) && is.string(utxo.scriptPubKey),
   output: output => is.obj(output) && is.num(output.satoshis) && is.address(output.address),
+  rawtx: rawtx => is.def(rawtx) && is.hex(rawtx) && (() => { try { Transaction(rawtx); return true; } catch (e) { return false; } })(),
 };
 // aliases
 is.array = is.arr;

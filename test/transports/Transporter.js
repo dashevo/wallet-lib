@@ -1,6 +1,6 @@
 const { expect } = require('chai');
-const Transporter = require('../../src/transports/Transporter');
 const DAPIClient = require('@dashevo/dapi-client');
+const Transporter = require('../../src/transports/Transporter');
 const InsightClient = require('../../src/transports/Insight/insightClient');
 
 const pluginRequiredKeys = ['getAddressSummary', 'getTransaction', 'getUTXO', 'subscribeToAddresses', 'closeSocket', 'sendRawTransaction'];
@@ -44,6 +44,8 @@ describe('Transporter', () => {
     transporterInsight.disconnect();
     transporterDAPI2.disconnect();
     transporterInsight2.disconnect();
+    transporterFake.disconnect();
+    transporterFake2.disconnect();
   });
   it('should handle invalid transporter', () => {
     const empty = new Transporter('tirelipinpon');
@@ -60,6 +62,10 @@ describe('Transporter', () => {
       });
     const transporterFake = new Transporter(fakeTransportPlugin);
     expect(transporterFake.isValid).to.equal(false);
+
+    empty.disconnect();
+    invalid.disconnect();
+    transporterFake.disconnect();
   });
   it('should handle the change of a network', () => {
     const insightClient = new InsightClient();
