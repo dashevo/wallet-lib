@@ -48,7 +48,7 @@ class Transporter {
         if (Object.keys(transportList).includes(loweredTransportName)) {
           // TODO : Remove me toward release
           if (transportArg === 'dapi') {
-            transport = new DAPIClient({ seeds: [{ ip: '52.39.47.232', port: 3000 }] });
+            transport = new DAPIClient({ seeds: [{ ip: '54.218.19.16', port: 3000 }] });
           } else {
             transport = new transportList[loweredTransportName]();
           }
