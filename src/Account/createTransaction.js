@@ -76,9 +76,11 @@ function createTransaction(opts) {
 
   // In case or excessive fund, we will get that to an address in our possession
   // and determine the finalFees
+  // eslint-disable-next-line no-underscore-dangle
   const preChangeSize = tx._estimateSize();
   const changeAddress = _.has(opts, 'change') ? opts.change : this.getUnusedAddress('internal', 1).address;
   tx.change(changeAddress);
+  // eslint-disable-next-line no-underscore-dangle
   const deltaChangeSize = tx._estimateSize() - preChangeSize;
   const finalFees = Math.ceil(estimatedFee + (deltaChangeSize * estimatedFee / preChangeSize));
 
