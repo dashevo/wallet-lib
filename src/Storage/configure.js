@@ -17,5 +17,9 @@ module.exports = async function configure(opts = {}) {
     await this.rehydrateState();
   }
 
+  if (this.autosave) {
+    this.startWorker();
+  }
+
   this.events.emit(CONFIGURED);
 };
