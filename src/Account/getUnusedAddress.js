@@ -9,9 +9,11 @@ function getUnusedAddress(type = 'external', skip = 0) {
     address: '',
   };
   let skipped = 0;
-  const { walletId } = this;
+  const { walletId, accountIndex } = this;
 
-  const keys = Object.keys(this.store.wallets[walletId].addresses[type]);
+  const keys = Object.keys(this.store.wallets[walletId].addresses[type])
+    // We filter out other potential account
+    .filter(el => parseInt(el.split('/')[3]) === accountIndex);
 
   for (let i = 0; i < keys.length; i += 1) {
     const key = keys[i];

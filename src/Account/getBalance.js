@@ -7,11 +7,14 @@ const { duffsToDash } = require('../utils');
 function getBalance(unconfirmed = true, displayDuffs = true) {
   const self = this;
   let totalSat = 0;
-  const { walletId, storage } = this;
+  const { walletId, storage, accountIndex } = this;
   const { addresses } = storage.getStore().wallets[walletId];
   const subwallets = Object.keys(addresses);
   subwallets.forEach((subwallet) => {
-    const paths = Object.keys(self.store.wallets[walletId].addresses[subwallet]);
+    const paths = Object.keys(self.store.wallets[walletId].addresses[subwallet])
+    // We filter out other potential account
+      .filter(el => parseInt(el.split('/')[3], 10) === accountIndex);
+
     paths.forEach((path) => {
       const address = self.store.wallets[walletId].addresses[subwallet][path];
       const { unconfirmedBalanceSat, balanceSat } = address;

@@ -58,7 +58,7 @@ class BIP44Worker extends Worker {
       firstExecutionRequired: true,
       executeOnStart: true,
       dependencies: [
-        'storage', 'getAddress', 'walletId',
+        'storage', 'getAddress', 'walletId', 'accountIndex',
       ],
     });
   }
@@ -68,7 +68,7 @@ class BIP44Worker extends Worker {
     const store = this.storage.getStore();
     const addresses = store.wallets[this.walletId].addresses.external;
     let addressesPaths = Object.keys(addresses);
-
+    const { accountIndex } = this;
     let prevPath;
 
     // Ensure that all our above paths are contiguous
@@ -81,6 +81,8 @@ class BIP44Worker extends Worker {
 
     addressesPaths = Object
       .keys(store.wallets[this.walletId].addresses.external)
+      .filter(el => parseInt(el.split('/')[3]) === accountIndex)
+      // sort by index
       .sort((a, b) => parseInt(a.split('/')[5], 10) - parseInt(b.split('/')[5], 10));
 
     // Scan already generated addresse and count how many are unused
@@ -106,6 +108,7 @@ class BIP44Worker extends Worker {
         this.getAddress(i, 'internal');
       }
     }
+
     return true;
   }
 
