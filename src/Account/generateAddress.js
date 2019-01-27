@@ -19,7 +19,7 @@ function generateAddress(path) {
     console.log('notprivkey');
   }
 
-  const address = new Dashcore.Address(privateKey.publicKey.toAddress(), this.network).toString();
+  const address = new Dashcore.Address(privateKey.publicKey.toAddress(this.network), this.network).toString();
 
   const addressData = {
     path,
