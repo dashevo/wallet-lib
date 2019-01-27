@@ -79,11 +79,12 @@ class BIP44Worker extends Worker {
       this.getAddress(index, 'internal');
     });
 
+    const sortByIndex = (a, b) => parseInt(a.split('/')[5], 10) - parseInt(b.split('/')[5], 10);
     addressesPaths = Object
       .keys(store.wallets[this.walletId].addresses.external)
-      .filter(el => parseInt(el.split('/')[3]) === accountIndex)
+      .filter(el => parseInt(el.split('/')[3], 10) === accountIndex)
       // sort by index
-      .sort((a, b) => parseInt(a.split('/')[5], 10) - parseInt(b.split('/')[5], 10));
+      .sort(sortByIndex);
 
     // Scan already generated addresse and count how many are unused
     addressesPaths.forEach((path) => {

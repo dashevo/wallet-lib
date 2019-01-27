@@ -10,6 +10,7 @@ const { WALLET_TYPES } = require('../CONSTANTS');
 function generateAddress(path) {
   if (!path) throw new Error('Expected path to generate an address');
   let index = 0;
+  const { network } = this;
   if (this.type === WALLET_TYPES.HDWALLET) {
     // eslint-disable-next-line prefer-destructuring
     index = path.split('/')[5];
@@ -17,7 +18,7 @@ function generateAddress(path) {
 
   const privateKey = this.keyChain.getKeyForPath(path);
 
-  const address = new Dashcore.Address(privateKey.publicKey.toAddress(this.network), this.network).toString();
+  const address = new Dashcore.Address(privateKey.publicKey.toAddress(network), network).toString();
 
   const addressData = {
     path,
