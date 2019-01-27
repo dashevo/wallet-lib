@@ -14,10 +14,8 @@ function generateAddress(path) {
     // eslint-disable-next-line prefer-destructuring
     index = path.split('/')[5];
   }
+
   const privateKey = this.keyChain.getKeyForPath(path);
-  if (!privateKey) {
-    console.log('notprivkey');
-  }
 
   const address = new Dashcore.Address(privateKey.publicKey.toAddress(this.network), this.network).toString();
 

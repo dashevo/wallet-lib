@@ -544,7 +544,7 @@
             "unconfirmedBalanceSat": 0,
             "transactions": [],
             "fetchedLast": 1548538385123,
-            "used": false,
+            "used": true,
             "utxos": {}
           },
           "m/44'/1'/0'/1/1": {
