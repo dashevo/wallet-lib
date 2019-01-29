@@ -1,6 +1,7 @@
 const { EventEmitter } = require('events');
 const { cloneDeep, has } = require('lodash');
 
+const CONSTANTS = require('../CONSTANTS');
 const addNewTxToAddress = require('./addNewTxToAddress');
 const addUTXOToAddress = require('./addUTXOToAddress');
 const announce = require('./announce');
@@ -36,6 +37,7 @@ const initialStore = {
 const defaultOpts = {
   rehydrate: true,
   autosave: true,
+  autosaveIntervalTime: CONSTANTS.STORAGE.autosaveIntervalTime,
 };
 /**
  * Handle all the storage logic, it's a wrapper around the adapters
@@ -76,6 +78,10 @@ class Storage {
     this.store = cloneDeep(initialStore);
     this.rehydrate = has(opts, 'rehydrate') ? opts.rehydrate : defaultOpts.rehydrate;
     this.autosave = has(opts, 'autosave') ? opts.autosave : defaultOpts.autosave;
+    this.autosaveIntervalTime = has(opts, 'autosaveIntervalTime')
+      ? opts.autosaveIntervalTime
+      : defaultOpts.autosaveIntervalTime;
+
     this.lastRehydrate = null;
     this.lastSave = null;
     this.lastModified = null;

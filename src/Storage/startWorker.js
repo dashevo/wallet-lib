@@ -1,4 +1,3 @@
-const CONSTANTS = require('../CONSTANTS');
 /**
  * Allow to start the working interval (worker for saving state).
  * @return {boolean}
@@ -8,5 +7,5 @@ module.exports = function startWorker() {
     if (this.lastModified > this.lastSave) {
       this.saveState();
     }
-  }, CONSTANTS.STORAGE.autosaveInterval);
+  }, this.autosaveIntervalTime);
 };

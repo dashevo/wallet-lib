@@ -1,3 +1,4 @@
+const { has } = require('lodash');
 const configureAdapter = require('./_configureAdapter.js');
 const getDefaultAdapter = require('./_getDefaultAdapter.js');
 const { CONFIGURED } = require('../EVENTS');
@@ -8,12 +9,16 @@ const { CONFIGURED } = require('../EVENTS');
  * @return {Promise<void>}
  */
 module.exports = async function configure(opts = {}) {
-  this.rehydrate = (opts.rehydrate) ? opts.rehydrate : this.rehydrate;
-  this.autosave = (opts.autosave) ? opts.autosave : this.autosave;
+  this.rehydrate = has(opts, 'rehydrate') ? opts.rehydrate : this.rehydrate;
+  this.autosave = has(opts, 'autosave') ? opts.autosave : this.autosave;
   this.adapter = await configureAdapter((opts.adapter) ? opts.adapter : await getDefaultAdapter());
 
   if (this.rehydrate) {
     await this.rehydrateState();
+  }
+
+  if (this.autosave) {
+    this.startWorker();
   }
 
   this.events.emit(CONFIGURED);
