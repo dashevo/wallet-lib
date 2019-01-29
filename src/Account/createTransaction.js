@@ -8,6 +8,8 @@ const { dashToDuffs, coinSelection } = require('../utils');
  * @param opts.amount - Amount in dash that you want to send
  * @param opts.satoshis - Amount in satoshis
  * @param opts.recipient - Address of the recipient
+ * @param opts.change - String - A valid Dash address - optional
+ * @param opts.utxos - Array - A utxo set - optional
  * @param opts.isInstantSend - If you want to use IS or stdTx.
  * @param opts.deductFee - Deduct fee
  * @param opts.privateKeys - Overwrite default behavior : auto-searching local matching keys.
@@ -30,7 +32,7 @@ function createTransaction(opts) {
 
   const outputs = [{ address: opts.recipient, satoshis }];
 
-  const utxosList = this.getUTXOS();
+  const utxosList = _.has(opts, 'utxos') ? opts.utxos : this.getUTXOS();
 
   utxosList.map((utxo) => {
     const utxoTx = self.storage.searchTransaction(utxo.txid);
@@ -42,7 +44,7 @@ function createTransaction(opts) {
     return utxo;
   });
 
-  const feeCategory = (opts.isInstantSend) ? 'instant' : 'PRIORITY';
+  const feeCategory = (opts.isInstantSend) ? 'instant' : 'normal';
   let selection;
   try {
     selection = coinSelection(utxosList, outputs, deductFee, feeCategory);
@@ -73,24 +75,24 @@ function createTransaction(opts) {
   tx.from(inputs);
 
   // In case or excessive fund, we will get that to an address in our possession
-  const addressChange = this.getUnusedAddress('internal', 1).address;
-  tx.change(addressChange);
+  // and determine the finalFees
+  // eslint-disable-next-line no-underscore-dangle
+  const preChangeSize = tx._estimateSize();
+  const changeAddress = _.has(opts, 'change') ? opts.change : this.getUnusedAddress('internal', 1).address;
+  tx.change(changeAddress);
+  // eslint-disable-next-line no-underscore-dangle
+  const deltaChangeSize = tx._estimateSize() - preChangeSize;
+  const finalFees = Math.ceil(estimatedFee + (deltaChangeSize * estimatedFee / preChangeSize));
 
+  tx.fee(finalFees);
+  const addressList = selectedUTXOs.map((el) => {
+    if (el.address) return el.address;
+    return Dashcore.Script
+      .fromHex(el.scriptPubKey)
+      .toAddress(this.network)
+      .toString();
+  });
 
-  // TODO : Deduct fee operation should happen here ?
-
-  // const feeRate = (opts.isInstantSend) ? feeCalculation('instantSend') : feeCalculation();
-  // if (feeRate.type === 'perBytes') {
-  // console.log(feeRate.value * tx.size)
-  // tx.feePerKb(feeRate.value * 10);
-  // tx.fee(FEES.DEFAULT_FEE);
-  // }
-  // if (feeRate.type === 'perInputs') {
-  //   const fee = inputs.length * FEES.NORMAL;
-  //   tx.fee(fee);
-  // }
-  tx.fee(estimatedFee);
-  const addressList = selectedUTXOs.map(el => ((el.address)));
   const privateKeys = _.has(opts, 'privateKeys')
     ? opts.privateKeys
     : this.getPrivateKeys(addressList);
