@@ -73,7 +73,7 @@ const CONSTANTS = {
     ],
   },
   STORAGE: {
-    autosaveInterval: 10 * 1000,
+    autosaveIntervalTime: 10 * 1000,
   },
   TXIN_OUTPOINT_TXID_BYTES: 36,
   TXIN_OUTPOINT_INDEX_BYTES: 4,
