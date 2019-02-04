@@ -1,0 +1,84 @@
+const { sortAndVerifyUTXOS } = require('../helpers');
+const TransactionEstimator = require('../TransactionEstimator.js');
+
+/**
+ * Given a utxos list and a threesholdSatoshis, will add them
+ * without any further logic up to met with requested params.
+ * @param utxos
+ * @param thresholdSatoshis
+ * @return {*}
+ */
+const simplyAccumulateUtxos = (utxos, thresholdSatoshis) => {
+  let pendingSatoshis = 0;
+  const accumulatedUtxos = utxos.filter((utxo) => {
+    if (pendingSatoshis < thresholdSatoshis) {
+      pendingSatoshis += utxo.satoshis;
+      return utxo;
+    }
+    return false;
+  });
+  if (pendingSatoshis < thresholdSatoshis) {
+    throw new Error('Unsufficient utxo amount');
+  }
+  return accumulatedUtxos;
+};
+/**
+ * Simple transaction optimized accumulator strategy :
+ * Will try to not exceed the simpleTransaction definition by selecting 4 or less inputs
+ * in ascending order
+ * @param {*} utxosList - A utxos list
+ * @param {*} outputsList - The output list
+ * @param {*} deductFee - default: false - Deduct fee from outputs
+ * @param {*} feeCategory - default: normal
+
+ */
+const simpleTransactionOptimizedAccumulator = (utxosList, outputsList, deductFee = false, feeCategory = 'normal') => {
+  const txEstimator = new TransactionEstimator(feeCategory);
+
+  // We add our outputs, theses will change only in case deductfee being true
+  txEstimator.addOutputs(outputsList);
+
+  const sort = { property: 'satoshis', direction: 'ascending' };
+
+  const sortedUtxosList = sortAndVerifyUTXOS(utxosList, sort);
+
+  const totalOutputValue = txEstimator.getTotalOutputValue();
+
+  let simplyAccumulatedUtxos = simplyAccumulateUtxos(sortedUtxosList, totalOutputValue);
+  let len = simplyAccumulatedUtxos.length;
+
+  if (simplyAccumulatedUtxos.length > 4) {
+    for (let i = 0; i < sortedUtxosList.length; i++) {
+      simplyAccumulatedUtxos = sortedUtxosList.slice(i);
+      len = simplyAccumulatedUtxos.length;
+      if (len <= 4) break;
+    }
+  }
+
+
+  // We add the expected inputs, which should match the requested amount
+  // TODO : handle case when we do not match it.
+  txEstimator.addInputs(simplyAccumulatedUtxos);
+
+  const estimatedFee = txEstimator.getFeeEstimate();
+  if (deductFee === true) {
+    // Then we check that we will be able to do it
+    const inValue = txEstimator.getInValue();
+    const outValue = txEstimator.getOutValue();
+    if (inValue < outValue + estimatedFee) {
+      // We don't have enought change for fee, so we remove from outValue
+      txEstimator.reduceFeeFromOutput((outValue + estimatedFee) - inValue);
+    } else {
+      // TODO : Here we can add some process to check up that we clearly have enough to deduct fee
+    }
+  }
+  // console.log('estimatedFee are', estimatedFee, 'satoshis');
+  return {
+    utxos: txEstimator.getInputs(),
+    outputs: txEstimator.getOutputs(),
+    feeCategory,
+    estimatedFee,
+    utxosValue: txEstimator.getInValue(),
+  };
+};
+module.exports = simpleTransactionOptimizedAccumulator;
