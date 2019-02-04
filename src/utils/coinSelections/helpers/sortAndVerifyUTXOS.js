@@ -1,5 +1,3 @@
-const _ = require('lodash');
-
 const sort = {
   by(el, params) {
     if (!params) return el;

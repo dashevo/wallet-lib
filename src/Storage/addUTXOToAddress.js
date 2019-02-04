@@ -26,7 +26,7 @@ const addUTXOToAddress = function (utxo, address) {
     }
 
     // If the received utxo does not exist
-    const utxoKey = `${utxo.txid}-${utxo.outputIndex}`
+    const utxoKey = `${utxo.txid}-${utxo.outputIndex}`;
 
     if (!!newAddr.utxos[utxoKey] === false) {
       newAddr.utxos[utxoKey] = utxo;

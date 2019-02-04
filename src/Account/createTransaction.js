@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const _ = require('lodash');
 const Dashcore = require('@dashevo/dashcore-lib');
 const { CreateTransactionError } = require('../errors');

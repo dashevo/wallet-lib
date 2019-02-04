@@ -48,7 +48,7 @@ const simpleTransactionOptimizedAccumulator = (utxosList, outputsList, deductFee
   let len = simplyAccumulatedUtxos.length;
 
   if (simplyAccumulatedUtxos.length > MAX_INPUTS_FOR_AUTO_IX) {
-    for (let i = 0; i < sortedUtxosList.length; i++) {
+    for (let i = 0; i < sortedUtxosList.length; i += 1) {
       simplyAccumulatedUtxos = sortedUtxosList.slice(i);
       len = simplyAccumulatedUtxos.length;
       if (len <= MAX_INPUTS_FOR_AUTO_IX) break;

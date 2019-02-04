@@ -4,7 +4,7 @@ const { EventEmitter } = require('events');
 const { WALLET_TYPES } = require('../CONSTANTS');
 const { is } = require('../utils/index');
 const EVENTS = require('../EVENTS');
-const { simpleTransactionOptimizedAccumulator} = require('../utils/coinSelections/strategies');
+const { simpleTransactionOptimizedAccumulator } = require('../utils/coinSelections/strategies');
 
 const defaultOptions = {
   network: 'testnet',
