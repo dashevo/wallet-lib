@@ -59,15 +59,18 @@ For the account options, see the Account documentation.
 ## Get an Account
 
 ```
-const account = wallet.getAccount(0);
-const account = wallet.getAccount(42, accountOpts); //If no account on index 42, will create with passed options
+const account = wallet.getAccount({index:0});
+
+const accountOpts = {index:42, ... };
+const account = wallet.getAccount(accountOpts); //If no account on index 42, will create with other passed options
 ```
 
 ##### params
 
-> **accountIndex** : Bool(def: 0) : allow to specifically select an account 
+> **accountOpts** : Object: If the account doesn't exist yet, we create it passing these options
+> **accountOpts.index ** : Bool(def : 0) : If the account doesn't exist yet, we create it passing these options
 
-> **accountOpts** : Object(def : {}) : If the account doesn't exist yet, we create it passing these options
+See above `Create an Account` section for other options.
 
 ---
 

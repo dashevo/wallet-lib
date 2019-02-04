@@ -84,7 +84,7 @@ class Account {
     this.type = wallet.type;
     this.offlineMode = wallet.offlineMode;
 
-    const accountIndex = (opts.accountIndex) ? opts.accountIndex : wallet.accounts.length;
+    const accountIndex = _.has(opts, 'accountIndex') ? opts.accountIndex : wallet.accounts.length;
     this.accountIndex = accountIndex;
 
     this.network = getNetwork(wallet.network.toString());
