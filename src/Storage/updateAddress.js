@@ -47,15 +47,18 @@ const updateAddress = function (addressObj, walletId) {
     // we compare the diff between the two utxos sets
 
     const previousUTXOS = (previousObject !== undefined) ? previousObject.utxos : [];
+
     const newUtxos = xor(newObjectUtxosKeys, Object.keys(previousUTXOS));
-    newUtxos.forEach((txid) => {
-      const utxo = utxos[txid];
+    // Then we verify the outputs
+
+    newUtxos.forEach((utxoKey) => {
+      const utxo = utxos[utxoKey];
       try {
         const { blockheight } = this.getTransaction(utxo.txid);
         if (currentBlockHeight - blockheight >= 6) newObject.balanceSat += utxo.satoshis;
         else newObject.unconfirmedBalanceSat += utxo.satoshis;
       } catch (e) {
-        // console.log(e);
+        console.log(e);
         if (e instanceof TransactionNotInStore) {
           // TODO : We consider unconfirmed a transaction that we don't know of, should we ?
           newObject.unconfirmedBalanceSat += utxo.satoshis;

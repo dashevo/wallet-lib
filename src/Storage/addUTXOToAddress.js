@@ -24,9 +24,12 @@ const addUTXOToAddress = function (utxo, address) {
     if (!newAddr.transactions.includes(utxo.txid)) {
       newAddr.transactions.push(utxo.txid);
     }
+
     // If the received utxo does not exist
-    if (!!newAddr.utxos[utxo.txid] === false) {
-      newAddr.utxos[utxo.txid] = utxo;
+    const utxoKey = `${utxo.txid}-${utxo.outputIndex}`
+
+    if (!!newAddr.utxos[utxoKey] === false) {
+      newAddr.utxos[utxoKey] = utxo;
       newAddr.used = true;
       this.updateAddress(newAddr, searchAddr.walletId);
       return true;
