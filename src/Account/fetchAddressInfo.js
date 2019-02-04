@@ -52,10 +52,10 @@ async function fetchAddressInfo(addressObj, fetchUtxo = true) {
       }
     }
     if (fetchUtxo) {
-      const originalUtxo = (await self.transport.getUTXO(address));
+      const fetchedUtxo = (await self.transport.getUTXO(address));
       const utxos = [];
       if (balanceSat > 0) {
-        originalUtxo.forEach((utxo) => {
+        fetchedUtxo.forEach((utxo) => {
           utxos.push({
             satoshis: utxo.satoshis,
             txid: utxo.txid,
