@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const coinSelection = require('../../src/utils/coinSelection');
 const { utxosList } = require('../fixtures/crackspice');
+const STRATEGIES = require('../../src/utils/coinSelections/strategies');
 
 const outputs = {
   ONE_DASH: {
@@ -59,7 +60,7 @@ describe('Utils - coinSelection', () => {
     expect(() => coinSelection(utxosList, [outputs.HUNDRED_DASH])).to.throw('Unsufficient utxos (7099960000) to cover the output : 10000000000. Diff : -2900040000');
   });
   it('should get a coinSelection for 1 dash', () => {
-    const result = coinSelection(utxosList, [outputs.ONE_DASH]);
+    const result = coinSelection(utxosList, [outputs.ONE_DASH], false, 'normal', STRATEGIES.simpleDescendingAccumulator );
     const expectedResult = {
       utxos: [{
         address: 'yNgqjoW69ouSivtBMNFRCG5zSG85nyxW3d', txid: '36820d7268090d6f315eef03b28b7b2b2097c8b067608f652612a2c4612a6697', outputIndex: 1, scriptPubKey: '76a91419fc1815a04c42a849a7a6dda826c67478514fed88ac', amount: 9.9999, satoshis: 999990000, height: 203208,
@@ -74,7 +75,7 @@ describe('Utils - coinSelection', () => {
     expect(result).to.deep.equal(expectedResult);
   });
   it('should handle a case when using more than 25 utxos', () => {
-    const result = coinSelection(utxosList, [outputs.TWENTY_FIVE_DASH]);
+    const result = coinSelection(utxosList, [outputs.TWENTY_FIVE_DASH], false, 'normal', STRATEGIES.simpleDescendingAccumulator );
     const expectedResult = {
       utxos: [{
         address: 'yNgqjoW69ouSivtBMNFRCG5zSG85nyxW3d', txid: '36820d7268090d6f315eef03b28b7b2b2097c8b067608f652612a2c4612a6697', outputIndex: 1, scriptPubKey: '76a91419fc1815a04c42a849a7a6dda826c67478514fed88ac', amount: 9.9999, satoshis: 999990000, height: 203208,
@@ -93,7 +94,7 @@ describe('Utils - coinSelection', () => {
     expect(result).to.deep.equal(expectedResult);
   });
   it('should handle a case when using more than 45 utxos', () => {
-    const result = coinSelection(utxosList, [outputs.FOURTY_FIVE_DASH]);
+    const result = coinSelection(utxosList, [outputs.FOURTY_FIVE_DASH], false, 'normal', STRATEGIES.simpleDescendingAccumulator );
     const expectedResult = {
       utxos: [{
         address: 'yNgqjoW69ouSivtBMNFRCG5zSG85nyxW3d', txid: '36820d7268090d6f315eef03b28b7b2b2097c8b067608f652612a2c4612a6697', outputIndex: 1, scriptPubKey: '76a91419fc1815a04c42a849a7a6dda826c67478514fed88ac', amount: 9.9999, satoshis: 999990000, height: 203208,

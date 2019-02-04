@@ -11,7 +11,7 @@ const getStore = require('../../src/Storage/getStore');
 const getUTXOS = require('../../src/Account/getUTXOS');
 const KeyChain = require('../../src/KeyChain');
 const Storage = require('../../src/Storage/Storage');
-const { simpleTransactionOptimizedAccumulator } = require('../../src/utils/coinSelections/strategies');
+const { simpleDescendingAccumulator } = require('../../src/utils/coinSelections/strategies');
 
 const { mnemonicToHDPrivateKey } = require('../../src/utils');
 
@@ -112,7 +112,7 @@ describe('Account - createTransaction', () => {
       accountIndex: 0,
       BIP44PATH: 'm/44\'/1\'/0\'',
       getPrivateKeys,
-      strategy: simpleTransactionOptimizedAccumulator,
+      strategy: simpleDescendingAccumulator ,
       generateAddress,
       keyChain: new KeyChain({ HDRootKey: mnemonicToHDPrivateKey(duringDevelopMnemonic, 'testnet', '') }),
       storage,
