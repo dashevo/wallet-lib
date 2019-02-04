@@ -9,6 +9,7 @@ const InvalidAddress = require('./InvalidAddress');
 const InvalidAddressObject = require('./InvalidAddressObject');
 const InvalidOutput = require('./InvalidOutput');
 const InvalidRawTransaction = require('./InvalidRawTransaction');
+const InvalidStrategy = require('./InvalidStrategy');
 const InvalidStorageAdapter = require('./InvalidStorageAdapter');
 
 const InvalidTransactionObject = require('./InvalidTransactionObject');
@@ -32,6 +33,7 @@ module.exports = {
   InvalidAddress,
   InvalidAddressObject,
   InvalidOutput,
+  InvalidStrategy,
   InvalidRawTransaction,
   InvalidStorageAdapter,
   InvalidTransactionObject,
