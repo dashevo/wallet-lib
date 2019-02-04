@@ -2,6 +2,7 @@ const _ = require('lodash');
 const { Worker } = require('../');
 const { ValidTransportLayerRequired, InvalidTransactionObject } = require('../../errors');
 const EVENTS = require('../../EVENTS');
+const { UNCONFIRMED_TRANSACTION_STATUS_CODE } = require('../../CONSTANTS');
 
 const defaultOpts = {
   fetchThreshold: 10 * 60 * 1000,
@@ -172,7 +173,7 @@ class SyncWorker extends Worker {
             // In case we have a transaction associated to an address but unknown in global level
             if (!knownsTxId.includes(txid)) {
               toFetchTransactions.push(txid);
-            } else if (transactions[txid].blockheight === -1) {
+            } else if (transactions[txid].blockheight === UNCONFIRMED_TRANSACTION_STATUS_CODE) {
               toFetchTransactions.push(txid);
             } else if (blockheight - transactions[txid].blockheight < unconfirmedThreshold) {
               // When the txid is more than -1 but less than 6 conf.

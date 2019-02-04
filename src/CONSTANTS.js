@@ -31,6 +31,7 @@ const CONSTANTS = {
     // Fee for IS are 0.0001 * INPUTS
     INSTANT_FEE_PER_INPUTS: 10000,
   },
+  UNCONFIRMED_TRANSACTION_STATUS_CODE: -1,
   WALLET_TYPES: {
     SINGLE_ADDRESS: 'single_address',
     HDWALLET: 'hdwallet',
