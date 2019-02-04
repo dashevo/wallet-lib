@@ -1,7 +1,9 @@
 const _ = require('lodash');
 const Dashcore = require('@dashevo/dashcore-lib');
 const { CreateTransactionError } = require('../errors');
-const { dashToDuffs, coinSelection } = require('../utils');
+const { dashToDuffs, coinSelection, is } = require('../utils');
+const _loadStrategy = require('./_loadStrategy');
+
 /**
  * Create a transaction based around on the provided information
  * @param opts - Options object
@@ -13,6 +15,7 @@ const { dashToDuffs, coinSelection } = require('../utils');
  * @param opts.isInstantSend - If you want to use IS or stdTx.
  * @param opts.deductFee - Deduct fee
  * @param opts.privateKeys - Overwrite default behavior : auto-searching local matching keys.
+ * @param opts.strategy - Overwrite default strategy
  * @return {String} - rawTx
  */
 function createTransaction(opts) {
@@ -31,6 +34,10 @@ function createTransaction(opts) {
     : true;
 
   const outputs = [{ address: opts.recipient, satoshis }];
+  const strategy = _.has(opts, 'strategy')
+    ? _loadStrategy(opts.strategy)
+    : this.strategy;
+
 
   const utxosList = _.has(opts, 'utxos') ? opts.utxos : this.getUTXOS();
 
@@ -47,7 +54,7 @@ function createTransaction(opts) {
   const feeCategory = (opts.isInstantSend) ? 'instant' : 'normal';
   let selection;
   try {
-    selection = coinSelection(utxosList, outputs, deductFee, feeCategory);
+    selection = coinSelection(utxosList, outputs, deductFee, feeCategory, strategy);
   } catch (e) {
     throw new CreateTransactionError(e);
   }

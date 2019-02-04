@@ -113,6 +113,8 @@ To broadcast a transaction, use [Account.broadcastTransaction(tx)](#broadcast-tr
 
 > **opts.utxos** : Array[utxos] (def: all known available utxos) - UTXOS from where spend. Allow granular control. - optional
 
+> **opts.strategy** : {String|Function} (def: 'simpleTransactionOptimizedAccumulator') - Allow you to specify the coinselection strategy to apply - optional
+
 ---
 
 
