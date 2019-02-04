@@ -7,11 +7,12 @@ const {
 const EVENTS = require('../EVENTS');
 /**
  * Broadcast a Transaction to the transport layer
- * @param rawtx {String} - the hexa representation of the transaxtion
+ * @param tx {String|Transaction} - A Transaction object or it's hexadecimal representation
  * @param isIs - If the tx is InstantSend tx todo: Should be automatically deducted from the rawtx
  * @return {Promise<*>}
  */
 async function broadcastTransaction(rawtx, isIs = false) {
+  if (is.type(rawtx, 'Transaction')) return broadcastTransaction.call(this, rawtx.toString());
   if (!this.transport.isValid) throw new ValidTransportLayerRequired('broadcast');
 
   if (!is.rawtx(rawtx)) throw new InvalidRawTransaction(rawtx);
@@ -46,7 +47,6 @@ async function broadcastTransaction(rawtx, isIs = false) {
         }
       });
       address.utxos = cleanedUtxos;
-      console.log('Broadcast totalSatoshi', totalSatoshis);
       // this.storage.store.addresses[type][path].fetchedLast = 0;// In order to trigger a refresh
       this.events.emit(EVENTS.UNCONFIRMED_BALANCE_CHANGED, { delta: -totalSatoshis, txid });
     });

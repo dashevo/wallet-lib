@@ -33,13 +33,14 @@ const account = new Account(wallet, [opts]);
 > **cache.transactions** Array|Object 
 
 ---
-### Broadcast Transaction Balance
+### Broadcast Transaction
 
+`const txid = await account.broadcastTransaction(tx)`
 `const txid = await account.broadcastTransaction(rawtx)`
 
 ##### params
 
-> **rawtx** : The hexadecimal reprensation of a transaction.
+> **rawtx** : {String|Transaction} - A valid hexadecimal represation of a transaction or Transaction object.
 
 ---
 
@@ -86,9 +87,10 @@ Will return the balance amount in satoshis,
 
 ### Create Transaction
 
-The transaction creation method output a hexadecimal representation of a transaction, also called rawtx.   
-Using Dashcore-lib.Transaction class you can inspect the rawtx or control inputs/outputs/fees.   
-To broadcast a transaction, used the `broadcastTransaction()` method.
+The transaction creation method return you a signed transaction object. , also called rawtx.   
+The hexadecimal representation (also called rawtx) can be obtain by doing `tx.toString()`. 
+See the Dashcore-lib.Transaction documenation for more methods. 
+To broadcast a transaction, use [Account.broadcastTransaction(tx)](#broadcast-transaction) method.
 
 
 `const rawtx = account.createTransaction(opts)`

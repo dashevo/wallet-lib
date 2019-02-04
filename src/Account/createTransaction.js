@@ -111,8 +111,7 @@ function createTransaction(opts) {
       transformedPrivateKeys,
       Dashcore.crypto.Signature.SIGHASH_ALL,
     );
-    // console.log(signedTx.verify())
-    return signedTx.toString();
+    return signedTx;
   } catch (e) {
     // if (e.message === 'Not fully signed transaction') {}
     return e;
