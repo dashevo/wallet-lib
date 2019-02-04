@@ -11,6 +11,7 @@ const getStore = require('../../src/Storage/getStore');
 const getUTXOS = require('../../src/Account/getUTXOS');
 const KeyChain = require('../../src/KeyChain');
 const Storage = require('../../src/Storage/Storage');
+const { simpleTransactionOptimizedAccumulator } = require('../../src/utils/coinSelections/strategies');
 
 const { mnemonicToHDPrivateKey } = require('../../src/utils');
 
@@ -19,6 +20,58 @@ const validStore = require('../fixtures/walletStore').valid.orange.store;
 const duringDevelopStore = require('../fixtures/duringdevelop-fullstore-snapshot-1548538361');
 
 const duringDevelopMnemonic = 'during develop before curtain hazard rare job language become verb message travel';
+
+const craftedStrategy = (utxosList, outputsList, deductFee = false, feeCategory = 'normal') => {
+  const TransactionEstimator = require('../../src/utils/coinSelections/TransactionEstimator.js');
+  const { sortAndVerifyUTXOS } = require('../../src/utils/coinSelections/helpers/');
+
+  const txEstimator = new TransactionEstimator(feeCategory);
+
+  // We add our outputs, theses will change only in case deductfee being true
+  txEstimator.addOutputs(outputsList);
+
+  const sort = { sortBy: 'satoshis', direction: 'descending' };
+  const sortedUtxosList = sortAndVerifyUTXOS(utxosList, sort);
+
+  const totalOutputValue = txEstimator.getTotalOutputValue();
+
+  let pendingSatoshis = 0;
+  const simplyAccumulatedUtxos = sortedUtxosList.filter((utxo) => {
+    if (pendingSatoshis < totalOutputValue) {
+      pendingSatoshis += utxo.satoshis;
+      return utxo;
+    }
+    return false;
+  });
+  if (pendingSatoshis < totalOutputValue) {
+    throw new Error('Unsufficient utxo amount');
+  }
+
+  // We add the expected inputs, which should match the requested amount
+  // TODO : handle case when we do not match it.
+  txEstimator.addInputs(simplyAccumulatedUtxos);
+
+  const estimatedFee = txEstimator.getFeeEstimate();
+  if (deductFee === true) {
+    // Then we check that we will be able to do it
+    const inValue = txEstimator.getInValue();
+    const outValue = txEstimator.getOutValue();
+    if (inValue < outValue + estimatedFee) {
+      // We don't have enought change for fee, so we remove from outValue
+      txEstimator.reduceFeeFromOutput((outValue + estimatedFee) - inValue);
+    } else {
+      // TODO : Here we can add some process to check up that we clearly have enough to deduct fee
+    }
+  }
+  // console.log('estimatedFee are', estimatedFee, 'satoshis');
+  return {
+    utxos: txEstimator.getInputs(),
+    outputs: txEstimator.getOutputs(),
+    feeCategory,
+    estimatedFee,
+    utxosValue: txEstimator.getInValue(),
+  };
+};
 
 describe('Account - createTransaction', () => {
   it('sould warn on missing inputs', () => {
@@ -59,6 +112,7 @@ describe('Account - createTransaction', () => {
       accountIndex: 0,
       BIP44PATH: 'm/44\'/1\'/0\'',
       getPrivateKeys,
+      strategy: simpleTransactionOptimizedAccumulator,
       generateAddress,
       keyChain: new KeyChain({ HDRootKey: mnemonicToHDPrivateKey(duringDevelopMnemonic, 'testnet', '') }),
       storage,
@@ -95,9 +149,37 @@ describe('Account - createTransaction', () => {
 
     expect(tx2.inputs[0].script.toAddress().toString()).to.equal('XeHNNXZJbUfJkyJbUDq4sp61dr6dHuCZec');
     expect(tx2.inputs[0].output._satoshis).to.equal(34999999753);
-
-
-    // Validate other expected elements
+  });
+  it('should be able to create a transaction with specific strategy', () => {
+    const walletId = '5061b8276c';
+    const storage = new Storage();
+    storage.importAddresses(duringDevelopStore.wallets[walletId].addresses.external, walletId);
+    storage.importAddresses(duringDevelopStore.wallets[walletId].addresses.internal, walletId);
+    storage.importAccounts(duringDevelopStore.wallets[walletId].accounts, walletId);
+    storage.importTransactions(duringDevelopStore.transactions);
+    const self = {
+      store: duringDevelopStore,
+      walletId,
+      getUTXOS,
+      getUnusedAddress,
+      getAddress,
+      accountIndex: 0,
+      BIP44PATH: 'm/44\'/1\'/0\'',
+      getPrivateKeys,
+      generateAddress,
+      strategy: () => { throw new Error(); }, // Ensure it call the passed option
+      keyChain: new KeyChain({ HDRootKey: mnemonicToHDPrivateKey(duringDevelopMnemonic, 'testnet', '') }),
+      storage,
+      events: { emit: _.noop },
+    };
+    const txOpts1 = {
+      recipient: addressesFixtures.testnet.valid.yereyozxENB9jbhqpbg1coE5c39ExqLSaG.addr,
+      satoshis: 100e8,
+      strategy: craftedStrategy,
+    };
+    const tx1 = createTransaction.call(self, txOpts1);
+    const expectedRawTx1 = '0300000001bf4a70ad9d24deb6f374e088208af950c7a2e68d03cfa0a0f3e8e6553d3744dd010000006b483045022100da2c81b18703d4a92c644a317e81e9684adad9a1bc200bf45a591d5c7865b3b502206967ee9c23c5292414109e40238561649e284c4af5850d3f8032d3dac184e9df012103fffaacbf96c63a6758b45a5c3ca0d1984781ed6991050169cd578b607d546b4dffffffff0200e40b54020000001976a914cb594917ad4e5849688ec63f29a0f7f3badb5da688ac12b81dd2050000001976a9149c2e6d97ccb044a3e3ef44319dc1c53cf451988988ac00000000';
+    expect(tx1.toString()).to.equal(expectedRawTx1);
   });
   it('should be able to have a passed change address', () => {
 
