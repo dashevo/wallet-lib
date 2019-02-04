@@ -78,7 +78,7 @@ function createTransaction(opts) {
   // and determine the finalFees
   // eslint-disable-next-line no-underscore-dangle
   const preChangeSize = tx._estimateSize();
-  const changeAddress = _.has(opts, 'change') ? opts.change : this.getUnusedAddress('internal', 1).address;
+  const changeAddress = _.has(opts, 'change') ? opts.change : this.getUnusedAddress('internal').address;
   tx.change(changeAddress);
   // eslint-disable-next-line no-underscore-dangle
   const deltaChangeSize = tx._estimateSize() - preChangeSize;
