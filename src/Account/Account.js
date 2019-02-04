@@ -4,6 +4,7 @@ const { EventEmitter } = require('events');
 const { WALLET_TYPES } = require('../CONSTANTS');
 const { is } = require('../utils/index');
 const EVENTS = require('../EVENTS');
+const { simpleTransactionOptimizedAccumulator} = require('../utils/coinSelections/strategies');
 
 const defaultOptions = {
   network: 'testnet',
@@ -11,13 +12,13 @@ const defaultOptions = {
   allowSensitiveOperations: false,
   plugins: [],
   injectDefaultPlugins: true,
+  strategy: simpleTransactionOptimizedAccumulator,
 };
 
-
-// eslint-disable-next-line no-underscore-dangle
-const _addAccountToWallet = require('./_addAccountToWallet');
-// eslint-disable-next-line no-underscore-dangle
+/* eslint-disable no-underscore-dangle */
 const _initializeAccount = require('./_initializeAccount');
+const _addAccountToWallet = require('./_addAccountToWallet');
+const _loadStrategy = require('./_loadStrategy');
 
 const broadcastTransaction = require('./broadcastTransaction');
 const connect = require('./connect');
@@ -86,7 +87,7 @@ class Account {
 
     const accountIndex = _.has(opts, 'accountIndex') ? opts.accountIndex : wallet.accounts.length;
     this.accountIndex = accountIndex;
-
+    this.strategy = _loadStrategy(_.has(opts, 'strategy') ? opts.strategy : defaultOptions.strategy);
     this.network = getNetwork(wallet.network.toString());
 
     this.BIP44PATH = getBIP44Path(this.network, accountIndex);

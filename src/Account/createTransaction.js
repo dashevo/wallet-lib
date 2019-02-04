@@ -50,7 +50,6 @@ function createTransaction(opts) {
     ? opts.deductFee
     : true;
 
-  const outputs = [{ address: opts.recipient, satoshis }];
   const strategy = _.has(opts, 'strategy')
     ? _loadStrategy(opts.strategy)
     : this.strategy;
