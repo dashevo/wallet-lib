@@ -1,6 +1,6 @@
 const { sortAndVerifyUTXOS } = require('../helpers');
 const TransactionEstimator = require('../TransactionEstimator.js');
-
+const { MAX_INPUTS_FOR_AUTO_IX } = require('../../../CONSTANTS');
 /**
  * Given a utxos list and a threesholdSatoshis, will add them
  * without any further logic up to met with requested params.
@@ -47,11 +47,11 @@ const simpleTransactionOptimizedAccumulator = (utxosList, outputsList, deductFee
   let simplyAccumulatedUtxos = simplyAccumulateUtxos(sortedUtxosList, totalOutputValue);
   let len = simplyAccumulatedUtxos.length;
 
-  if (simplyAccumulatedUtxos.length > 4) {
+  if (simplyAccumulatedUtxos.length > MAX_INPUTS_FOR_AUTO_IX) {
     for (let i = 0; i < sortedUtxosList.length; i++) {
       simplyAccumulatedUtxos = sortedUtxosList.slice(i);
       len = simplyAccumulatedUtxos.length;
-      if (len <= 4) break;
+      if (len <= MAX_INPUTS_FOR_AUTO_IX) break;
     }
   }
 
