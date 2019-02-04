@@ -10,6 +10,7 @@ const _loadStrategy = require('./_loadStrategy');
  * @param opts.amount - Amount in dash that you want to send
  * @param opts.satoshis - Amount in satoshis
  * @param opts.recipient - Address of the recipient
+ * @param opts.recipients - Optional - replace individual satoshis/amount/recipient args
  * @param opts.change - String - A valid Dash address - optional
  * @param opts.utxos - Array - A utxo set - optional
  * @param opts.isInstantSend - If you want to use IS or stdTx.
@@ -22,13 +23,29 @@ function createTransaction(opts) {
   const self = this;
   const tx = new Dashcore.Transaction();
 
-  if (!opts || (!opts.amount && !opts.satoshis)) {
-    throw new Error('An amount in dash or in satoshis is expected to create a transaction');
+  let outputs = [];
+
+  if (_.has(opts, 'recipients')) {
+    if (!is.arr(opts.recipients)) throw new Error('Expected recipients to be an array of recipient');
+    _.each(opts.recipients, (recipient) => {
+      if (_.has(recipient, 'address') && _.has(recipient, 'satoshis')) {
+        outputs.push(recipient);
+      } else {
+        console.error('Invalid recipient provided', recipient);
+      }
+    });
+  } else {
+    if (!opts || (!opts.amount && !opts.satoshis)) {
+      throw new Error('An amount in dash or in satoshis is expected to create a transaction');
+    }
+    const satoshis = (opts.amount && !opts.satoshis) ? dashToDuffs(opts.amount) : opts.satoshis;
+    if (!opts || (!opts.recipient)) {
+      throw new Error('A recipient is expected to create a transaction');
+    }
+    outputs = [{ address: opts.recipient, satoshis }];
   }
-  const satoshis = (opts.amount && !opts.satoshis) ? dashToDuffs(opts.amount) : opts.satoshis;
-  if (!opts || (!opts.recipient)) {
-    throw new Error('A recipient is expected to create a transaction');
-  }
+
+
   const deductFee = _.has(opts, 'deductFee')
     ? opts.deductFee
     : true;

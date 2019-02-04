@@ -115,6 +115,8 @@ To broadcast a transaction, use [Account.broadcastTransaction(tx)](#broadcast-tr
 
 > **opts.strategy** : {String|Function} (def: 'simpleTransactionOptimizedAccumulator') - Allow you to specify the coinselection strategy to apply - optional
 
+> **opts.recipients** : Object{recipient,satoshis} - Allow you to send to multiple recipients - optional. Override recipient/satoshis and amount values.
+
 ---
 
 
