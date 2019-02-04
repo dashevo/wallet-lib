@@ -31,13 +31,13 @@ const simplyAccumulateUtxos = (utxos, thresholdSatoshis) => {
  * @param {*} feeCategory - default: normal
 
  */
-const simpleAccumulator = (utxosList, outputsList, deductFee = false, feeCategory = 'normal') => {
+const simpleDescendingAccumulator = (utxosList, outputsList, deductFee = false, feeCategory = 'normal') => {
   const txEstimator = new TransactionEstimator(feeCategory);
 
   // We add our outputs, theses will change only in case deductfee being true
   txEstimator.addOutputs(outputsList);
 
-  const sort = { sortBy: 'satoshis', direction: 'descending' };
+  const sort = { property: 'satoshis', direction: 'descending' };
   const sortedUtxosList = sortAndVerifyUTXOS(utxosList, sort);
 
   const totalOutputValue = txEstimator.getTotalOutputValue();
@@ -68,4 +68,4 @@ const simpleAccumulator = (utxosList, outputsList, deductFee = false, feeCategor
     utxosValue: txEstimator.getInValue(),
   };
 };
-module.exports = simpleAccumulator;
+module.exports = simpleDescendingAccumulator;
