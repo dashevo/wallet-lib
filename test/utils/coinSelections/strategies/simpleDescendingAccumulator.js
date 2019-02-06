@@ -119,15 +119,26 @@ describe('CoinSelection - Strategy - simpleDescendingAccumulator', () => {
       utxosValue: 60000000000,
     };
 
-    expect(simpleDescendingAccumulator.call(self, utxosList, outputsList1e4)).to.deep.equal(expectedRes1e4);
-    expect(simpleDescendingAccumulator.call(self, utxosList, outputsList1e5)).to.deep.equal(expectedRes1e5);
-    expect(simpleDescendingAccumulator.call(self, utxosList, outputsList1e6)).to.deep.equal(expectedRes1e6);
-    expect(simpleDescendingAccumulator.call(self, utxosList, outputsList1e7)).to.deep.equal(expectedRes1e7);
-    expect(simpleDescendingAccumulator.call(self, utxosList, outputsList1e8)).to.deep.equal(expectedRes1e8);
-    expect(simpleDescendingAccumulator.call(self, utxosList, outputsList1e9)).to.deep.equal(expectedRes1e9);
-    expect(simpleDescendingAccumulator.call(self, utxosList, outputsList1e10)).to.deep.equal(expectedRes1e10);
-    expect(simpleDescendingAccumulator.call(self, utxosList, outputsList2e10)).to.deep.equal(expectedRes2e10);
-    expect(simpleDescendingAccumulator.call(self, utxosList, outputsList6e10)).to.deep.equal(expectedRes6e10);
+
+    const res1e4 = simpleDescendingAccumulator.call(self, utxosList, outputsList1e4);
+    const res1e5 = simpleDescendingAccumulator.call(self, utxosList, outputsList1e5);
+    const res1e6 = simpleDescendingAccumulator.call(self, utxosList, outputsList1e6);
+    const res1e7 = simpleDescendingAccumulator.call(self, utxosList, outputsList1e7);
+    const res1e8 = simpleDescendingAccumulator.call(self, utxosList, outputsList1e8);
+    const res1e9 = simpleDescendingAccumulator.call(self, utxosList, outputsList1e9);
+    const res1e10 = simpleDescendingAccumulator.call(self, utxosList, outputsList1e10);
+    const res2e10 = simpleDescendingAccumulator.call(self, utxosList, outputsList2e10);
+    const res6e10 = simpleDescendingAccumulator.call(self, utxosList, outputsList6e10);
+
+    expect(res1e4).to.deep.equal(expectedRes1e4);
+    expect(res1e5).to.deep.equal(expectedRes1e5);
+    expect(res1e6).to.deep.equal(expectedRes1e6);
+    expect(res1e7).to.deep.equal(expectedRes1e7);
+    expect(res1e8).to.deep.equal(expectedRes1e8);
+    expect(res1e9).to.deep.equal(expectedRes1e9);
+    expect(res1e10).to.deep.equal(expectedRes1e10);
+    expect(res2e10).to.deep.equal(expectedRes2e10);
+    expect(res6e10).to.deep.equal(expectedRes6e10);
     expect(() => simpleDescendingAccumulator.call(self, utxosList, outputsList1e11)).to.throw(('Unsufficient utxo amount'));
 
 
