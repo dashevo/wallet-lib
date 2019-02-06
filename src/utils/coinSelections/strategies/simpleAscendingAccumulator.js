@@ -1,6 +1,5 @@
-const { sortAndVerifyUTXOS } = require('../helpers');
+const { sortBy } = require('lodash');
 const TransactionEstimator = require('../TransactionEstimator.js');
-
 /**
  * Given a utxos list and a threesholdSatoshis, will add them
  * without any further logic up to met with requested params.
@@ -40,10 +39,7 @@ const simpleAscendingAccumulator = (utxosList, outputsList, deductFee = false, f
   // We add our outputs, theses will change only in case deductfee being true
   txEstimator.addOutputs(outputsList);
 
-  const sort = { property: 'satoshis', direction: 'ascending' };
-  const sortedUtxosList = sortAndVerifyUTXOS(utxosList, sort);
-
-  // console.log(sortedUtxosList[0].satoshis, sortedUtxosList[sortedUtxosList.length-1].satoshis);
+  const sortedUtxosList = sortBy(utxosList, ['-satoshis', 'txid', 'outputIndex']);
 
   const totalOutputValue = txEstimator.getTotalOutputValue();
   const simplyAccumulatedUtxos = simplyAccumulateUtxos(sortedUtxosList, totalOutputValue);

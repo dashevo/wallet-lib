@@ -1,4 +1,4 @@
-const { sortAndVerifyUTXOS } = require('../helpers');
+const { sortBy } = require('lodash');
 const TransactionEstimator = require('../TransactionEstimator.js');
 const { MAX_INPUTS_FOR_AUTO_IX } = require('../../../CONSTANTS');
 /**
@@ -38,9 +38,7 @@ const simpleTransactionOptimizedAccumulator = (utxosList, outputsList, deductFee
   // We add our outputs, theses will change only in case deductfee being true
   txEstimator.addOutputs(outputsList);
 
-  const sort = { property: 'satoshis', direction: 'ascending' };
-
-  const sortedUtxosList = sortAndVerifyUTXOS(utxosList, sort);
+  const sortedUtxosList = sortBy(utxosList, ['-satoshis', 'txid', 'outputIndex']);
 
   const totalOutputValue = txEstimator.getTotalOutputValue();
 
