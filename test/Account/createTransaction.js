@@ -30,7 +30,7 @@ const craftedStrategy = (utxosList, outputsList, deductFee = false, feeCategory 
   // We add our outputs, theses will change only in case deductfee being true
   txEstimator.addOutputs(outputsList);
 
-  const sort = { sortBy: 'satoshis', direction: 'descending' };
+  const sort = [{ sortBy: 'satoshis', direction: 'descending' }];
   const sortedUtxosList = sortAndVerifyUTXOS(utxosList, sort);
 
   const totalOutputValue = txEstimator.getTotalOutputValue();
@@ -127,7 +127,7 @@ describe('Account - createTransaction', () => {
     expect(tx1.constructor.name).to.equal('Transaction');
     expect(tx1.isFullySigned()).to.equal(true);
     expect(tx1.verify()).to.equal(true);
-    const expectedRawTx1 = '0300000001bf4a70ad9d24deb6f374e088208af950c7a2e68d03cfa0a0f3e8e6553d3744dd010000006b483045022100f0971295bd5f0b82369a8dcdf34515f8167db2094730305ea553dd2136a6524e02201214ca804104855be1bcb63d018c3bd256d2a48cceb068c593cd0f1ae634858a012103fffaacbf96c63a6758b45a5c3ca0d1984781ed6991050169cd578b607d546b4dffffffff0200e1f505000000001976a914cb594917ad4e5849688ec63f29a0f7f3badb5da688ac12bb3320080000001976a9149c2e6d97ccb044a3e3ef44319dc1c53cf451988988ac00000000';
+    const expectedRawTx1 = '0300000001bf4a70ad9d24deb6f374e088208af950c7a2e68d03cfa0a0f3e8e6553d3744dd000000006a47304402202708fb9d0f98720be46cf3db0075e07738a6333475992faf1b8a1e8479c926770220476785d5367c06461af528c975dbd924fcb8cc65c2d412a1bfb377dc675f65340121028614ed50b56e0430d6bb954320b0bc23f0420c3d6e0a2efcd163f414765b6c0cffffffff0200e1f505000000001976a914cb594917ad4e5849688ec63f29a0f7f3badb5da688ac09f41b78030000001976a9149c2e6d97ccb044a3e3ef44319dc1c53cf451988988ac00000000';
     expect(tx1.toString()).to.equal(expectedRawTx1);
 
     // Only satoshis was changed to equal amount. Should then be similar than first rawtx.
@@ -141,14 +141,14 @@ describe('Account - createTransaction', () => {
     const tx2Json = tx2.toJSON();
     expect(tx2Json.outputs.length).to.equal(2);
     expect(tx2Json.outputs[0].satoshis).to.equal(1e8);
-    expect(tx2Json.outputs[1].satoshis).to.equal(34899999506);
+    expect(tx2Json.outputs[1].satoshis).to.equal(14899999753);
     expect(tx2Json.fee).to.equal(247);
 
     expect(tx2.outputs[0].script.toAddress().toString()).to.equal('yereyozxENB9jbhqpbg1coE5c39ExqLSaG');
     expect(tx2.outputs[1].script.toAddress().toString()).to.equal('yaZFt1VnAbi72mtyjDNV4AwTECqdg5Bv95');
 
-    expect(tx2.inputs[0].script.toAddress().toString()).to.equal('XeHNNXZJbUfJkyJbUDq4sp61dr6dHuCZec');
-    expect(tx2.inputs[0].output._satoshis).to.equal(34999999753);
+    expect(tx2.inputs[0].script.toAddress().toString()).to.equal('XsXC8nUKVdN7EQepL5Sg4XDwNvP5zjayY4');
+    expect(tx2.inputs[0].output._satoshis).to.equal(15000000000);
   });
   it('should be able to create a transaction with specific strategy', () => {
     const walletId = '5061b8276c';

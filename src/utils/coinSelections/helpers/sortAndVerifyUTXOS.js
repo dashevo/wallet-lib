@@ -16,6 +16,7 @@ const sort = {
         }
         return result * direction;
       });
+      return 0;
     });
 
 
