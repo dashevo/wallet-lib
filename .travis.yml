@@ -2,7 +2,7 @@ os: linux
 language: node_js
 node_js:
   - '8'
-  - "10.15"
+  - "10"
 
 before_install:
   - echo -e "machine github.com\n  login ${GH_TOKEN}" >> ~/.netrc
