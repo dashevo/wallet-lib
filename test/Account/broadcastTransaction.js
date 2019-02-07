@@ -21,7 +21,7 @@ describe('Account - broadcastTransaction', () => {
       );
   });
   it('should throw error on invalid rawtx (string)', async () => {
-    const expectedException1 = 'InvalidRawTransaction';
+    const expectedException1 = 'A valid transaction object or it\'s hex representation is required';
     const self = {
       transport: {
         isValid: true,
@@ -36,7 +36,7 @@ describe('Account - broadcastTransaction', () => {
       );
   });
   it('should throw error on invalid rawtx (hex)', async () => {
-    const expectedException1 = 'InvalidRawTransaction';
+    const expectedException1 = 'A valid transaction object or it\'s hex representation is required';
     const self = {
       transport: {
         isValid: true,
@@ -50,7 +50,23 @@ describe('Account - broadcastTransaction', () => {
         err => expect(err).to.be.a('Error').with.property('message', expectedException1),
       );
   });
-  it('should work on valid tx', async () => {
+  it('should work on valid Transaction object', async () => {
+    let sendCalled = +1;
+    const self = {
+      transport: {
+        isValid: true,
+        sendRawTransaction: () => sendCalled = +1,
+      },
+    };
+
+    const tx = new Dashcore.Transaction(validRawTxs.tx1to1Mainnet);
+    return broadcastTransaction
+      .call(self, tx)
+      .then(
+        () => expect(sendCalled).to.equal(1),
+      );
+  });
+  it('should work on valid rawtx', async () => {
     let sendCalled = +1;
     const self = {
       transport: {

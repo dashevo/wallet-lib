@@ -1,10 +1,20 @@
+const _ = require('lodash');
+const { is } = require('../utils');
+
+const defaultOpts = {
+  index: 0,
+};
 /**
  * Get a specific account per accountIndex
- * @param accountIndex - Default: 0, set a specific index to get
  * @param accountOpts - If the account doesn't exist yet, we create it passing these options
+ * @param accountOpts.index - Default: 0, set a specific index to get
  * @return {*|account}
  */
-function getAccount(accountIndex = 0, accountOpts) {
+function getAccount(accountOpts = defaultOpts) {
+  const accountIndex = (_.has(accountOpts, 'index') && is.num(accountOpts.index))
+    ? accountOpts.index
+    : defaultOpts.index;
+
   const acc = this.accounts.filter(el => el.accountIndex === accountIndex);
   const baseOpts = { accountIndex };
 

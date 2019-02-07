@@ -1,6 +1,10 @@
-const simpleAccumulator = require('./simpleAccumulator');
+const simpleAscendingAccumulator = require('./simpleAscendingAccumulator');
+const simpleDescendingAccumulator = require('./simpleDescendingAccumulator');
+const simpleTransactionOptimizedAccumulator = require('./simpleTransactionOptimizedAccumulator');
 
 const STRATEGIES = {
-  simpleAccumulator,
+  simpleDescendingAccumulator,
+  simpleAscendingAccumulator,
+  simpleTransactionOptimizedAccumulator,
 };
 module.exports = STRATEGIES;

@@ -1,11 +1,11 @@
 const WalletLibError = require('./WalletLibError');
 
 
-class InvalidRawTransaction extends WalletLibError {
+class InvalidTransaction extends WalletLibError {
   constructor(rawtx) {
-    const getErrorMessageOf = () => 'InvalidRawTransaction';
+    const getErrorMessageOf = () => 'A valid transaction object or it\'s hex representation is required';
     super(getErrorMessageOf((rawtx)));
   }
 }
 
-module.exports = InvalidRawTransaction;
+module.exports = InvalidTransaction;

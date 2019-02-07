@@ -87,10 +87,6 @@ class Wallet {
 
     this.storage.configure({
       adapter: opts.adapter,
-      walletId: this.walletId,
-      network: this.network,
-      mnemonic: this.mnemonic,
-      type: this.type,
     });
 
     this.store = this.storage.store;

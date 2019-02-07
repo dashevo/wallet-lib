@@ -15,7 +15,11 @@ const saveState = async function () {
       this.events.emit(SAVE_STATE_SUCCESS);
       return true;
     } catch (e) {
-      console.log('Storage saveState err', e);
+      switch (e.message) {
+        default:
+          console.log('Storage saveState err', e);
+      }
+
       this.events.emit(SAVE_STATE_FAILED, e);
 
       throw e;
