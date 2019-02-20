@@ -34,12 +34,12 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^5.14.1",
-    "nodeforage": "git+https://github.com/Alex-Werner/nodeForage.git",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.10.0",
     "mocha": "^5.2.0",
-    "nyc": "^11.9.0"
+    "nodeforage": "git+https://github.com/Alex-Werner/nodeForage.git",
+    "nyc": "^13.3.0"
   }
 }
