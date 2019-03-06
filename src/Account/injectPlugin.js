@@ -76,6 +76,9 @@ module.exports = async function injectPlugin(UnsafePlugin, allowSensitiveOperati
         self.plugins.standard[pluginName] = plugin;
         break;
     }
+
+    if (!!plugin.onInjected) plugin.onInjected();
+
     return res(plugin);
   });
 };

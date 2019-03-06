@@ -34,7 +34,6 @@ async function _initializeAccount(account, userUnsafePlugins) {
 
     _.each(userUnsafePlugins, (UnsafePlugin) => {
       account.injectPlugin(UnsafePlugin, account.allowSensitiveOperations);
-      if(account.hasOwnProperty('_onInjection')) account._onInjection();
     });
 
     // eslint-disable-next-line no-param-reassign
