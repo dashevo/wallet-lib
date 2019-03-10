@@ -18,7 +18,7 @@ const _loadStrategy = require('./_loadStrategy');
  * @param opts.deductFee - Deduct fee
  * @param opts.privateKeys - Overwrite default behavior : auto-searching local matching keys.
  * @param opts.strategy - Overwrite default strategy
- * @return {String} - rawTx
+ * @return {Transaction} - Transaction object
  */
 function createTransaction(opts) {
   const self = this;
