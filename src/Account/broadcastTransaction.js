@@ -33,22 +33,27 @@ async function broadcastTransaction(rawtx, isIs = false) {
       affectedTxs.push(input.prevTxId);
     });
 
+    // FIXME : It is unknown if something changed in DAPI, but recently we
+    // seems to not get any addresses affected by our transaction (storage.savetx failing?)
+
     affectedTxs.forEach((affectedtxid) => {
       const { path, type } = this.storage.searchAddressWithTx(affectedtxid);
-      const address = this.storage.store.wallets[this.walletId].addresses[type][path];
-      const cleanedUtxos = {};
-      Object.keys(address.utxos).forEach((utxoTxId) => {
-        const utxo = address.utxos[utxoTxId];
-        if (utxo.txid === affectedtxid) {
-          totalSatoshis -= utxo.satoshis;
-          address.balanceSat -= utxo.satoshis;
-        } else {
-          cleanedUtxos[utxoTxId] = (utxo);
-        }
-      });
-      address.utxos = cleanedUtxos;
-      // this.storage.store.addresses[type][path].fetchedLast = 0;// In order to trigger a refresh
-      this.events.emit(EVENTS.UNCONFIRMED_BALANCE_CHANGED, { delta: -totalSatoshis, txid });
+      if (type !== null) {
+        const address = this.storage.store.wallets[this.walletId].addresses[type][path];
+        const cleanedUtxos = {};
+        Object.keys(address.utxos).forEach((utxoTxId) => {
+          const utxo = address.utxos[utxoTxId];
+          if (utxo.txid === affectedtxid) {
+            totalSatoshis -= utxo.satoshis;
+            address.balanceSat -= utxo.satoshis;
+          } else {
+            cleanedUtxos[utxoTxId] = (utxo);
+          }
+        });
+        address.utxos = cleanedUtxos;
+        // this.storage.store.addresses[type][path].fetchedLast = 0;// In order to trigger a refresh
+        this.events.emit(EVENTS.UNCONFIRMED_BALANCE_CHANGED, { delta: -totalSatoshis, txid });
+      } else console.log('Unknown address for', affectedtxid);
     });
   }
   return txid;
