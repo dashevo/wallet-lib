@@ -7,7 +7,7 @@ const {
 const EVENTS = require('../EVENTS');
 /**
  * Broadcast a Transaction to the transport layer
- * @param tx {String|Transaction} - A Transaction object or it's hexadecimal representation
+ * @param rawtx {String|Transaction} - A Transaction object or it's hexadecimal representation
  * @param isIs - If the tx is InstantSend tx todo: Should be automatically deducted from the rawtx
  * @return {Promise<*>}
  */
