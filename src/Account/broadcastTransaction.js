@@ -12,7 +12,9 @@ const EVENTS = require('../EVENTS');
  * @return {Promise<*>}
  */
 async function broadcastTransaction(rawtx, isIs = false) {
-  if (is.type(rawtx, 'Transaction')) return broadcastTransaction.call(this, rawtx.toString());
+  if (rawtx.constructor.name === Dashcore.Transaction.name) {
+    return broadcastTransaction.call(this, rawtx.toString());
+  }
   if (!this.transport.isValid) throw new ValidTransportLayerRequired('broadcast');
 
   if (!is.rawtx(rawtx)) throw new InvalidRawTransaction(rawtx);
