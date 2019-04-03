@@ -15,7 +15,7 @@ const searchAddressWithTx = function (txid) {
   const store = this.getStore();
 
   // Look up by looping over all addresses todo:optimisation
-  const existingWallets = Object.keys(store);
+  const existingWallets = Object.keys(store.wallets);
   existingWallets.forEach((walletId) => {
     if (_.has(store.wallets[walletId], 'addresses')) {
       const existingTypes = Object.keys(store.wallets[walletId].addresses);
