@@ -30,6 +30,7 @@ const is = {
   address: addr => is.string(addr) || addr.constructor.name === Address.name,
   addressObj: addrObj => addrObj.address.constructor.name === Address.name || (is.string(addrObj.address) && is.string(addrObj.path)),
   transactionObj: tx => is.obj(tx) && is.txid(tx.txid) && tx.vin && is.arr(tx.vin) && tx.vout && is.arr(tx.vout),
+  dashcoreTransaction: tx => is.type(tx, Transaction.name),
   feeRate: feeRate => is.obj(feeRate) && is.string(feeRate.type) && is.int(feeRate.value),
   txid: txid => is.string(txid) && txid.length === 64,
   utxo: utxo => is.obj(utxo) && is.txid(utxo.txid) && is.num(utxo.outputIndex) && is.num(utxo.satoshis) && is.string(utxo.scriptPubKey),
