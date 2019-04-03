@@ -3,61 +3,77 @@ const { is } = require('../utils');
 const {
   ValidTransportLayerRequired,
   InvalidRawTransaction,
+  InvalidDashcoreTransaction,
 } = require('../errors/index');
 const EVENTS = require('../EVENTS');
+
+const impactAffectedInputs = function ({
+  inputs,
+}) {
+  const {
+    storage, walletId, events,
+  } = this;
+  // let totalSatoshis = outputs.reduce((ac, cur) => acc + cur.satoshis, 0);
+  const affectedTxs = inputs.reduce((acc, curr) => acc.push(curr.prevTxId) && acc, []);
+
+  let sumSpent = 0;
+  affectedTxs.forEach((affectedTxId) => {
+    const { path, type } = storage.searchAddressWithTx(affectedTxId);
+
+    if (type !== null) {
+      const address = storage.store.wallets[walletId].addresses[type][path];
+      const cleanedUtxos = {};
+      Object.keys(address.utxos).forEach((utxoTxId) => {
+        const utxo = address.utxos[utxoTxId];
+        if (utxo.txid === affectedTxId) {
+          sumSpent += utxo.satoshis;
+          address.balanceSat -= utxo.satoshis;
+        } else {
+          cleanedUtxos[utxoTxId] = (utxo);
+        }
+      });
+
+      const currentValue = this.getBalance();
+      events.emit(EVENTS.UNCONFIRMED_BALANCE_CHANGED, { delta: -sumSpent, currentValue });
+
+      address.utxos = cleanedUtxos;
+      // this.storage.store.addresses[type][path].fetchedLast = 0;// In order to trigger a refresh
+    }
+  });
+  return true;
+};
 /**
  * Broadcast a Transaction to the transport layer
- * @param rawtx {String|Transaction} - A Transaction object or it's hexadecimal representation
+ * @param transaction {Transaction|RawTransaction} - A txobject or it's hexadecimal representation
  * @param isIs - If the tx is InstantSend tx todo: Should be automatically deducted from the rawtx
  * @return {Promise<*>}
  */
-async function broadcastTransaction(rawtx, isIs = false) {
-  if (rawtx.constructor.name === Dashcore.Transaction.name) {
-    return broadcastTransaction.call(this, rawtx.toString());
-  }
+async function broadcastTransaction(transaction, isIs = false) {
   if (!this.transport.isValid) throw new ValidTransportLayerRequired('broadcast');
 
-  if (!is.rawtx(rawtx)) throw new InvalidRawTransaction(rawtx);
-  const txid = await this.transport.sendRawTransaction(rawtx, isIs);
-
-  if (is.txid(txid)) {
-    const {
-      inputs, outputs,
-    } = new Dashcore.Transaction(rawtx).toObject();
-
-    let totalSatoshis = 0;
-    outputs.forEach((out) => {
-      totalSatoshis += out.satoshis;
-    });
-
-    const affectedTxs = [];
-    inputs.forEach((input) => {
-      affectedTxs.push(input.prevTxId);
-    });
-
-    // FIXME : It is unknown if something changed in DAPI, but recently we
-    // seems to not get any addresses affected by our transaction (storage.savetx failing?)
-
-    affectedTxs.forEach((affectedtxid) => {
-      const { path, type } = this.storage.searchAddressWithTx(affectedtxid);
-      if (type !== null) {
-        const address = this.storage.store.wallets[this.walletId].addresses[type][path];
-        const cleanedUtxos = {};
-        Object.keys(address.utxos).forEach((utxoTxId) => {
-          const utxo = address.utxos[utxoTxId];
-          if (utxo.txid === affectedtxid) {
-            totalSatoshis -= utxo.satoshis;
-            address.balanceSat -= utxo.satoshis;
-          } else {
-            cleanedUtxos[utxoTxId] = (utxo);
-          }
-        });
-        address.utxos = cleanedUtxos;
-        // this.storage.store.addresses[type][path].fetchedLast = 0;// In order to trigger a refresh
-        this.events.emit(EVENTS.UNCONFIRMED_BALANCE_CHANGED, { delta: -totalSatoshis, txid });
-      } else console.log('Unknown address for', affectedtxid);
-    });
+  // We still support having in rawtransaction, if this is the case
+  // we first need to reform our object
+  if (is.string(transaction)) {
+    const rawtx = transaction.toString();
+    if (!is.rawtx(rawtx)) throw new InvalidRawTransaction(rawtx);
+    return broadcastTransaction.call(this, new Dashcore.Transaction(rawtx).toObject());
   }
+
+  if (!is.dashcoreTransaction(transaction)) {
+    throw new InvalidDashcoreTransaction(transaction);
+  }
+
+  const txid = await this.transport.sendRawTransaction(transaction.toString(), isIs);
+  if (!is.txid(txid)) {
+    console.error(txid, 'is said to not be a txid!');
+  }
+  // We now need to impact/update our affected inputs
+  // so we clear them out from UTXOset.
+  const { inputs, outputs } = new Dashcore.Transaction(transaction).toObject();
+  impactAffectedInputs.call(this, {
+    inputs, outputs, txid,
+  });
+
   return txid;
 }
 module.exports = broadcastTransaction;
