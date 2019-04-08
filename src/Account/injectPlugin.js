@@ -19,7 +19,7 @@ module.exports = async function injectPlugin(UnsafePlugin, allowSensitiveOperati
     const isInit = !(typeof UnsafePlugin === 'function');
     const plugin = (isInit) ? UnsafePlugin : new UnsafePlugin();
 
-    const pluginName = plugin.constructor.name.toLowerCase() || 'NoNamedPlugin';
+    const pluginName = plugin.name.toLowerCase();
 
     if (_.isEmpty(plugin)) rej(new InjectionErrorCannotInject(pluginName, 'Empty plugin'));
 
