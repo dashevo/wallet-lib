@@ -18,12 +18,14 @@ module.exports = async function injectPlugin(UnsafePlugin, allowSensitiveOperati
   return new Promise(async (res, rej) => {
     const isInit = !(typeof UnsafePlugin === 'function');
     const plugin = (isInit) ? UnsafePlugin : new UnsafePlugin();
-    if (_.isEmpty(plugin)) rej(new InjectionErrorCannotInject('Empty plugin'));
+
+    const pluginName = plugin.constructor.name.toLowerCase() || 'NoNamedPlugin';
+
+    if (_.isEmpty(plugin)) rej(new InjectionErrorCannotInject(pluginName, 'Empty plugin'));
 
     // All plugins will require the event object
     const { pluginType } = plugin;
 
-    const pluginName = plugin.constructor.name.toLowerCase();
     plugin.inject('events', self.events);
 
     // Check for dependencies
@@ -42,7 +44,7 @@ module.exports = async function injectPlugin(UnsafePlugin, allowSensitiveOperati
           plugin.inject(dependencyName, this.plugins.standard[loweredDependencyName], true);
         } else if (injectedDaps.includes(loweredDependencyName)) {
           plugin.inject(dependencyName, this.plugins.daps[loweredDependencyName], true);
-        } else rej(new InjectionErrorCannotInjectUnknownDependency(dependencyName));
+        } else rej(new InjectionErrorCannotInjectUnknownDependency(pluginName, dependencyName));
       }
     });
     switch (pluginType) {
