@@ -56,7 +56,7 @@ async function broadcastTransaction(transaction, isIs = false) {
   if (is.string(transaction)) {
     const rawtx = transaction.toString();
     if (!is.rawtx(rawtx)) throw new InvalidRawTransaction(rawtx);
-    return broadcastTransaction.call(this, new Dashcore.Transaction(rawtx).toObject());
+    return broadcastTransaction.call(this, new Dashcore.Transaction(rawtx));
   }
 
   if (!is.dashcoreTransaction(transaction)) {
