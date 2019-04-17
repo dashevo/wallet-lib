@@ -8,7 +8,7 @@ const { WALLET_TYPES } = require('../CONSTANTS');
 // eslint-disable-next-line no-underscore-dangle
 async function _initializeAccount(account, userUnsafePlugins) {
   const self = account;
-  return new Promise((res)=>{
+  return new Promise((res) => {
     if (account.injectDefaultPlugins) {
       // TODO: Should check in other accounts if a similar is setup already
       // TODO: We want to sort them by dependencies and deal with the await this way
@@ -54,7 +54,6 @@ async function _initializeAccount(account, userUnsafePlugins) {
     }, 600);
 
     self.events.emit(EVENTS.STARTED);
-  })
-
+  });
 }
 module.exports = _initializeAccount;

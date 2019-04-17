@@ -5,6 +5,12 @@ const { WALLET_TYPES } = require('../CONSTANTS');
  * @return {account} - account object
  */
 function createAccount(accountOpts) {
+  /**
+   *   Wallet.createAccount calls Account that depends on Wallet.
+   *   In order to avoid a cyclic dependency issue we put this require here and
+   *   disable eslint global require for next line
+   */
+  // eslint-disable-next-line global-require
   const Account = require('../Account/Account.js');
 
   const { injectDefaultPlugins, plugins, allowSensitiveOperations } = this;

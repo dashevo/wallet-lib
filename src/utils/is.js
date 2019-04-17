@@ -19,7 +19,7 @@ const is = {
   def: val => val !== undefined,
   undef: val => val === undefined,
   null: val => val === null,
-  exist: val=> !is.undefOrNull(val),
+  exist: val => !is.undefOrNull(val),
   undefOrNull: val => is.undef(val) || is.null(val),
   promise: fn => fn && is.fn(fn.then) && is.fn(fn.catch),
   JSON(val) { try { JSON.stringify(val); return true; } catch (e) { return false; } },
