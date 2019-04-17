@@ -36,7 +36,7 @@ async function _initializeAccount(account, userUnsafePlugins) {
       account.injectPlugin(UnsafePlugin, account.allowSensitiveOperations);
     });
 
-    // eslint-disable-next-line no-param-reassign
+    // eslint-disable-next-line no-param-reassign,consistent-return
     account.readinessInterval = setInterval(() => {
       const watchedWorkers = Object.keys(account.plugins.watchers);
       let readyWorkers = 0;
