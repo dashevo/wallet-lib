@@ -60,7 +60,10 @@ const importTransaction = function importTransaction(transaction) {
 
 
     const secureBlockheight = (transaction.blockheight + SECURE_TRANSACTION_CONFIRMATIONS_NB);
-    const isSecureTx = (transaction.blockheight !== UNCONFIRMED_TRANSACTION_STATUS_CODE && currBlockheight >= secureBlockheight);
+    const isSecureTx = (
+      transaction.blockheight !== UNCONFIRMED_TRANSACTION_STATUS_CODE
+      && currBlockheight >= secureBlockheight
+    );
 
     const eventName = (isSecureTx)
       ? FETCHED_CONFIRMED_TRANSACTION
