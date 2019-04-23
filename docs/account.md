@@ -176,7 +176,7 @@ account.disconnect();
 
 ### Events 
 
-```json
+```javascript
 const {EVENTS} = require('@dashevo/wallet-lib');
 const {READY} = EVENTS;
 const doSomethingWhenReady = (info) => {...}
@@ -186,24 +186,38 @@ account.events.on(READY, doSomethingWhenReady);
 
 Events types : 
 
-Storage : 
 
-- CONFIGURED : throwed when Storage has configured the adapter.
-- REHYDRATE_STATE_FAILED: onFailedRehydrateState
-- REHYDRATE_STATE_SUCCESS: throwed when Storage has succesfully rehydrated the data
+### Storage
 
-General : 
-- READY : throwed when ready to be used.
+| Event Name                 | Description                                             | 
+| -------------------------- |:-------------------------------------------------------:|
+| CONFIGURED                 |  throwed when Storage has configured the adapter.       |
+| REHYDRATE_STATE_FAILED     | onFailedRehydrateState                                  |
+| REHYDRATE_STATE_SUCCESS    | throwed when Storage has succesfully rehydrated the data|
 
-Sync Info : 
-- BLOCKHEIGHT_CHANGED : When the chain has moved from one block forward
-- FETCHED_UNCONFIRMED_TRANSACTION : When we got to fetch an unconfirmed transaction, we throw this event
-- FETCHED_CONFIRMED_TRANSACTION : This one is if the transaction is confirmed
-- FETCHED_TRANSACTIONS : In both case, we throw that event
+### General 
 
-Balance : 
+| Event Name                 | Description                          | 
+| -------------------------- |:------------------------------------:|
+| READY                      |  throwed when ready to be used       |
 
-We handle two different balance, confirmed and unconfirmed.
 
-- UNCONFIRMED_BALANCE_CHANGED : When the balance change, we gives the delta + totalValue
-- BALANCE_CHANGED : When the balance change, we gives the delta + totalValue
+
+### Sync Info
+
+| Event Name                       | Description                                                          | 
+| -------------------------------- |:--------------------------------------------------------------------:|
+| BLOCKHEIGHT_CHANGED              |  When the chain has moved from one block forward                     |
+| FETCHED_UNCONFIRMED_TRANSACTION  | When we got to fetch an unconfirmed transaction, we throw this event |
+| FETCHED_CONFIRMED_TRANSACTION    | This one is if the transaction is confirmed                          |
+| FETCHED_TRANSACTIONS             | In both case, we throw that event                                    |
+
+
+### Balance
+
+| Event Name                   | Description                                                            | 
+| ---------------------------- |:----------------------------------------------------------------------:|
+| UNCONFIRMED_BALANCE_CHANGED  | When unconfirmed balance change, we gives the delta + totalValue       |
+| BALANCE_CHANGED              | When the balance change, we gives the delta + totalValue               |
+
+
