@@ -114,12 +114,12 @@ class SyncWorker extends Worker {
           const address = walletAddresses[path];
 
 
-          const hasUnconfirmedBalance = (address.unconfirmedBalanceSat > 0);
+          const hasUnconfirmedBalance = address.unconfirmedBalanceSat > 0;
           // This will make all last address (the one we got from unconfirmedAddress)
           // to basically check each time
-          const isFirstAndUnused = (address.used === false && address.index === 0);
-          const hasMostChanceToReceiveTx = ((prevWasUsed === true && address.used === false));
-          const hasReachRefreshThreshold = (address.fetchedLast < Date.now() - self.fetchThreshold);
+          const isFirstAndUnused = address.used === false && address.index === 0;
+          const hasMostChanceToReceiveTx = prevWasUsed === true && address.used === false;
+          const hasReachRefreshThreshold = address.fetchedLast < (Date.now() - self.fetchThreshold);
           if (
             isFirstAndUnused
             || hasUnconfirmedBalance

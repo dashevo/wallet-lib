@@ -59,7 +59,7 @@ const importTransaction = function importTransaction(transaction) {
     this.lastModified = +new Date();
 
 
-    const secureBlockheight = (transaction.blockheight + SECURE_TRANSACTION_CONFIRMATIONS_NB);
+    const secureBlockheight = transaction.blockheight + SECURE_TRANSACTION_CONFIRMATIONS_NB;
     const isSecureTx = (
       transaction.blockheight !== UNCONFIRMED_TRANSACTION_STATUS_CODE
       && currBlockheight >= secureBlockheight
