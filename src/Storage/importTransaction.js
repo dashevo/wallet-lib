@@ -10,10 +10,10 @@ const { FETCHED_UNCONFIRMED_TRANSACTION, FETCHED_CONFIRMED_TRANSACTION } = requi
 const importTransaction = function importTransaction(transaction) {
   const self = this;
   if (!is.transactionObj(transaction)) throw new InvalidTransactionObject(transaction);
-  const { store } = this;
+  const { store, network } = this;
 
   const transactionStore = store.transactions;
-  const currBlockheight = store.chains[this.network].blockheight;
+  const currBlockheight = store.chains[network].blockheight;
   const transactionsIds = Object.keys(transactionStore);
 
   if (!transactionsIds.includes(transaction.txid)) {
