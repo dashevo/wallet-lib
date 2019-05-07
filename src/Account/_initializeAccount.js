@@ -82,7 +82,7 @@ async function _initializeAccount(account, userUnsafePlugins) {
           return res(true);
         }
       }
-    });
+    }, 600);
 
     self.events.emit(EVENTS.STARTED);
   });
