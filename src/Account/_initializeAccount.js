@@ -70,10 +70,12 @@ async function _initializeAccount(account, userUnsafePlugins) {
         clearInterval(self.readinessInterval);
         if (account.hasPlugins([BIP44Worker, SyncWorker])) {
           recursivelyGenerateAddresses()
+            .then(() => {
+              sendReady();
+              return res(true);
+            })
             .catch(() => {
               console.error('Unable to generate addresses');
-            })
-            .finally(() => {
               sendReady();
               return res(true);
             });
