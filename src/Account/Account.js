@@ -37,6 +37,7 @@ const getBIP44Path = require('./getBIP44Path');
 const getDAP = require('./getDAP');
 const getNetwork = require('./getNetwork');
 const getPlugin = require('./getPlugin');
+const getWorker = require('./getWorker');
 const getPrivateKeys = require('./getPrivateKeys');
 const getTransaction = require('./getTransaction');
 const getTransactionHistory = require('./getTransactionHistory');
@@ -66,6 +67,7 @@ class Account {
       getBIP44Path,
       getDAP,
       getPlugin,
+      getWorker,
       getPrivateKeys,
       getTransaction,
       getTransactionHistory,
