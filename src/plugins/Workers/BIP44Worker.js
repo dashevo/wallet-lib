@@ -116,7 +116,7 @@ class BIP44Worker extends Worker {
       const startingIndex = index;
       const lastIndex = addressToGenerate + startingIndex;
       if (lastIndex > startingIndex) {
-        for (let i = startingIndex; i <= lastIndex; i++) {
+        for (let i = startingIndex; i <= lastIndex; i += 1) {
           this.getAddress(i, 'external');
           generated += 1;
           if (walletType === WALLET_TYPES.HDWALLET) {
