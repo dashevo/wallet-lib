@@ -46,6 +46,7 @@ const getUTXOS = require('./getUTXOS');
 const injectPlugin = require('./injectPlugin');
 const sign = require('./sign');
 const updateNetwork = require('./updateNetwork');
+const hasPlugins = require('./hasPlugins');
 
 class Account {
   constructor(wallet, opts = defaultOptions) {
@@ -74,6 +75,7 @@ class Account {
       injectPlugin,
       sign,
       updateNetwork,
+      hasPlugins,
     });
     if (!wallet || wallet.constructor.name !== Wallet.name) throw new Error('Expected wallet to be passed as param');
     if (!_.has(wallet, 'walletId')) throw new Error('Missing walletID to create an account');
