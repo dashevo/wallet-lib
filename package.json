@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint src/*",
     "lint:fix": "eslint . --fix",
-    "test": "nyc mocha test/ --recursive && npm run size",
+    "test": "nyc mocha test/ --recursive",
     "size": "size-limit",
     "size:why": "size-limit --why"
   },
