@@ -3,7 +3,7 @@ const {
   InjectionErrorCannotInject,
   InjectionErrorCannotInjectUnknownDependency,
 } = require('../errors/index');
-const {is} = require('../utils');
+const { is } = require('../utils');
 /**
  * Will try to inject a given plugin. If needed, it will construct the object first (new).
  * @param UnsafePlugin - Either a child object, or it's parent class to inject
@@ -12,9 +12,9 @@ const {is} = require('../utils');
  * @return {Promise<*>}
  */
 module.exports = async function injectPlugin(
-    UnsafePlugin,
-    allowSensitiveOperations = false,
-    awaitOnInjection = true,
+  UnsafePlugin,
+  allowSensitiveOperations = false,
+  awaitOnInjection = true,
 ) {
   // TODO : Only called internally, it might be worth to remove public access to it.
   // For now, it helps us on debugging
@@ -28,7 +28,7 @@ module.exports = async function injectPlugin(
     if (_.isEmpty(plugin)) rej(new InjectionErrorCannotInject(pluginName, 'Empty plugin'));
 
     // All plugins will require the event object
-    const {pluginType} = plugin;
+    const { pluginType } = plugin;
 
     plugin.inject('events', self.events);
 
