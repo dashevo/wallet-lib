@@ -2,11 +2,18 @@ const DashPlatformProtocol = require('@dashevo/dpp');
 const { Transaction } = require('@dashevo/dashcore-lib');
 const StandardPlugin = require('./StandardPlugin');
 
+const defaultOpts = {
+  schema: null,
+  verifyOnInjected: true,
+  isValid: false,
+};
+
 class DAP extends StandardPlugin {
   constructor(opts) {
     super(Object.assign({ type: 'DAP' }, opts));
-    this.schema = (opts.schema) ? opts.schema : null;
-    this.isValid = false;
+    this.schema = (opts.schema !== undefined) ? opts.schema : defaultOpts.schema;
+    this.verifyOnInjected = (opts.verifyOnInjected !== undefined) ? opts.verifyOnInjected : defaultOpts.verifyOnInjected;
+    this.isValid = (opts.isValid !== undefined) ? opts.isValid : defaultOpts.isValid;
   }
 
   initDPP() {

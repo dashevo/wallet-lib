@@ -91,7 +91,7 @@ module.exports = async function injectPlugin(
       else plugin.onInjected();
     }
 
-    if (pluginType === 'DAP') {
+    if (pluginType === 'DAP' && plugin.verifyOnInjected) {
       await plugin.verifyDAP(this.transport.transport);
     }
 
