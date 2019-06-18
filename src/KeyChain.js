@@ -105,7 +105,7 @@ class KeyChain {
    * Return a safier root path to derivate from
    *
    */
-  getFeatureHardenedPath() {
+  getHardenedFeaturePath() {
     const pathRoot = (this.network.toString() === 'testnet') ? BIP44_TESTNET_ROOT_PATH : BIP44_LIVENET_ROOT_PATH;
     return this.generateKeyForPath(pathRoot);
   }
