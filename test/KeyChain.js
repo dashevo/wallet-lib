@@ -8,10 +8,9 @@ const mnemonic = 'during develop before curtain hazard rare job language become 
 const pk = '4226d5e2fe8cbfe6f5beb7adf5a5b08b310f6c4a67fc27826779073be6f5699e';
 describe('Keychain', () => {
   it('should create a keychain', () => {
-    const expectedException1 = 'Expect some parameters to construct keychain';
+    const expectedException1 = 'Expect privateKey, HDPublicKey or HDPrivateKey';
     expect(() => new KeyChain()).to.throw(expectedException1);
-    const expectedException2 = 'Bad arguments. Cannot construct keychain.';
-    expect(() => new KeyChain(mnemonic)).to.throw(expectedException2);
+    expect(() => new KeyChain(mnemonic)).to.throw(expectedException1);
 
     keychain = new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(mnemonic, 'testnet') });
     expect(keychain.type).to.equal('HDPrivateKey');

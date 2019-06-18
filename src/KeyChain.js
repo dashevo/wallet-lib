@@ -4,17 +4,18 @@ const {
 const { has } = require('lodash');
 const { BIP44_TESTNET_ROOT_PATH, BIP44_LIVENET_ROOT_PATH } = require('./CONSTANTS');
 
-const defaultOpts = {
-  network: Networks.testnet,
+// eslint-disable-next-line no-underscore-dangle
+const _defaultOpts = {
+  network: Networks.testnet.toString(),
   keys: {},
 };
 
 class KeyChain {
-  constructor(opts) {
+  constructor(opts = JSON.parse(JSON.stringify(_defaultOpts))) {
+    const defaultOpts = JSON.parse(JSON.stringify(_defaultOpts));
     this.network = defaultOpts.network;
     this.keys = Object.assign({}, defaultOpts.keys);
 
-    if (!opts) throw new Error('Expect some parameters to construct keychain');
     if (has(opts, 'HDPrivateKey')) {
       this.type = 'HDPrivateKey';
       this.HDPrivateKey = opts.HDPrivateKey;
@@ -27,13 +28,13 @@ class KeyChain {
       this.type = 'privateKey';
       this.privateKey = opts.privateKey;
     } else {
-      throw new Error('Bad arguments. Cannot construct keychain.');
+      throw new Error('Expect privateKey, HDPublicKey or HDPrivateKey');
     }
     if (opts.network) this.network = opts.network;
     if (opts.keys) this.keys = Object.assign({}, opts.keys);
   }
 
-  updateNetwork(network = defaultOpts.network) {
+  updateNetwork(network = JSON.parse(JSON.stringify(_defaultOpts.network.toString()))) {
     this.network = network;
   }
 
