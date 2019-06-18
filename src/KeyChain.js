@@ -57,7 +57,7 @@ class KeyChain {
   getPrivateKey() {
     let pk;
     if (this.type === 'HDPrivateKey') {
-      pk = PrivateKey(this.HDPrivateKey);
+      pk = PrivateKey(this.HDPrivateKey.privateKey);
     }
     if (this.type === 'privateKey') {
       pk = PrivateKey(this.privateKey);
