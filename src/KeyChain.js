@@ -1,5 +1,5 @@
 const {
-  PrivateKey, HDPublicKey, crypto, Transaction, Networks,
+  PrivateKey, HDPublicKey, HDPrivateKey, crypto, Transaction, Networks,
 } = require('@dashevo/dashcore-lib');
 const { has } = require('lodash');
 const { BIP44_TESTNET_ROOT_PATH, BIP44_LIVENET_ROOT_PATH } = require('./CONSTANTS');
@@ -12,7 +12,7 @@ const defaultOpts = {
 class KeyChain {
   constructor(opts) {
     this.network = defaultOpts.network;
-    this.keys = defaultOpts.keys;
+    this.keys = Object.assign({}, defaultOpts.keys);
 
     if (!opts) throw new Error('Expect some parameters to construct keychain');
     if (has(opts, 'HDPrivateKey')) {
@@ -30,7 +30,7 @@ class KeyChain {
       throw new Error('Bad arguments. Cannot construct keychain.');
     }
     if (opts.network) this.network = opts.network;
-    if (opts.keys) this.keys = opts.keys;
+    if (opts.keys) this.keys = Object.assign({}, opts.keys);
   }
 
   updateNetwork(network = defaultOpts.network) {
@@ -94,14 +94,14 @@ class KeyChain {
     }
     if (!this.keys[path]) {
       if (this.type === 'HDPrivateKey') {
-        this.keys[path] = this.generateKeyForPath(path, type);
+        this.keys[path] = this.generateKeyForPath(path, type).toString();
       }
       if (this.type === 'privateKey') {
-        this.keys[path] = this.getPrivateKey(path);
+        this.keys[path] = this.getPrivateKey(path).toString();
       }
     }
 
-    return this.keys[path];
+    return new HDPrivateKey(this.keys[path]);
   }
 
   /**
