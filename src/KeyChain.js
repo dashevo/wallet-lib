@@ -11,22 +11,25 @@ const defaultOpts = {
 
 class KeyChain {
   constructor(opts) {
+    this.network = defaultOpts.network;
+    this.keys = defaultOpts.keys;
+
     if (!opts) throw new Error('Expect some parameters to construct keychain');
     if (has(opts, 'HDPrivateKey')) {
       this.type = 'HDPrivateKey';
       this.HDPrivateKey = opts.HDPrivateKey;
+      this.network = this.HDPrivateKey.network;
     } else if (has(opts, 'HDPublicKey')) {
       this.type = 'HDPublicKey';
       this.HDPublicKey = opts.HDPublicKey;
+      this.network = this.HDPublicKey.network;
     } else if (has(opts, 'privateKey')) {
       this.type = 'privateKey';
       this.privateKey = opts.privateKey;
     } else {
       throw new Error('Bad arguments. Cannot construct keychain.');
     }
-    this.network = defaultOpts.network;
     if (opts.network) this.network = opts.network;
-    this.keys = defaultOpts.keys;
     if (opts.keys) this.keys = opts.keys;
   }
 
