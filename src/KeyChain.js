@@ -2,6 +2,7 @@ const {
   PrivateKey, HDPublicKey, crypto, Transaction, Networks,
 } = require('@dashevo/dashcore-lib');
 const { has } = require('lodash');
+const { BIP44_TESTNET_ROOT_PATH, BIP44_LIVENET_ROOT_PATH } = require('./CONSTANTS');
 
 const defaultOpts = {
   network: Networks.testnet,
@@ -27,6 +28,10 @@ class KeyChain {
     if (opts.network) this.network = opts.network;
     this.keys = defaultOpts.keys;
     if (opts.keys) this.keys = opts.keys;
+  }
+
+  updateNetwork(network = defaultOpts.network) {
+    this.network = network;
   }
 
   /**
@@ -101,7 +106,8 @@ class KeyChain {
    *
    */
   getFeatureHardenedPath() {
-    return this.generateKeyForPath('');
+    const pathRoot = (this.network.toString() === 'testnet') ? BIP44_TESTNET_ROOT_PATH : BIP44_LIVENET_ROOT_PATH;
+    return this.generateKeyForPath(pathRoot);
   }
 
   /**
