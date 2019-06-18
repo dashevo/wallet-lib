@@ -5,6 +5,7 @@ const { is, dashToDuffs } = require('../../utils/index');
 // Here to avoid asking to much to the network when doing a nodemon for the tests.
 // Probably will require to mock the test part.
 
+// eslint-disable-next-line no-underscore-dangle
 const _defaultOpts = {
   uris: {
     insight: {
@@ -40,6 +41,8 @@ class InsightClient {
   }
 
   setSocketURI(uri) {
+    const defaultOpts = JSON.parse(JSON.stringify(_defaultOpts));
+
     this.socketUri = (uri) || (defaultOpts.uris.sockets[this.network]);
     if (this.useSocket) {
       if (this.socket) {
@@ -60,6 +63,7 @@ class InsightClient {
   }
 
   setInsightURI(uri) {
+    const defaultOpts = JSON.parse(JSON.stringify(_defaultOpts));
     this.insightUri = (uri) || defaultOpts.uris.insight[this.network];
     return true;
   }

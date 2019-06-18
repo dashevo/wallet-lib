@@ -1,5 +1,5 @@
 const DAPIClient = require('@dashevo/dapi-client');
-const {is, hasProp} = require('../utils/index');
+const { is, hasProp } = require('../utils/index');
 const InsightClient = require('../transports/Insight/insightClient');
 
 
@@ -50,7 +50,7 @@ class Transporter {
           // TODO : Remove me toward release
           if (transportArg === 'dapi') {
             transport = new DAPIClient({
-              seeds: [{service: '18.237.69.61:3000'}],
+              seeds: [{ service: '18.237.69.61:3000' }],
               timeout: 20000,
               retries: 5,
             });
@@ -85,7 +85,7 @@ class Transporter {
           return e;
       }
     } else if (e && e.response && e.response.data) {
-      const {status, error} = e.response.data;
+      const { status, error } = e.response.data;
       switch (status) {
         case 429:
           if (error === 'Rate limit exceeded') {
@@ -182,7 +182,7 @@ class Transporter {
         return this.transport.network;
       }
       if (this.transport.getNetwork) {
-        return this.transport.getNetwork()
+        return this.transport.getNetwork();
       }
     }
     return null;
