@@ -1,7 +1,12 @@
 const {
-  PrivateKey, HDPublicKey, crypto, Transaction,
+  PrivateKey, HDPublicKey, crypto, Transaction, Networks,
 } = require('@dashevo/dashcore-lib');
 const { has } = require('lodash');
+
+const defaultOpts = {
+  network: Networks.testnet,
+  keys: {},
+};
 
 class KeyChain {
   constructor(opts) {
@@ -15,10 +20,13 @@ class KeyChain {
     } else if (has(opts, 'privateKey')) {
       this.type = 'privateKey';
       this.privateKey = opts.privateKey;
+    } else {
+      throw new Error('Bad arguments. Cannot construct keychain.');
     }
-    this.keys = {
-
-    };
+    this.network = defaultOpts.network;
+    if (opts.network) this.network = opts.network;
+    this.keys = defaultOpts.keys;
+    if (opts.keys) this.keys = opts.keys;
   }
 
   /**
@@ -89,6 +97,14 @@ class KeyChain {
   }
 
   /**
+   * Return a safier root path to derivate from
+   *
+   */
+  getFeatureHardenedPath() {
+    return this.generateKeyForPath('');
+  }
+
+  /**
    * Generate a key by deriving it's direct child
    * @param index - {Number}
    * @return {HDPrivateKey | HDExtPublicKey}
@@ -119,4 +135,5 @@ class KeyChain {
     return obj;
   }
 }
+
 module.exports = KeyChain;
