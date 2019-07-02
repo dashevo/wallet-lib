@@ -19,7 +19,7 @@ describe('Transporter', () => {
     const transporterDAPI2 = new Transporter(dapiClient);
     const transporterInsight2 = new Transporter(insightClient);
     expect(transporterDAPI2.isValid).to.equal(true);
-    expect(transporterInsight2.isValid).to.equal(true);
+    expect(transporterInsight2.isValid).to.equal(false);
 
     const fakeTransportPlugin = {};
     [...pluginRequiredKeys]
