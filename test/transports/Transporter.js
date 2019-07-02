@@ -3,7 +3,7 @@ const DAPIClient = require('@dashevo/dapi-client');
 const Transporter = require('../../src/transports/Transporter');
 const InsightClient = require('../../src/transports/Insight/insightClient');
 
-const pluginRequiredKeys = ['getAddressSummary', 'getTransaction', 'getUTXO', 'subscribeToAddresses', 'closeSocket', 'sendRawTransaction'];
+const pluginRequiredKeys = ['getAddressSummary', 'getTransactionById', 'getUTXO', 'subscribeToAddresses', 'closeSocket', 'sendRawTransaction'];
 
 describe('Transporter', () => {
   it('should create a new transporter', () => {
