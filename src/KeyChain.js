@@ -64,7 +64,8 @@ class KeyChain {
     if (!['HDPrivateKey', 'HDPublicKey'].includes(this.type)) {
       throw new Error('Wallet is not loaded from a mnemonic or a HDPubKey, impossible to derivate child');
     }
-    const hdPublicKey = this.HDPublicKey.deriveChild(index);
+    const HDKey = this[this.type];
+    const hdPublicKey = HDKey.deriveChild(index);
     if (type === 'HDPublicKey') return HDPublicKey(hdPublicKey);
     return hdPublicKey;
   }
