@@ -1,10 +1,8 @@
 const { expect } = require('chai');
-const Dashcore = require('@dashevo/dashcore-lib');
 const mockedStore = require('../fixtures/sirentonight-fullstore-snapshot-1562711703');
 const getBalance = require('../../src/Account/getBalance');
 
 
-let wallet;
 let mockedWallet;
 describe('Account - getBalance', () => {
   before(() => {
