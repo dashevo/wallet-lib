@@ -1,10 +1,10 @@
 const WalletLibError = require('./WalletLibError');
 
-class UnknownDAP extends WalletLibError {
-  constructor(dapName) {
-    const getErrorMessageOf = () => `Unknown DAP : ${dapName}.`;
+class UnknownDPA extends WalletLibError {
+  constructor(dpaName) {
+    const getErrorMessageOf = () => `Unknown DPA : ${dpaName}.`;
     super(getErrorMessageOf());
   }
 }
 
-module.exports = UnknownDAP;
+module.exports = UnknownDPA;

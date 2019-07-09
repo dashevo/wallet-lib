@@ -1,18 +1,18 @@
 const {
-  UnknownDAP,
+  UnknownDPA,
 } = require('../errors/index');
 /**
  * Get a worker by it's name
- * @param dapName
+ * @param dpaName
  * @return {*}
  */
-function getDAP(dapName) {
-  const loweredDapName = dapName.toLowerCase();
-  const dapsList = Object.keys(this.plugins.workers).map(key => key.toLowerCase());
-  if (dapsList.includes(loweredDapName)) {
-    return this.plugins.workers[loweredDapName];
+function getDPA(dpaName) {
+  const loweredDPAName = dpaName.toLowerCase();
+  const dpaList = Object.keys(this.plugins.workers).map(key => key.toLowerCase());
+  if (dpaList.includes(loweredDPAName)) {
+    return this.plugins.workers[loweredDPAName];
   }
-  throw new UnknownDAP(loweredDapName);
+  throw new UnknownDPA(loweredDPAName);
 }
 
-module.exports = getDAP;
+module.exports = getDPA;
