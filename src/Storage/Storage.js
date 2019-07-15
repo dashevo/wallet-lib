@@ -5,6 +5,7 @@ const CONSTANTS = require('../CONSTANTS');
 const addNewTxToAddress = require('./addNewTxToAddress');
 const addUTXOToAddress = require('./addUTXOToAddress');
 const announce = require('./announce');
+const calculateDuffBalance = require('./calculateDuffBalance');
 const clearAll = require('./clearAll');
 const configure = require('./configure');
 const createChain = require('./createChain');
@@ -53,6 +54,7 @@ class Storage {
       addNewTxToAddress,
       addUTXOToAddress,
       announce,
+      calculateDuffBalance,
       clearAll,
       configure,
       createChain,
