@@ -15,8 +15,8 @@ const wallet = new Wallet({
 
 const account = wallet.getAccount();
 const start = async () => {
-  console.log('Balance Conf', await account.getBalance(false, false));
-  console.log('Balance Unconf', await account.getBalance(true, false));
+  console.log('Balance Conf', await account.getConfirmedBalance(false, false));
+  console.log('Balance Unconf', await account.getUnconfirmedBalance(true, false));
   console.log('New Addr', await account.getUnusedAddress().address);
 };
 account.events.on(EVENTS.GENERATED_ADDRESS, (info) => { console.log('GENERATED_ADDRESS'); });

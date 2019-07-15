@@ -29,7 +29,9 @@ const start = async () => {
   //
   // },2000)
 
-  console.log(account.getBalance());
+  console.log(account.getTotalBalance());
+  console.log(account.getConfirmedBalance());
+  console.log(account.getUnconfirmedBalance());
   console.log(account.getUTXOS());
   console.log(account.getUnusedAddress());
 };

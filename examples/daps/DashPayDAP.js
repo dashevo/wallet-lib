@@ -9,7 +9,7 @@ class DashPayDAP extends DAP {
     super({
       dependencies: [
         'getUTXOS',
-        'getBalance',
+        'getConfirmedBalance',
         'getUnusedAddress',
         'sign',
         'broadcastTransaction',
@@ -32,7 +32,7 @@ class DashPayDAP extends DAP {
    */
   async registerUsername(blockchainUsername, funding = 10000) {
     const { address } = this.getUnusedAddress();
-    const balance = await this.getBalance();
+    const balance = await this.getConfirmedBalance();
 
     if (balance === 0) throw new Error('Insufficient funds');
 
