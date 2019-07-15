@@ -1,15 +1,16 @@
-const { expect } = require('chai');
+const {expect} = require('chai');
 const mockedStore = require('../fixtures/sirentonight-fullstore-snapshot-1562711703');
 const getTotalBalance = require('../../src/Account/getTotalBalance');
 const getConfirmedBalance = require('../../src/Account/getConfirmedBalance');
 const getUnconfirmedBalance = require('../../src/Account/getUnconfirmedBalance');
-
+const calculateDuffBalance = require('../../src/Storage/calculateDuffBalance');
 
 let mockedWallet;
 describe('Account - getTotalBalance', () => {
   before(() => {
     const storageHDW = {
       store: mockedStore,
+      calculateDuffBalance,
       getStore: () => mockedStore,
       mappedAddress: {},
     };
@@ -29,10 +30,12 @@ describe('Account - getTotalBalance', () => {
     expect(balance).to.equal(184499999506);
   });
   it('should correctly get the balance dash value instead of duff', async () => {
-    const balanceUnconfDash = await getUnconfirmedBalance.call(mockedWallet,false);
+    const balanceTotalDash = await getTotalBalance.call(mockedWallet, false);
+    const balanceUnconfDash = await getUnconfirmedBalance.call(mockedWallet, false);
     const balanceConfDash = await getConfirmedBalance.call(mockedWallet, false);
 
-    expect(balanceUnconfDash).to.equal(1844.99999506);
+    expect(balanceTotalDash).to.equal(1844.99999506);
+    expect(balanceUnconfDash).to.equal(0);
     expect(balanceConfDash).to.equal(1844.99999506);
   });
 });

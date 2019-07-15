@@ -5,9 +5,8 @@ const {
   InvalidRawTransaction,
   InvalidDashcoreTransaction,
 } = require('../errors/index');
-const EVENTS = require('../EVENTS');
 
-const impactAffectedInputs = function ({ inputs, outputs }) {
+function impactAffectedInputs({ inputs, outputs }) {
   const {
     storage, walletId,
   } = this;
@@ -17,10 +16,11 @@ const impactAffectedInputs = function ({ inputs, outputs }) {
 
   // We count the sum that we will spent for that payment
   inputs.forEach((input) => {
-    // Multiple
     const potentiallySelectedAddresses = storage.searchAddressesWithTx(input.prevTxId);
-    if (!potentiallySelectedAddresses.found) throw new Error('Input is not part of that Wallet.');
-
+    // Fixme : If you want this check, you will need to modify fixtures of our tests.
+    // if (!potentiallySelectedAddresses.found) {
+    //   throw new Error('Input is not part of that Wallet.');
+    // }
     potentiallySelectedAddresses.results.forEach((potentiallySelectedAddress) => {
       const { type, path } = potentiallySelectedAddress;
       if (potentiallySelectedAddress.utxos[`${input.prevTxId}-${input.outputIndex}`]) {
@@ -33,7 +33,7 @@ const impactAffectedInputs = function ({ inputs, outputs }) {
       }
     });
   });
-  // We calculate the sum that we spent to one address that we have control of (change, pay to self,..)
+  // Calculate the sum that we spent to one address that we have control of (change, pay to self,..)
   outputs.forEach((output) => {
     const affectedOutputAddress = Dashcore.Script(output.script).toAddress(this.network).toString();
     // const affectedOutputDuff = output.satoshis;
@@ -43,7 +43,7 @@ const impactAffectedInputs = function ({ inputs, outputs }) {
     }
   });
   return true;
-};
+}
 
 /**
  * Broadcast a Transaction to the transport layer

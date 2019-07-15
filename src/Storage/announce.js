@@ -13,7 +13,6 @@ const announce = function (type, el) {
     case EVENTS.UNCONFIRMED_BALANCE_CHANGED:
     case EVENTS.FETCHED_UNCONFIRMED_TRANSACTION:
     case EVENTS.FETCHED_CONFIRMED_TRANSACTION:
-      console.log('ANnounce', type, el);
       this.events.emit(type, el);
       break;
     default:
