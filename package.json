@@ -29,7 +29,7 @@
     "@dashevo/dapi-client": "^0.6.2",
     "@dashevo/dashcore-lib": "^0.17.6",
     "@dashevo/dpp": "^0.7.1",
-    "axios": "^0.18.0",
+    "axios": "^0.19.0",
     "localforage": "^1.7.3",
     "lodash": "^4.17.11",
     "socket.io-client": "^2.2.0"
