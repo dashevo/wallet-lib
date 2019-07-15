@@ -13,7 +13,7 @@ const start = async () => {
   console.log('Balance Unconf', await account.getUnconfirmedBalance( false));
   console.log('New Addr', await account.getUnusedAddress());
 };
-account.events.on(EVENTS.CONFIRMED_BALANCE_CHANGED, (info) => { console.log('Balance Changed', info, info.delta); });
+account.events.on(EVENTS.CONFIRMED_BALANCE_CHANGED, (info) => { console.log('CONFIRMED_BALANCE_CHANGED', info, info.delta); });
 account.events.on(EVENTS.UNCONFIRMED_BALANCE_CHANGED, (info) => { console.log('UNCONFIRMED_BALANCE_CHANGED', info); });
 account.events.on(EVENTS.READY, start);
 account.events.on(EVENTS.BLOCKHEIGHT_CHANGED, info => console.log(info));
