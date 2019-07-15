@@ -6,15 +6,12 @@ const {
   InvalidDashcoreTransaction,
 } = require('../errors/index');
 
-function impactAffectedInputs({ inputs, outputs }) {
+function impactAffectedInputs({ inputs }) {
   const {
     storage, walletId,
   } = this;
 
-  // let sumSpent = 0;
-  // let sumSentToSelf = 0;
-
-  // We count the sum that we will spent for that payment
+  // We iterate out input to substract their balance.
   inputs.forEach((input) => {
     const potentiallySelectedAddresses = storage.searchAddressesWithTx(input.prevTxId);
     // Fixme : If you want this check, you will need to modify fixtures of our tests.
@@ -26,22 +23,13 @@ function impactAffectedInputs({ inputs, outputs }) {
       if (potentiallySelectedAddress.utxos[`${input.prevTxId}-${input.outputIndex}`]) {
         const inputUTXO = potentiallySelectedAddress.utxos[`${input.prevTxId}-${input.outputIndex}`];
         const address = storage.store.wallets[walletId].addresses[type][path];
-        // sumSpent += inputUTXO.satoshis;
         // Todo: This modify the balance of an address, we need a std method to do that instead.
         address.balanceSat -= inputUTXO.satoshis;
         delete address.utxos[`${input.prevTxId}-${input.outputIndex}`];
       }
     });
   });
-  // Calculate the sum that we spent to one address that we have control of (change, pay to self,..)
-  outputs.forEach((output) => {
-    const affectedOutputAddress = Dashcore.Script(output.script).toAddress(this.network).toString();
-    // const affectedOutputDuff = output.satoshis;
-    const isSelfAddress = storage.searchAddress(affectedOutputAddress).found;
-    if (isSelfAddress) {
-      // sumSentToSelf += affectedOutputDuff;
-    }
-  });
+
   return true;
 }
 
@@ -72,9 +60,9 @@ async function broadcastTransaction(transaction, isIs = false) {
   }
   // We now need to impact/update our affected inputs
   // so we clear them out from UTXOset.
-  const { inputs, outputs } = new Dashcore.Transaction(transaction).toObject();
+  const { inputs } = new Dashcore.Transaction(transaction).toObject();
   impactAffectedInputs.call(this, {
-    inputs, outputs,
+    inputs,
   });
 
   return txid;
