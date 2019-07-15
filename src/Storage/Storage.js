@@ -21,7 +21,7 @@ const importTransactions = require('./importTransactions');
 const rehydrateState = require('./rehydrateState');
 const saveState = require('./saveState');
 const searchAddress = require('./searchAddress');
-const searchAddressWithTx = require('./searchAddressWithTx');
+const searchAddressesWithTx = require('./searchAddressesWithTx');
 const searchTransaction = require('./searchTransaction');
 const searchWallet = require('./searchWallet');
 const updateAddress = require('./updateAddress');
@@ -68,7 +68,7 @@ class Storage {
       rehydrateState,
       saveState,
       searchAddress,
-      searchAddressWithTx,
+      searchAddressesWithTx,
       searchTransaction,
       searchWallet,
       updateAddress,
