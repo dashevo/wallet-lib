@@ -9,10 +9,11 @@ const EVENTS = require('../EVENTS');
 const announce = function (type, el) {
   if (!this.events) return false;
   switch (type) {
-    case EVENTS.BALANCE_CHANGED:
+    case EVENTS.CONFIRMED_BALANCE_CHANGED:
     case EVENTS.UNCONFIRMED_BALANCE_CHANGED:
     case EVENTS.FETCHED_UNCONFIRMED_TRANSACTION:
     case EVENTS.FETCHED_CONFIRMED_TRANSACTION:
+      console.log('ANnounce', type, el);
       this.events.emit(type, el);
       break;
     default:

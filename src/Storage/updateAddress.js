@@ -70,7 +70,7 @@ const updateAddress = function (addressObj, walletId) {
   if (previousObject === undefined) {
     if (newObject.balanceSat > 0) {
       this.announce(
-        EVENTS.BALANCE_CHANGED,
+        EVENTS.CONFIRMED_BALANCE_CHANGED,
         {
           currentValue: newObject.balanceSat,
           delta: newObject.balanceSat,
@@ -86,7 +86,7 @@ const updateAddress = function (addressObj, walletId) {
   } else {
     if (previousObject.balanceSat !== newObject.balanceSat) {
       this.announce(
-        EVENTS.BALANCE_CHANGED,
+        EVENTS.CONFIRMED_BALANCE_CHANGED,
         {
           delta: newObject.balanceSat - previousObject.balanceSat,
           currentValue: newObject.balanceSat,
@@ -94,6 +94,7 @@ const updateAddress = function (addressObj, walletId) {
       );
     }
     if (previousObject.unconfirmedBalanceSat !== newObject.unconfirmedBalanceSat) {
+      console.log('CAS 3', previousObject, newObject)
       this.announce(EVENTS.UNCONFIRMED_BALANCE_CHANGED,
         {
           delta: newObject.unconfirmedBalanceSat - previousObject.unconfirmedBalanceSat,
