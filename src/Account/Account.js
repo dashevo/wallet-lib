@@ -36,7 +36,7 @@ const getConfirmedBalance = require('./getConfirmedBalance');
 const getUnconfirmedBalance = require('./getUnconfirmedBalance');
 const getTotalBalance = require('./getTotalBalance');
 const getBIP44Path = require('./getBIP44Path');
-const getDAP = require('./getDAP');
+const getDPA = require('./getDPA');
 const getNetwork = require('./getNetwork');
 const getPlugin = require('./getPlugin');
 const getWorker = require('./getWorker');
@@ -69,7 +69,7 @@ class Account {
       getUnconfirmedBalance,
       getTotalBalance,
       getBIP44Path,
-      getDAP,
+      getDPA,
       getPlugin,
       getWorker,
       getPrivateKeys,
@@ -140,7 +140,7 @@ class Account {
 
     this.plugins = {
       workers: {},
-      daps: {},
+      DPAs: {},
       standard: {},
       watchers: {},
     };
