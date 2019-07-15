@@ -9,8 +9,8 @@ const wallet = new Wallet({
 
 const account = wallet.getAccount();
 const start = async () => {
-  console.log('Balance Conf', await account.getConfirmedBalance(false, false));
-  console.log('Balance Unconf', await account.getUnconfirmedBalance(true, false));
+  console.log('Balance Conf', await account.getConfirmedBalance( false));
+  console.log('Balance Unconf', await account.getUnconfirmedBalance( false));
   console.log('New Addr', await account.getUnusedAddress());
 };
 account.events.on(EVENTS.CONFIRMED_BALANCE_CHANGED, (info) => { console.log('Balance Changed', info, info.delta); });
