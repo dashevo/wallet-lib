@@ -1,5 +1,5 @@
 const Dashcore = require('@dashevo/dashcore-lib');
-const {is} = require('../utils/index');
+const { is } = require('../utils/index');
 
 /**
  * Will update network of a Wallet and child accounts
