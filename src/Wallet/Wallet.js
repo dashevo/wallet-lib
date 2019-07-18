@@ -67,7 +67,10 @@ class Wallet {
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
 
     if (!(is.network(network))) throw new Error('Expected a valid network (typeof String)');
-    this.network = Dashcore.Networks[network];
+    if (!Dashcore.Networks[network]) {
+      throw new Error(`Un-handled network: ${network}`);
+    }
+    this.network = Dashcore.Networks[network].toString();
 
     if ('mnemonic' in opts) {
       this.fromMnemonic(opts.mnemonic);
