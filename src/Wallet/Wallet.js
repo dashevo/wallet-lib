@@ -59,14 +59,14 @@ class Wallet {
       exportWallet,
     });
 
-    const network = _.has(opts, 'network') ? opts.network : defaultOptions.network;
+    const network = _.has(opts, 'network') ? opts.network.toString() : defaultOptions.network;
     const passphrase = _.has(opts, 'passphrase') ? opts.passphrase : defaultOptions.passphrase;
     this.passphrase = passphrase;
     this.offlineMode = _.has(opts, 'offlineMode') ? opts.offlineMode : defaultOptions.offlineMode;
     this.allowSensitiveOperations = _.has(opts, 'allowSensitiveOperations') ? opts.allowSensitiveOperations : defaultOptions.allowSensitiveOperations;
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
 
-    if (!(is.network(network))) throw new Error('Expected a valid network (typeof Network or String)');
+    if (!(is.network(network))) throw new Error('Expected a valid network (typeof String)');
     this.network = Dashcore.Networks[network];
 
     if ('mnemonic' in opts) {

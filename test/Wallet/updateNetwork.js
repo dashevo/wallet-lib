@@ -17,7 +17,7 @@ describe('Wallet - update network', () => {
       accounts: [{ updateNetwork: () => called += 1 }],
     };
     updateNetwork.call(self1, 'mainnet');
-    expect(self1.network).to.equal(Dashcore.Networks.mainnet);
+    expect(self1.network).to.equal(Dashcore.Networks.mainnet.toString());
     updateNetwork.call(self1, 'testnet');
     expect(self1.network).to.equal(Dashcore.Networks.testnet.toString());
 
