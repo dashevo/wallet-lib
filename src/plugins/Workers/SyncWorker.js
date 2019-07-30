@@ -9,7 +9,7 @@ const { UNCONFIRMED_TRANSACTION_STATUS_CODE, SECURE_TRANSACTION_CONFIRMATIONS_NB
 const _defaultOpts = {
   // Thoses are addresses that were used only once, and long time ago.
   // Low chance of receiving fund. We still check every ten minutes
-  slowFetchThresold: 10 * 60 * 1000,
+  slowFetchThresold: 5 * 60 * 1000,
   // Those are addresses that we consider standard, InstantSend promise a one minute time,
   // That is what we offer here (will be changed with streams)
   fetchThreshold: 60 * 1000,
