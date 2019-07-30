@@ -145,35 +145,25 @@ class SyncWorker extends Worker {
               || hasMostChanceToReceiveTx) && hasReachFastThreshold
           ) {
             shouldFetch = true;
-          } else if (!hasReachStandardThreshold) {
-            // Then, if we didn't even reach the standard refresh rate, we don't even care
-            shouldFetch = false;
-            return;
-          } else if (isUsed && address.transactions.length > 10 && hasReachStandardThreshold) {
+          } else if (!isUsed
+              && ((nbPreviousUsed <= 10 && hasReachStandardThreshold))
+          ) {
+            // The next 10 unused address got a standard threshold
             shouldFetch = true;
-          } else if (isUsed && address.transactions.length <= 10) {
-            // It might be a single used and throw address. Let's figure this out
-            let hasYoungTx = false;
-            for (const txId of address.transactions) {
-              // FIXME : It's temporary till we got stream, but in case of, we put this stamp.
-              // eslint-disable-next-line no-await-in-loop
-              const tx = await self.getTransaction(txId);
-              if (!tx || currBlockheight - tx.blockheight < 40000) {
-                hasYoungTx = true;
-                break;
-              }
-            }
-            if ((hasYoungTx && hasReachFastThreshold) || hasReachSlowThreshold) {
+          } else if (isUsed && address.transactions.length === 1) {
+            // Tis might be a single used and throw address. Let's figure tx age
+            // eslint-disable-next-line no-await-in-loop
+            const tx = await self.getTransaction(address.transactions[0]);
+            if (currBlockheight - tx.blockheight < 20000 && hasReachStandardThreshold) {
               shouldFetch = true;
             }
-          } else if (isUsed && address.transactions.length > 10 && hasReachStandardThreshold) {
-            shouldFetch = true;
-          } else if (!isUsed
-              && ((nbPreviousUsed <= 10 && hasReachStandardThreshold) || hasReachSlowThreshold)
-          ) {
+          } else if (isUsed && address.transactions.length > 1 && hasReachStandardThreshold){
             shouldFetch = true;
           }
 
+          if (hasReachSlowThreshold) {
+            shouldFetch = true;
+          }
           if (shouldFetch) {
             toFetchAddresses.push(address);
           }
