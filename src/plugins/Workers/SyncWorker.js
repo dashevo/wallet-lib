@@ -157,7 +157,7 @@ class SyncWorker extends Worker {
             if (currBlockheight - tx.blockheight < 20000 && hasReachStandardThreshold) {
               shouldFetch = true;
             }
-          } else if (isUsed && address.transactions.length > 1 && hasReachStandardThreshold){
+          } else if (isUsed && address.transactions.length > 1 && hasReachStandardThreshold) {
             shouldFetch = true;
           }
 
