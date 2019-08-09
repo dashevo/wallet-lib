@@ -46,16 +46,20 @@ async function _initializeAccount(account, userUnsafePlugins) {
       }
     });
 
+    self.events.emit(EVENTS.STARTED);
 
     const sendReady = () => {
       if (!self.isReady) {
+        self.events.emit(EVENTS.INITIALIZED);
         self.events.emit(EVENTS.READY);
         self.isReady = true;
       }
     };
 
-    // The need for this function is to pre-generate the address
-    // and doing so before syncworker execute.
+    // The need for this function is to pre-generate the address when syncWorker is also doing so
+    // We then ensure first syncWorker to do it's job (which will fetch all used address)
+    // and only then lookup for remaining needed 20 unused address.
+    // Without that, waiting a tick would result similarly.
     const recursivelyGenerateAddresses = async (isSyncWorkerActive = true) => {
       const bip44worker = account.getWorker('BIP44Worker');
 
@@ -103,8 +107,6 @@ async function _initializeAccount(account, userUnsafePlugins) {
           });
       }
     }, 600);
-
-    self.events.emit(EVENTS.STARTED);
   });
 }
 
