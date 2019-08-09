@@ -12,22 +12,27 @@ const mocks = {
   offlineMode: true,
 };
 
-const getMockedWalletInstance = () => new class Wallet {
-  constructor() {
-    this.walletId = '123456789';
-    this.accounts = [];
-    this.network = Dashcore.Networks.testnet;
-    this.storage = { store: {}, getStore: () => {} };
-  }
-}();
 
 describe('Account - class', () => {
+  before(() => {
+    mocks.wallet = (new (function Wallet() {
+      this.walletId = '1234567891';
+      this.accounts = [];
+      this.network = Dashcore.Networks.testnet;
+      this.storage = {
+        store: {},
+        getStore: () => {},
+        saveState: () => {},
+        stopWorker: () => {},
+      };
+    })());
+  });
   it('should be specify on missing params', () => {
     const expectedException1 = 'Expected wallet to be passed as param';
     expect(() => new Account()).to.throw(expectedException1);
   });
   it('should create an account', () => {
-    const mockWallet = getMockedWalletInstance();
+    const mockWallet = mocks.wallet;
     const account = new Account(mockWallet, { injectDefaultPlugins: false });
 
     expect(account).to.be.deep.equal(mockWallet.accounts[0]);
@@ -45,5 +50,7 @@ describe('Account - class', () => {
     });
     expect(account.readinessInterval.constructor.name).to.be.equal('Timeout');
     expect(account.readinessInterval._idleTimeout).to.be.equal(600);
+
+    account.disconnect();
   });
 });
