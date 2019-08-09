@@ -53,11 +53,17 @@ async function _initializeAccount(account, userUnsafePlugins) {
         self.isReady = true;
       }
     };
-    const recursivelyGenerateAddresses = async () => {
+
+    // The need for this function is to pre-generate the address
+    // and doing so before syncworker execute.
+    const recursivelyGenerateAddresses = async (isSyncWorkerActive = true) => {
       const bip44worker = account.getWorker('BIP44Worker');
-      const syncWorker = account.getWorker('syncWorker');
+
       const exec = async () => {
-        await syncWorker.execute();
+        if (isSyncWorkerActive) {
+          const syncWorker = account.getWorker('syncWorker');
+          await syncWorker.execute();
+        }
         return bip44worker.ensureEnoughAddress();
       };
       if (await exec() !== 0) return recursivelyGenerateAddresses();
@@ -78,21 +84,23 @@ async function _initializeAccount(account, userUnsafePlugins) {
         // We need to tweak it a little bit to have BIP44 ensuring address
         // while SyncWorker fetch'em on network
         clearInterval(self.readinessInterval);
-        if (account.hasPlugins([BIP44Worker, SyncWorker])) {
-          recursivelyGenerateAddresses()
-            .then(() => {
-              sendReady();
-              return res(true);
-            })
-            .catch(() => {
-              console.error('Unable to generate addresses');
-              sendReady();
-              return res(true);
-            });
-        } else {
-          sendReady();
-          return res(true);
+
+        const resultBIP44WorkerSearch = account.hasPlugins(BIP44Worker);
+        const resultSyncWorkerSearch = account.hasPlugins(SyncWorker);
+        const isSyncWorkerActive = resultSyncWorkerSearch.found;
+
+        if (!resultBIP44WorkerSearch.found) {
+          throw new Error('Unable to initialize. BIP44 Worker not found.');
         }
+        return recursivelyGenerateAddresses(isSyncWorkerActive)
+          .then(() => {
+            sendReady();
+            return res(true);
+          })
+          .catch((err) => {
+            console.log(err);
+            throw new Error(`Unable to generate addresses :${err}`);
+          });
       }
     }, 600);
 
