@@ -49,7 +49,7 @@ describe('Account - class', () => {
       workers: {}, DPAs: {}, standard: {}, watchers: {},
     });
     expect(account.readinessInterval.constructor.name).to.be.equal('Timeout');
-    expect(account.readinessInterval._idleTimeout).to.be.equal(600);
+    expect(account.readinessInterval._idleTimeout).to.be.equal(200);
 
     account.disconnect();
   });

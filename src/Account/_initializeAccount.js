@@ -8,6 +8,8 @@ const { WALLET_TYPES } = require('../CONSTANTS');
 // eslint-disable-next-line no-underscore-dangle
 async function _initializeAccount(account, userUnsafePlugins) {
   const self = account;
+  // We run faster in offlineMode to speed up the process when less happens.
+  const readinessIntervalTime = (account.offlineMode) ? 50 : 200;
   return new Promise((res) => {
     if (account.injectDefaultPlugins) {
       // TODO: Should check in other accounts if a similar is setup already
@@ -114,7 +116,7 @@ async function _initializeAccount(account, userUnsafePlugins) {
             throw new Error(`Unable to generate addresses :${err}`);
           });
       }
-    }, 600);
+    }, readinessIntervalTime);
   });
 }
 
