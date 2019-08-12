@@ -50,9 +50,14 @@ async function _initializeAccount(account, userUnsafePlugins) {
 
     const sendReady = () => {
       if (!self.isReady) {
-        self.events.emit(EVENTS.INITIALIZED);
         self.events.emit(EVENTS.READY);
         self.isReady = true;
+      }
+    };
+    const sendInitialized = () => {
+      if (!self.isInitialized) {
+        self.events.emit(EVENTS.INITIALIZED);
+        self.isInitialized = true;
       }
     };
 
@@ -84,6 +89,9 @@ async function _initializeAccount(account, userUnsafePlugins) {
         }
       });
       if (readyWorkers === watchedWorkers.length) {
+        // At this stage, our worker are initialized
+        sendInitialized();
+
         // If both of the plugins are present
         // We need to tweak it a little bit to have BIP44 ensuring address
         // while SyncWorker fetch'em on network
