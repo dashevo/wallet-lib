@@ -73,6 +73,7 @@ const CONSTANTS = {
     ],
     SAFE_PROPERTIES: [
       'events',
+      'offlineMode',
       'transport',
       'walletId',
     ],
