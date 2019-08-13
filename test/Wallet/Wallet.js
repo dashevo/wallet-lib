@@ -124,6 +124,9 @@ describe('Wallet - class', () => {
   it('should have an offline Mode', () => {
     const wallet = new Wallet(Object.assign({ offlineMode: true, privateKey: cR4t6ePrivateKey.privateKey, network: 'testnet' }, mocks));
     expect(wallet.offlineMode).to.equal(true);
+    wallet.storage.events.on('CONFIGURED', () => {
+      wallet.disconnect();
+    });
   });
 });
 describe('Wallet - Get/Create Account', () => {
