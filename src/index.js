@@ -1,4 +1,4 @@
-const Wallet = require('./types/Wallet/methods/Wallet');
+const Wallet = require('./types/Wallet/Wallet');
 const Account = require('./types/Account/Account');
 const EVENTS = require('./EVENTS');
 const CONSTANTS = require('./CONSTANTS');

@@ -1,6 +1,6 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const { expect } = require('chai');
-const Wallet = require('../../src/types/Wallet/methods/Wallet');
+const Wallet = require('../../src/types/Wallet/Wallet');
 const fromHDPublicKey = require('../../src/types/Wallet/methods/fromHDExtPublicKey');
 const gatherSail = require('../fixtures/gathersail');
 const { WALLET_TYPES } = require('../../src/CONSTANTS');

@@ -30,7 +30,7 @@ export declare type TransactionInfo<T extends object = object> = T & {
 };
 export declare type Plugins<T extends object = object> = T & {
     toString(): string;
-};
+};npm
 export declare type PublicAddress<T extends string = string> = T;
 export declare type Address<T extends object = object> = T & {
     toString(): string;
