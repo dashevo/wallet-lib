@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 
 const localForage = require('localforage');
-const Storage = require('../../src/Storage/Storage');
+const Storage = require('../../src/types/Storage/Storage');
 const { CONFIGURED } = require('../../src/EVENTS');
 const Dashcore = require('@dashevo/dashcore-lib');
 

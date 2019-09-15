@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
-const broadcastTransaction = require('../../src/Account/broadcastTransaction');
+const broadcastTransaction = require('../../src/types/Account/methods/broadcastTransaction');
 const validRawTxs = require('../fixtures/rawtx').valid;
 const invalidRawTxs = require('../fixtures/rawtx').invalid;
 

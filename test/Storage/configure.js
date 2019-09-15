@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const configure = require('../../src/Storage/configure');
+const configure = require('../../src/types/Storage/methods/configure');
 
 const noop = () => {};
 

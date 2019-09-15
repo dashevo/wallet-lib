@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
-const getTransactions = require('../../src/Account/getTransactions');
+const getTransactions = require('../../src/types/Account/methods/getTransactions');
 
 
 describe('Account - getTransactions', () => {

@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
-const searchWallet = require('../../src/Storage/searchWallet');
+const searchWallet = require('../../src/types/Storage/methods/searchWallet');
 
 describe('Storage - searchWallet', () => {
   it('should find a wallet', () => {

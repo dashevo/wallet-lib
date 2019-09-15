@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const importTransactions = require('../../src/Storage/importTransactions');
+const importTransactions = require('../../src/types/Storage/methods/importTransactions');
 
 describe('Storage - importTransactions', () => {
   it('should import an array of transaction', () => {

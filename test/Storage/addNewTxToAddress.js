@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const addNewTxToAddress = require('../../src/Storage/addNewTxToAddress');
+const addNewTxToAddress = require('../../src/types/Storage/methods/addNewTxToAddress');
 // const { fd7c727155ef67fd5c1d54b73dea869e9690c439570063d6e96fec1d3bba450e } = require('../fixtures/transactions').valid;
 
 // FIXME : We only use this method in one specific case : From the SyncWorker when receiving from the WSock from insight

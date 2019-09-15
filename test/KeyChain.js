@@ -1,6 +1,6 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const { expect } = require('chai');
-const KeyChain = require('../src/KeyChain');
+const KeyChain = require('../src/types/KeyChain');
 const { mnemonicToHDPrivateKey } = require('../src/utils/mnemonic');
 
 let keychain;

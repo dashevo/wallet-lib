@@ -1,6 +1,6 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const { expect } = require('chai');
-const fromMnemonic = require('../../src/Wallet/fromMnemonic');
+const fromMnemonic = require('../../src/types/Wallet/methods/fromMnemonic');
 const knifeFixture = require('../fixtures/knifeeasily');
 const { WALLET_TYPES } = require('../../src/CONSTANTS');
 

@@ -1,9 +1,9 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
-const getUnusedAddress = require('../../src/Account/getUnusedAddress');
-const getAddress = require('../../src/Account/getAddress');
-const generateAddress = require('../../src/Account/generateAddress');
-const KeyChain = require('../../src/KeyChain');
+const getUnusedAddress = require('../../src/types/Account/methods/getUnusedAddress');
+const getAddress = require('../../src/types/Account/methods/getAddress');
+const generateAddress = require('../../src/types/Account/methods/generateAddress');
+const KeyChain = require('../../src/types/KeyChain');
 
 const mockedStore = require('../fixtures/duringdevelop-fullstore-snapshot-1548538361');
 

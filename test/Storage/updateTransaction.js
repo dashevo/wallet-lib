@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const updateTransaction = require('../../src/Storage/updateTransaction');
+const updateTransaction = require('../../src/types/Storage/methods/updateTransaction');
 const orangeWStore = require('../fixtures/walletStore').valid.orange.store;
 
 describe('Storage - updateTransaction', () => {

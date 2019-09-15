@@ -1,16 +1,16 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
 const _ = require('lodash');
-const createTransaction = require('../../src/Account/createTransaction');
-const getUnusedAddress = require('../../src/Account/getUnusedAddress');
-const getAddress = require('../../src/Account/getAddress');
-const generateAddress = require('../../src/Account/generateAddress');
-const getPrivateKeys = require('../../src/Account/getPrivateKeys');
-const searchTransaction = require('../../src/Storage/searchTransaction');
-const getStore = require('../../src/Storage/getStore');
-const getUTXOS = require('../../src/Account/getUTXOS');
-const KeyChain = require('../../src/KeyChain');
-const Storage = require('../../src/Storage/Storage');
+const createTransaction = require('../../src/types/Account/methods/createTransaction');
+const getUnusedAddress = require('../../src/types/Account/methods/getUnusedAddress');
+const getAddress = require('../../src/types/Account/methods/getAddress');
+const generateAddress = require('../../src/types/Account/methods/generateAddress');
+const getPrivateKeys = require('../../src/types/Account/methods/getPrivateKeys');
+const searchTransaction = require('../../src/types/Storage/methods/searchTransaction');
+const getStore = require('../../src/types/Storage/methods/getStore');
+const getUTXOS = require('../../src/types/Account/methods/getUTXOS');
+const KeyChain = require('../../src/types/KeyChain');
+const Storage = require('../../src/types/Storage/Storage');
 const { simpleDescendingAccumulator } = require('../../src/utils/coinSelections/strategies');
 
 const { mnemonicToHDPrivateKey } = require('../../src/utils');

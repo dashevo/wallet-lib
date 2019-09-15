@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
-const createWallet = require('../../src/Storage/createWallet');
-const createChain = require('../../src/Storage/createChain');
+const createWallet = require('../../src/types/Storage/methods/createWallet');
+const createChain = require('../../src/types/Storage/methods/createChain');
 
 describe('Storage - createWallet', () => {
   it('should create a wallet', () => {

@@ -7,7 +7,7 @@ const { WALLET_TYPES } = require('../../src/CONSTANTS');
 const { Wallet } = require('../../src');
 const inMem = require('../../src/adapters/InMem');
 const Dashcore = require('@dashevo/dashcore-lib');
-const fromHDPublicKey = require('../../src/Wallet/fromHDExtPublicKey');
+const fromHDPublicKey = require('../../src/types/Wallet/methods/fromHDExtPublicKey');
 const gatherSail = require('../fixtures/gathersail');
 
 const mocks = {

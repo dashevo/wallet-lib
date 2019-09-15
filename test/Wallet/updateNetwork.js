@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
-const updateNetwork = require('../../src/Wallet/updateNetwork');
+const updateNetwork = require('../../src/types/Wallet/methods/updateNetwork');
 
 describe('Wallet - update network', () => {
   it('should indicate if it worked', () => {

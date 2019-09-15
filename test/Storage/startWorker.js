@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const startWorker = require('../../src/Storage/startWorker');
+const startWorker = require('../../src/types/Storage/methods/startWorker');
 
 const noop = () => {};
 

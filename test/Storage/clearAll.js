@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const clearState = require('../../src/Storage/clearAll');
+const clearState = require('../../src/types/Storage/methods/clearAll');
 
 describe('Storage - clearAll', () => {
   it('should clear the whole state', () => {

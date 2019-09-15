@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const getTransaction = require('../../src/Storage/getTransaction');
+const getTransaction = require('../../src/types/Storage/methods/getTransaction');
 const transactionsFixtures = require('../fixtures/transactions');
 
 describe('Storage - getTransaction', () => {
