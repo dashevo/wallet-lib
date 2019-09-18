@@ -2,7 +2,7 @@ const { WALLET_TYPES } = require('../../../CONSTANTS');
 /**
  * Will derivate to a new account.
  * @param {object} accountOpts - options to pass, will autopopulate some
- * @return {account} - account object
+ * @return {Account} - account object
  */
 function createAccount(accountOpts) {
   /**

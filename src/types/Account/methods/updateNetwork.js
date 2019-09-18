@@ -1,5 +1,5 @@
-const getBIP44Path = require('./getBIP44Path');
-const getNetwork = require('./getNetwork');
+const getBIP44Path = require('../_getBIP44Path');
+const getNetwork = require('../_getNetwork');
 const { is } = require('../../../utils');
 /**
  * Will update the account network and ask the transport adapter to do the same

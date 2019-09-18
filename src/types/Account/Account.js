@@ -21,35 +21,8 @@ const _initializeAccount = require('./_initializeAccount');
 const _addAccountToWallet = require('./_addAccountToWallet');
 const _loadStrategy = require('./_loadStrategy');
 
-const broadcastTransaction = require('./methods/broadcastTransaction');
-const connect = require('./methods/connect');
-const createTransaction = require('./methods/createTransaction');
-const disconnect = require('./methods/disconnect');
-const fetchAddressInfo = require('./methods/fetchAddressInfo');
-const fetchStatus = require('./methods/fetchStatus');
-const fetchTransactionInfo = require('./methods/fetchTransactionInfo');
-const forceRefreshAccount = require('./methods/forceRefreshAccount');
-const generateAddress = require('./methods/generateAddress');
-const getAddress = require('./methods/getAddress');
-const getAddresses = require('./methods/getAddresses');
-const getConfirmedBalance = require('./methods/getConfirmedBalance');
-const getUnconfirmedBalance = require('./methods/getUnconfirmedBalance');
-const getTotalBalance = require('./methods/getTotalBalance');
-const getBIP44Path = require('./methods/getBIP44Path');
-const getDPA = require('./methods/getDPA');
-const getNetwork = require('./methods/getNetwork');
-const getPlugin = require('./methods/getPlugin');
-const getWorker = require('./methods/getWorker');
-const getPrivateKeys = require('./methods/getPrivateKeys');
-const getTransaction = require('./methods/getTransaction');
-const getTransactionHistory = require('./methods/getTransactionHistory');
-const getTransactions = require('./methods/getTransactions');
-const getUnusedAddress = require('./methods/getUnusedAddress');
-const getUTXOS = require('./methods/getUTXOS');
-const injectPlugin = require('./methods/injectPlugin');
-const sign = require('./methods/sign');
-const updateNetwork = require('./methods/updateNetwork');
-const hasPlugins = require('./methods/hasPlugins');
+const getNetwork = require('./_getNetwork');
+const getBIP44Path = require('./_getBIP44Path');
 
 class Account {
   constructor(wallet, opts = defaultOptions) {
@@ -143,33 +116,54 @@ class Account {
   }
 }
 
-Account.prototype.broadcastTransaction = broadcastTransaction;
-Account.prototype.connect = connect;
-Account.prototype.createTransaction = createTransaction;
-Account.prototype.disconnect = disconnect;
-Account.prototype.fetchAddressInfo = fetchAddressInfo;
-Account.prototype.fetchStatus = fetchStatus;
-Account.prototype.fetchTransactionInfo = fetchTransactionInfo;
-Account.prototype.forceRefreshAccount = forceRefreshAccount;
-Account.prototype.generateAddress = generateAddress;
-Account.prototype.getAddress = getAddress;
-Account.prototype.getAddresses = getAddresses;
-Account.prototype.getConfirmedBalance = getConfirmedBalance;
-Account.prototype.getUnconfirmedBalance = getUnconfirmedBalance;
-Account.prototype.getTotalBalance = getTotalBalance;
-Account.prototype.getBIP44Path = getBIP44Path;
-Account.prototype.getDPA = getDPA;
-Account.prototype.getPlugin = getPlugin;
-Account.prototype.getWorker = getWorker;
-Account.prototype.getPrivateKeys = getPrivateKeys;
-Account.prototype.getTransaction = getTransaction;
-Account.prototype.getTransactionHistory = getTransactionHistory;
-Account.prototype.getTransactions = getTransactions;
-Account.prototype.getUnusedAddress = getUnusedAddress;
-Account.prototype.getUTXOS = getUTXOS;
-Account.prototype.injectPlugin = injectPlugin;
-Account.prototype.sign = sign;
-Account.prototype.updateNetwork = updateNetwork;
-Account.prototype.hasPlugins = hasPlugins;
+Account.prototype.broadcastTransaction = require('./methods/broadcastTransaction');
+Account.prototype.connect = require('./methods/connect');
+Account.prototype.createTransaction = require('./methods/createTransaction');
+Account.prototype.disconnect = require('./methods/disconnect');
+Account.prototype.fetchAddressInfo = require('./methods/fetchAddressInfo');
+Account.prototype.fetchStatus = require('./methods/fetchStatus');
+
+Account.prototype.fetchTransactionInfo = require('./methods/fetchTransactionInfo');
+
+Account.prototype.forceRefreshAccount = require('./methods/forceRefreshAccount');
+
+Account.prototype.generateAddress = require('./methods/generateAddress');
+
+Account.prototype.getAddress = require('./methods/getAddress');
+
+Account.prototype.getAddresses = require('./methods/getAddresses');
+
+Account.prototype.getConfirmedBalance = require('./methods/getConfirmedBalance');
+
+Account.prototype.getUnconfirmedBalance = require('./methods/getUnconfirmedBalance');
+
+Account.prototype.getTotalBalance = require('./methods/getTotalBalance');
+
+Account.prototype.getDPA = require('./methods/getDPA');
+
+Account.prototype.getPlugin = require('./methods/getPlugin');
+
+Account.prototype.getWorker = require('./methods/getWorker');
+
+Account.prototype.getPrivateKeys = require('./methods/getPrivateKeys');
+
+Account.prototype.getTransaction = require('./methods/getTransaction');
+
+Account.prototype.getTransactionHistory = require('./methods/getTransactionHistory');
+
+Account.prototype.getTransactions = require('./methods/getTransactions');
+
+Account.prototype.getUnusedAddress = require('./methods/getUnusedAddress');
+
+Account.prototype.getUTXOS = require('./methods/getUTXOS');
+
+Account.prototype.injectPlugin = require('./methods/injectPlugin');
+
+Account.prototype.sign = require('./methods/sign');
+
+Account.prototype.updateNetwork = require('./methods/updateNetwork');
+
+Account.prototype.hasPlugins = require('./methods/hasPlugins');
+
 
 module.exports = Account;
