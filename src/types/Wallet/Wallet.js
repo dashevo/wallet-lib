@@ -17,16 +17,11 @@ const defaultOptions = {
   allowSensitiveOperations: false,
 };
 
-const createAccount = require('./methods/createAccount');
-const disconnect = require('./methods/disconnect');
-const getAccount = require('./methods/getAccount');
-const exportWallet = require('./methods/exportWallet');
 const fromMnemonic = require('./methods/fromMnemonic');
 const fromPrivateKey = require('./methods/fromPrivateKey');
 const fromSeed = require('./methods/fromSeed');
 const fromHDExtPublicKey = require('./methods/fromHDExtPublicKey');
 const generateNewWalletId = require('./methods/generateNewWalletId');
-const updateNetwork = require('./methods/updateNetwork');
 
 /**
  * Instantiate a basic Wallet object,
@@ -53,7 +48,6 @@ class Wallet {
       fromPrivateKey,
       fromHDExtPublicKey,
       generateNewWalletId,
-      exportWallet,
     });
 
     const network = _.has(opts, 'network') ? opts.network.toString() : defaultOptions.network;
@@ -120,11 +114,11 @@ class Wallet {
   }
 }
 
-Wallet.prototype.createAccount = createAccount;
-Wallet.prototype.disconnect = disconnect;
-Wallet.prototype.getAccount = getAccount;
+Wallet.prototype.createAccount = require('./methods/createAccount');
+Wallet.prototype.disconnect = require('./methods/disconnect');
+Wallet.prototype.getAccount = require('./methods/getAccount');
 Wallet.prototype.generateNewWalletId = generateNewWalletId;
-Wallet.prototype.updateNetwork = updateNetwork;
-Wallet.prototype.exportWallet = exportWallet;
+Wallet.prototype.updateNetwork = require('./methods/updateNetwork');
+Wallet.prototype.exportWallet = require('./methods/exportWallet');
 
 module.exports = Wallet;
