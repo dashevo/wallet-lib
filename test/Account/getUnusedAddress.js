@@ -3,7 +3,7 @@ const Dashcore = require('@dashevo/dashcore-lib');
 const getUnusedAddress = require('../../src/types/Account/methods/getUnusedAddress');
 const getAddress = require('../../src/types/Account/methods/getAddress');
 const generateAddress = require('../../src/types/Account/methods/generateAddress');
-const KeyChain = require('../../src/types/KeyChain');
+const KeyChain = require('../../src/types/KeyChain/KeyChain');
 
 const mockedStore = require('../fixtures/duringdevelop-fullstore-snapshot-1548538361');
 

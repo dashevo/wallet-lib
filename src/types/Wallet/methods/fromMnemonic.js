@@ -2,7 +2,7 @@ const {
   mnemonicToHDPrivateKey,
   is,
 } = require('../../../utils');
-const KeyChain = require('../../KeyChain');
+const KeyChain = require('../../KeyChain/KeyChain');
 const { WALLET_TYPES } = require('../../../CONSTANTS');
 
 /**

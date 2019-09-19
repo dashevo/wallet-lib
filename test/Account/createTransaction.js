@@ -9,7 +9,7 @@ const getPrivateKeys = require('../../src/types/Account/methods/getPrivateKeys')
 const searchTransaction = require('../../src/types/Storage/methods/searchTransaction');
 const getStore = require('../../src/types/Storage/methods/getStore');
 const getUTXOS = require('../../src/types/Account/methods/getUTXOS');
-const KeyChain = require('../../src/types/KeyChain');
+const KeyChain = require('../../src/types/KeyChain/KeyChain');
 const Storage = require('../../src/types/Storage/Storage');
 const { simpleDescendingAccumulator } = require('../../src/utils/coinSelections/strategies');
 
