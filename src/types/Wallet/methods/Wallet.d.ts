@@ -7,13 +7,13 @@ export declare class Wallet {
     createAccount(accOptions: Account.Options): Account;
     disconnect(): void;
     exportWallet():Mnemonic["toString"];
-    fromMnemonic(Mnemonic):void;
-    fromPrivateKey(PrivateKey):void;
-    fromHDPubKey(HDPublicKey):void;
-    fromSeed(seed):void;
+    fromMnemonic(mnemonic: Mnemonic):void;
+    fromPrivateKey(privateKey: PrivateKey):void;
+    fromHDPubKey(HDExtPublicKey:HDPublicKey):void;
+    fromSeed(seed:string):void;
     generateNewWalletId():void;
-    getAccount(accOptions: Wallet.getAccOptions): Account;
-    updateNetwork(Network):boolean;
+    getAccount(accOptions?: Wallet.getAccOptions): Account;
+    updateNetwork(network:Network):boolean;
 
 }
 export declare namespace Wallet {
