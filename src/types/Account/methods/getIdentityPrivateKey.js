@@ -6,7 +6,7 @@
 function getIdentityPrivateKey(index) {
   // TODO: add proper feature-based derivation
   const { address } = this.getAddress(index);
-  const [privateKey] = this.getIdentityPrivateKey([address]);
+  const [privateKey] = this.getPrivateKeys([address]);
   return privateKey.privateKey;
 }
 
