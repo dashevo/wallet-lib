@@ -13,6 +13,8 @@ install:
 
 jobs:
   include:
+    - stage: lint
+      script: npm run lint
     - stage: size
       script: npm run size
 
