@@ -20,6 +20,10 @@ describe('Account - getIdentityPrivateKey', () => {
     account = new Account(walletMock);
   });
 
+  afterEach(() => {
+    walletMock.disconnect();
+  });
+
   it('Should derive a key for identity for a given index', () => {
     const actualIdentityPrivateKey = account.getIdentityPrivateKey(0);
     const actualIdentityPrivateKey1 = account.getIdentityPrivateKey(1);
