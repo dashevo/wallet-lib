@@ -8,9 +8,6 @@ before_install:
   - echo -e "machine github.com\n  login ${GH_TOKEN}" >> ~/.netrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
 
-install:
-  - npm ci
-
 jobs:
   include:
     - stage: lint
