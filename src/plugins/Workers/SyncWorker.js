@@ -1,10 +1,16 @@
 /* eslint-disable no-restricted-syntax */
 const _ = require('lodash');
 const logger = require('../../logger');
+const BloomFilter = require('bloom-filter');
 const { Worker } = require('../');
 const { ValidTransportLayerRequired, InvalidTransactionObject } = require('../../errors');
 const EVENTS = require('../../EVENTS');
-const { UNCONFIRMED_TRANSACTION_STATUS_CODE, SECURE_TRANSACTION_CONFIRMATIONS_NB } = require('../../CONSTANTS');
+const {
+  UNCONFIRMED_TRANSACTION_STATUS_CODE,
+  SECURE_TRANSACTION_CONFIRMATIONS_NB,
+  BLOOM_ADDRESSES,
+  BLOOM_FPR,
+} = require('../../CONSTANTS');
 
 // eslint-disable-next-line no-underscore-dangle
 const _defaultOpts = {
@@ -50,7 +56,8 @@ class SyncWorker extends Worker {
     this.listeners = {
       addresses: [],
     };
-    this.bloomfilters = [];
+
+    this.addressFilter = BloomFilter.create(BLOOM_ADDRESSES, BLOOM_FPR);
   }
 
   async execute() {
@@ -68,7 +75,6 @@ class SyncWorker extends Worker {
 
 
     await this.execAddressListener();
-    await this.execAddressBloomfilter();
   }
 
   async execAddressListener() {
@@ -272,15 +278,15 @@ class SyncWorker extends Worker {
     return true;
   }
 
-  async execAddressBloomfilter() {
-    const bloomfilterAddresses = [];
-    this.bloomfilters.filter((bloom) => bloomfilterAddresses.push(bloom.address));
-    const toPushBloom = [];
-
-    toPushBloom.forEach((bloom) => {
-      this.bloomfilters.push(bloom);
-    });
-    return true;
+  async filterAddress(address) {
+    if (!address) {
+      return false;
+    }
+    const buffer = Buffer.from(address, 'hex');
+    if (this.addressFilter.contains(buffer)) {
+      return address;
+    }
+    return false;
   }
 
   announce(type, el) {

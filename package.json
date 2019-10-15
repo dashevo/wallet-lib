@@ -35,6 +35,7 @@
     "bls-signatures": "^0.1.9",
     "cbor": "^5.0.1",
     "crypto-js": "^3.1.9-1",
+    "bloom-filter": "^0.2.0",
     "localforage": "^1.7.3",
     "lodash": "^4.17.15",
     "winston": "^3.2.1",
