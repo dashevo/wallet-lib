@@ -1,14 +1,13 @@
 /* eslint-disable no-restricted-syntax */
 const _ = require('lodash');
+const { Address, BloomFilter } = require('@dashevo/dashcore-lib');
 const logger = require('../../logger');
-const BloomFilter = require('bloom-filter');
 const { Worker } = require('../');
 const { ValidTransportLayerRequired, InvalidTransactionObject } = require('../../errors');
 const EVENTS = require('../../EVENTS');
 const {
   UNCONFIRMED_TRANSACTION_STATUS_CODE,
   SECURE_TRANSACTION_CONFIRMATIONS_NB,
-  BLOOM_ADDRESSES,
   BLOOM_FPR,
 } = require('../../CONSTANTS');
 
@@ -56,8 +55,6 @@ class SyncWorker extends Worker {
     this.listeners = {
       addresses: [],
     };
-
-    this.addressFilter = BloomFilter.create(BLOOM_ADDRESSES, BLOOM_FPR);
   }
 
   async execute() {
@@ -136,6 +133,7 @@ class SyncWorker extends Worker {
     const toFetchAddresses = [];
 
     let nbPreviousUsed = 0;
+    const addressFilter = BloomFilter.create(Object.keys(addresses).length, BLOOM_FPR);
     for (const walletType of Object.keys(addresses)) {
       const walletAddresses = addresses[walletType];
       const walletPaths = Object.keys(walletAddresses);
@@ -183,6 +181,7 @@ class SyncWorker extends Worker {
           }
           if (shouldFetch) {
             toFetchAddresses.push(address);
+            addressFilter.insert(Address.fromString(address.address).hashBuffer);
           }
           if (!isUsed) {
             nbPreviousUsed += 1;
@@ -190,6 +189,8 @@ class SyncWorker extends Worker {
         }
       }
     }
+
+
 
     const promises = [];
     toFetchAddresses.forEach((addressObj) => {
@@ -276,17 +277,6 @@ class SyncWorker extends Worker {
     const resolvedPromised = await Promise.all(promises);
     this.events.emit(EVENTS.FETCHED_TRANSACTIONS, resolvedPromised);
     return true;
-  }
-
-  async filterAddress(address) {
-    if (!address) {
-      return false;
-    }
-    const buffer = Buffer.from(address, 'hex');
-    if (this.addressFilter.contains(buffer)) {
-      return address;
-    }
-    return false;
   }
 
   announce(type, el) {

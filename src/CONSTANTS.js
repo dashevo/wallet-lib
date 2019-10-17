@@ -88,7 +88,6 @@ const CONSTANTS = {
   TXOUT_DUFFS_VALUE_BYTES: 8,
   VERSION_BYTES: 4,
   N_LOCKTIME_BYTES: 4,
-  BLOOM_ADDRESSES: 3000000, // 3 million
   BLOOM_FPR: 0.01, // false positive rate
 };
 module.exports = CONSTANTS;
