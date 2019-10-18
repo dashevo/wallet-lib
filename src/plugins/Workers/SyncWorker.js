@@ -191,7 +191,6 @@ class SyncWorker extends Worker {
     }
 
 
-
     const promises = [];
     toFetchAddresses.forEach((addressObj) => {
       // We set at false so we don't autofetch utxos.
