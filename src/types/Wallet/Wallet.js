@@ -24,6 +24,7 @@ const fromSeed = require('./methods/fromSeed');
 const fromHDPublicKey = require('./methods/fromHDPublicKey');
 const fromHDPrivateKey = require('./methods/fromHDPrivateKey');
 const generateNewWalletId = require('./methods/generateNewWalletId');
+const sweepPaperWallet = require('./methods/sweepPaperWallet');
 
 /**
  * Instantiate a basic Wallet object,
@@ -52,6 +53,8 @@ class Wallet {
       fromHDPublicKey,
       generateNewWalletId,
     });
+
+    this.sweepPaperWallet = sweepPaperWallet;
 
     const network = _.has(opts, 'network') ? opts.network.toString() : defaultOptions.network;
     const passphrase = _.has(opts, 'passphrase') ? opts.passphrase : defaultOptions.passphrase;
@@ -124,6 +127,5 @@ Wallet.prototype.disconnect = require('./methods/disconnect');
 Wallet.prototype.getAccount = require('./methods/getAccount');
 Wallet.prototype.generateNewWalletId = generateNewWalletId;
 Wallet.prototype.exportWallet = require('./methods/exportWallet');
-Wallet.sweepPaperWallet = require('./methods/sweepPaperWallet');
 
 module.exports = Wallet;
