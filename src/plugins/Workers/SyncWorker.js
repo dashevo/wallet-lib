@@ -181,7 +181,7 @@ class SyncWorker extends Worker {
           }
           if (shouldFetch) {
             toFetchAddresses.push(address);
-            addressFilter.insert(Address.fromString(address.address).hashBuffer);
+            addressFilter.insert(Buffer.from(address.address));
           }
           if (!isUsed) {
             nbPreviousUsed += 1;
@@ -190,6 +190,11 @@ class SyncWorker extends Worker {
       }
     }
 
+    // eslint-disable-next-line
+    const actualStream = await this.transport.transport.subscribeToTransactionsWithProofs({
+      ...addressFilter.toObject(),
+      vData: Uint8Array.from(addressFilter.vData),
+    });
 
     const promises = [];
     toFetchAddresses.forEach((addressObj) => {
