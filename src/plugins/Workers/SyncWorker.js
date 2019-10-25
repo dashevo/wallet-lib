@@ -191,10 +191,7 @@ class SyncWorker extends Worker {
     }
 
     // eslint-disable-next-line
-    const actualStream = await this.transport.transport.subscribeToTransactionsWithProofs({
-      ...addressFilter.toObject(),
-      vData: Uint8Array.from(addressFilter.vData),
-    });
+    const actualStream = await this.transport.transport.subscribeToTransactionsWithProofs(addressFilter);
 
     const promises = [];
     toFetchAddresses.forEach((addressObj) => {

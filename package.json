@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/dashevo/wallet-lib#readme",
   "dependencies": {
-    "@dashevo/dapi-client": "^0.6.10",
+    "@dashevo/dapi-client": "^0.6.11",
     "@dashevo/dashcore-lib": "^0.18.0",
     "@dashevo/dpp": "^0.7.2",
     "cbor": "^5.0.1",
