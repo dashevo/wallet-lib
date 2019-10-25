@@ -1,4 +1,5 @@
 const CryptoJS = require('crypto-js');
+const logger = require('../logger');
 
 class SecureStorage {
   constructor(secret) {
@@ -17,7 +18,7 @@ class SecureStorage {
       const decryptedStr = bytes.toString(CryptoJS.enc.Utf8);
       return JSON.parse(decryptedStr);
     } catch (e) {
-      console.error(`SecureStorage: cannot retrieve "${key}"`);
+      logger.error(`SecureStorage: cannot retrieve "${key}"`);
       return null;
     }
   }
