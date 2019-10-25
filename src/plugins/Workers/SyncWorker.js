@@ -190,8 +190,11 @@ class SyncWorker extends Worker {
       }
     }
 
-    // eslint-disable-next-line
-    const actualStream = await this.transport.transport.subscribeToTransactionsWithProofs(addressFilter);
+    /*
+    const stream = await this.transport.transport.subscribeToTransactionsWithProofs(addressFilter);
+    // stream.on('data', cb) will be supported when network is updated to >= 0.6.1
+    stream.on('data', (response) => logger.info('transaction', response.getData()));
+    */
 
     const promises = [];
     toFetchAddresses.forEach((addressObj) => {
