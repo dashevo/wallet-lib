@@ -127,6 +127,8 @@ Account.prototype.fetchTransactionInfo = require('./methods/fetchTransactionInfo
 
 Account.prototype.forceRefreshAccount = require('./methods/forceRefreshAccount');
 
+Account.prototype.encrypt = require('./methods/encrypt');
+
 Account.prototype.generateAddress = require('./methods/generateAddress');
 
 Account.prototype.getAddress = require('./methods/getAddress');
