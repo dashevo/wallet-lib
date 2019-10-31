@@ -190,11 +190,13 @@ class SyncWorker extends Worker {
       }
     }
 
-    /*
     const stream = await this.transport.transport.subscribeToTransactionsWithProofs(addressFilter);
-    // stream.on('data', cb) will be supported when network is updated to >= 0.6.1
-    stream.on('data', (response) => logger.info('transaction', response.getData()));
-    */
+    try {
+      stream.on('data', (response) => logger.info('transaction', response.getData()));
+    } catch (err) {
+      // stream.on('data', cb) will be supported when network is updated to >= 0.6.1
+      logger.error('subscribeToTransactionsWithProofs', err);
+    }
 
     const promises = [];
     toFetchAddresses.forEach((addressObj) => {
