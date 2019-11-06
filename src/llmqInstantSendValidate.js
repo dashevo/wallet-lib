@@ -3,17 +3,6 @@ const { hash } = require('./utils/crypto');
 
 // https://github.com/dashpay/dips/blob/master/dip-0006.md
 
-// Each receiver of a contribution message must first perform
-// some basic validation of the message on receival. These include:
-
-// 1. The quorumHash must match the current DKG session
-// 2. The proTxHash must belong to a member of the LLMQ
-// 3. The verification vector must have exactly as many entries as the configured quorumThreshold
-// 4. The verification vector should not have any duplicates
-// 5. The number of secret key contributions must match the total quorum size
-// 6. The signature of the message must be valid and
-//    signed with the operator key of the contributing masternode
-
 module.exports = async (dapiClient, masternode, llmq, dkg) => {
   const {
     quorumSize,
@@ -39,4 +28,4 @@ module.exports = async (dapiClient, masternode, llmq, dkg) => {
   }
 
   return true;
-}
+};
