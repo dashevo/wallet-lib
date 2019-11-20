@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const CryptoJS = require('crypto-js');
+const cbor = require('cbor');
 const { Wallet } = require('../../../src');
 
 const derivationPath = "m/44'/1'/0'/0";
@@ -16,12 +16,10 @@ describe('Account - encrypt', () => {
     wallet.disconnect();
   });
 
-  it('should encrypt extPubKey with aes', () => {
-    const secret = 'secret';
+  it('should encode extPubKey with cbor', () => {
     const extPubKey = account.keyChain.getKeyForPath(derivationPath, 'HDPublicKey').toString();
-    const encryptedExtPubKey = account.encrypt('aes', extPubKey, secret).toString();
-    const bytes = CryptoJS.AES.decrypt(encryptedExtPubKey, secret);
-    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+    const encryptedExtPubKey = account.encode('cbor', extPubKey);
+    const decrypted = cbor.decodeFirstSync(encryptedExtPubKey);
     expect(decrypted).to.equal(extPubKey);
   });
 });
