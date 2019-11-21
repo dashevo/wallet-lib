@@ -3,7 +3,7 @@
  * @param walletId
  * @return {{walletId: *, found: boolean}}
  */
-const searchWallet = function (walletId) {
+function searchWallet(walletId) {
   const search = {
     walletId,
     found: false,
@@ -14,5 +14,6 @@ const searchWallet = function (walletId) {
     search.result = store.wallets[walletId];
   }
   return search;
-};
+}
+
 module.exports = searchWallet;

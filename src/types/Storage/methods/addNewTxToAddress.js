@@ -7,7 +7,7 @@ const { is } = require('../../../utils');
 * @param address
 * @return {boolean}
   */
-const addNewTxToAddress = function (tx, address) {
+function addNewTxToAddress(tx, address) {
   if (!is.address(address)) throw new InvalidAddress(address);
   if (!is.transactionObj(tx)) throw new InvalidTransactionObject(tx);
 
@@ -26,5 +26,6 @@ const addNewTxToAddress = function (tx, address) {
     return true;
   }
   throw new StorageUnableToAddTransaction(tx);
-};
+}
+
 module.exports = addNewTxToAddress;

@@ -3,7 +3,7 @@
  * @param transactions
  * @return {boolean}
  * */
-const importTransactions = function (transactions) {
+function importTransactions(transactions) {
   const type = transactions.constructor.name;
   const self = this;
 
@@ -27,5 +27,6 @@ const importTransactions = function (transactions) {
     throw new Error('Invalid transaction. Cannot import.');
   }
   return true;
-};
+}
+
 module.exports = importTransactions;

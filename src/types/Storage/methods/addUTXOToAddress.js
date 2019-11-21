@@ -8,7 +8,7 @@ const { is } = require('../../../utils');
  * @param address - A valid Address.
  * @return {boolean}
  */
-const addUTXOToAddress = function (utxo, address) {
+function addUTXOToAddress(utxo, address) {
   if (!is.address(address)) throw new Error('Invalid address');
   if (is.arr(utxo)) {
     utxo.forEach((_utxo) => {
@@ -36,5 +36,6 @@ const addUTXOToAddress = function (utxo, address) {
     }
   }
   return false;
-};
+}
+
 module.exports = addUTXOToAddress;

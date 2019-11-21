@@ -1,4 +1,4 @@
-const importSingleAddress = function (singleAddress, walletId) {
+function importSingleAddress(singleAddress, walletId) {
   const type = singleAddress.constructor.name;
   if (!walletId) throw new Error('Expected walletId to import single address');
   if (!this.searchWallet(walletId).found) {
@@ -17,5 +17,6 @@ const importSingleAddress = function (singleAddress, walletId) {
     throw new Error('Invalid account. Cannot import.');
   }
   return true;
-};
+}
+
 module.exports = importSingleAddress;

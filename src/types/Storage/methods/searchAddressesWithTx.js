@@ -5,7 +5,7 @@ const _ = require('lodash');
  * @param txid
  * @return {{txid: *, address: null, type: null, found: boolean}}
  */
-const searchAddressesWithTx = function (txid) {
+function searchAddressesWithTx(txid) {
   const search = {
     txid,
     results: [],
@@ -32,5 +32,6 @@ const searchAddressesWithTx = function (txid) {
   });
 
   return search;
-};
+}
+
 module.exports = searchAddressesWithTx;

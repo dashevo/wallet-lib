@@ -97,7 +97,7 @@ class SyncWorker extends Worker {
 
     toPushListener.forEach((listener) => {
       const listenerObj = { ...listener };
-      listenerObj.cb = function (event) {
+      listenerObj.cb = (event) => {
         logger.info('Event:', event, listenerObj.address);
       };
 
@@ -109,7 +109,7 @@ class SyncWorker extends Worker {
       return acc;
     }, []);
 
-    const getTransactionAndStore = async function (tx) {
+    const getTransactionAndStore = async (tx) => {
       if (tx.address && tx.txid) {
         self.storage.addNewTxToAddress(tx, tx.address);
         const transactionInfo = await self.transport.getTransactionById(tx.txid);

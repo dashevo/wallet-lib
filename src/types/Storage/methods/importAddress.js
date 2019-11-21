@@ -7,7 +7,7 @@ const { is } = require('../../../utils');
  * @param walletId
  * @return {boolean}
  */
-const importAddress = function (addressObj, walletId) {
+function importAddress(addressObj, walletId) {
   if (!walletId) throw new Error('Expected walletId to import addresses');
   if (!this.searchWallet(walletId).found) {
     this.createWallet(walletId);
@@ -40,5 +40,6 @@ const importAddress = function (addressObj, walletId) {
     this.updateAddress(modifiedAddressObject, walletId);
   }
   return true;
-};
+}
+
 module.exports = importAddress;

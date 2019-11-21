@@ -7,7 +7,7 @@ const EVENTS = require('../../../EVENTS');
  * @param el
  * @return {boolean}
  */
-const announce = function (type, el) {
+function announce(type, el) {
   if (!this.events) return false;
   switch (type) {
     case EVENTS.CONFIRMED_BALANCE_CHANGED:
@@ -21,5 +21,6 @@ const announce = function (type, el) {
       logger.warn('Not implemented, announce of ', type, el);
   }
   return true;
-};
+}
+
 module.exports = announce;

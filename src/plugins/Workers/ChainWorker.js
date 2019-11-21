@@ -35,7 +35,7 @@ class ChainWorker extends Worker {
 
   async execBlockListener() {
     const self = this;
-    const cb = async function (block) {
+    const cb = async (block) => {
       const { network } = self.storage.store.wallets[self.walletId];
       self.storage.store.chains[network.toString()].blockheight += 1;
       self.announce(EVENTS.BLOCK, block);

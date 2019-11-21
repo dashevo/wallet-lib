@@ -4,7 +4,7 @@
  * @param forceLoop - boolean - default : false - When set at true, will force a full search
  * @return {{address: *, type: null, found: boolean}}
  */
-const searchAddress = function (address, forceLoop = false) {
+function searchAddress(address, forceLoop = false) {
   const search = {
     address,
     type: null,
@@ -43,5 +43,6 @@ const searchAddress = function (address, forceLoop = false) {
 
 
   return search;
-};
+}
+
 module.exports = searchAddress;

@@ -1,5 +1,3 @@
-const Dashcore = require('@dashevo/dashcore-lib');
+const { Networks } = require('@dashevo/dashcore-lib');
 
-module.exports = function (network) {
-  return Dashcore.Networks[network].toString() || Dashcore.Networks.testnet.toString();
-};
+module.exports = (network) => Networks[network].toString() || Networks.testnet.toString();

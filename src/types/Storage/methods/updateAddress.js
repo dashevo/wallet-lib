@@ -10,7 +10,7 @@ const EVENTS = require('../../../EVENTS');
 * @param walletId
 * @return {boolean}
 */
-const updateAddress = function (addressObj, walletId) {
+function updateAddress(addressObj, walletId) {
   if (!walletId) throw new Error('Expected walletId to update an address');
   if (!is.addressObj(addressObj)) throw new InvalidAddressObject(addressObj);
   const { path } = addressObj;
@@ -121,5 +121,6 @@ const updateAddress = function (addressObj, walletId) {
     this.mappedAddress[newObject.address] = { walletId, type, path };
   }
   return true;
-};
+}
+
 module.exports = updateAddress;

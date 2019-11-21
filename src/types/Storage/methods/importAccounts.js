@@ -4,7 +4,7 @@
  * @param walletId
  * @return {boolean}
  */
-const importAccounts = function (accounts, walletId) {
+function importAccounts(accounts, walletId) {
   if (!walletId) throw new Error('Expected walletId to import addresses');
   if (!this.searchWallet(walletId).found) {
     this.createWallet(walletId);
@@ -45,5 +45,6 @@ const importAccounts = function (accounts, walletId) {
     throw new Error('Invalid account. Cannot import.');
   }
   return true;
-};
+}
+
 module.exports = importAccounts;

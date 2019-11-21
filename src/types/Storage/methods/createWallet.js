@@ -2,7 +2,7 @@ const Dashcore = require('@dashevo/dashcore-lib');
 const { hasProp } = require('../../../utils');
 
 const { testnet } = Dashcore.Networks;
-const createWallet = function (walletId = 'squawk7700', network = testnet.toString(), mnemonic = null, type = null) {
+function createWallet(walletId = 'squawk7700', network = testnet.toString(), mnemonic = null, type = null) {
   if (!hasProp(this.store.wallets, walletId)) {
     this.store.wallets[walletId] = {
       accounts: {},
@@ -20,5 +20,6 @@ const createWallet = function (walletId = 'squawk7700', network = testnet.toStri
     return true;
   }
   return false;
-};
+}
+
 module.exports = createWallet;

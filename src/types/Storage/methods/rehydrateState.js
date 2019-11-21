@@ -8,7 +8,7 @@ const { REHYDRATE_STATE_FAILED, REHYDRATE_STATE_SUCCESS } = require('../../../EV
  * Fetch the state from the persistance adapter
  * @return {Promise<void>}
  */
-const rehydrateState = async function () {
+async function rehydrateState() {
   if (this.rehydrate && this.lastRehydrate === null) {
     try {
       const transactions = (this.adapter && hasProp(this.adapter, 'getItem'))
@@ -31,5 +31,6 @@ const rehydrateState = async function () {
       throw e;
     }
   }
-};
+}
+
 module.exports = rehydrateState;

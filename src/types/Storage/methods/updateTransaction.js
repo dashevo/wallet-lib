@@ -5,7 +5,7 @@
  * @param walletId
  * @return {boolean}
  */
-const updateTransaction = function (transaction) {
+function updateTransaction(transaction) {
   if (!transaction) throw new Error('Expected a transaction to update');
 
   const transactionStore = this.store.transactions;
@@ -15,5 +15,6 @@ const updateTransaction = function (transaction) {
     this.lastModified = Date.now();
   }
   return true;
-};
+}
+
 module.exports = updateTransaction;

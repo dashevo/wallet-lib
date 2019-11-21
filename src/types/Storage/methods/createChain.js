@@ -5,7 +5,7 @@ const { hasProp } = require('../../../utils');
  * @param network
  * @return {boolean}
  */
-const createChain = function (network) {
+function createChain(network) {
   if (!hasProp(this.store.chains, network.toString())) {
     this.store.chains[network.toString()] = {
       name: network.toString(),
@@ -14,5 +14,6 @@ const createChain = function (network) {
     return true;
   }
   return false;
-};
+}
+
 module.exports = createChain;

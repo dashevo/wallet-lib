@@ -3,7 +3,7 @@
  * @param txid
  * @return {{txid: *, found: boolean}}
  */
-const searchTransaction = function (txid) {
+function searchTransaction(txid) {
   const search = {
     txid,
     found: false,
@@ -17,5 +17,6 @@ const searchTransaction = function (txid) {
     }
   }
   return search;
-};
+}
+
 module.exports = searchTransaction;
