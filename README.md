@@ -47,6 +47,8 @@ Dash is a powerful new peer-to-peer platform for the next generation of financia
 
 ## Install
 
+### Node
+
 ```sh
 npm install @dashevo/wallet-lib
 ```
@@ -54,6 +56,13 @@ npm install @dashevo/wallet-lib
 In order to use this library, you will need to add it to your project as a dependency.
 
 Having [NodeJS](https://nodejs.org/) installed, just type : `npm install @dashevo/wallet-lib` in your terminal.
+
+### CDN Standalone
+For browser usage, you can also directly rely on unpkg :
+
+```html
+<script src="https://unpkg.com/@dashevo/wallet-lib"></script>
+```
 
 ## Usage
 
