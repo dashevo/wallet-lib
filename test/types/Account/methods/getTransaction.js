@@ -1,7 +1,7 @@
 const { expect } = require('chai');
-const mockedStore = require('../../fixtures/sirentonight-fullstore-snapshot-1562711703');
-const getTransaction = require('../../../src/types/Account/methods/getTransaction');
-const searchTransaction = require('../../../src/types/Storage/methods/searchTransaction');
+const mockedStore = require('../../../fixtures/sirentonight-fullstore-snapshot-1562711703');
+const getTransaction = require('../../../../src/types/Account/methods/getTransaction');
+const searchTransaction = require('../../../../src/types/Storage/methods/searchTransaction');
 
 let mockedWallet;
 let fetchTransactionInfoCalledNb = 0;

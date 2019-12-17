@@ -1,10 +1,10 @@
 const {expect} = require('chai');
-const getTransactionHistory = require('../../../src/types/Account/methods/getTransactionHistory');
-const searchTransaction = require('../../../src/types/Storage/methods/searchTransaction');
-const getTransaction = require('../../../src/types/Storage/methods/getTransaction');
-const searchAddress = require('../../../src/types/Storage/methods/searchAddress');
-const mockedStoreHDWallet = require('../../fixtures/duringdevelop-fullstore-snapshot-1548538361');
-const mockedStoreSingleAddress = require('../../fixtures/da07-fullstore-snapshot-1548533266');
+const getTransactionHistory = require('../../../../src/types/Account/methods/getTransactionHistory');
+const searchTransaction = require('../../../../src/types/Storage/methods/searchTransaction');
+const getTransaction = require('../../../../src/types/Storage/methods/getTransaction');
+const searchAddress = require('../../../../src/types/Storage/methods/searchAddress');
+const mockedStoreHDWallet = require('../../../fixtures/duringdevelop-fullstore-snapshot-1548538361');
+const mockedStoreSingleAddress = require('../../../fixtures/da07-fullstore-snapshot-1548533266');
 
 describe('Account - getTransactionHistory', () => {
   it('should return an empty array on no transaction history', async () => {

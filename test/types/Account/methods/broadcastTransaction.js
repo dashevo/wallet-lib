@@ -1,8 +1,8 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
-const broadcastTransaction = require('../../../src/types/Account/methods/broadcastTransaction');
-const validRawTxs = require('../../fixtures/rawtx').valid;
-const invalidRawTxs = require('../../fixtures/rawtx').invalid;
+const broadcastTransaction = require('../../../../src/types/Account/methods/broadcastTransaction');
+const validRawTxs = require('../../../fixtures/rawtx').valid;
+const invalidRawTxs = require('../../../fixtures/rawtx').invalid;
 
 describe('Account - broadcastTransaction', () => {
   it('should throw error on missing transport', async () => {

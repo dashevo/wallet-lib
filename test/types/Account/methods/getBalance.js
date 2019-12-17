@@ -1,9 +1,9 @@
 const { expect } = require('chai');
-const mockedStore = require('../../fixtures/sirentonight-fullstore-snapshot-1562711703');
-const getTotalBalance = require('../../../src/types/Account/methods/getTotalBalance');
-const getConfirmedBalance = require('../../../src/types/Account/methods/getConfirmedBalance');
-const getUnconfirmedBalance = require('../../../src/types/Account/methods/getUnconfirmedBalance');
-const calculateDuffBalance = require('../../../src/types/Storage/methods/calculateDuffBalance');
+const mockedStore = require('../../../fixtures/sirentonight-fullstore-snapshot-1562711703');
+const getTotalBalance = require('../../../../src/types/Account/methods/getTotalBalance');
+const getConfirmedBalance = require('../../../../src/types/Account/methods/getConfirmedBalance');
+const getUnconfirmedBalance = require('../../../../src/types/Account/methods/getUnconfirmedBalance');
+const calculateDuffBalance = require('../../../../src/types/Storage/methods/calculateDuffBalance');
 
 let mockedWallet;
 describe('Account - getTotalBalance', () => {

@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const cbor = require('cbor');
-const { Wallet } = require('../../../src');
+const { Wallet } = require('../../../../src');
 
 const derivationPath = "m/44'/1'/0'/0";
 

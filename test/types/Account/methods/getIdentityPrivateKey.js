@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 
-const { Account, Wallet } = require('../../../src');
+const { Account, Wallet } = require('../../../../src');
 
 let mnemonic;
 let expectedIdentityPrivateKey;

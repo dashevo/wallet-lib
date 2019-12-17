@@ -1,29 +1,29 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
 const _ = require('lodash');
-const createTransaction = require('../../../src/types/Account/methods/createTransaction');
-const getUnusedAddress = require('../../../src/types/Account/methods/getUnusedAddress');
-const getAddress = require('../../../src/types/Account/methods/getAddress');
-const generateAddress = require('../../../src/types/Account/methods/generateAddress');
-const getPrivateKeys = require('../../../src/types/Account/methods/getPrivateKeys');
-const searchTransaction = require('../../../src/types/Storage/methods/searchTransaction');
-const getStore = require('../../../src/types/Storage/methods/getStore');
-const getUTXOS = require('../../../src/types/Account/methods/getUTXOS');
-const KeyChain = require('../../../src/types/KeyChain/KeyChain');
-const Storage = require('../../../src/types/Storage/Storage');
-const { simpleDescendingAccumulator } = require('../../../src/utils/coinSelections/strategies');
+const createTransaction = require('../../../../src/types/Account/methods/createTransaction');
+const getUnusedAddress = require('../../../../src/types/Account/methods/getUnusedAddress');
+const getAddress = require('../../../../src/types/Account/methods/getAddress');
+const generateAddress = require('../../../../src/types/Account/methods/generateAddress');
+const getPrivateKeys = require('../../../../src/types/Account/methods/getPrivateKeys');
+const searchTransaction = require('../../../../src/types/Storage/methods/searchTransaction');
+const getStore = require('../../../../src/types/Storage/methods/getStore');
+const getUTXOS = require('../../../../src/types/Account/methods/getUTXOS');
+const KeyChain = require('../../../../src/types/KeyChain/KeyChain');
+const Storage = require('../../../../src/types/Storage/Storage');
+const { simpleDescendingAccumulator } = require('../../../../src/utils/coinSelections/strategies');
 
-const { mnemonicToHDPrivateKey } = require('../../../src/utils');
+const { mnemonicToHDPrivateKey } = require('../../../../src/utils');
 
-const addressesFixtures = require('../../fixtures/addresses.json');
-const validStore = require('../../fixtures/walletStore').valid.orange.store;
-const duringDevelopStore = require('../../fixtures/duringdevelop-fullstore-snapshot-1548538361');
+const addressesFixtures = require('../../../fixtures/addresses.json');
+const validStore = require('../../../fixtures/walletStore').valid.orange.store;
+const duringDevelopStore = require('../../../fixtures/duringdevelop-fullstore-snapshot-1548538361');
 
 const duringDevelopMnemonic = 'during develop before curtain hazard rare job language become verb message travel';
 
 const craftedStrategy = (utxosList, outputsList, deductFee = false, feeCategory = 'normal') => {
-  const TransactionEstimator = require('../../../src/utils/coinSelections/TransactionEstimator.js');
-  const { sortAndVerifyUTXOS } = require('../../../src/utils/coinSelections/helpers');
+  const TransactionEstimator = require('../../../../src/utils/coinSelections/TransactionEstimator.js');
+  const { sortAndVerifyUTXOS } = require('../../../../src/utils/coinSelections/helpers');
 
   const txEstimator = new TransactionEstimator(feeCategory);
 

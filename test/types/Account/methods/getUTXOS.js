@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
-const getUTXOS = require('../../../src/types/Account/methods/getUTXOS');
+const getUTXOS = require('../../../../src/types/Account/methods/getUTXOS');
 
 const mockedStoreEmpty = {
   wallets: {
