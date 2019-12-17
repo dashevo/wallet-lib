@@ -1,6 +1,6 @@
 const { expect } = require('chai');
-const updateAddress = require('../../../src/types/Storage/methods/updateAddress');
-const orangeWStore = require('../../fixtures/walletStore').valid.orange.store;
+const updateAddress = require('../../../../src/types/Storage/methods/updateAddress');
+const orangeWStore = require('../../../fixtures/walletStore').valid.orange.store;
 
 describe('Storage - updateAddress', () => {
   it('should throw errors on failed update', () => {

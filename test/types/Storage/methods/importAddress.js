@@ -1,6 +1,6 @@
 const { expect } = require('chai');
-const logger = require('../../../src/logger');
-const importAddress = require('../../../src/types/Storage/methods/importAddress');
+const logger = require('../../../../src/logger');
+const importAddress = require('../../../../src/types/Storage/methods/importAddress');
 
 describe('Storage - importAddress', () => {
   it('should throw on failed import', () => {

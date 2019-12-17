@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const createChain = require('../../../src/types/Storage/methods/createChain');
+const createChain = require('../../../../src/types/Storage/methods/createChain');
 
 describe('Storage - createChain', () => {
   it('should create a chain', () => {

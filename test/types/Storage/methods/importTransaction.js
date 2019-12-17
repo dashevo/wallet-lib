@@ -1,6 +1,6 @@
 const { expect } = require('chai');
-const importTransaction = require('../../../src/types/Storage/methods/importTransaction');
-const { fd7c727155ef67fd5c1d54b73dea869e9690c439570063d6e96fec1d3bba450e } = require('../../fixtures/transactions').valid.mainnet;
+const importTransaction = require('../../../../src/types/Storage/methods/importTransaction');
+const { fd7c727155ef67fd5c1d54b73dea869e9690c439570063d6e96fec1d3bba450e } = require('../../../fixtures/transactions').valid.mainnet;
 
 describe('Storage - importTransaction', () => {
   it('should throw on failed import', () => {

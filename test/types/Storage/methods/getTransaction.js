@@ -1,6 +1,6 @@
 const { expect } = require('chai');
-const getTransaction = require('../../../src/types/Storage/methods/getTransaction');
-const transactionsFixtures = require('../../fixtures/transactions');
+const getTransaction = require('../../../../src/types/Storage/methods/getTransaction');
+const transactionsFixtures = require('../../../fixtures/transactions');
 
 describe('Storage - getTransaction', () => {
   it('should throw on failed fetching', () => {

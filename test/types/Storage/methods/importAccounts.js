@@ -1,6 +1,6 @@
 const { expect } = require('chai');
-const importAccounts = require('../../../src/types/Storage/methods/importAccounts');
-const Wallet = require('../../../src/types/Wallet/Wallet');
+const importAccounts = require('../../../../src/types/Storage/methods/importAccounts');
+const Wallet = require('../../../../src/types/Wallet/Wallet');
 
 describe('Storage - importAccounts', async function suite() {
   this.timeout(15000);

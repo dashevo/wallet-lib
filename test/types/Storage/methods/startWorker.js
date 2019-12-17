@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const startWorker = require('../../../src/types/Storage/methods/startWorker');
+const startWorker = require('../../../../src/types/Storage/methods/startWorker');
 
 describe('Storage - startWorker', () => {
   it('should set an interval', () => {
