@@ -1,5 +1,5 @@
-import {Mnemonic,PrivateKey, HDPublicKey, Strategy, Network, Plugins} from "../../types";
-import {Account} from "../../Account/Account";
+import {Mnemonic,PrivateKey, HDPublicKey, Strategy, Network, Plugins} from "../types";
+import {Account} from "../Account/Account";
 
 export declare class Wallet {
     offlineMode: boolean;
