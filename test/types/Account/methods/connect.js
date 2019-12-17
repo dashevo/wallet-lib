@@ -1,32 +1,19 @@
 const { expect } = require('chai');
 const connect = require('../../../../src/types/Account/methods/connect');
-const Worker = require('../../../../src/plugins/Worker');
+const DummyWorker = require('../../../fixtures/DummyWorker');
 
-class DummyWorker extends Worker {
-  constructor() {
-    super({
-      name: 'DummyWorker',
-      dependencies: [],
-    });
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  execute() {
-    console.log('Dummy worker successfully did nothing');
-  }
-}
-
+let transportConnected = false;
 const emitted = [];
 
 describe('Account - connect', () => {
-  it('should connect to stream and worker', () => {
+  it('should connect to transport and worker', () => {
     const self = {
       events: {
         emit: (eventName) => emitted.push(eventName),
       },
       transport: {
         isValid: true,
-        connect: () => true,
+        connect: () => { transportConnected = true; },
       },
       plugins: {
         workers: {
@@ -40,6 +27,7 @@ describe('Account - connect', () => {
 
     expect(connect.call(self)).to.equal(true);
     expect(emitted).to.deep.equal(['WORKER/DUMMYWORKER/STARTED']);
+    expect(transportConnected).to.deep.equal(true);
 
     // We need to stop the worker
     self.plugins.workers.dummyWorker.stopWorker();
