@@ -1,7 +1,7 @@
 const { expect } = require('chai');
-const fromSeed = require('../../../src/types/Wallet/methods/fromSeed');
-const knifeFixture = require('../../fixtures/knifeeasily');
-const { WALLET_TYPES } = require('../../../src/CONSTANTS');
+const fromSeed = require('../../../../src/types/Wallet/methods/fromSeed');
+const knifeFixture = require('../../../fixtures/knifeeasily');
+const { WALLET_TYPES } = require('../../../../src/CONSTANTS');
 
 describe('Wallet - fromSeed', () => {
   it('should indicate missing data', () => {

@@ -1,7 +1,7 @@
 const { expect } = require('chai');
-const fromPrivateKey = require('../../../src/types/Wallet/methods/fromPrivateKey');
-const cR4t6eFixture = require('../../fixtures/cR4t6e_pk');
-const { WALLET_TYPES } = require('../../../src/CONSTANTS');
+const fromPrivateKey = require('../../../../src/types/Wallet/methods/fromPrivateKey');
+const cR4t6eFixture = require('../../../fixtures/cR4t6e_pk');
+const { WALLET_TYPES } = require('../../../../src/CONSTANTS');
 
 describe('Wallet - fromPrivateKey', () => {
   it('should indicate missing data', () => {

@@ -1,9 +1,9 @@
 const { expect } = require('chai');
-const generateNewWalletId = require('../../../src/types/Wallet/methods/generateNewWalletId');
-const knifeMnemonic = require('../../fixtures/knifeeasily');
-const gatherSail = require('../../fixtures/gathersail');
-const cR4t6ePrivateKey = require('../../fixtures/cR4t6e_pk');
-const { WALLET_TYPES } = require('../../../src/CONSTANTS');
+const generateNewWalletId = require('../../../../src/types/Wallet/methods/generateNewWalletId');
+const knifeMnemonic = require('../../../fixtures/knifeeasily');
+const gatherSail = require('../../../fixtures/gathersail');
+const cR4t6ePrivateKey = require('../../../fixtures/cR4t6e_pk');
+const { WALLET_TYPES } = require('../../../../src/CONSTANTS');
 
 describe('Wallet - generateNewWalletId', () => {
   it('should indicate on missing data', () => {

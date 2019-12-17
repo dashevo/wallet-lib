@@ -1,8 +1,8 @@
 const { expect } = require('chai');
-const exportWallet = require('../../../src/types/Wallet/methods/exportWallet');
-const { WALLET_TYPES } = require('../../../src/CONSTANTS');
-const cR4t6ePrivateKey = require('../../fixtures/cR4t6e_pk');
-const knifeMnemonic = require('../../fixtures/knifeeasily');
+const exportWallet = require('../../../../src/types/Wallet/methods/exportWallet');
+const { WALLET_TYPES } = require('../../../../src/CONSTANTS');
+const cR4t6ePrivateKey = require('../../../fixtures/cR4t6e_pk');
+const knifeMnemonic = require('../../../fixtures/knifeeasily');
 
 describe('Wallet - export Wallet', () => {
   it('should indicate on missing data', () => {
