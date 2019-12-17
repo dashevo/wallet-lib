@@ -1,5 +1,6 @@
-import {Mnemonic,PrivateKey, HDPublicKey, Strategy, Network, Plugins} from "../types";
+import {Mnemonic, PrivateKey, HDPublicKey, Strategy, Network, Plugins, AddressInfoMap, WalletType} from "../types";
 import {Account} from "../Account/Account";
+import {MappedAddress} from "../Storage/Storage";
 
 export declare class Wallet {
     offlineMode: boolean;
@@ -36,4 +37,5 @@ export declare namespace Wallet {
         index?:number;
     }
 }
+
 
