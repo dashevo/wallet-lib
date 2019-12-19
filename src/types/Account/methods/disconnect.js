@@ -11,7 +11,7 @@ module.exports = function disconnect() {
   }
 
   if (this.readinessInterval) {
-    this.readinessInterval = clearTimeout(this.readinessInterval);
+    this.readinessInterval = clearInterval(this.readinessInterval);
   }
 
   if (this.plugins.workers) {
