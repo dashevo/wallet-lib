@@ -67,6 +67,10 @@ class Transporter {
 
   handleError(e) {
     const self = this;
+    const setUnableToConnect = (reason = 'unknown reason') => {
+      self.canConnect = false;
+      logger.error(`Transporter - Unable to connect - ${reason}`);
+    };
     if (!e) {
       return false;
     }
@@ -74,20 +78,29 @@ class Transporter {
       switch (e.code) {
         case 'ECONNREFUSED':
           if (self.canConnect === true) {
-            self.canConnect = false;
+            setUnableToConnect('Connection refused.');
+            return e;
+          }
+          break;
+        case 'ETIMEDOUT':
+          if (self.canConnect === true) {
+            setUnableToConnect(`Timeout : ${e.message}`);
             return e;
           }
           break;
         default:
-          logger.error('E.code', e.code);
-          return e;
+          if (self.canConnect === true) {
+            setUnableToConnect(`${e.code} - ${e.message}`);
+            return e;
+          }
       }
-    } else if (e && e.response && e.response.data) {
+      return e;
+    } if (e && e.response && e.response.data) {
       const { status, error } = e.response.data;
       switch (status) {
         case 429:
           if (error === 'Rate limit exceeded') {
-            self.canConnect = false;
+            setUnableToConnect();
             logger.error('Rate limit exceeded');
             return e;
           }
