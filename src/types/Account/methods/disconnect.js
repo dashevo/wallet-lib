@@ -10,10 +10,6 @@ module.exports = function disconnect() {
     this.transport.disconnect();
   }
 
-  if (this.readinessInterval) {
-    this.readinessInterval = clearInterval(this.readinessInterval);
-  }
-
   if (this.plugins.workers) {
     const workersKey = Object.keys(this.plugins.workers);
     workersKey.forEach((key) => {
