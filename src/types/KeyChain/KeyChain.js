@@ -39,6 +39,5 @@ KeyChain.prototype.getKeyForChild = require('./methods/getKeyForChild');
 KeyChain.prototype.getKeyForPath = require('./methods/getKeyForPath');
 KeyChain.prototype.getPrivateKey = require('./methods/getPrivateKey');
 KeyChain.prototype.sign = require('./methods/sign');
-KeyChain.prototype.updateNetwork = require('./methods/updateNetwork');
 
 module.exports = KeyChain;

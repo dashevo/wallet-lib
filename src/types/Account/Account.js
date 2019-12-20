@@ -167,8 +167,6 @@ Account.prototype.injectPlugin = require('./methods/injectPlugin');
 
 Account.prototype.sign = require('./methods/sign');
 
-Account.prototype.updateNetwork = require('./methods/updateNetwork');
-
 Account.prototype.hasPlugins = require('./methods/hasPlugins');
 
 Account.prototype.getIdentityPrivateKey = require('./methods/getIdentityPrivateKey');

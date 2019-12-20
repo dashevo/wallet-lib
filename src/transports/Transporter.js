@@ -180,12 +180,6 @@ class Transporter {
     return (this.transport.closeSocket) ? this.transport.closeSocket() : false;
   }
 
-  updateNetwork(network) {
-    if (!this.transport || !this.transport.updateNetwork) {
-      throw new Error('Transport does not handle network changes');
-    }
-    return this.transport.updateNetwork(network);
-  }
 
   getNetwork() {
     if (this.transport) {

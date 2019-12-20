@@ -60,7 +60,6 @@ const CONSTANTS = {
       'getTransactions',
       'getTransactionHistory',
       'forceRefreshAccount',
-      'updateNetwork',
       'disconnect',
       'connect',
     ],

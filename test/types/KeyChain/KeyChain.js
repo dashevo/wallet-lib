@@ -37,13 +37,6 @@ describe('Keychain', () => {
     const address = new Dashcore.Address(derivedPk.publicKey.toAddress()).toString();
     expect(address).to.equal('yNfUebksUc5HoSfg8gv98ruC3jUNJUM8pT');
   });
-  it('should update network', () => {
-    const keychain2 = new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(mnemonic, 'testnet') });
-    // TODO : Network should never be the whole object, just the string.
-    // expect(keychain2.network).to.equal('testnet');
-    keychain2.updateNetwork('livenet');
-    expect(keychain2.network).to.equal('livenet');
-  });
   it('should generate key for child', () => {
     const keychain2 = new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(mnemonic, 'testnet') });
     const keyForChild = keychain2.generateKeyForChild(0);
