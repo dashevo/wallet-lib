@@ -17,7 +17,7 @@ describe('Storage - startWorker', () => {
     let testInterval = null;
     const self = {
       saveState: () => { saved += 1; self.lastSave = Date.now(); },
-      autosaveIntervalTime: 10,
+      autosaveIntervalTime: 50,
       lastModified: Date.now(),
       lastSave: 0,
     };
@@ -37,6 +37,6 @@ describe('Storage - startWorker', () => {
 
       // First autosave + 4 induced changes
       res(expect(saved).to.be.equal(5));
-    }, 100);
+    }, 300);
   }));
 });
