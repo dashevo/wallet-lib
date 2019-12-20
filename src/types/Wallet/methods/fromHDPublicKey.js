@@ -10,7 +10,7 @@ const normalizeHDPubKey = (key) => (is.string(key) ? Dashcore.HDPublicKey(key) :
  * @param HDPublicKey
  */
 module.exports = function fromHDPublicKey(_hdPublicKey) {
-  if (!is.HDPublicKey(_hdPublicKey)) throw new Error('Expected a valid HDPUBLIC key (typeof HDPUBLIC or String)');
+  if (!is.HDPublicKey(_hdPublicKey)) throw new Error('Expected a valid HDPublicKey (typeof HDPublicKey or String)');
   this.walletType = WALLET_TYPES.HDPUBLIC;
   this.mnemonic = null;
   this.HDPublicKey = normalizeHDPubKey(_hdPublicKey);

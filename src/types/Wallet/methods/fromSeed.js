@@ -2,8 +2,6 @@ const {
   is,
   seedToHDPrivateKey,
 } = require('../../../utils');
-const KeyChain = require('../../KeyChain/KeyChain');
-const { WALLET_TYPES } = require('../../../CONSTANTS');
 
 /**
  * Will set a wallet to work with a seed (HDPrivateKey)
@@ -12,5 +10,5 @@ const { WALLET_TYPES } = require('../../../CONSTANTS');
  */
 module.exports = function fromSeed(seed) {
   if (!is.seed(seed)) throw new Error('Expected a valid seed (typeof string)');
-  return this.fromHDPrivateKey(seedToHDPrivateKey(seed));
+  return this.fromHDPrivateKey(seedToHDPrivateKey(seed, this.network));
 };

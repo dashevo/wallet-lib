@@ -14,15 +14,15 @@ const { WALLET_TYPES } = require('../../../../src/CONSTANTS');
 describe('Wallet - HDPublicKey', () => {
   const gatherTestnet = gatherSail.testnet;
   it('should detect wrong parameters', () => {
-    const mockOpts1 = { };
-    const exceptedException1 = 'Expected a valid HDPublic key (typeof HDPublicKey or String)';
+    const mockOpts1 = {};
+    const exceptedException1 = 'Expected a valid HDPublicKey (typeof HDPublicKey or String)';
     expect(() => fromHDPublicKey.call(mockOpts1)).to.throw(exceptedException1);
     expect(() => fromHDPublicKey.call(mockOpts1, gatherTestnet.external.hdprivkey)).to.throw(exceptedException1);
     expect(() => fromHDPublicKey.call(mockOpts1, gatherTestnet.mnemonic)).to.throw(exceptedException1);
     expect(() => fromHDPublicKey.call(mockOpts1, 'cR4t6evwVZoCp1JsLk4wURK4UmBCZzZotNzn9T1mhBT19SH9JtNt')).to.throw(exceptedException1);
   });
   it('should work from a valid HDPubKey', () => {
-    const mockOpts1 = { };
+    const mockOpts1 = {};
     fromHDPublicKey.call(mockOpts1, gatherTestnet.external.hdpubkey);
 
     expect(mockOpts1.walletType).to.equal(WALLET_TYPES.HDPUBLIC);

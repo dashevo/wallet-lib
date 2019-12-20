@@ -70,7 +70,7 @@ describe('Wallet - class', () => {
     });
   });
   it('should create a wallet with HDPrivateKey', () => {
-    const wallet1 = new Wallet(Object.assign({ seed: knifeMnemonic.HDRootPrivateKeyTestnet, network: 'testnet' }, mocks));
+    const wallet1 = new Wallet(Object.assign({ HDPrivateKey: knifeMnemonic.HDRootPrivateKeyTestnet, network: 'testnet' }, mocks));
     expect(wallet1.walletType).to.be.equal(WALLET_TYPES.HDWALLET);
     expect(wallet1.mnemonic).to.be.equal(null);
 
@@ -169,7 +169,7 @@ describe('Wallet - Get/Create Account', () => {
       network,
     };
     const walletTestnet = new Wallet(Object.assign(config, mocks));
-    const encryptedHDPriv = walletTestnet.exportWallet(true);
+    const encryptedHDPriv = walletTestnet.exportWallet('HDPrivateKey');
     const expectedHDPriv = 'tprv8ZgxMBicQKsPcuZMDBeTL2qaBF7gyUPt2wbqbJG2yp8s7yzRE1cRcjRnG3Xmdv3sELwtLGz186VX3EeHQ5we1xr1qH95QN6FRopP6FZqBUJ';
     expect(encryptedHDPriv.toString()).to.equal(expectedHDPriv);
     walletTestnet.storage.events.on('CONFIGURED', () => {
