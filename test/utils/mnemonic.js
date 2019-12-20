@@ -2,7 +2,10 @@ const { expect } = require('chai');
 const { Mnemonic } = require('@dashevo/dashcore-lib');
 const Dashcore = require('@dashevo/dashcore-lib');
 const {
-  generateNewMnemonic, mnemonicToHDPrivateKey, mnemonicToWalletId,
+  generateNewMnemonic,
+  mnemonicToHDPrivateKey,
+  mnemonicToWalletId,
+  mnemonicToSeed,
 } = require('../../src/utils/mnemonic');
 const is = require('../../src/utils/is');
 
@@ -10,6 +13,10 @@ const mnemonic1 = 'hole lesson insane entire dolphin scissors game dwarf polar e
 const mnemonic2 = 'woman forest output essay bleak satisfy era ordinary exotic source portion wire';
 const mnemonic3 = 'divorce radar castle wire sun timber master income exchange wash fluid loud';
 const mnemonic4 = 'increase table banana fiscal innocent wool sport mercy motion stable prize promote';
+
+const passSeed1 = 'superpassphrase';
+const expectedSeed1 = '436905e6756c24551bffaebe97d0ebd51b2fa027e838c18d45767bd833b02a80a1dd55728635b54f2b1dbed5963f4155e160ee1e96e2d67f7e8ac28557d87d96'
+const expectedPassSeed1 = 'f637c95a551647f3f49c707c2f40ea0ee38a70995ab108004529af55ea43bcf02c6bcb156f8750e6b4188ac1f0955505173336a1a1b579fe970071b0014be44c'
 
 describe('Utils - mnemonic', () => {
   it('should generate new mnemonic', () => {
@@ -38,5 +45,9 @@ describe('Utils - mnemonic', () => {
 
     expect(() => mnemonicToWalletId()).to.throw('Expect mnemonic to be provided');
     expect(() => mnemonicToHDPrivateKey()).to.throw('Expect mnemonic to be provided');
+  });
+  it('should do mnemonicToSeed', () => {
+    expect(mnemonicToSeed(mnemonic1)).to.equal(expectedSeed1);
+    expect(mnemonicToSeed(mnemonic1, passSeed1)).to.equal(expectedPassSeed1);
   });
 });
