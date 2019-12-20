@@ -1,8 +1,7 @@
 const { expect } = require('chai');
-const { Mnemonic } = require('@dashevo/dashcore-lib');
-const Dashcore = require('@dashevo/dashcore-lib');
 const {
   generateNewMnemonic,
+  seedToHDPrivateKey,
   mnemonicToHDPrivateKey,
   mnemonicToWalletId,
   mnemonicToSeed,
@@ -15,9 +14,10 @@ const mnemonic3 = 'divorce radar castle wire sun timber master income exchange w
 const mnemonic4 = 'increase table banana fiscal innocent wool sport mercy motion stable prize promote';
 
 const passSeed1 = 'superpassphrase';
-const expectedSeed1 = '436905e6756c24551bffaebe97d0ebd51b2fa027e838c18d45767bd833b02a80a1dd55728635b54f2b1dbed5963f4155e160ee1e96e2d67f7e8ac28557d87d96'
-const expectedPassSeed1 = 'f637c95a551647f3f49c707c2f40ea0ee38a70995ab108004529af55ea43bcf02c6bcb156f8750e6b4188ac1f0955505173336a1a1b579fe970071b0014be44c'
-
+const expectedSeed1 = '436905e6756c24551bffaebe97d0ebd51b2fa027e838c18d45767bd833b02a80a1dd55728635b54f2b1dbed5963f4155e160ee1e96e2d67f7e8ac28557d87d96';
+const expectedPassSeed1 = 'f637c95a551647f3f49c707c2f40ea0ee38a70995ab108004529af55ea43bcf02c6bcb156f8750e6b4188ac1f0955505173336a1a1b579fe970071b0014be44c';
+const expectedPrivate1Mainnet = 'xprv9s21ZrQH143K3hVMJ7XzM4uiV1PndeSqGVzowkGjRpnSesDkmb3p5iGp8scGgAPjLw8Z3WZZr2BcbN2kfzqSYRG3VKSQgSszEdijEoWSDAC';
+const expectedPrivate1Testnet = 'tprv8ZgxMBicQKsPeWisxgPVWiXho8ozsAUqc3uvpAhBuoGvSTxqkxPZbTeG43mvgXn3iNfL3cBL1NmR4DaVoDBPMUXe1xeiLoc39jU9gRTVBd2';
 describe('Utils - mnemonic', () => {
   it('should generate new mnemonic', () => {
     const result = generateNewMnemonic();
@@ -49,5 +49,9 @@ describe('Utils - mnemonic', () => {
   it('should do mnemonicToSeed', () => {
     expect(mnemonicToSeed(mnemonic1)).to.equal(expectedSeed1);
     expect(mnemonicToSeed(mnemonic1, passSeed1)).to.equal(expectedPassSeed1);
+  });
+  it('should do seedToHDPrivateKey', () => {
+    expect(seedToHDPrivateKey(expectedSeed1).toString()).to.equal(expectedPrivate1Testnet);
+    expect(seedToHDPrivateKey(expectedSeed1, 'mainnet').toString()).to.equal(expectedPrivate1Mainnet);
   });
 });

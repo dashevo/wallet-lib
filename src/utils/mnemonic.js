@@ -1,5 +1,5 @@
 const { pbkdf2Sync } = require('pbkdf2');
-const { Mnemonic } = require('@dashevo/dashcore-lib');
+const { Mnemonic, HDPrivateKey } = require('@dashevo/dashcore-lib');
 const { doubleSha256 } = require('./crypto');
 
 function generateNewMnemonic() {
@@ -34,10 +34,14 @@ const mnemonicToSeed = function (mnemonic, password = '') {
   return pbkdf2Sync(mnemonicBuff, salfBuff, 2048, 64, 'sha512')
     .toString('hex');
 };
-
+// See https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
+const seedToHDPrivateKey = function (seed, network = 'testnet') {
+  return HDPrivateKey.fromSeed(seed, network);
+};
 module.exports = {
   generateNewMnemonic,
   mnemonicToHDPrivateKey,
   mnemonicToWalletId,
   mnemonicToSeed,
+  seedToHDPrivateKey,
 };
