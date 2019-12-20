@@ -4,7 +4,7 @@ const { Wallet } = require('../../../../src');
 
 const derivationPath = "m/44'/1'/0'/0";
 
-describe('Account - encrypt', () => {
+describe('Account - encode', () => {
   let wallet;
   let account;
   beforeEach(() => {
