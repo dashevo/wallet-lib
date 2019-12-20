@@ -1,10 +1,10 @@
 const AES = require('crypto-js/aes');
 
 const encrypt = function (method, data, secret) {
-  const str = data === 'string' ? data : data.toString();
+  const str = typeof data === 'string' ? data : data.toString();
   switch (method) {
-    default: // AES
-      return AES.encrypt(str, secret);
+    default:
+      return AES.encrypt(str, secret).toString();
   }
 };
 module.exports = encrypt;
