@@ -1,8 +1,8 @@
 const { expect } = require('chai');
 const cbor = require('cbor');
-const encode = require('../../../../src/types/Account/methods/encode');
+const decode = require('../../../../src/types/Account/methods/decode');
 
-describe('Account - encode', () => {
+describe('Account - decode', () => {
   const jsonObject = {
     string: 'string',
     list: ['a', 'b', 'c', 'd'],
@@ -12,10 +12,10 @@ describe('Account - encode', () => {
       theNull: null,
     },
   };
+  const encodedJSON = cbor.encodeCanonical(jsonObject);
 
-  it('should encode JSON with cbor', () => {
-    const encodedJSON = encode('cbor', jsonObject)
-    const decoded = cbor.decodeFirstSync(encodedJSON)
+  it('should decode JSON with cbor', () => {
+    const decoded = decode('cbor', encodedJSON);
     expect(decoded).to.deep.equal(jsonObject);
   });
 });
