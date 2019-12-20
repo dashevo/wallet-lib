@@ -119,6 +119,7 @@ class Account {
 Account.prototype.broadcastTransaction = require('./methods/broadcastTransaction');
 Account.prototype.connect = require('./methods/connect');
 Account.prototype.createTransaction = require('./methods/createTransaction');
+Account.prototype.decrypt = require('./methods/decrypt');
 Account.prototype.disconnect = require('./methods/disconnect');
 Account.prototype.fetchAddressInfo = require('./methods/fetchAddressInfo');
 Account.prototype.fetchStatus = require('./methods/fetchStatus');
