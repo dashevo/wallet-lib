@@ -64,7 +64,7 @@ class Account {
         network: this.network,
       }, this.walletId);
     }
-    if (this.walletType === WALLET_TYPES.HDEXTPUBLIC) {
+    if (this.walletType === WALLET_TYPES.HDPUBLIC) {
       this.storage.importSingleAddress({
         label: this.label,
         path: '/0',

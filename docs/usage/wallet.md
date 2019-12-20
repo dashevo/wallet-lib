@@ -34,11 +34,13 @@ const Wallet = new Wallet(opts);
 
 > **mnemonic** : String|Mnemonic : When set will init the wallet from it.
 
-> **seed** : String|HDPrivateKey : When set will init the wallet from it.
+> **HDPrivateKey** : String|HDPrivateKey : When set will init the wallet from it.
+
+> **seed** : String : When set will init the wallet from it.
 
 > **privateKey** : String|PrivateKey : When set will init the wallet from it.
 
-> **HDExtPublicKey** : String|HDPublicKey : When set will init the wallet from it.
+> **HDPublicKey** : String|HDPublicKey : When set will init the wallet from it.
 
 > **network** : String(def: testnet) : Will be used to set the network for various crypto manipulation (genAddr)
 
@@ -47,6 +49,30 @@ const Wallet = new Wallet(opts);
 > **offlineMode** : Bool(false) : When set at true, the wallet will not try to use any transport layer.
 
 N.B : If mnemonic, seed and privateKey are filled, only mnemonic will be used. If none is entered, the wallet will create a mnemonic.
+
+### Creation from Mnemonic 
+
+```js
+const wallet = new Wallet({
+  mnemonic: 'hole lesson insane entire dolphin scissors game dwarf polar ethics drip math'
+})
+```
+
+### Creation from HDPrivateKey 
+
+```js
+const wallet = new Wallet({
+  HDPrivateKey: 'tprv8ZgxMBicQKsPeWisxgPVWiXho8ozsAUqc3uvpAhBuoGvSTxqkxPZbTeG43mvgXn3iNfL3cBL1NmR4DaVoDBPMUXe1xeiLoc39jU9gRTVBd2'
+})
+```
+
+### Creation from Seed 
+
+```js
+const wallet = new Wallet({
+  seed: '436905e6756c24551bffaebe97d0ebd51b2fa027e838c18d45767bd833b02a80a1dd55728635b54f2b1dbed5963f4155e160ee1e96e2d67f7e8ac28557d87d96'
+})
+```
 
 ## Create an Account
 

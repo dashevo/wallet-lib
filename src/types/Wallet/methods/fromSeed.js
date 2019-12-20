@@ -1,5 +1,6 @@
 const {
   is,
+  seedToHDPrivateKey,
 } = require('../../../utils');
 const KeyChain = require('../../KeyChain/KeyChain');
 const { WALLET_TYPES } = require('../../../CONSTANTS');
@@ -10,9 +11,6 @@ const { WALLET_TYPES } = require('../../../CONSTANTS');
  * @param seed
  */
 module.exports = function fromSeed(seed) {
-  if (!is.seed(seed)) throw new Error('Expected a valid seed (typeof HDPrivateKey or String)');
-  this.walletType = WALLET_TYPES.HDWALLET;
-  this.mnemonic = null;
-  this.HDPrivateKey = seed;
-  this.keyChain = new KeyChain({ HDPrivateKey: seed });
+  if (!is.seed(seed)) throw new Error('Expected a valid seed (typeof string)');
+  return this.fromHDPrivateKey(seedToHDPrivateKey(seed));
 };

@@ -7,7 +7,7 @@ const { WALLET_TYPES } = require('../../../src/CONSTANTS');
 const { Wallet } = require('../../../src');
 const inMem = require('../../../src/adapters/InMem');
 const Dashcore = require('@dashevo/dashcore-lib');
-const fromHDPublicKey = require('../../../src/types/Wallet/methods/fromHDExtPublicKey');
+const fromHDPublicKey = require('../../../src/types/Wallet/methods/fromHDPublicKey');
 const gatherSail = require('../../fixtures/gathersail');
 
 const mocks = {
@@ -86,9 +86,9 @@ describe('Wallet - class', () => {
       wallet1.disconnect();
     });
   });
-  it('should create a wallet with HDExtPublicKey', () => {
-    const wallet1 = new Wallet(Object.assign({ HDExtPublicKey: gatherSailMnemonic.testnet.external.hdpubkey, network: 'testnet' }, mocks));
-    expect(wallet1.walletType).to.be.equal(WALLET_TYPES.HDEXTPUBLIC);
+  it('should create a wallet with HDPublicKey', () => {
+    const wallet1 = new Wallet(Object.assign({ HDPublicKey: gatherSailMnemonic.testnet.external.hdpubkey, network: 'testnet' }, mocks));
+    expect(wallet1.walletType).to.be.equal(WALLET_TYPES.HDPUBLIC);
     expect(wallet1.mnemonic).to.be.equal(null);
 
     expect(wallet1.plugins).to.be.deep.equal({});

@@ -1,7 +1,7 @@
 const Dashcore = require('@dashevo/dashcore-lib');
 const { expect } = require('chai');
 const Wallet = require('../../../../src/types/Wallet/Wallet');
-const fromHDPublicKey = require('../../../../src/types/Wallet/methods/fromHDExtPublicKey');
+const fromHDPublicKey = require('../../../../src/types/Wallet/methods/fromHDPublicKey');
 const gatherSail = require('../../../fixtures/gathersail');
 const { WALLET_TYPES } = require('../../../../src/CONSTANTS');
 /**
@@ -11,34 +11,34 @@ const { WALLET_TYPES } = require('../../../../src/CONSTANTS');
  *
  * @type {string}
  */
-describe('Wallet - HDExtPublicKey', () => {
+describe('Wallet - HDPublicKey', () => {
   const gatherTestnet = gatherSail.testnet;
   it('should detect wrong parameters', () => {
     const mockOpts1 = { };
-    const exceptedException1 = 'Expected a valid HDExtPublic key (typeof HDExtPublicKey or String)';
+    const exceptedException1 = 'Expected a valid HDPublic key (typeof HDPublicKey or String)';
     expect(() => fromHDPublicKey.call(mockOpts1)).to.throw(exceptedException1);
     expect(() => fromHDPublicKey.call(mockOpts1, gatherTestnet.external.hdprivkey)).to.throw(exceptedException1);
     expect(() => fromHDPublicKey.call(mockOpts1, gatherTestnet.mnemonic)).to.throw(exceptedException1);
     expect(() => fromHDPublicKey.call(mockOpts1, 'cR4t6evwVZoCp1JsLk4wURK4UmBCZzZotNzn9T1mhBT19SH9JtNt')).to.throw(exceptedException1);
   });
-  it('should work from a valid HDExtPubKey', () => {
+  it('should work from a valid HDPubKey', () => {
     const mockOpts1 = { };
     fromHDPublicKey.call(mockOpts1, gatherTestnet.external.hdpubkey);
 
-    expect(mockOpts1.walletType).to.equal(WALLET_TYPES.HDEXTPUBLIC);
+    expect(mockOpts1.walletType).to.equal(WALLET_TYPES.HDPUBLIC);
     expect(mockOpts1.mnemonic).to.equal(null);
-    expect(mockOpts1.HDExtPublicKey.toString()).to.equal(gatherTestnet.external.hdpubkey);
-    expect(new Dashcore.HDPublicKey(mockOpts1.HDExtPublicKey)).to.equal(mockOpts1.HDExtPublicKey);
+    expect(mockOpts1.HDPublicKey.toString()).to.equal(gatherTestnet.external.hdpubkey);
+    expect(new Dashcore.HDPublicKey(mockOpts1.HDPublicKey)).to.equal(mockOpts1.HDPublicKey);
     expect(mockOpts1.keyChain.type).to.equal('HDPublicKey');
     expect(mockOpts1.keyChain.HDPublicKey).to.deep.equal(Dashcore.HDPublicKey(gatherTestnet.external.hdpubkey));
     expect(mockOpts1.keyChain.keys).to.deep.equal({});
   });
-  it('should work from a HDExtPubKey', () => {
+  it('should work from a HDPubKey', () => {
     const wallet1 = new Wallet(
-      { HDExtPublicKey: gatherTestnet.external.hdpubkey, offlineMode: true },
+      { HDPublicKey: gatherTestnet.external.hdpubkey, offlineMode: true },
     );
 
-    expect(wallet1.walletType).to.be.equal(WALLET_TYPES.HDEXTPUBLIC);
+    expect(wallet1.walletType).to.be.equal(WALLET_TYPES.HDPUBLIC);
     expect(wallet1.mnemonic).to.be.equal(null);
 
     expect(wallet1.plugins).to.be.deep.equal({});

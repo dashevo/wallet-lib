@@ -31,8 +31,8 @@ describe('Wallet - generateNewWalletId', () => {
   });
   it('should generate a wallet id from HDPubKey', () => {
     const mockOptsTestnet = {
-      walletType: WALLET_TYPES.HDEXTPUBLIC,
-      HDExtPublicKey: gatherSail.testnet.external.hdpubkey,
+      walletType: WALLET_TYPES.HDPUBLIC,
+      HDPublicKey: gatherSail.testnet.external.hdpubkey,
     };
 
     const walletId1 = generateNewWalletId.call(mockOptsTestnet);
