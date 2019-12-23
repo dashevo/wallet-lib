@@ -1,6 +1,13 @@
 const { expect } = require('chai');
 const startWorker = require('../../../../src/types/Storage/methods/startWorker');
 
+let testInterval = null;
+const simulateChangeEvery = function (ms) {
+  const self = this;
+  testInterval = setInterval(() => {
+    self.lastModified = Date.now();
+  }, ms);
+};
 describe('Storage - startWorker', () => {
   it('should set an interval', () => {
     const defaultIntervalValue = 10000;
@@ -14,29 +21,21 @@ describe('Storage - startWorker', () => {
   });
   it('should works', async () => new Promise((res) => {
     let saved = 0;
-    let testInterval = null;
     const self = {
       saveState: () => { saved += 1; self.lastSave = Date.now(); },
-      autosaveIntervalTime: 50,
+      autosaveIntervalTime: 100,
       lastModified: Date.now(),
       lastSave: 0,
     };
     startWorker.call(self);
-
-    const simulateChangeEvery = (ms) => {
-      testInterval = setInterval(() => {
-        self.lastModified = Date.now();
-      }, ms);
-    };
-
-    simulateChangeEvery(20);
+    simulateChangeEvery.call(self, 20);
 
     setTimeout(() => {
       clearInterval(self.interval);
       testInterval = clearInterval(testInterval);
 
-      // First autosave + 4 induced changes
-      res(expect(saved).to.be.equal(5));
-    }, 300);
+      // First autosave + 9 induced changes
+      res(expect(saved).to.be.equal(10));
+    }, 1090);
   }));
 });
