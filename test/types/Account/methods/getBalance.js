@@ -17,7 +17,7 @@ describe('Account - getTotalBalance', () => {
     const walletId = Object.keys(mockedStore.wallets)[0];
     mockedWallet = Object.assign({
       walletId,
-      accountIndex: 0,
+      index: 0,
       storage: storageHDW,
     });
   });

@@ -26,7 +26,7 @@ describe('Account - getUnusedAddress', () => {
       }),
       BIP44PATH: 'm/44\'/1\'/0\'',
       walletId: '5061b8276c',
-      accountIndex: 0,
+      index: 0,
     });
     self.getAddress = getAddress.bind(self);
     self.generateAddress = generateAddress.bind(self);

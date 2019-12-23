@@ -19,7 +19,7 @@ describe('Account - getTransactionHistory', () => {
     const walletIdHDW = Object.keys(mockedStoreHDWallet.wallets)[0];
     const selfHDW = Object.assign({
       walletId: walletIdHDW,
-      accountIndex: 0,
+      index: 0,
       storage: storageHDW,
     });
 
@@ -29,7 +29,7 @@ describe('Account - getTransactionHistory', () => {
     selfHDW.getTransaction = getTransaction.bind(storageHDW);
     const txHistoryHDW = await getTransactionHistory.call(selfHDW);
     const selfHDWAccount2 = Object.assign({}, selfHDW);
-    selfHDWAccount2.accountIndex = 1;
+    selfHDWAccount2.index = 1;
 
     const expectedTxHistoryHDW = [
       {
@@ -229,7 +229,7 @@ describe('Account - getTransactionHistory', () => {
     const walletIdHDW = Object.keys(mockedStoreHDWallet.wallets)[0];
     const selfHDW = Object.assign({
       walletId: walletIdHDW,
-      accountIndex: 1,
+      index: 1,
       storage: storageHDW,
     });
 
@@ -342,7 +342,7 @@ describe('Account - getTransactionHistory', () => {
     const walletIdHDW = Object.keys(mockedStoreHDWallet.wallets)[0];
     const selfHDW = Object.assign({
       walletId: walletIdHDW,
-      accountIndex: 0,
+      index: 0,
       storage: storageHDW,
     });
 

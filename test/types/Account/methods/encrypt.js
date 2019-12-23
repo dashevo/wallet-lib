@@ -9,7 +9,7 @@ describe('Account - encrypt', () => {
   let account;
   beforeEach(() => {
     wallet = new Wallet();
-    account = wallet.getAccount(0);
+    account = wallet.getAccount({ index: 0 });
   });
 
   afterEach(() => {
@@ -41,9 +41,9 @@ describe('Account - encrypt', () => {
     const decryptedEncodedJSON = CryptoJS
       .AES
       .decrypt(encryptedJSON, secret)
-      .toString(CryptoJS.enc.Utf8)
+      .toString(CryptoJS.enc.Utf8);
 
-    const decodedJSON = account.decode('cbor', decryptedEncodedJSON)
+    const decodedJSON = account.decode('cbor', decryptedEncodedJSON);
     expect(encodedJSON).to.equal(decryptedEncodedJSON);
     expect(decodedJSON).to.deep.equal(jsonObject);
   });

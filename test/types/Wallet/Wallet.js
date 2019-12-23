@@ -190,12 +190,12 @@ describe('Wallet - Get/Create Account', () => {
     // eslint-disable-next-line no-unused-expressions
     expect(account).to.exist;
     expect(account.BIP44PATH.split('/')[3]).to.equal('0\'');
-    expect(account.accountIndex).to.equal(0);
+    expect(account.index).to.equal(0);
 
 
-    const accountSpecificIndex = walletTestnet.createAccount({ accountIndex: 42 });
+    const accountSpecificIndex = walletTestnet.createAccount({ index: 42 });
     expect(accountSpecificIndex.BIP44PATH.split('/')[3]).to.equal('42\'');
-    expect(accountSpecificIndex.accountIndex).to.equal(42);
+    expect(accountSpecificIndex.index).to.equal(42);
     walletTestnet.storage.events.on('CONFIGURED', () => {
       walletTestnet.disconnect();
       done();

@@ -40,7 +40,7 @@ class Account {
     this.walletType = wallet.walletType;
     this.offlineMode = wallet.offlineMode;
 
-    const accountIndex = _.has(opts, 'accountIndex') ? opts.accountIndex : wallet.accounts.length;
+    const accountIndex = _.has(opts, 'index') ? opts.index : wallet.accounts.length;
     this.index = accountIndex;
     this.strategy = _loadStrategy(_.has(opts, 'strategy') ? opts.strategy : defaultOptions.strategy);
     this.network = getNetwork(wallet.network).toString();
