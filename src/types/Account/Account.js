@@ -41,7 +41,7 @@ class Account {
     this.offlineMode = wallet.offlineMode;
 
     const accountIndex = _.has(opts, 'accountIndex') ? opts.accountIndex : wallet.accounts.length;
-    this.accountIndex = accountIndex;
+    this.index = accountIndex;
     this.strategy = _loadStrategy(_.has(opts, 'strategy') ? opts.strategy : defaultOptions.strategy);
     this.network = getNetwork(wallet.network).toString();
 
@@ -111,6 +111,9 @@ class Account {
       }
     }
     this.events.emit(EVENTS.CREATED);
+    // It's actually Account that mutates wallet.accounts to add itself.
+    // We might want to get rid of that as it can be really confusing.
+    // It would gives that responsability to createAccount to create (and therefore push to accounts).
     _addAccountToWallet(this, wallet);
     _initializeAccount(this, wallet.plugins);
   }

@@ -81,6 +81,7 @@ const account = wallet.createAccount([opts]);
 ```
 
 For the account options, see the Account documentation.
+You also probably mean to use get an account instead. This is designed mostly to be Private as get an account deal with it. 
 
 ---
 
