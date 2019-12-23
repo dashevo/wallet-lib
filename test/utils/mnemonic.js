@@ -100,8 +100,8 @@ describe('Utils - mnemonic', () => {
     expect(seedToHDPrivateKey(expectedSeed24Es, 'mainnet').toString()).to.equal(expectedEsRootKey);
 
     expect(mnemonicToSeed(mnemonic24Jp).toString()).to.equal(expectedSeed24Jp);
-    // expect(seedToHDPrivateKey(expectedSeed24Jp, 'mainnet').toString()).to.equal(expectedJpRootKey);
-    return;
+    expect(seedToHDPrivateKey(expectedSeed24Jp, 'mainnet').toString()).to.equal(expectedJpRootKey);
+
     expect(mnemonicToSeed(mnemonic24Cn).toString()).to.equal(expectedSeed24Cn);
     expect(seedToHDPrivateKey(expectedSeed24Cn, 'mainnet').toString()).to.equal(expectedCnRootKey);
 
