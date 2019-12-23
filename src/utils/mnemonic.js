@@ -29,7 +29,7 @@ function mnemonicToWalletId(mnemonic) {
   return buff.toString('hex').slice(0, 10);
 }
 const mnemonicToSeed = function (mnemonic, password = '') {
-  const mnemonicBuff = Buffer.from(mnemonic, 'utf8');
+  const mnemonicBuff = Buffer.from(mnemonic.normalize('NFKD'), 'utf8');
   const salfBuff = Buffer.from(`mnemonic${password}`, 'utf8');
   return pbkdf2Sync(mnemonicBuff, salfBuff, 2048, 64, 'sha512')
     .toString('hex');
