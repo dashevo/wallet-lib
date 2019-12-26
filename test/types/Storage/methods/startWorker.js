@@ -8,7 +8,8 @@ const simulateChangeEvery = function (ms) {
     self.lastModified = Date.now();
   }, ms);
 };
-describe('Storage - startWorker', () => {
+describe('Storage - startWorker', function suite() {
+  this.timeout(60000);
   it('should set an interval', () => {
     const defaultIntervalValue = 10000;
     const self = {
@@ -23,12 +24,12 @@ describe('Storage - startWorker', () => {
     let saved = 0;
     const self = {
       saveState: () => { saved += 1; self.lastSave = Date.now(); },
-      autosaveIntervalTime: 100,
+      autosaveIntervalTime: 500,
       lastModified: Date.now(),
       lastSave: 0,
     };
     startWorker.call(self);
-    simulateChangeEvery.call(self, 20);
+    simulateChangeEvery.call(self, 200);
 
     setTimeout(() => {
       clearInterval(self.interval);
@@ -36,6 +37,6 @@ describe('Storage - startWorker', () => {
 
       // First autosave + 9 induced changes
       res(expect(saved).to.be.equal(10));
-    }, 1090);
+    }, 5499);
   }));
 });
