@@ -1,4 +1,5 @@
 import {Mnemonic, Transaction, AddressObj,AddressInfo, AddressType, transactionId, TransactionInfo, PublicAddress, PrivateKey, Strategy, Network, Plugins} from "../types";
+import {KeyChain} from "../KeyChain/KeyChain";
 
 export declare class Account {
     constructor(options?: Account.Options);
@@ -32,7 +33,7 @@ export declare class Account {
     getTransaction(txid: transactionId): Transaction;
     getTransactionHistory(): [object];
     getTransactions(): [Transaction];
-    getUnusedAddress(): AddressObj;
+    getUnusedAddress(type?: AddressType, skip?: number): AddressObj;
     getUTXOS(): [object];
     injectPlugin(unsafePlugin: Plugins, allowSensitiveOperation:boolean): Promise<boolean>;
     sign(object?:Transaction, privateKeys?:[PrivateKey], sigType?:string): Transaction;
