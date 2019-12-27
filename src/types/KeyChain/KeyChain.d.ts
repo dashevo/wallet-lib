@@ -1,5 +1,5 @@
 import {PrivateKey, Network,} from "../types";
-import {HDPrivateKey} from "@dashevo/dashcore-lib";
+import {HDPrivateKey, HDPublicKey} from "@dashevo/dashcore-lib";
 
 export declare class KeyChain {
     constructor(options?: KeyChain.Options);
@@ -12,24 +12,22 @@ export declare class KeyChain {
     privateKey?: PrivateKey;
 
 
-    generateKeyForChild(index: number, type: HDKeyTypesParam): HDKeyTypes;
-    generateKeyForPath(path: string, type: HDKeyTypesParam): HDKeyTypes;
+    generateKeyForChild(index: number, type?: HDKeyTypesParam): HDPrivateKey|HDPublicKey;
+    generateKeyForPath(path: string, type?: HDKeyTypesParam): HDKeyTypes;
 
-    getHardenedBIP44Path(): string;
-    getHardenedDIP9FeaturePath(): string;
+    getHardenedBIP44Path(type?: HDKeyTypesParam): HDKeyTypes;
+    getHardenedDIP9FeaturePath(type?: HDKeyTypesParam): HDKeyTypes;
 
-    getKeyForChild(index: number, type: HDKeyTypesParam): HDKeyTypes;
-    getKeyForPath(path: string, type: HDKeyTypesParam): HDKeyTypes;
+    getKeyForChild(index: number, type?: HDKeyTypesParam): HDKeyTypes;
+    getKeyForPath(path: string, type?: HDKeyTypesParam): HDKeyTypes;
     getPrivateKey(): HDPrivateKey|PrivateKey;
 
     // TODO : dashcore-lib miss an implementation definition of crypto.Signature
     sign(object: any, privateKeys:[any], sigType: object): any;
 
 }
-export declare enum HDKeyTypes {
-    HDPrivateKey,
-    HDPublicKey,
-}
+type HDKeyTypes = HDPublicKey | HDPrivateKey;
+
 export declare enum HDKeyTypesParam {
     HDPrivateKey="HDPrivateKey",
     HDPublicKey="HDPrivateKey",
