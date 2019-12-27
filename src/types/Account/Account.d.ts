@@ -2,6 +2,7 @@ import {Mnemonic, Transaction, AddressObj,AddressInfo, AddressType, transactionI
 
 export declare class Account {
     constructor(options?: Account.Options);
+    keyChain: KeyChain;
 
     broadcastTransaction(rawtx: string, isIS?: boolean): Promise<transactionId>;
     connect(): boolean;
