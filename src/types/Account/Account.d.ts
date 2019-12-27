@@ -5,6 +5,8 @@ export declare class Account {
     constructor(options?: Account.Options);
     keyChain: KeyChain;
 
+    isReady(): Promise<boolean>;
+    isInitialized(): Promise<boolean>;
     broadcastTransaction(rawtx: string, isIS?: boolean): Promise<transactionId>;
     connect(): boolean;
     createTransaction(opts: Account.createTransactionOptions): Transaction;

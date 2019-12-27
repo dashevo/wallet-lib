@@ -57,9 +57,9 @@ async function _initializeAccount(account, userUnsafePlugins) {
       }
     };
     const sendInitialized = () => {
-      if (!self.isInitialized) {
+      if (!self.state.isInitialized) {
         self.events.emit(EVENTS.INITIALIZED);
-        self.isInitialized = true;
+        self.state.isInitialized = true;
       }
     };
 

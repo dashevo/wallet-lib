@@ -32,8 +32,10 @@ class Account {
 
     this.events = new EventEmitter();
     this.isReady = false;
-    this.isInitialized = false;
-    this.isDisconnecting = false;
+    this.state = {
+      isInitialized: false,
+      isDisconnecting: false,
+    };
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
     this.allowSensitiveOperations = _.has(opts, 'allowSensitiveOperations') ? opts.allowSensitiveOperations : defaultOptions.allowSensitiveOperations;
 
@@ -117,6 +119,22 @@ class Account {
     // (and therefore push to accounts).
     _addAccountToWallet(this, wallet);
     _initializeAccount(this, wallet.plugins);
+  }
+
+  async isInitialized() {
+    // eslint-disable-next-line consistent-return
+    return new Promise(((resolve) => {
+      if (this.state.isInitialized) return resolve(true);
+      this.events.on(EVENTS.INITIALIZED, () => resolve(true));
+    }));
+  }
+
+  async isReady() {
+    // eslint-disable-next-line consistent-return
+    return new Promise(((resolve) => {
+      if (this.state.isReady) return resolve(true);
+      this.events.on(EVENTS.READY, () => resolve(true));
+    }));
   }
 }
 
