@@ -4,6 +4,7 @@ import {KeyChain} from "../KeyChain/KeyChain";
 export declare class Account {
     constructor(options?: Account.Options);
     keyChain: KeyChain;
+    state:any;
 
     isReady(): Promise<boolean>;
     isInitialized(): Promise<boolean>;

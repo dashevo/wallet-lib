@@ -31,9 +31,9 @@ class Account {
     this.walletId = wallet.walletId;
 
     this.events = new EventEmitter();
-    this.isReady = false;
     this.state = {
       isInitialized: false,
+      isReady: false,
       isDisconnecting: false,
     };
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;

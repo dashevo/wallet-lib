@@ -51,9 +51,9 @@ async function _initializeAccount(account, userUnsafePlugins) {
     self.events.emit(EVENTS.STARTED);
 
     const sendReady = () => {
-      if (!self.isReady) {
+      if (!self.state.isReady) {
         self.events.emit(EVENTS.READY);
-        self.isReady = true;
+        self.state.isReady = true;
       }
     };
     const sendInitialized = () => {
