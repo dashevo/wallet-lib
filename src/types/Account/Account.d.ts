@@ -3,6 +3,7 @@ import {KeyChain} from "../KeyChain/KeyChain";
 
 export declare class Account {
     constructor(options?: Account.Options);
+    index: number;
     keyChain: KeyChain;
     state:any;
 
