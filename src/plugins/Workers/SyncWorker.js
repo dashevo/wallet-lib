@@ -200,6 +200,27 @@ class SyncWorker extends Worker {
 
     const responses = await Promise.all(promises);
 
+    const addressList = toFetchAddresses.map((addressInfo) => addressInfo.address);
+    const utxosPerAddress = await this.transport.getUTXO(addressList);
+
+    // Here's the part extracted from fetch
+    if (utxosPerAddress.totalItems) {
+      const fetchedUtxo = utxosPerAddress.items;
+
+      fetchedUtxo.forEach((rawUtxo) => {
+        const utxo = {
+          satoshis: rawUtxo.satoshis,
+          txid: rawUtxo.txid,
+          address: rawUtxo.address,
+          outputIndex: rawUtxo.outputIndex,
+          scriptPubKey: rawUtxo.script,
+          // scriptSig: utxo.scriptSig,
+        };
+
+        self.storage.addUTXOToAddress([utxo], rawUtxo.address);
+      });
+    }
+
     responses.forEach((addrInfo) => {
       try {
         const prev = self.storage.searchAddress(addrInfo.address);

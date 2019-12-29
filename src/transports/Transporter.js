@@ -156,7 +156,11 @@ class Transporter {
   }
 
   async getUTXO(address) {
-    if (!is.address(address)) throw new Error('Received an invalid address to fetch');
+    if (Array.isArray(address)) {
+      address.forEach((addr) => {
+        if (!is.address(addr)) throw new Error('Received an invalid address to fetch');
+      });
+    } else if (!is.address(address)) throw new Error('Received an invalid address to fetch');
     return this.fetchAndReturn('getUTXO', address);
   }
 
