@@ -29,16 +29,16 @@
   },
   "homepage": "https://github.com/dashevo/wallet-lib#readme",
   "dependencies": {
-    "@dashevo/dapi-client": "^0.6.7",
+    "@dashevo/dapi-client": "^0.7.0",
     "@dashevo/dashcore-lib": "^0.18.0",
-    "@dashevo/dpp": "^0.7.2",
+    "@dashevo/dpp": "^0.9.1",
     "bls-signatures": "^0.1.9",
     "cbor": "^5.0.1",
     "crypto-js": "^3.1.9-1",
     "localforage": "^1.7.3",
     "lodash": "^4.17.15",
     "winston": "^3.2.1",
-    "pbkdf2": "latest"
+    "pbkdf2": "^3.0.17"
   },
   "devDependencies": {
     "chai": "^4.2.0",
