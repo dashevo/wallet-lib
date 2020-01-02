@@ -27,7 +27,7 @@ export declare class Account {
 
     getDPA(name: string): object;
 
-    getIdentityPrivateKey(index: number): PrivateKey;
+    getIdentityKey(index: number): PrivateKey;
 
     getNetwork(): Network;
 
