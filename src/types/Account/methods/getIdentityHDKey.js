@@ -7,7 +7,6 @@ const Identity = require('@dashevo/dpp/lib/identity/Identity');
  * @return {PrivateKey}
  */
 function getIdentityHDKey(keyIndex = 0, identityType = 'USER') {
-  // TODO: add proper feature-based derivation
   const { keyChain, index: accountIndex } = this;
   const hardenedFeatureRootKey = keyChain.getHardenedDIP9FeaturePath();
 
