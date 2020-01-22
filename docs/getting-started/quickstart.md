@@ -7,7 +7,7 @@ In order to use this library in Node, you will need to add it to your project as
 Having [NodeJS](https://nodejs.org/) installed, just type in your terminal : 
 
 ```sh
-npm install @dashevo/dashjs
+npm install @dashevo/wallet-lib
 ```
 
 ### CDN Standalone
