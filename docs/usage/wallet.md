@@ -50,41 +50,7 @@ const Wallet = new Wallet(opts);
 
 N.B : If mnemonic, seed and privateKey are filled, only mnemonic will be used. If none is entered, the wallet will create a mnemonic.
 
-### Creation without a mnemonic (gets one generated)
-```js
-const wallet = new Wallet();
-```
-or 
-```js
-const wallet = new Wallet({
-  mnemonic: null
-});
-console.log(wallet.exportWallet());
-```
 
-### Creation from Mnemonic 
-
-```js
-const wallet = new Wallet({
-  mnemonic: 'hole lesson insane entire dolphin scissors game dwarf polar ethics drip math'
-})
-```
-
-### Creation from HDPrivateKey 
-
-```js
-const wallet = new Wallet({
-  HDPrivateKey: 'tprv8ZgxMBicQKsPeWisxgPVWiXho8ozsAUqc3uvpAhBuoGvSTxqkxPZbTeG43mvgXn3iNfL3cBL1NmR4DaVoDBPMUXe1xeiLoc39jU9gRTVBd2'
-})
-```
-
-### Creation from Seed 
-
-```js
-const wallet = new Wallet({
-  seed: '436905e6756c24551bffaebe97d0ebd51b2fa027e838c18d45767bd833b02a80a1dd55728635b54f2b1dbed5963f4155e160ee1e96e2d67f7e8ac28557d87d96'
-})
-```
 
 ## Create an Account
 
