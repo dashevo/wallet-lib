@@ -1,5 +1,5 @@
 **Usage**: `account.events.on('FETCHED/CONFIRMED_TRANSACTION', fn)`    
-**Description**: Every time a new unconfirmed transaction is fetched from the network, an event in thrown.
+**Description**: Every time a new confirmed transaction is fetched from the network, an event in thrown.
 
 Returns : {Transaction}
 
@@ -11,4 +11,3 @@ const onNewConfirmedTx = (tx)=>{
 }
 account.events.on(EVENTS.FETCHED_CONFIRMED_TRANSACTION, onNewConfirmedTx);
 ```
-
