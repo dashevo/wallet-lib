@@ -3,8 +3,8 @@
 
 Parameters: 
 
-| parameters           | type      | required       | Description                                                                       |  
-|----------------------|-----------|----------------| -------------------------------------------------------------------------------	  |
-| **onlySpendable**    | boolean   | no (def: true) | When set at true, returns only the UTXOS that are spendable |
+| parameters           | type      | required       | Description                                                                             |  
+|----------------------|-----------|----------------| ----------------------------------------------------------------------------------------|
+| **onlyAvailable**    | boolean   | no (def: true) | When set at true, returns only the UTXOS that are available for use (spendable outputs) |
 
 Returns : Array[utxos].

@@ -12,6 +12,6 @@ In order to access your UTXO, you will have to provide a valid mnemonic that wil
 
 ## Wallet accounts
 
-Since the introduction of deterministic wallet, a Wallet is actually composed of multiple account. 
+Since the introduction of [deterministic wallet](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki), a Wallet is actually composed of multiple account. 
 
 For manipulation account, `Wallet.getAccount()` takes an optional (default: 0) account Id. 
