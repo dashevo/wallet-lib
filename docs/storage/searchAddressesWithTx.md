@@ -1,4 +1,4 @@
-**Usage**: `storage.searchAddressesWithTx(txid)`    
+**Usage**: `storage.searchAddressesWithTx(transactionId)`    
 **Description**: Returns the list of addresses objects that has a relation with the provided TxId.   
 
 Parameters: 

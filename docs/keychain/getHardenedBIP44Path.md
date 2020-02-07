@@ -1,4 +1,4 @@
-**Usage**: `keychain.getHardenedBIP44Path(index,type)`    
+**Usage**: `keychain.getHardenedBIP44Path(type)`    
 **Description**: Return a safier root path to derivate from
 
 Parameters: 
@@ -11,8 +11,6 @@ Returns : HDPrivateKey
 
 Example: 
 ```js
-const { privateKey } = keychain.getKeyForChild(0);
+const hdPrivateKey = keychain.getHardenedBIP44Path();
+const { privateKey } = hdPrivateKey
 ```
-
-
-VERIFY THAT IT ACTUALLY WORKS AS EXPECTED LOL.

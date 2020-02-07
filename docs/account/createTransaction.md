@@ -1,22 +1,22 @@
-**Usage**: `account.createTransaction(transactionOpts)`    
+**Usage**: `account.createTransaction(txOpts)`    
 **Description**: Allow to create a transaction to one or multiple recipients.
 
 Parameters: 
 
-| parameters             | type                          | required                     | Description                                                                                                                         |  
-|------------------------|-------------------------------|------------------------------| ----------------------------------------------------------------------------------------------------------------------------------- |
-| **recipient**          | string                        | yes (if no `recipients`)     | The external address recipient of this transaction                                                                                  |
-| **satoshis**           | string                        | yes (if no `recipients` set) | The value amount to transfer to the recipient address                                                                               |
-| **recipients**         | Array[{recipient, satoshis}]  | no                           | Alternatively, you can use this to send to multiple address/amount. Array arra of {recipient, satoshis}                             |
-| **utxos**              | Array[utxos]                  | no                           | Can be specified to use specific utxo to use, or other utxos own by other private keys (you will need to pass the privateKeys along |
-| **privateKeys**        | Array[PrivateKey/HDPrivateKey]| no                           | Overwrite the default behaviour (searching locally for keys) and uses these to sign instead.                                        |
-| **strategy**           | string                        | no                           | Overwrite the default strategy used (using account default or specified strategy)                                                   |
-| **deductFee**          | boolean                       | no                           | Defaults: true. When set at false, will not deduct fee on the Transaction object                                                    |
-| **change**             | string                        | no                           | Defaults: `account.getUnusedAddress(internal)`. When set, will use that address as a change address on remaining fund               |
+| parameters                    | type                          | required                     | Description                                                                                                                         |  
+|-------------------------------|-------------------------------|------------------------------| ----------------------------------------------------------------------------------------------------------------------------------- |
+| **txOpts.recipient**          | string                        | yes (if no `recipients`)     | The external address recipient of this transaction                                                                                  |
+| **txOpts.satoshis**           | string                        | yes (if no `recipients` set) | The value amount to transfer to the recipient address                                                                               |
+| **txOpts.recipients**         | Array[{recipient, satoshis}]  | no                           | Alternatively, you can use this to send to multiple address/amount. Array arra of {recipient, satoshis}                             |
+| **txOpts.utxos**              | Array[utxos]                  | no                           | Can be specified to use specific utxo to use, or other utxos own by other private keys (you will need to pass the privateKeys along |
+| **txOpts.privateKeys**        | Array[PrivateKey/HDPrivateKey]| no                           | Overwrite the default behaviour (searching locally for keys) and uses these to sign instead.                                        |
+| **txOpts.strategy**           | string                        | no                           | Overwrite the default strategy used (using account default or specified strategy)                                                   |
+| **txOpts.deductFee**          | boolean                       | no                           | Defaults: true. When set at false, will not deduct fee on the Transaction object                                                    |
+| **txOpts.change**             | string                        | no                           | Defaults: `account.getUnusedAddress(internal)`. When set, will use that address as a change address on remaining fund               |
 
 
 Returns : [Transaction](https://dashevo.github.io/DashJS/#/usage/dashcorelib-primitives?id=transaction)   
-Notes: This transaction will be need to be signed `account.sign(transaction)` and then, if wanted, broadcasted to the network for execution `account.broadcastTransaction()`.
+Notes: This transaction will be need to be signed [`account.sign(transaction)`](/account/sign) and then, if wanted, broadcasted to the network for execution `account.broadcastTransaction()`.
 
 Example : 
 ```js

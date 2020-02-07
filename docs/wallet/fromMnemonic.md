@@ -6,7 +6,7 @@ Parameters:
 
 | parameters             | type                   | required       | Description                                                         |  
 |------------------------|------------------------|----------------| --------------------------------------------------------------------|
-| **Mnemonic**           | Mnemonic|String        | yes            | The Mnemonic from which you want to initialize the wallet.      |
+| **mnemonic**           | Mnemonic|String        | yes            | The Mnemonic from which you want to initialize the wallet.      |
 
 Returns : void (set a HD Wallet).
 

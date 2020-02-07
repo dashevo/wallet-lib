@@ -6,7 +6,6 @@ Parameters:
 
 | parameters             | type              | required         | Description                                                             |  
 |------------------------|-------------------|------------------| ------------------------------------------------------------------------|
-| **opts**               |                   |                  |                                                                         |
 | **opts.rehydrate**     | Boolean           |  no              |  Set if the Storage will autoload from the adapter                      |
 | **opts.autosave**      | Boolean           |  no              |  Set if the Storage will autosave to the adapter                        |
 | **opts.adapter**       | Adapter           |  no              |  The adapter to test and use.                                           |

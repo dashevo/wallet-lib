@@ -5,7 +5,7 @@ Parameters:
 
 | parameters             | type      | required       | Description                                                                       |  
 |------------------------|-----------|----------------| -------------------------------------------------------------------------------	  |
-| **index**              | number    | no (default: 0)| The [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) index |
+| **opts.index**         | number    | no (default: 0)| The [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) index |
 
 Returns : Account.
 

@@ -13,8 +13,6 @@ Example:
 ```js
 
 const hdPrivateKey = keychain.getHardenedDIP9FeaturePath();
-// Derivate for u
+const { privateKey } = hdPrivateKey;
+
 ```
-
-
-VERIFY THAT IT ACTUALLY WORKS AS EXPECTED LOL.

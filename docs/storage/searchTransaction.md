@@ -1,4 +1,4 @@
-**Usage**: `storage.searchTransaction(txid)`    
+**Usage**: `storage.searchTransaction(transactionId)`    
 **Description**: Returns the transaction information from the provided TxId if exists.   
 
 Parameters: 

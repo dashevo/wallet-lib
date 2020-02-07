@@ -1,4 +1,4 @@
-**Usage**: `storage.importSingleAddress(address, walletId)`     
+**Usage**: `storage.importSingleAddress(singleAddress, walletId)`     
 **Description**: Allow to import a single address to the wallet     
 **Notes**: Not useful when managing a HDWallet.   
 

@@ -1,4 +1,4 @@
-**Usage**: `account.encore(valueToEncode)`    
+**Usage**: `account.encore(method, data)`    
 **Description**: Allow to decode an encoded value   
 **Notes**: Method allowed right now limited to cbor (used by platform protocol).      
 

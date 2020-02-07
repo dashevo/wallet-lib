@@ -1,4 +1,4 @@
-**Usage**: `storage.getTransaction(txid)`     
+**Usage**: `storage.getTransaction(transactionId)`     
 **Description**: Return the transaction from the store matching the txId.
 
 Parameters: 
