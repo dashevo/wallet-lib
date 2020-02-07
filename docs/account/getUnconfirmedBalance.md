@@ -1,5 +1,5 @@
 **Usage**: `account.getUnconfirmedBalance(displayDuffs)`      
-**Description**: This method will return the unconfirmed balance (missing inclusion in a block) of an accout
+**Description**: This method will return the unconfirmed balance (missing inclusion in a block) of an account
 
 Parameters: 
 
