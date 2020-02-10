@@ -20,7 +20,7 @@ async function sweepWallet() {
         network: this.network,
         allowSensitiveOperations: this.allowSensitiveOperations,
         injectDefaultPlugins: this.injectDefaultPlugins,
-        transport: this.transport,
+        transport: this.transport.transport,
       });
       const mnemonic = newWallet.exportWallet();
       const recipient = newWallet.getAccount({index:0}).getUnusedAddress().address;
