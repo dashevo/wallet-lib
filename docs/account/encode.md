@@ -1,13 +1,13 @@
-**Usage**: `account.encore(method, data)`    
-**Description**: Allow to decode an encoded value   
-**Notes**: Method allowed right now limited to cbor (used by platform protocol).      
+**Usage**: `account.encode(method, data)`    
+**Description**: Allow to encode any raw data   
+**Notes**: Methods allowed right now limited to cbor (used by platform protocol).      
 
 Parameters: 
 
-| parameters        | type   | required       | Description                                      |  
-|-------------------|--------|----------------| -------------------------------------------------|
-| **method**        | String | yes            | Enter a valid encoding method (one of: ['cbor']) |
-| **data**          | Object/String | yes     | A value to encode                                |
+| parameters        | type          | required       | Description                                      |  
+|-------------------|---------------|----------------| -------------------------------------------------|
+| **method**        | String        | yes            | Enter a valid encoding method (one of: ['cbor']) |
+| **data**          | Object/String | yes            | A value to encode                                |
 
 Returns : encoded value (Buffer)  
 

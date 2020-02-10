@@ -1,5 +1,5 @@
 **Usage**: `account.encrypt(method, data, secret)`    
-**Description**: Allow to encrypt a value   
+**Description**: Allow to encrypt a value using a specific secret
 
 Parameters:   
 

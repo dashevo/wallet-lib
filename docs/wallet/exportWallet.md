@@ -1,4 +1,4 @@
-**Usage**: `wallet.exportWallet()`    
+**Usage**: `wallet.exportWallet([outputType])`    
 **Description**: This method will export the wallet to the default outputType (depending on initializated params : mnemonic. HDPubKey,...). 
 
 This method varies depending from which type of wallet is this. 

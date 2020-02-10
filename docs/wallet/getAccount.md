@@ -1,4 +1,4 @@
-**Usage**: `wallet.getAccount(opts)`    
+**Usage**: `wallet.getAccount([opts])`    
 **Description**: This method will get you the account specified by it's index. 
 
 Parameters: 

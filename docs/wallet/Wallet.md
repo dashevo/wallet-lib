@@ -1,7 +1,7 @@
 **Usage**: `new Wallet(walletOpts)`  
-**Description**: This method create a new Account associated to the given wallet.
-In Wallet-Lib, a Wallet is a manager that is tied to a passphrase/seed or privateKey and manage one or multiples accounts from that. 
-It's purpose is mainly to create or get an account, allowing multiple account to be tracked and tied from a single manager.  
+**Description**: This method creates a new Wallet.  
+In Wallet-Lib, a Wallet is a manager that is tied to a passphrase/seed or privateKey and manage one or multiples Account from that.   
+It's purpose is mainly to create or get an account, allowing multiple account to be tracked and tied from a single manager.    
 
 Parameters: 
 
@@ -28,7 +28,7 @@ N.B 2 : When initialized from a `privateKey` or an `HDPublicKey`, comportment of
 - PrivateKey : There is no path in this mode. It's a unique public address. 
 - HDPublicKey : There is no signing in this mode. Watch-only.
 
-Returns : Account instance.
+Returns : Wallet instance.
 
 **Examples** :
 

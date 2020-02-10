@@ -2,7 +2,9 @@
     - [Quick start](getting-started/quickstart.md)
     - [Quick introduction to core concepts](getting-started/core-concepts.md)
 - Usage 
+    - [DAPI](usage/dapi.md)   
     - [Examples](usage/examples.md)
+    - [Coin Selection](usage/coinSelection.md)
     - Account
         - [`new Account()`](account/Account.md)
         - [`.broadcastTransaction()`](account/broadcastTransaction.md)
@@ -80,8 +82,7 @@
         - [`CONFIRMED_BALANCE_CHANGED`](events/confirmed_balance_changed.md)
         - [`UNCONFIRMED_BALANCE_CHANGED`](events/unconfirmed_balance_changed.md)
         - [`BLOCKHEIGHT_CHANGED`](events/blockheight_changed.md)
-    - [Coin Selection](usage/coinSelection.md)
-    - [DAPI](usage/dapi.md)    
+ 
     
 - Plugins 
     - [Using a plugin](plugins/using-a-plugin.md)
@@ -89,4 +90,4 @@
     - [Wallet workers](plugins/wallet-workers.md)
     - [Community plugins](plugins/community-plugins.md)
     
-- [License](#license)
+- [License](https://github.com/dashevo/wallet-lib/blob/master/LICENSE)
