@@ -21,7 +21,6 @@ function isValidTransport(transport) {
     expectedKeys.forEach((key) => {
       if (!transport[key]) {
         valid = false;
-        console.log(`Invalid Transporter. Expected key :${key}`)
         logger.error(`Invalid Transporter. Expected key :${key}`);
       }
     });
