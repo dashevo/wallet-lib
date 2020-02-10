@@ -14,13 +14,14 @@ function isValidTransport(transport) {
     let valid = true;
     const expectedKeys = [
       'getAddressSummary',
-      'getTransactionById',
+      'getTransaction',
       'getUTXO',
-      'sendRawTransaction',
+      'sendTransaction',
     ];
     expectedKeys.forEach((key) => {
       if (!transport[key]) {
         valid = false;
+        console.log(`Invalid Transporter. Expected key :${key}`)
         logger.error(`Invalid Transporter. Expected key :${key}`);
       }
     });
@@ -55,7 +56,7 @@ class Transporter {
           } else {
             transport = new transportList[loweredTransportName]();
           }
-          this.isValid = isValidTransport(loweredTransportName);
+          this.isValid = isValidTransport(transport);
         }
       } else {
         this.isValid = isValidTransport(transportArg);
@@ -145,7 +146,7 @@ class Transporter {
 
   async getTransaction(txid) {
     if (!is.txid(txid)) throw new Error(`Received an invalid txid to fetch : ${txid}`);
-    const data = await this.fetchAndReturn('getTransactionById', txid);
+    const data = await this.fetchAndReturn('getTransaction', txid);
     if (!data) {
       return false;
     }
@@ -193,9 +194,9 @@ class Transporter {
     return null;
   }
 
-  async sendRawTransaction(rawtx, isIs) {
+  async sendTransaction(rawtx, isIs) {
     if (!is.string(rawtx)) throw new Error('Received an invalid rawtx');
-    return this.transport.sendRawTransaction(rawtx, isIs);
+    return this.transport.sendTransaction(rawtx, isIs);
   }
 }
 

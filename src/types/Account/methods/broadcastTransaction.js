@@ -56,7 +56,7 @@ async function broadcastTransaction(transaction, isIs = false) {
     throw new InvalidDashcoreTransaction(transaction);
   }
 
-  const txid = await this.transport.sendRawTransaction(transaction.toString(), isIs);
+  const txid = await this.transport.sendTransaction(transaction.toString(), isIs);
   if (!is.txid(txid)) {
     logger.error(txid, 'is said to not be a txid!');
   }
