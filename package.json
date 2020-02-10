@@ -34,7 +34,6 @@
     "@dashevo/dpp": "^0.10.0-dev.14",
     "cbor": "^5.0.1",
     "crypto-js": "^3.1.9-1",
-    "localforage": "^1.7.3",
     "lodash": "^4.17.15",
     "winston": "^3.2.1",
     "pbkdf2": "^3.0.17"
@@ -44,6 +43,7 @@
     "eslint": "^6.3.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.18.2",
+    "localforage": "^1.7.3",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1",
     "size-limit": "^2.1.4",
