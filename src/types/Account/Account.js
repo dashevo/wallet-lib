@@ -7,6 +7,26 @@ const EVENTS = require('../../EVENTS');
 const Wallet = require('../Wallet/Wallet.js');
 const { simpleTransactionOptimizedAccumulator } = require('../../utils/coinSelections/strategies');
 
+function getNextUnusedAccountIndexForWallet(wallet) {
+  if (wallet && wallet.accounts) {
+    if (!wallet.accounts.length) return 0;
+
+    const indexes = wallet.accounts.reduce((acc, curr) => {
+      acc.push(curr.index);
+      return acc;
+    }, []).sort();
+    let index;
+    for (let i = 0; i <= indexes[indexes.length - 1] + 1; i += 1) {
+      if (!indexes.includes(i)) {
+        index = i;
+        break;
+      }
+    }
+    return index;
+  }
+  throw new Error('An account is attached to a wallet that has not been provided to the account constructor.');
+}
+
 const defaultOptions = {
   network: 'testnet',
   cacheTx: true,
@@ -46,14 +66,12 @@ class Account extends EventEmitter {
     this.walletType = wallet.walletType;
     this.offlineMode = wallet.offlineMode;
 
-    // FIXME : this is wrong, it suppose they have been created sequentially. What if [i:0, i:10]...
-    // We should use the same system that for BIP44 and foreach seq
-    const accountIndex = _.has(opts, 'index') ? opts.index : wallet.accounts[wallet.accounts.length - 1].index + 1;
-    this.index = accountIndex;
+
+    this.index = _.has(opts, 'index') ? opts.index : getNextUnusedAccountIndexForWallet(wallet);
     this.strategy = _loadStrategy(_.has(opts, 'strategy') ? opts.strategy : defaultOptions.strategy);
     this.network = getNetwork(wallet.network).toString();
 
-    this.BIP44PATH = getBIP44Path(this.network, accountIndex);
+    this.BIP44PATH = getBIP44Path(this.network, this.index);
 
     this.transactions = {};
 
