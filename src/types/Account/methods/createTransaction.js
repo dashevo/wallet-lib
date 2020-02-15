@@ -22,7 +22,6 @@ const parseUtxos = (utxos) => {
  * @param opts.recipients - Optional - replace individual satoshis/amount/recipient args
  * @param opts.change - String - A valid Dash address - optional
  * @param opts.utxos - Array - A utxo set - optional
- * @param opts.isInstantSend - If you want to use IS or stdTx.
  * @param opts.deductFee - Deduct fee
  * @param opts.privateKeys - Overwrite default behavior : auto-searching local matching keys.
  * @param opts.strategy - Overwrite default strategy
@@ -77,7 +76,7 @@ function createTransaction(opts) {
     return utxo;
   });
 
-  const feeCategory = (opts.isInstantSend) ? 'instant' : 'normal';
+  const feeCategory = 'normal';
   let selection;
   try {
     selection = coinSelection(utxosList, outputs, deductFee, feeCategory, strategy);

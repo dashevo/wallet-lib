@@ -65,7 +65,6 @@ export declare namespace Account {
         recipients?:[RecipientOptions]
         change?: string;
         utxos?:[object];
-        isInstantSend?: boolean;
         deductFee?: boolean
         privateKeys?: [PrivateKey],
         strategy?: Strategy

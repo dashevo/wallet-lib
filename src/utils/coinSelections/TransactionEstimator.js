@@ -163,10 +163,7 @@ class TransactionEstimator {
 
   estimateFees() {
     const bytesSize = this.getSize();
-    if (this.feeCategory === 'instant') {
-      const inputNb = this.getInputs().length;
-      return (inputNb * FEES.INSTANT_FEE_PER_INPUTS);
-    }
+    // const inputNb = this.getInputs().length;
     return ((bytesSize / 1000) * FEES[this.feeCategory.toUpperCase()]);
   }
 

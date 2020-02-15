@@ -5,10 +5,6 @@ module.exports = function feeCalculation(type = 'standard') {
   };
 
   switch (type) {
-    case 'instantSend':
-      feeRate.type = 'perInputs';
-      feeRate.value = 10000;
-      return feeRate;
     case 'standard':
     default:
       feeRate.type = 'perBytes';
