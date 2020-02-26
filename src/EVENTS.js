@@ -7,6 +7,8 @@ module.exports = {
   UNCONFIRMED_BALANCE_CHANGED: 'unconfirmed_balance_changed',
   BLOCKHEIGHT_CHANGED: 'blockheight_changed',
   BLOCK: 'block',
+  TRANSACTION: 'transaction',
+  BLOCKHEADER: 'blockheader',
   FETCHED_ADDRESS: 'FETCHED/ADDRESS',
   ERROR_UPDATE_ADDRESS: 'ERROR/UPDATE_ADDRESS',
   FETCHED_TRANSACTIONS: 'FETCHED/TRANSACTIONS',

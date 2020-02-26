@@ -6,7 +6,7 @@ const {
   is,
 } = require('../../utils');
 
-const Transporter = require('../../transports/Transporter');
+const transporters = require('../../transporters');
 
 const defaultOptions = {
   offlineMode: false,
@@ -108,9 +108,9 @@ class Wallet {
       }
     }
     if (this.offlineMode) {
-      this.transport = { isValid: false };
+      this.transporter = { isValid: false };
     } else {
-      this.transport = (opts.transport) ? new Transporter(opts.transport) : new Transporter();
+      this.transporter = transporters.resolve(opts.transporter);
     }
     this.accounts = [];
     this.interface = opts.interface;
