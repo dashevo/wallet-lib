@@ -38,7 +38,7 @@ describe('Account - getTransaction', () => {
 const expectedTx = {
   txid: '92150f239013c961db15bc91d904404d2ae0520929969b59b69b17493569d0d5',
   blockhash: '000000c5d6ca463ebbfddffe9a0a135312b6d8fc4eae2787b82b0fca9de7a554',
-  blockheight: 29197,
+  blockHeight: 29197,
   blocktime: 1562060795,
   fees: 522,
   size: 521,

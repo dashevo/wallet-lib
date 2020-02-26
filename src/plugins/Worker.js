@@ -41,9 +41,13 @@ class Worker extends StandardPlugin {
     // every minutes, check the pool
     this.worker = setInterval(this.execWorker.bind(self), this.workerIntervalTime);
     if (this.executeOnStart === true) {
+      if (this.onStart) {
+        await this.onStart();
+      }
       await this.execWorker();
     }
-    this.events.emit(`WORKER/${this.name.toUpperCase()}/STARTED`);
+    const eventType = `WORKER/${this.name.toUpperCase()}/STARTED`;
+    self.parentEvents.emit(eventType, { type: eventType, payload: null });
   }
 
   stopWorker() {
@@ -51,7 +55,8 @@ class Worker extends StandardPlugin {
     this.worker = null;
     this.workerPass = 0;
     this.isWorkerRunning = false;
-    this.events.emit(`WORKER/${this.name.toUpperCase()}/STOPPED`);
+    const eventType = `WORKER/${this.name.toUpperCase()}/STOPPED`;
+    this.parentEvents.emit(eventType, { type: eventType, payload: null });
   }
 
   async execWorker() {
@@ -76,8 +81,8 @@ class Worker extends StandardPlugin {
 
     this.isWorkerRunning = false;
     this.workerPass += 1;
-
-    this.events.emit(`WORKER/${this.name.toUpperCase()}/EXECUTED`);
+    const eventType = `WORKER/${this.name.toUpperCase()}/EXECUTED`;
+    this.parentEvents.emit(eventType, { type: eventType, payload: null });
     return true;
   }
 }

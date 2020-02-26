@@ -56,7 +56,7 @@ describe('Account - broadcastTransaction', () => {
     const self = {
       transport: {
         isValid: true,
-        sendRawTransaction: () => sendCalled = +1,
+        sendTransaction: () => sendCalled = +1,
       },
       storage: {
         searchAddress: () => { searchCalled = +1; return { found: false }; },
@@ -77,7 +77,7 @@ describe('Account - broadcastTransaction', () => {
     const self = {
       transport: {
         isValid: true,
-        sendRawTransaction: () => sendCalled = +1,
+        sendTransaction: () => sendCalled = +1,
       },
       storage: {
         searchAddress: () => { searchCalled = +1; return { found: false }; },
@@ -97,7 +97,7 @@ describe('Account - broadcastTransaction', () => {
     const self = {
       transport: {
         isValid: true,
-        sendRawTransaction: () => sendCalled = +1,
+        sendTransaction: () => sendCalled = +1,
       },
       storage: {
         searchAddress: () => { searchCalled = +1; return { found: false }; },

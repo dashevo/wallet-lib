@@ -3,10 +3,10 @@ const { dashToDuffs, duffsToDash } = require('../../../utils');
 
 // Will filter out transaction that are not concerning us
 // (which can happen in the case of multiple account in store)
-const getFilteredTransactions = (store, walletId, accountIndex) => {
+const getFilteredTransactions = async function getFilteredTransactions(storage, walletId, accountIndex) {
   const txids = [];
   const txs = [];
-
+  const store = storage.getStore();
   const { transactions } = store;
   const { addresses } = store.wallets[walletId];
 
@@ -17,7 +17,7 @@ const getFilteredTransactions = (store, walletId, accountIndex) => {
 
     _.each({ ...external, ...internal }, (address) => {
       if (!isHDWallet
-        || (isHDWallet && parseInt(address.path.split('/')[3], 10) === accountIndex)
+          || (isHDWallet && parseInt(address.path.split('/')[3], 10) === accountIndex)
       ) {
         address.transactions.forEach((txid) => {
           if (!txids.includes(txid)) {
@@ -37,17 +37,30 @@ const getFilteredTransactions = (store, walletId, accountIndex) => {
     });
   }
 
+  // for (const transactionId of txids) {
+  //   const tx = transactions[transactionId];
+  //   const {
+  //     hash: txid, nLockTime, vin, vout,
+  //   } = tx;
+  //   const time = storage.getBlockHeader(nLockTime);
+  //
+  //   console.log({ time });
+  // }
   _.each(txids, (transactionId) => {
+    const tx = transactions[transactionId];
+
     const {
-      txid, fees, blocktime, vin, vout,
-    } = transactions[transactionId];
+      hash: txid, nLockTime, vin, vout,
+    } = tx;
+
+    const time = storage.getBlockHeader(nLockTime);
 
     txs.push({
       txid,
-      fees,
+      // fees:tx._estimateFee(),
       vin,
       vout,
-      time: blocktime,
+      time,
     });
   });
 
@@ -82,7 +95,7 @@ async function getTransactionHistory() {
   const accountIndex = this.index;
   const store = this.storage.getStore();
 
-  const txs = getFilteredTransactions(store, walletId, accountIndex);
+  const txs = await getFilteredTransactions(this.storage, walletId, accountIndex);
 
   const { addresses } = store.wallets[walletId];
   const isHDWallet = !((Object.keys(addresses.misc).length > Object.keys(addresses.external)));
@@ -266,7 +279,7 @@ async function getTransactionHistory() {
   };
 
   _.each(txs, (tx) => {
-    const { txid, time, fees } = tx;
+    const { txid, time } = tx;
     const { type, to, from } = determinateTransactionMetaData(tx);
 
     const cleanUpPredicate = (val) => ({
@@ -279,7 +292,7 @@ async function getTransactionHistory() {
       time,
       to: to.map(cleanUpPredicate),
       from: from.map(cleanUpPredicate),
-      fees,
+      // fees,
       type,
     };
 
@@ -288,4 +301,5 @@ async function getTransactionHistory() {
 
   return transactionHistory.sort(sortByTimeDesc);
 }
+
 module.exports = getTransactionHistory;
