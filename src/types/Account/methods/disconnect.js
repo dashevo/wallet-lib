@@ -6,8 +6,8 @@
  */
 module.exports = function disconnect() {
   this.isDisconnecting = true;
-  if (this.transport && this.transport.isValid && this.transport.disconnect) {
-    this.transport.disconnect();
+  if (this.transporter && this.transporter.isValid && this.transporter.disconnect) {
+    this.transporter.disconnect();
   }
 
   if (this.plugins.workers) {

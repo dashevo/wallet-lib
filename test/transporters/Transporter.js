@@ -1,8 +1,8 @@
 const { expect } = require('chai');
 const DAPIClient = require('@dashevo/dapi-client');
-const Transporter = require('../../src/transports/Transporter');
+const Transporter = require('../../src/transporters/Transporter');
 
-const pluginRequiredKeys = ['getAddressSummary', 'getTransactionById', 'getUTXO', 'subscribeToAddresses', 'closeSocket', 'sendRawTransaction'];
+const pluginRequiredKeys = ['getAddressSummary', 'getTransactionById', 'getUTXO', 'subscribeToAddresses', 'closeSocket', 'sendTransaction'];
 
 describe('Transporter', () => {
   it('should create a new transporter', () => {

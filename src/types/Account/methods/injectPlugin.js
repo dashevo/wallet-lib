@@ -31,7 +31,7 @@ module.exports = async function injectPlugin(
     // All plugins will require the event object
     const { pluginType } = plugin;
 
-    plugin.inject('events', self.events);
+    plugin.inject('parentEvents', { on: self.on, emit: self.emit });
 
     // Check for dependencies
     const deps = plugin.dependencies || [];
@@ -72,8 +72,8 @@ module.exports = async function injectPlugin(
             const onStartedEvent = () => startWatcher(watcher);
             const onExecuteEvent = () => setReadyWatch(watcher);
 
-            self.events.on(`WORKER/${pluginName.toUpperCase()}/STARTED`, onStartedEvent);
-            self.events.on(`WORKER/${pluginName.toUpperCase()}/EXECUTED`, onExecuteEvent);
+            self.on(`WORKER/${pluginName.toUpperCase()}/STARTED`, onStartedEvent);
+            self.on(`WORKER/${pluginName.toUpperCase()}/EXECUTED`, onExecuteEvent);
           }
           await plugin.startWorker();
         }
@@ -81,10 +81,28 @@ module.exports = async function injectPlugin(
       case 'DPA':
         self.plugins.DPAs[pluginName] = plugin;
         break;
-      case 'StandardPlugin':
-      default:
+      case 'Standard':
+        if (plugin.executeOnStart === true) {
+          if (plugin.firstExecutionRequired === true) {
+            const watcher = {
+              ready: false,
+              started: false,
+            };
+            self.plugins.watchers[pluginName] = watcher;
+            // eslint-disable-next-line no-return-assign,no-param-reassign
+            const startWatcher = (_watcher) => { _watcher.started = true; _watcher.ready = true; };
+
+            const onStartedEvent = () => startWatcher(watcher);
+            self.on(`PLUGIN/${pluginName.toUpperCase()}/STARTED`, onStartedEvent);
+          }
+        }
         self.plugins.standard[pluginName] = plugin;
+        await plugin.startPlugin();
         break;
+      default:
+        throw new Error(`Unable to inject plugin: ${pluginType}`);
+        // self.plugins.standard[pluginName] = plugin;
+        // await plugin.startPlugin();
     }
 
     if (is.fn(plugin.onInjected)) {
@@ -93,7 +111,7 @@ module.exports = async function injectPlugin(
     }
 
     if (pluginType === 'DPA' && plugin.verifyOnInjected) {
-      await plugin.verifyDPA(this.transport.transport);
+      await plugin.verifyDPA(this.transporter.transport);
     }
 
     return res(plugin);

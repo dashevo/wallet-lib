@@ -1,4 +1,4 @@
-const { HDPrivateKey } = require('@dashevo/dashcore-lib');
+const { HDPrivateKey, PrivateKey} = require('@dashevo/dashcore-lib');
 /**
  * Get a key from the cache or generate if none
  * @param path
@@ -16,9 +16,9 @@ function getKeyForPath(path, type = 'HDPrivateKey') {
     }
     if (this.type === 'privateKey') {
       this.keys[path] = this.getPrivateKey(path).toString();
+      return new PrivateKey(this.keys[path]);
     }
   }
-
   return new HDPrivateKey(this.keys[path]);
 }
 module.exports = getKeyForPath;

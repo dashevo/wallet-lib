@@ -40,7 +40,7 @@ class SyncWorker extends Worker {
       workerIntervalTime: defaultOpts.workerIntervalTime,
       fetchThreshold: defaultOpts.fetchThreshold,
       dependencies: [
-        'storage', 'transport', 'fetchStatus', 'getTransaction', 'fetchAddressInfo', 'fetchTransactionInfo', 'walletId', 'getUnusedAddress',
+        'storage', 'transporter', 'fetchStatus', 'getTransaction', 'fetchAddressInfo', 'walletId', 'getUnusedAddress',
       ],
       ...opts,
     };
@@ -102,28 +102,44 @@ class SyncWorker extends Worker {
       };
 
       this.listeners.addresses.push(listener);
-      // self.transport.subscribeToAddress(listener.address, cb.bind({ listener }));
+      // self.transporter.subscribeToAddressesTransactions(listener.address, cb.bind({ listener }));
+      //
+      // await self.transporter.subscribeToBlocks();
+      // self.transporter.on(EVENTS.BLOCK, (ev) => {
+      //   const { network } = self.storage.store.wallets[self.walletId];
+      //   const { payload: block } = ev;
+      //   self.announce(EVENTS.BLOCK, block);
+      //   self.announce(EVENTS.BLOCKHEADER, block.header);
+      //   console.log('RECEIVED BLOCKHEADER', block.header);
+      //   self.storage.importBlockHeader(block.header);
+      //   self.announce(
+      //       EVENTS.BLOCKHEIGHT_CHANGED,
+      //       self.storage.store.chains[network.toString()].blockHeight,
+      //   );
+      // });
     });
-    const subscribedAddress = this.listeners.addresses.reduce((acc, el) => {
-      acc.push(el.address);
-      return acc;
-    }, []);
 
-    const getTransactionAndStore = async function (tx) {
-      if (tx.address && tx.txid) {
-        self.storage.addNewTxToAddress(tx, tx.address);
-        const transactionInfo = await self.transport.getTransactionById(tx.txid);
-        self.storage.importTransactions(transactionInfo);
-      }
-    };
-    await self.transport.subscribeToAddresses(subscribedAddress, getTransactionAndStore);
+    // TODO : Finish me when BloomFilter are available via subscribeToTransactionsWithProofs
+    // const subscribedAddress = this.listeners.addresses.reduce((acc, el) => {
+    //   acc.push(el.address);
+    //   return acc;
+    // }, []);
+    //
+    // const getTransactionAndStore = async function (tx) {
+    //   if (tx.address && tx.txid) {
+    //     self.storage.addNewTxToAddress(tx, tx.address);
+    //     const transactionInfo = await self.transporter.getTransactionById(tx.txid);
+    //     self.storage.importTransactions(transactionInfo);
+    //   }
+    // };
+    // await self.transporter.subscribeToAddresses(subscribedAddress, getTransactionAndStore);
     return true;
   }
 
   async execAddressFetching() {
     const self = this;
     const { addresses, network } = this.storage.getStore().wallets[this.walletId];
-    const currBlockheight = this.storage.getStore().chains[network.toString()].blockheight;
+    const currBlockheight = this.storage.getStore().chains[network.toString()].blockHeight;
     const currTime = Date.now();
     const { fetchAddressInfo } = this;
 
@@ -165,7 +181,7 @@ class SyncWorker extends Worker {
             // Tis might be a single used and throw address. Let's figure tx age
             // eslint-disable-next-line no-await-in-loop
             const tx = await self.getTransaction(address.transactions[0]);
-            if (currBlockheight - tx.blockheight < 20000 && hasReachStandardThreshold) {
+            if (currBlockheight - tx.blockHeight < 20000 && hasReachStandardThreshold) {
               shouldFetch = true;
             }
           } else if (isUsed && address.transactions.length > 1 && hasReachStandardThreshold) {
@@ -209,17 +225,19 @@ class SyncWorker extends Worker {
         }
         self.storage.updateAddress(addrInfo, self.walletId);
       } catch (e) {
-        self.events.emit(EVENTS.ERROR_UPDATE_ADDRESS, e);
+        const eventType = EVENTS.ERROR_UPDATE_ADDRESS;
+        self.parentEvents.emit(eventType, { type: eventType, payload: e });
       }
     });
-    this.events.emit(EVENTS.FETCHED_ADDRESS, responses);
+    const eventType = EVENTS.FETCHED_ADDRESS;
+    this.parentEvents.emit(eventType, { type: eventType, payload: responses });
   }
 
   async execTransactionsFetching() {
     const self = this;
     const { transactions, wallets } = this.storage.getStore();
-    const { blockheight, addresses } = wallets[this.walletId];
-    const { fetchTransactionInfo } = this;
+    const { blockHeight, addresses } = wallets[this.walletId];
+    const { getTransaction } = this;
 
     const toFetchTransactions = [];
     const unconfirmedThreshold = SECURE_TRANSACTION_CONFIRMATIONS_NB;
@@ -238,9 +256,9 @@ class SyncWorker extends Worker {
             // In case we have a transaction associated to an address but unknown in global level
             if (!knownsTxId.includes(txid)) {
               toFetchTransactions.push(txid);
-            } else if (transactions[txid].blockheight === UNCONFIRMED_TRANSACTION_STATUS_CODE) {
+            } else if (transactions[txid].blockHeight === UNCONFIRMED_TRANSACTION_STATUS_CODE) {
               toFetchTransactions.push(txid);
-            } else if (blockheight - transactions[txid].blockheight < unconfirmedThreshold) {
+            } else if (blockHeight - transactions[txid].blockHeight < unconfirmedThreshold) {
               // When the txid is more than -1 but less than 6 conf.
               transactions[txid].spendable = false;
               self.storage.updateTransaction(transactions[txid]);
@@ -256,19 +274,14 @@ class SyncWorker extends Worker {
     const promises = [];
 
     toFetchTransactions.forEach((transactionObj) => {
-      const p = fetchTransactionInfo(transactionObj)
-        .then((transactionInfo) => {
-          self.storage.importTransaction(transactionInfo);
-        }).catch((e) => {
-          if (e instanceof ValidTransportLayerRequired) return false;
-          if (e instanceof InvalidTransactionObject) return false;
-          throw e;
-        });
+      // account.getTransaction already handle the cache storage
+      const p = getTransaction(transactionObj);
       promises.push(p);
     });
 
     const resolvedPromised = await Promise.all(promises);
-    this.events.emit(EVENTS.FETCHED_TRANSACTIONS, resolvedPromised);
+    const eventType = EVENTS.FETCHED_TRANSACTIONS;
+    this.parentEvents.emit(eventType, { type: eventType, payload: resolvedPromised });
     return true;
   }
 
@@ -286,13 +299,14 @@ class SyncWorker extends Worker {
   announce(type, el) {
     switch (type) {
       case EVENTS.BLOCK:
-        this.events.emit(EVENTS.BLOCK, el);
+        this.parentEvents.emit(EVENTS.BLOCK, { type: EVENTS.BLOCK, payload: el });
         break;
       case EVENTS.BLOCKHEIGHT_CHANGED:
-        this.events.emit(EVENTS.BLOCKHEIGHT_CHANGED, el);
+        this.parentEvents.emit(EVENTS.BLOCKHEIGHT_CHANGED,
+          { type: EVENTS.BLOCKHEIGHT_CHANGED, payload: el });
         break;
       default:
-        this.events.emit(type, el);
+        this.parentEvents.emit(type, { type, paylaod: el });
         logger.warn('Not implemented, announce of ', { type, el });
     }
   }
