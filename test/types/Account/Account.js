@@ -34,7 +34,6 @@ describe('Account - class', () => {
   it('should create an account', () => {
     const mockWallet = mocks.wallet;
     const account = new Account(mockWallet, { injectDefaultPlugins: false });
-
     expect(account).to.be.deep.equal(mockWallet.accounts[0]);
     expect(account.index).to.be.deep.equal(0);
     expect(account.injectDefaultPlugins).to.be.deep.equal(false);
@@ -52,5 +51,19 @@ describe('Account - class', () => {
     expect(account.readinessInterval._idleTimeout).to.be.equal(200);
 
     account.disconnect();
+
+
+  });
+  it('should correctly create the right expected index', () => {
+    const mockWallet = mocks.wallet;
+    const account = new Account(mockWallet, { injectDefaultPlugins: false });
+    const account2 = new Account(mockWallet, { index:10,injectDefaultPlugins: false });
+    const account3 = new Account(mockWallet, { injectDefaultPlugins: false });
+    expect(account.index).to.be.deep.equal(1);
+    expect(account2.index).to.be.deep.equal(10);
+    expect(account3.index).to.be.deep.equal(2);
+    account.disconnect();
+    account2.disconnect();
+    account3.disconnect();
   });
 });
