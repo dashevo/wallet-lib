@@ -103,6 +103,12 @@ async function _initializeAccount(account, userUnsafePlugins) {
         const resultSyncWorkerSearch = account.hasPlugins(SyncWorker);
         const isSyncWorkerActive = resultSyncWorkerSearch.found;
 
+        if (account.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
+          account.generateAddress(0);
+          sendReady();
+          return res(true);
+        }
+
         if (!resultBIP44WorkerSearch.found) {
           if (account.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
             sendReady();

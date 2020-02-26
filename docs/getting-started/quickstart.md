@@ -26,7 +26,7 @@ const wallet = new Wallet({adapter: localforage});
 
 ## Initialization
 
-Let's load our Wallet by creating a new Wallet instance specifying our mnemonic.
+Let's load our Wallet by creating a new Wallet instance specifying our mnemonic.  
 
 ```js
 const { Wallet } = require('@dashevo/wallet-lib');
@@ -50,7 +50,7 @@ Nothing force you to do so, this is mostly an helper provided to you.
 
 Quick note :
 - If no mnemonic is provided (nor any privatekey, HDPubKey,...) or if mnemonic is `null`, a mnemonic will be created for you automatically.  
-- By default, if not provided, network value will be `testnet`.
+- **By default, if not provided, network value will be `testnet`**.
 - If no adapter specified, Wallet-lib will use a in-memory store (and warn you about it).
 - If no transport specified, Wallet-lib will connect to DAPI.
 - `wallet.getAccount()` is by default equivalent to `wallet.getAccount(0)`, where 0 correspond of the account index as per [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki).
