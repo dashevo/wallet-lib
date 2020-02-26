@@ -1,4 +1,3 @@
-const localForage = require('localforage');
 const logger = require('../../logger');
 const InMem = require('../../adapters/InMem');
 
@@ -16,7 +15,7 @@ module.exports = async function getDefaultAdapter() {
     logger.warn('React Native env - Specify an adapter, fallback on inMem storage only.');
     return InMem;
   } if (isBrowser) {
-    return localForage;
+    return InMem;
   }
   throw new Error('Undetected platform - No default adapter.');
 };
