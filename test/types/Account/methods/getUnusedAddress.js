@@ -17,9 +17,7 @@ describe('Account - getUnusedAddress', () => {
         getStore: () => mockedStore,
         importAddresses: _ => (_),
       },
-      events: {
-        emit: _ => (_),
-      },
+      emit: _ => (_),
       keyChain: new KeyChain({
         type: 'HDPrivateKey',
         HDPrivateKey: Dashcore.HDPrivateKey(HDRootKeyMockedStore),

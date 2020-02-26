@@ -77,7 +77,6 @@ const CONSTANTS = {
       'keyChain',
     ],
     SAFE_PROPERTIES: [
-      'events',
       'offlineMode',
       'transporter',
       'walletId',

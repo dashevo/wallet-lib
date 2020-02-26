@@ -8,10 +8,8 @@ const emitted = [];
 
 describe('Account - disconnect', () => {
   const self = {
-    events: {
-      emit: (eventName) => emitted.push(eventName),
-    },
-    transport: {
+    emit: (eventName) => emitted.push(eventName),
+    transporter: {
       isValid: true,
       connect: () => { transportConnected = true; },
       disconnect: () => { transportConnected = false; },
@@ -23,7 +21,7 @@ describe('Account - disconnect', () => {
     },
   };
   // We simulate what injectPlugin does regarding events
-  self.plugins.workers.dummyWorker.events = self.events;
+  self.plugins.workers.dummyWorker.parentEvents = { on: self.on, emit: self.emit };
   connect.call(self);
   it('should disconnect to stream and worker', () => {
     expect(transportConnected).to.equal(true);

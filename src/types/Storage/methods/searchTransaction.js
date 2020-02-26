@@ -9,6 +9,7 @@ const searchTransaction = function (hash) {
     found: false,
   };
   const store = this.getStore();
+  console.log(store.transactions[hash], hash, store)
   if (store.transactions[hash]) {
     const tx = store.transactions[hash];
     if (tx.hash === hash) {

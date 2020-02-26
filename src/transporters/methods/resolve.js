@@ -28,14 +28,19 @@ const defaultDAPIOpts = {
 module.exports = function resolve(props = { type: 'DAPIClient' }) {
   let opts = {};
   let Transporter = this.getByName('dapi');
-
+  let transporter;
   if (is.string(props)) {
-    Transporter = this.getByName(props);
+    try {
+      Transporter = this.getByName(props);
+    } catch (e) {
+      console.error('Error:', e.message);
+      Transporter = this.getByName('BaseTransporter');
+    }
     // TODO: Remove me when DAPIClient has correct seed
     if (Transporter === this.DAPIClient) {
       opts = defaultDAPIOpts;
     }
-  } else if (is.obj(props)) {
+  } else if (is.obj(props) && props.type) {
     Transporter = this.getByName(props.type || 'dapi');
     // TODO: Remove me when DAPIClient has correct seed
     if (Transporter === this.DAPIClient && !props.seeds) {
@@ -49,11 +54,14 @@ module.exports = function resolve(props = { type: 'DAPIClient' }) {
     if (props === undefined) {
       return resolve('dapi');
     }
+    // User may have specified a whole instance of his client.
+    if (props.constructor.name !== Function.name) {
+      transporter = props;
+    }
     // User may have specified a Transporter class that will be validated and used.
     Transporter = props;
   }
-
-  const transporter = new Transporter(opts);
+  if (!transporter) transporter = new Transporter(opts);
   transporter.isValid = this.validate(transporter);
   return transporter;
 };

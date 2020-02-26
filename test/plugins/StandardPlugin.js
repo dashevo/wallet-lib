@@ -16,12 +16,11 @@ describe('Plugins - StandardPlugin', function suite() {
     expect(plugin.pluginType).to.equal('Standard');
     expect(plugin.name).to.equal('UnnamedPlugin');
     expect(plugin.dependencies).to.deep.equal([]);
-    expect(plugin.events).to.equal(null);
   });
   it('should inject an event emitter', () => {
     const emitter = new EventEmitter();
-    plugin.inject('events', emitter);
-    expect(plugin.events).to.deep.equal(emitter);
+    plugin.inject('parentEvents', { on: emitter.on, emit: emitter.emit });
+    expect(plugin.parentEvents).to.deep.equal(emitter);
   });
   it('should provide methods', () => {
     expect(plugin.provideSomething()).to.equal(true);

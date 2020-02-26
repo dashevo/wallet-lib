@@ -7,7 +7,10 @@ module.exports = function getByName(transporterName) {
     Transporter = this.RPCClient;
   } else if (name.startsWith('protocol')) {
     Transporter = this.ProtocolClient;
-  } else if (!this[name]) {
+  } else if (name.startsWith('base')) {
+    Transporter = this.BaseTransporter;
+  }
+  else if (!this[name]) {
     throw new Error(`Not supported : Transport ${transporterName}`);
   }
   return Transporter;

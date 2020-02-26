@@ -24,7 +24,7 @@ describe('Storage - createWallet', () => {
           addresses: { external: {}, internal: {}, misc: {} },
         },
       },
-      chains: { testnet: { name: 'testnet', blockHeight: -1 } },
+      chains: { testnet: { name: 'testnet', blockHeight: -1, blockHeaders: {}, mappedBlockHeaderHeights: {} } },
     };
     expect(self.store).to.be.deep.equal(expected);
   });
@@ -47,7 +47,7 @@ describe('Storage - createWallet', () => {
           addresses: { external: {}, internal: {}, misc: {} },
         },
       },
-      chains: { testnet: { name: 'testnet', blockHeight: -1 } },
+      chains: { testnet: { name: 'testnet', blockHeight: -1, blockHeaders: {}, mappedBlockHeaderHeights: {} } },
     };
     expect(self.store).to.be.deep.equal(expected);
   });

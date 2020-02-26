@@ -116,7 +116,7 @@ describe('Account - createTransaction', () => {
       generateAddress,
       keyChain: new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(duringDevelopMnemonic, 'testnet', '') }),
       storage,
-      events: { emit: _.noop },
+      emit: _.noop
     };
 
     const txOpts1 = {
@@ -170,7 +170,7 @@ describe('Account - createTransaction', () => {
       strategy: () => { throw new Error(); }, // Ensure it call the passed option
       keyChain: new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(duringDevelopMnemonic, 'testnet', '') }),
       storage,
-      events: { emit: _.noop },
+      emit: _.noop ,
     };
     const txOpts1 = {
       recipient: addressesFixtures.testnet.valid.yereyozxENB9jbhqpbg1coE5c39ExqLSaG.addr,

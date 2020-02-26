@@ -8,7 +8,6 @@ const Dashcore = require('@dashevo/dashcore-lib');
 describe('Storage - constructor', () => {
   it('It should create a storage', () => {
     const storage = new Storage();
-    expect(storage.events).to.exist;
     expect(storage.store).to.deep.equal({ wallets: {}, transactions: {}, chains: {} });
     expect(storage.getStore()).to.deep.equal(storage.store);
     expect(storage.rehydrate).to.equal(true);
@@ -21,7 +20,7 @@ describe('Storage - constructor', () => {
   it('should configure a storage with default adapter', async () => {
     const storage = new Storage();
     let configuredEvent = false;
-    storage.events.on(CONFIGURED, () => configuredEvent = true);
+    storage.on(CONFIGURED, () => configuredEvent = true);
     await storage.configure();
     expect(storage.adapter).to.exist;
     expect(storage.adapter.constructor.name).to.equal('InMem');
@@ -45,7 +44,7 @@ describe('Storage - constructor', () => {
     await storage.createChain(Dashcore.Networks.testnet);
 
     const defaultWalletId = 'squawk7700';
-    const expectedStore1 = { wallets: {}, transactions: {}, chains: { testnet: { name: 'testnet', blockHeight: -1 } } };
+    const expectedStore1 = { wallets: {}, transactions: {}, chains: { testnet: { name: 'testnet', blockHeight: -1, blockHeaders: {}, mappedBlockHeaderHeights: {} } } };
     expect(storage.getStore()).to.deep.equal(expectedStore1);
 
     await storage.createWallet();
@@ -61,7 +60,7 @@ describe('Storage - constructor', () => {
         },
       },
       transactions: {},
-      chains: { testnet: { name: 'testnet', blockHeight: -1 } },
+      chains: { testnet: { name: 'testnet', blockHeight: -1, blockHeaders: {}, mappedBlockHeaderHeights: {} } },
     };
     expect(storage.getStore()).to.deep.equal(expectedStore2);
     expect(storage.store).to.deep.equal(expectedStore2);

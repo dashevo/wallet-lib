@@ -20,7 +20,7 @@ describe('Integration - fromMnemonic', function suite() {
   });
   it('should get an account', (done) => {
     account = wallet.getAccount({ index: 0 });
-    account.events.on(EVENTS.READY, done);
+    account.on(EVENTS.READY, done);
   });
   it('should get addresses', () => {
     expect(account.getAddress(0).address).to.equal('yPemRQzMffYKvDBDXW5Mt64wUPi5ZNdpFW');

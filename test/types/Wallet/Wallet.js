@@ -35,10 +35,10 @@ describe('Wallet - class', () => {
     expect(wallet2.mnemonic).to.be.not.equal(wallet1.mnemonic);
     expect(wallet2.network).to.be.deep.equal(Dashcore.Networks.testnet.toString());
 
-    wallet1.storage.events.on('CONFIGURED', () => {
+    wallet1.storage.on('CONFIGURED', () => {
       wallet1.disconnect();
     });
-    wallet2.storage.events.on('CONFIGURED', () => {
+    wallet2.storage.on('CONFIGURED', () => {
       wallet2.disconnect();
     });
   });
@@ -62,10 +62,10 @@ describe('Wallet - class', () => {
     expect(wallet2.network).to.be.deep.equal(Dashcore.Networks.mainnet.toString());
     expect(Dashcore.Mnemonic(wallet2.mnemonic).toString()).to.be.equal(wallet2.mnemonic);
     expect(wallet2.walletId).to.be.equal(knifeMnemonic.walletIdMainnet);
-    wallet1.storage.events.on('CONFIGURED', () => {
+    wallet1.storage.on('CONFIGURED', () => {
       wallet1.disconnect();
     });
-    wallet2.storage.events.on('CONFIGURED', () => {
+    wallet2.storage.on('CONFIGURED', () => {
       wallet2.disconnect();
     });
   });
@@ -82,7 +82,7 @@ describe('Wallet - class', () => {
     expect(wallet1.allowSensitiveOperations).to.be.deep.equal(false);
     expect(wallet1.injectDefaultPlugins).to.be.deep.equal(true);
     expect(wallet1.walletId).to.be.equal(knifeMnemonic.walletIdTestnet);
-    wallet1.storage.events.on('CONFIGURED', () => {
+    wallet1.storage.on('CONFIGURED', () => {
       wallet1.disconnect();
     });
   });
@@ -99,7 +99,7 @@ describe('Wallet - class', () => {
     expect(wallet1.allowSensitiveOperations).to.be.deep.equal(false);
     expect(wallet1.injectDefaultPlugins).to.be.deep.equal(true);
     expect(wallet1.walletId).to.be.equal(gatherSailMnemonic.testnet.external.walletId);
-    wallet1.storage.events.on('CONFIGURED', () => {
+    wallet1.storage.on('CONFIGURED', () => {
       wallet1.disconnect();
     });
   });
@@ -117,14 +117,14 @@ describe('Wallet - class', () => {
     expect(wallet1.injectDefaultPlugins).to.be.deep.equal(true);
     expect(wallet1.walletId).to.be.equal(cR4t6ePrivateKey.walletIdTestnet);
 
-    wallet1.storage.events.on('CONFIGURED', () => {
+    wallet1.storage.on('CONFIGURED', () => {
       wallet1.disconnect();
     });
   });
   it('should have an offline Mode', () => {
     const wallet = new Wallet(Object.assign({ offlineMode: true, privateKey: cR4t6ePrivateKey.privateKey, network: 'testnet' }, mocks));
     expect(wallet.offlineMode).to.equal(true);
-    wallet.storage.events.on('CONFIGURED', () => {
+    wallet.storage.on('CONFIGURED', () => {
       wallet.disconnect();
     });
   });
@@ -172,7 +172,7 @@ describe('Wallet - Get/Create Account', () => {
     const encryptedHDPriv = walletTestnet.exportWallet('HDPrivateKey');
     const expectedHDPriv = 'tprv8ZgxMBicQKsPcuZMDBeTL2qaBF7gyUPt2wbqbJG2yp8s7yzRE1cRcjRnG3Xmdv3sELwtLGz186VX3EeHQ5we1xr1qH95QN6FRopP6FZqBUJ';
     expect(encryptedHDPriv.toString()).to.equal(expectedHDPriv);
-    walletTestnet.storage.events.on('CONFIGURED', () => {
+    walletTestnet.storage.on('CONFIGURED', () => {
       walletTestnet.disconnect();
     });
   });
@@ -196,7 +196,7 @@ describe('Wallet - Get/Create Account', () => {
     const accountSpecificIndex = walletTestnet.createAccount({ index: 42 });
     expect(accountSpecificIndex.BIP44PATH.split('/')[3]).to.equal('42\'');
     expect(accountSpecificIndex.index).to.equal(42);
-    walletTestnet.storage.events.on('CONFIGURED', () => {
+    walletTestnet.storage.on('CONFIGURED', () => {
       walletTestnet.disconnect();
       done();
     });

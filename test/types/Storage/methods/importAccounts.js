@@ -15,10 +15,10 @@ describe('Storage - importAccounts', async function suite() {
   it('should create a wallet if not existing', (done) => {
 
     const wallet = new Wallet({ offlineMode: true });
-    wallet.storage.events.on('CONFIGURED', () => {
+    wallet.storage.on('CONFIGURED', () => {
       const acc = wallet.getAccount();
-      acc.events.on('*', (msg) => { console.log(msg); });
-      acc.events.on('INITIALIZED', () => {
+      acc.on('*', (msg) => { console.log(msg); });
+      acc.on('INITIALIZED', () => {
         let called = 0;
 
         const self = {
@@ -39,7 +39,7 @@ describe('Storage - importAccounts', async function suite() {
   });
   it('should import an account', (done) => {
     const wallet = new Wallet({ offlineMode: true });
-    wallet.storage.events.on('CONFIGURED', () => {
+    wallet.storage.on('CONFIGURED', () => {
       const acc = wallet.getAccount();
       let called = 0;
 

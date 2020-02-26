@@ -20,6 +20,8 @@ describe('Account - class', () => {
       this.accounts = [];
       this.network = Dashcore.Networks.testnet;
       this.storage = {
+        on: () => {},
+        emit: () => {},
         store: {},
         getStore: () => {},
         saveState: () => {},
