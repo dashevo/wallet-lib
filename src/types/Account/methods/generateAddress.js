@@ -44,7 +44,7 @@ function generateAddress(path) {
     used: false,
   };
   this.storage.importAddresses(addressData, this.walletId);
-  this.events.emit(EVENTS.GENERATED_ADDRESS, path);
+  this.emit(EVENTS.GENERATED_ADDRESS, { type: EVENTS.GENERATED_ADDRESS, payload: path });
   // console.log('gen', address,path)
   return addressData;
 }

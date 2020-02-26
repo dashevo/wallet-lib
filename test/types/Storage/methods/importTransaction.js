@@ -29,7 +29,7 @@ describe('Storage - importTransaction', () => {
     const self = {
       store: {
         transactions: {},
-        chains: { testnet: { blockheight: 50000 } },
+        chains: { testnet: { blockHeight: 50000 } },
       },
       network: 'testnet',
       lastModified: 0,
@@ -43,7 +43,7 @@ describe('Storage - importTransaction', () => {
 
     const expectedStore = {
       transactions: { '688dd18dea2b6f3c2d3892d13b41922fde7be01cd6040be9f3568dafbf9b1a23': { txid: '688dd18dea2b6f3c2d3892d13b41922fde7be01cd6040be9f3568dafbf9b1a23', vin: [], vout: [] } },
-      chains: { testnet: { blockheight: 50000 } },
+      chains: { testnet: { blockHeight: 50000 } },
     };
 
     expect(self.store).to.be.deep.equal(expectedStore);

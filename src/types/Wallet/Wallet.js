@@ -9,6 +9,7 @@ const {
 const transporters = require('../../transporters');
 
 const defaultOptions = {
+  debug: false,
   offlineMode: false,
   network: 'testnet',
   plugins: [],
@@ -56,6 +57,7 @@ class Wallet {
     const passphrase = _.has(opts, 'passphrase') ? opts.passphrase : defaultOptions.passphrase;
     this.passphrase = passphrase;
     this.offlineMode = _.has(opts, 'offlineMode') ? opts.offlineMode : defaultOptions.offlineMode;
+    this.debug = _.has(opts, 'debug') ? opts.debug : defaultOptions.debug;
     this.allowSensitiveOperations = _.has(opts, 'allowSensitiveOperations') ? opts.allowSensitiveOperations : defaultOptions.allowSensitiveOperations;
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
 
@@ -64,7 +66,6 @@ class Wallet {
       throw new Error(`Un-handled network: ${network}`);
     }
     this.network = Dashcore.Networks[network].toString();
-
     if ('mnemonic' in opts) {
       this.fromMnemonic((opts.mnemonic === null) ? generateNewMnemonic() : opts.mnemonic);
     } else if ('seed' in opts) {

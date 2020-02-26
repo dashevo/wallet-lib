@@ -42,7 +42,7 @@ function impactAffectedInputs({ inputs }) {
  */
 // FIXME : IsIS needs to be removed.
 async function broadcastTransaction(transaction, isIs = false) {
-  if (!this.transport.isValid) throw new ValidTransportLayerRequired('broadcast');
+  if (!this.transporter.isValid) throw new ValidTransportLayerRequired('broadcast');
 
   // We still support having in rawtransaction, if this is the case
   // we first need to reform our object
@@ -56,7 +56,7 @@ async function broadcastTransaction(transaction, isIs = false) {
     throw new InvalidDashcoreTransaction(transaction);
   }
 
-  const txid = await this.transport.sendTransaction(transaction.toString(), isIs);
+  const txid = await this.transporter.sendTransaction(transaction.toString(), isIs);
   if (!is.txid(txid)) {
     logger.error(txid, 'is said to not be a txid!');
   }

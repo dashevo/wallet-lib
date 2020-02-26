@@ -45,7 +45,7 @@ describe('Storage - constructor', () => {
     await storage.createChain(Dashcore.Networks.testnet);
 
     const defaultWalletId = 'squawk7700';
-    const expectedStore1 = { wallets: {}, transactions: {}, chains: { testnet: { name: 'testnet', blockheight: -1 } } };
+    const expectedStore1 = { wallets: {}, transactions: {}, chains: { testnet: { name: 'testnet', blockHeight: -1 } } };
     expect(storage.getStore()).to.deep.equal(expectedStore1);
 
     await storage.createWallet();
@@ -56,12 +56,12 @@ describe('Storage - constructor', () => {
           network: Dashcore.Networks.testnet.toString(),
           mnemonic: null,
           type: null,
-          blockheight: 0,
+          blockHeight: 0,
           addresses: { external: {}, internal: {}, misc: {} },
         },
       },
       transactions: {},
-      chains: { testnet: { name: 'testnet', blockheight: -1 } },
+      chains: { testnet: { name: 'testnet', blockHeight: -1 } },
     };
     expect(storage.getStore()).to.deep.equal(expectedStore2);
     expect(storage.store).to.deep.equal(expectedStore2);

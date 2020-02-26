@@ -58,7 +58,6 @@ const CONSTANTS = {
       'getAddress',
       'fetchAddressInfo',
       'fetchStatus',
-      'fetchTransactionInfo',
       'getPlugin',
       'getDPA',
       'sign',
@@ -80,7 +79,7 @@ const CONSTANTS = {
     SAFE_PROPERTIES: [
       'events',
       'offlineMode',
-      'transport',
+      'transporter',
       'walletId',
     ],
   },
