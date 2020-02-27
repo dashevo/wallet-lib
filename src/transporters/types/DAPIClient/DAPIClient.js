@@ -16,10 +16,12 @@ class DAPIClient extends BaseTransporter {
 }
 
 DAPIClient.prototype.getAddressSummary = require('./methods/getAddressSummary');
-DAPIClient.prototype.getBlockByHash = require('./methods/getBlockByHash');
-DAPIClient.prototype.getBlockHeaderByHash = require('./methods/getBlockHeaderByHash');
-DAPIClient.prototype.getBlockByHeight = require('./methods/getBlockByHeight');
 DAPIClient.prototype.getBestBlockHash = require('./methods/getBestBlockHash');
+DAPIClient.prototype.getBestBlockHeight = require('./methods/getBestBlockHeight');
+DAPIClient.prototype.getBlockByHash = require('./methods/getBlockByHash');
+DAPIClient.prototype.getBlockByHeight = require('./methods/getBlockByHeight');
+DAPIClient.prototype.getBlockHeaderByHash = require('./methods/getBlockHeaderByHash');
+DAPIClient.prototype.getBlockHeaderByHeight = require('./methods/getBlockHeaderByHeight');
 DAPIClient.prototype.getStatus = require('./methods/getStatus');
 DAPIClient.prototype.getTransaction = require('./methods/getTransaction');
 DAPIClient.prototype.getUTXO = require('./methods/getUTXO');

@@ -6,8 +6,8 @@ describe('transporters - DAPIClient - .getBestBlockHash', () => {
   const transporter = transporters.resolve('DAPIClient');
 
   it('should works', async () => {
-    transporter.client.getBestBlockHeight = () => fixture;
-    const res = await transporter.getBestBlockHeight();
+    transporter.client.getBestBlockHash = () => fixture;
+    const res = await transporter.getBestBlockHash();
     expect(res).to.deep.equal(fixture);
   });
 });
