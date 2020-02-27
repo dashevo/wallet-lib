@@ -35,7 +35,7 @@ describe('Wallet - sweepWallet', () => {
       unconfirmedBalanceSat: 0,
       utxos: {},
       fetchedLast: 0,
-      used: false,
+      used: true,
     });
     const addrTestnet = fullAccount.getAddress();
     expect(addrTestnet.path).to.equal('0');
@@ -52,7 +52,8 @@ describe('Wallet - sweepWallet', () => {
     expectThrowsAsync(async () => await sweepWallet.call({ walletType: 'HDWALLET' }), exceptedException);
   });
   it('should work', async () => {
-    const mnemonic = await fullWallet.sweepWallet();
+    const wallet = await fullWallet.sweepWallet();
+    console.log(wallet.export());
     console.log(mnemonic);
   });
   after(() => {
