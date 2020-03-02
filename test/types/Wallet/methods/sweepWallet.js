@@ -35,7 +35,7 @@ describe('Wallet - sweepWallet', () => {
       unconfirmedBalanceSat: 0,
       utxos: {},
       fetchedLast: 0,
-      used: true,
+      used: false,
     });
     const addrTestnet = fullAccount.getAddress();
     expect(addrTestnet.path).to.equal('0');

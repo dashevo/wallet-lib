@@ -30,6 +30,7 @@ describe('Account - disconnect', () => {
     expect(transportConnected).to.equal(false);
     expect(emitted).to.deep.equal([
       'WORKER/DUMMYWORKER/STARTED',
+      'WORKER/DUMMYWORKER/EXECUTED',
       'WORKER/DUMMYWORKER/STOPPED',
     ]);
   });
