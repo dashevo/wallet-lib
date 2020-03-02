@@ -1,8 +1,8 @@
 const _ = require('lodash');
 const logger = require('../../logger');
-const SyncWorker = require('../../plugins/Workers/SyncWorker');
+const SyncWorker = require('../../plugins/Workers/SyncWorker/SyncWorker');
 const ChainPlugin = require('../../plugins/Plugins/ChainPlugin');
-const BIP44Worker = require('../../plugins/Workers/BIP44Worker');
+const BIP44Worker = require('../../plugins/Workers/BIP44Worker/BIP44Worker');
 const EVENTS = require('../../EVENTS');
 const { WALLET_TYPES } = require('../../CONSTANTS');
 
@@ -11,7 +11,8 @@ async function _initializeAccount(account, userUnsafePlugins) {
   const self = account;
   // We run faster in offlineMode to speed up the process when less happens.
   const readinessIntervalTime = (account.offlineMode) ? 50 : 200;
-  return new Promise((res) => {
+  // eslint-disable-next-line no-async-promise-executor
+  return new Promise(async (res, rej) => {
     if (account.injectDefaultPlugins) {
       // TODO: Should check in other accounts if a similar is setup already
       // TODO: We want to sort them by dependencies and deal with the await this way
@@ -20,19 +21,18 @@ async function _initializeAccount(account, userUnsafePlugins) {
       // if yes add to watcher list.
 
       try {
-        if (!account.offlineMode) {
-          account.injectPlugin(ChainPlugin, true);
-        }
-
         if ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(account.walletType)) {
           // Ideally we should move out from worker to event based
-          account.injectPlugin(BIP44Worker, true);
-        }
-        if (account.type === WALLET_TYPES.SINGLE_ADDRESS) {
-          account.getAddress('0'); // We force what is usually done by the BIP44Worker.
+          await account.injectPlugin(BIP44Worker, true);
         }
         if (!account.offlineMode) {
-          account.injectPlugin(SyncWorker, true);
+          await account.injectPlugin(ChainPlugin, true);
+        }
+        if (account.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
+          await account.getAddress('0'); // We force what is usually done by the BIP44Worker.
+        }
+        if (!account.offlineMode) {
+          await account.injectPlugin(SyncWorker, true);
         }
       } catch (err) {
         logger.error('Failed to perform standard injections', err);

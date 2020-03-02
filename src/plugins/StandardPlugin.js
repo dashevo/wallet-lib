@@ -28,11 +28,9 @@ class StandardPlugin extends EventEmitter {
 
   async startPlugin() {
     const self = this;
-    // every minutes, check the pool
-    if (this.executeOnStart === true) {
-      if (this.onStart) {
-        await this.onStart();
-      }
+
+    if (this.executeOnStart === true && this.onStart) {
+      await this.onStart();
     }
     const eventType = `PLUGIN/${this.name.toUpperCase()}/STARTED`;
     self.parentEvents.emit(eventType, { type: eventType, payload: null });
