@@ -89,7 +89,9 @@ class Account extends EventEmitter {
     });
     if (this.debug) {
       this.emit = (...args) => {
-        logger.debug(`${this.walletId}:${this.index} - Emitted event ${JSON.stringify(...args)}`);
+        const { type } = args[1];
+        const payload = JSON.stringify(args[1].payload);
+        logger.debug(`${this.walletId}:${this.index} - Emitted event ${type} - ${payload} `);
         super.emit(...args);
       };
     }
@@ -118,7 +120,9 @@ class Account extends EventEmitter {
     this.keyChain = wallet.keyChain;
 
     this.cacheTx = (opts.cacheTx) ? opts.cacheTx : defaultOptions.cacheTx;
-    this.cacheBlockHeaders = (opts.cacheBlockHeaders) ? opts.cacheBlockHeaders : defaultOptions.cacheBlockHeaders;
+    this.cacheBlockHeaders = (opts.cacheBlockHeaders)
+      ? opts.cacheBlockHeaders
+      : defaultOptions.cacheBlockHeaders;
 
     this.plugins = {
       workers: {},

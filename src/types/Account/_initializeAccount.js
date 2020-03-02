@@ -90,6 +90,7 @@ async function _initializeAccount(account, userUnsafePlugins) {
           readyPlugins += 1;
         }
       });
+      logger.debug(`Initializing - ${readyPlugins}/${watchedPlugins.length} plugins`);
       if (readyPlugins === watchedPlugins.length) {
         // At this stage, our worker are initialized
         sendInitialized();
