@@ -44,10 +44,10 @@ class Worker extends StandardPlugin {
       if (this.onStart) {
         await this.onStart();
       }
-      await this.execWorker();
     }
     const eventType = `WORKER/${this.name.toUpperCase()}/STARTED`;
     self.parentEvents.emit(eventType, { type: eventType, payload: null });
+    if (this.executeOnStart) await this.execWorker();
   }
 
   stopWorker() {
