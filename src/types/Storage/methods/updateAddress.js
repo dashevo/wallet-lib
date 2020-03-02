@@ -55,9 +55,10 @@ const updateAddress = function (addressObj, walletId) {
     // Then we verify the outputs
 
     newUtxos.forEach((utxoKey) => {
+      const [txid, outputIndex] = utxoKey.split('-');
       const utxo = utxos[utxoKey];
       try {
-        const { blockHeight } = this.getTransaction(utxo.txid);
+        const { blockHeight } = this.getTransaction(txid);
         if (currentBlockHeight - blockHeight >= 6) newObject.balanceSat += utxo.satoshis;
         else newObject.unconfirmedBalanceSat += utxo.satoshis;
       } catch (e) {

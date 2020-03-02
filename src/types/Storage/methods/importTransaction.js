@@ -37,15 +37,11 @@ const importTransaction = function importTransaction(transaction) {
 
     // VOUT
     const vouts = transaction.outputs;
-    vouts.forEach((vout) => {
+    // For all output, we need to insert the utxo + associate the tx to addr.transactions
+    vouts.forEach((vout, voutIndex) => {
       const search = self.searchAddress(vout.script.toAddress(network).toString());
-      console.log(search);
       if (search.found) {
-        // FIXME: spentTxID is not returned anymore
-        // const isSpent = !!vout.spentTxId;
-        // if (!isSpent) {
-        self.addUTXOToAddress(vout, search.result.address);
-        // }
+        self.addUTXOToAddress(vout, search.result.address, transaction.hash, voutIndex);
       }
     });
     this.lastModified = +new Date();

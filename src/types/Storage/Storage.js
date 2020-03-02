@@ -36,6 +36,7 @@ class Storage extends EventEmitter {
     this.lastSave = null;
     this.lastModified = null;
     this.network = has(opts, 'network') ? opts.network.toString() : defaultOpts.network;
+
     // // Map an address to it's walletid/path/type schema (used by searchAddress for speedup)
     this.mappedAddress = {};
   }
