@@ -1,5 +1,5 @@
 const EVENTS = require('../../../../EVENTS');
-
+const logger = require('../../../../logger');
 // Artifact from previous optimisation made in SyncWorker plugin
 // Kept for reminder when Bloomfilters
 
@@ -14,11 +14,13 @@ const EVENTS = require('../../../../EVENTS');
 const fastFetchThreshold = 15 * 1000;
 // Loop will go through every 15 sec
 
-module.exports = async function subscribeToAddressesTransactions(addresses) {
+module.exports = async function subscribeToAddressesTransactions(addressList) {
+  if (!Array.isArray(addressList)) throw new Error('Expected array of addresses');
   const self = this;
   const { subscriptions } = this.state;
 
   const executor = async (addr) => {
+    logger.silly(`DAPIClient.subscribeToAddrTx.executor[${addr}]`);
     if (!self.state.addressesTransactionsMap[addr]) {
       self.state.addressesTransactionsMap[addr] = {};
     }
@@ -28,16 +30,18 @@ module.exports = async function subscribeToAddressesTransactions(addresses) {
       if (self.state.addressesTransactionsMap[addr][txid] === undefined) {
         self.getTransaction(txid).then((tx) => {
           self.state.addressesTransactionsMap[addr][txid] = outputIndex;
-          self.announce(EVENTS.TRANSACTION, tx);
+          self.announce(EVENTS.FETCHED_TRANSACTION, tx);
         });
       }
     });
+    self.announce(EVENTS.FETCHED_ADDRESS, { addr, utxos });
   };
-
-  addresses.forEach((address) => {
-    executor(address);
+  const immediatelyExecutedPromises = [];
+  addressList.forEach((address) => {
     if (!subscriptions.addresses[address]) {
+      immediatelyExecutedPromises.push(executor(address));
       subscriptions.addresses[address] = setInterval(() => executor(address), fastFetchThreshold);
     }
   });
+  await Promise.all(immediatelyExecutedPromises);
 };

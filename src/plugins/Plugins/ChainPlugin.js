@@ -32,21 +32,13 @@ class ChainPlugin extends StandardPlugin {
    */
   async execBlockListener() {
     const self = this;
-
-    // const currentHeight = (await this.fetchStatus()).blocks;
-
     if (!this.isSubscribedToBlocks) {
       self.transporter.on(EVENTS.BLOCK, async (ev) => {
         // const { network } = self.storage.store.wallets[self.walletId];
         const { payload: block } = ev;
-        self.announce(EVENTS.BLOCK, block);
-        self.announce(EVENTS.BLOCKHEADER, block.header);
-
+        this.parentEvents.emit(EVENTS.BLOCK, { type: EVENTS.BLOCK, payload: block });
+        // We do not announce BLOCKHEADER as this is done by Storage
         await self.storage.importBlockHeader(block.header);
-        // self.announce(
-        //   EVENTS.BLOCKHEIGHT_CHANGED,
-        //   self.storage.store.chains[network.toString()].blockHeight,
-        // );
       });
       await self.transporter.subscribeToBlocks();
     }
@@ -65,10 +57,12 @@ class ChainPlugin extends StandardPlugin {
       }
       const { blocks } = res;
       const { network } = this.storage.store.wallets[this.walletId];
+      logger.debug('ChainPlugin - Setting up starting blockHeight', blocks);
       this.storage.store.chains[network.toString()].blockHeight = blocks;
-      await this.storage.importBlockHeader(await this.transporter.getBlockHeaderByHash(await this.transporter.getBlockHash(blocks)));
 
-// /**/      this.announce(EVENTS.BLOCKHEIGHT_CHANGED, blocks);
+      const bestBlock = await this.transporter.getBlockHeaderByHeight(blocks);
+      await this.storage.importBlockHeader(bestBlock);
+
       return true;
     } catch (err) {
       if (err instanceof ValidTransportLayerRequired) {
@@ -81,24 +75,6 @@ class ChainPlugin extends StandardPlugin {
   async onStart() {
     await this.execStatusFetch();
     await this.execBlockListener();
-  }
-
-  announce(type, el) {
-    switch (type) {
-      case EVENTS.BLOCK:
-        this.parentEvents.emit(EVENTS.BLOCK, { type: EVENTS.BLOCK, payload: el });
-        break;
-      case EVENTS.BLOCKHEADER:
-        this.parentEvents.emit(EVENTS.BLOCKHEADER, { type: EVENTS.BLOCKHEADER, payload: el });
-        break;
-      case EVENTS.BLOCKHEIGHT_CHANGED:
-        this.parentEvents.emit(EVENTS.BLOCKHEIGHT_CHANGED,
-          { type: EVENTS.BLOCKHEIGHT_CHANGED, payload: el });
-        break;
-      default:
-        this.parentEvents.emit(type, { type, payload: el });
-        logger.warn('ChainPlugin - Not implemented, announce of ', type, el);
-    }
   }
 }
 

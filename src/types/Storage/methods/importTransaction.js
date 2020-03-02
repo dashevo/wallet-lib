@@ -24,7 +24,7 @@ const importTransaction = function importTransaction(transaction) {
     // VIN
     const vins = transaction.inputs;
     vins.forEach((vin) => {
-      const search = self.searchAddress(vin.script.toAddress().toString());
+      const search = self.searchAddress(vin.script.toAddress(network).toString());
       if (search.found) {
         const newAddr = cloneDeep(search.result);
         if (!newAddr.transactions.includes(transaction.hash)) {
@@ -38,7 +38,8 @@ const importTransaction = function importTransaction(transaction) {
     // VOUT
     const vouts = transaction.outputs;
     vouts.forEach((vout) => {
-      const search = self.searchAddress(vout.script.toAddress().toString());
+      const search = self.searchAddress(vout.script.toAddress(network).toString());
+      console.log(search);
       if (search.found) {
         // FIXME: spentTxID is not returned anymore
         // const isSpent = !!vout.spentTxId;
@@ -55,6 +56,7 @@ const importTransaction = function importTransaction(transaction) {
     const eventName = (isSecureTx)
       ? FETCHED_CONFIRMED_TRANSACTION
       : FETCHED_UNCONFIRMED_TRANSACTION;
+
     self.announce(eventName, { transaction });
   } else {
     this.updateTransaction(transaction);

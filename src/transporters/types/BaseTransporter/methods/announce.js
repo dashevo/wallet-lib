@@ -12,6 +12,12 @@ module.exports = function announce(eventName, args) {
     case EVENTS.TRANSACTION:
       this.emit(EVENTS.TRANSACTION, { type: EVENTS.TRANSACTION, payload: args });
       break;
+    case EVENTS.FETCHED_TRANSACTION:
+      this.emit(EVENTS.FETCHED_TRANSACTION, { type: EVENTS.FETCHED_TRANSACTION, payload: args });
+      break;
+    case EVENTS.FETCHED_ADDRESS:
+      this.emit(EVENTS.FETCHED_ADDRESS, { type: EVENTS.FETCHED_ADDRESS, payload: args });
+      break;
     default:
       this.emit(eventName, { type: eventName, payload: args });
       logger.warn('Transporter - Not implemented, announce of ', eventName, args);

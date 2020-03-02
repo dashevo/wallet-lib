@@ -5,7 +5,7 @@ const { is } = require('../../../utils');
 /**
  * Generate an address from a path and import it to the store
  * @param path
- * @return {addressData} Address information
+ * @return {{path: string, address: string, balanceSat: number, index: number, fetchedLast: number, utxos: {}, unconfirmedBalanceSat: number, used: boolean, transactions: []}} Address information
  * */
 function generateAddress(path) {
   if (is.undefOrNull(path)) throw new Error('Expected path to generate an address');
@@ -28,7 +28,6 @@ function generateAddress(path) {
     default:
       privateKey = this.keyChain.getKeyForPath(path.toString());
   }
-
   const address = privateKey.publicKey.toAddress(network).toString();
 
   const addressData = {
@@ -43,8 +42,9 @@ function generateAddress(path) {
     fetchedLast: 0,
     used: false,
   };
+
   this.storage.importAddresses(addressData, this.walletId);
-  this.emit(EVENTS.GENERATED_ADDRESS, { type: EVENTS.GENERATED_ADDRESS, payload: path });
+  this.emit(EVENTS.GENERATED_ADDRESS, { type: EVENTS.GENERATED_ADDRESS, payload: addressData });
   // console.log('gen', address,path)
   return addressData;
 }

@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 // Todo : Some validators here are really proto type of methods, urgent impr is needed here.
 const {
-  PrivateKey, HDPrivateKey, HDPublicKey, Transaction, Mnemonic, Address,
+  PrivateKey, HDPrivateKey, HDPublicKey, Transaction, Mnemonic, Address, Output
 } = require('@dashevo/dashcore-lib');
 
 const is = {
@@ -36,7 +36,7 @@ const is = {
   dashcoreTransaction: (tx) => is.type(tx, Transaction.name),
   feeRate: (feeRate) => is.obj(feeRate) && is.string(feeRate.type) && is.int(feeRate.value),
   txid: (txid) => is.string(txid) && txid.length === 64,
-  utxo: (utxo) => is.obj(utxo) && is.txid(utxo.txid) && is.num(utxo.outputIndex) && is.num(utxo.satoshis) && is.string(utxo.scriptPubKey),
+  utxo: (utxo) => is.type(utxo, Output.name),
   output: (output) => is.obj(output) && is.num(output.satoshis) && is.address(output.address),
   rawtx: (rawtx) => is.def(rawtx) && is.hex(rawtx) && (() => { try { Transaction(rawtx); return true; } catch (e) { return false; } })(),
 };
