@@ -1,3 +1,4 @@
+const util = require('util');
 /**
  * This method will disconnect from all the opened streams, will stop all running workers
  * and force a saving of the state.
@@ -20,6 +21,8 @@ module.exports = function disconnect() {
     this.storage.saveState();
     this.storage.stopWorker();
   }
+  if (this.removeAllListeners) this.removeAllListeners();
+  if (this.storage.removeAllListeners) this.storage.removeAllListeners();
   if (this.readinessInterval) {
     clearInterval(this.readinessInterval);
   }
