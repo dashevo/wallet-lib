@@ -18,6 +18,7 @@ class DAPIClient extends BaseTransporter {
 DAPIClient.prototype.getAddressSummary = require('./methods/getAddressSummary');
 DAPIClient.prototype.getBestBlockHash = require('./methods/getBestBlockHash');
 DAPIClient.prototype.getBestBlockHeight = require('./methods/getBestBlockHeight');
+DAPIClient.prototype.getBlockHash = require('./methods/getBlockHash');
 DAPIClient.prototype.getBlockByHash = require('./methods/getBlockByHash');
 DAPIClient.prototype.getBlockByHeight = require('./methods/getBlockByHeight');
 DAPIClient.prototype.getBlockHeaderByHash = require('./methods/getBlockHeaderByHash');
