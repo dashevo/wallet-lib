@@ -33,6 +33,11 @@ class Worker extends StandardPlugin {
     this.workerMaxPass = (opts.workerMaxPass)
       ? opts.workerMaxPass
       : defaultOpts.workerMaxPass;
+
+    this.state = {
+      started: false,
+      ready: false,
+    };
   }
 
   async startWorker() {
@@ -47,6 +52,7 @@ class Worker extends StandardPlugin {
     }
     const eventType = `WORKER/${this.name.toUpperCase()}/STARTED`;
     self.parentEvents.emit(eventType, { type: eventType, payload: null });
+    self.state.started = true;
     if (this.executeOnStart) await this.execWorker();
   }
 
@@ -56,6 +62,7 @@ class Worker extends StandardPlugin {
     this.workerPass = 0;
     this.isWorkerRunning = false;
     const eventType = `WORKER/${this.name.toUpperCase()}/STOPPED`;
+    this.state.started = false;
     this.parentEvents.emit(eventType, { type: eventType, payload: null });
   }
 
@@ -81,6 +88,7 @@ class Worker extends StandardPlugin {
 
     this.isWorkerRunning = false;
     this.workerPass += 1;
+    if (!this.state.ready) this.state.ready = true;
     const eventType = `WORKER/${this.name.toUpperCase()}/EXECUTED`;
     this.parentEvents.emit(eventType, { type: eventType, payload: null });
     return true;
