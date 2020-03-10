@@ -48,7 +48,7 @@ const getBIP44Path = require('./_getBIP44Path');
 
 class Account extends EventEmitter {
   constructor(wallet, opts = defaultOptions) {
-    super();
+    super({ wildcard: true });
     if (!wallet || wallet.constructor.name !== Wallet.name) throw new Error('Expected wallet to be passed as param');
     if (!_.has(wallet, 'walletId')) throw new Error('Missing walletID to create an account');
     this.walletId = wallet.walletId;

@@ -9,7 +9,7 @@ const defaultOpts = {
 
 class StandardPlugin extends EventEmitter {
   constructor(opts = {}) {
-    super();
+    super({ wildcard: true });
     this.pluginType = _.has(opts, 'type') ? opts.type : 'Standard';
     this.name = _.has(opts, 'name') ? opts.name : 'UnnamedPlugin';
     this.dependencies = _.has(opts, 'dependencies') ? opts.dependencies : [];
@@ -46,6 +46,8 @@ class StandardPlugin extends EventEmitter {
       this[name] = obj;
     } else if (name === 'parentEvents') {
       // Called by injectPlugin to setup the parentEvents on/emit fn.
+      // console.log(obj)
+      // this.parentEvents = {on:obj.on, emit:obj.emit};
       this.parentEvents = obj;
     } else {
       throw new InjectionToPluginUnallowed(name);
