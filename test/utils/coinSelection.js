@@ -84,14 +84,14 @@ describe('Utils - coinSelection', () => {
     const result = coinSelection(utxosList, [outputs.ONE_DASH], false, 'normal', STRATEGIES.simpleDescendingAccumulator);
     const expectedResult = {
       utxos: [{
-        address: 'yQeCpWLJNGP4Aiojmz5ZC5gbYXREsnLnaX', txid: '071502a8b211e08f575641f3345b687a86c922108b5fd608822bffe0151aaf09', outputIndex: 1, script: '76a9142f6cb2047c14f0068a561fa2df704e64467ce9c588ac', amount: 1, satoshis: 100000000, height: 203268,
+        script: '76a9142f6cb2047c14f0068a561fa2df704e64467ce9c588ac', satoshis: 100000000,
       }],
       outputs: [{ satoshis: 100000000, address: 'ybefxSHaEbDATvq5gVCxjV375NWus3ttV7', scriptType: 'P2PKH' }],
       feeCategory: 'normal',
       estimatedFee: 205,
       utxosValue: 100000000,
     };
-    result.utxos = result.utxos.map((el)=> el.toObject());
+    result.utxos = result.utxos.map((el) => el.toObject());
 
     expect(result).to.deep.equal(expectedResult);
   });
@@ -177,7 +177,7 @@ describe('Utils - coinSelection', () => {
       estimatedFee: 2815,
       utxosValue: 4929960000,
     };
-    expectedResult.utxos = expectedResult.map((el)=> el.toObject());
+    expectedResult.utxos = expectedResult.map((el) => el.toObject());
 
     expect(result).to.deep.equal(expectedResult);
   });
