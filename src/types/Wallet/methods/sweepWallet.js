@@ -26,14 +26,14 @@ async function sweepWallet(opts = {}) {
     if (!balance > 0) {
       return reject(new Error(`Cannot sweep an empty private key (current balance: ${balance})`));
     }
+    let newWallet;
     try {
       const walletOpts = {
-        offlineMode: true,
         network: self.network,
         transporter: self.transporter,
         ...opts,
       };
-      const newWallet = new self.constructor(walletOpts);
+      newWallet = new self.constructor(walletOpts);
       const recipient = newWallet.getAccount({ index: 0 }).getUnusedAddress().address;
       const tx = account.createTransaction({
         satoshis: balance,
@@ -45,6 +45,7 @@ async function sweepWallet(opts = {}) {
       return resolve(newWallet);
     } catch (err) {
       logger.error(`Failed to sweep wallet - ${err}`);
+      await newWallet.disconnect();
       return reject(err);
     }
   });
