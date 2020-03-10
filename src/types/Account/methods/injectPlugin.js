@@ -32,7 +32,24 @@ module.exports = async function injectPlugin(
       // All plugins will require the event object
       const { pluginType } = plugin;
 
-      plugin.inject('parentEvents', { on: self.on, emit: self.emit });
+      const {
+        on, emit,
+        _conf, _maxListeners, _on, _events, _all, _newListener, _removeListener, listenerTree,
+      } = self;
+
+      plugin.inject('parentEvents', {
+        on,
+        emit,
+        _conf,
+        _maxListeners,
+        wildcard: true,
+        _on,
+        _events,
+        _all,
+        _newListener,
+        _removeListener,
+        listenerTree,
+      });
 
       // Check for dependencies
       const deps = plugin.dependencies || [];
