@@ -20,14 +20,14 @@ module.exports = async function injectPlugin(
   // For now, it helps us on debugging
   const self = this;
   // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (res, rej) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const isInit = !(typeof UnsafePlugin === 'function');
       const plugin = (isInit) ? UnsafePlugin : new UnsafePlugin();
 
       const pluginName = plugin.name.toLowerCase();
 
-      if (_.isEmpty(plugin)) rej(new InjectionErrorCannotInject(pluginName, 'Empty plugin'));
+      if (_.isEmpty(plugin)) reject(new InjectionErrorCannotInject(pluginName, 'Empty plugin'));
 
       // All plugins will require the event object
       const { pluginType } = plugin;
@@ -67,7 +67,7 @@ module.exports = async function injectPlugin(
             plugin.inject(dependencyName, this.plugins.standard[loweredDependencyName], true);
           } else if (injectedDPAs.includes(loweredDependencyName)) {
             plugin.inject(dependencyName, this.plugins.DPAs[loweredDependencyName], true);
-          } else rej(new InjectionErrorCannotInjectUnknownDependency(pluginName, dependencyName));
+          } else reject(new InjectionErrorCannotInjectUnknownDependency(pluginName, dependencyName));
         }
       });
 
@@ -132,9 +132,9 @@ module.exports = async function injectPlugin(
         await plugin.verifyDPA(this.transporter.transport);
       }
 
-      return res(plugin);
+      return resolve(plugin);
     } catch (e) {
-      return rej(e);
+      return reject(e);
     }
   });
 };

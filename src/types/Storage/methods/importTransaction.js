@@ -24,14 +24,18 @@ const importTransaction = function importTransaction(transaction) {
     // VIN
     const vins = transaction.inputs;
     vins.forEach((vin) => {
+      if (vin.script) {
       const search = self.searchAddress(vin.script.toAddress(network).toString());
       if (search.found) {
         const newAddr = cloneDeep(search.result);
+          const utxoKey = `${vin.prevTxId.toString('hex')}-${vin.outputIndex}`;
+          delete newAddr[utxoKey];
         if (!newAddr.transactions.includes(transaction.hash)) {
           newAddr.transactions.push(transaction.hash);
           newAddr.used = true;
           self.updateAddress(newAddr, search.walletId);
         }
+      }
       }
     });
 

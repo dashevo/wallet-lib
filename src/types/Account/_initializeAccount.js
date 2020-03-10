@@ -12,7 +12,7 @@ async function _initializeAccount(account, userUnsafePlugins) {
   // We run faster in offlineMode to speed up the process when less happens.
   const readinessIntervalTime = (account.offlineMode) ? 50 : 200;
   // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (res, rej) => {
+  return new Promise(async (resolve, reject) => {
     if (account.injectDefaultPlugins) {
       // TODO: Should check in other accounts if a similar is setup already
       // TODO: We want to sort them by dependencies and deal with the await this way
@@ -107,20 +107,20 @@ async function _initializeAccount(account, userUnsafePlugins) {
         if (account.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
           account.generateAddress(0);
           sendReady();
-          return res(true);
+          return resolve(true);
         }
 
         if (!resultBIP44WorkerSearch.found) {
           if (account.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
             sendReady();
-            return res(true);
+            return resolve(true);
           }
           throw new Error('Unable to initialize. BIP44 Worker not found.');
         }
         return recursivelyGenerateAddresses(isSyncWorkerActive)
           .then(() => {
             sendReady();
-            return res(true);
+            return resolve(true);
           })
           .catch((err) => {
             logger.error('Error', err);

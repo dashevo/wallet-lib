@@ -4,7 +4,7 @@ const { expectThrowsAsync } = require('../../../test.utils');
 const sweepWallet = require('../../../../src/types/Wallet/methods/sweepWallet');
 
 const paperWallet = {
-  publicKey: 'XrHzASeS4C4aRz9HsphNxXkeB9g2BHV1UL',
+  publicKey: 'ybvbBPisVjiemj4qSg1mzZAzTSAPk64Ppf',
   privateKey: 'XE6ZTNwkjyuryGho75fAfCBBtL8rMy9ttLq1ANLF1TmMo2zwZXHq',
 };
 const testnetPaperWallet = {
@@ -18,7 +18,7 @@ describe('Wallet - sweepWallet', () => {
   let emptyWallet;
   let fullWallet;
   before(() => {
-    emptyWallet = new Wallet({ privateKey: paperWallet.privateKey, network: 'livenet' });
+    emptyWallet = new Wallet({ privateKey: paperWallet.privateKey, network: 'testnet', transporter: { devnetName: 'palinka' } });
     emptyAccount = emptyWallet.getAccount();
 
     fullWallet = new Wallet({ privateKey: testnetPaperWallet.privateKey, network: 'testnet', transporter: { devnetName: 'palinka' } });
@@ -41,6 +41,8 @@ describe('Wallet - sweepWallet', () => {
     expect(addrTestnet.path).to.equal('0');
     expect(addrTestnet.index).to.equal(0);
     expect(addrTestnet.address).to.equal(testnetPaperWallet.publicKey);
+    console.log(addrTestnet)
+    // If this is not passing, fund this : yiqbNC2EEpNgAUC3XrJDccEZxzGsf2rc9w :)
     expect(addrTestnet.used).to.equal(true);
   });
   it('should warn on empty balance', () => {
@@ -51,11 +53,11 @@ describe('Wallet - sweepWallet', () => {
     const exceptedException = 'Can only sweep wallet initialized from privateKey';
     expectThrowsAsync(async () => await sweepWallet.call({ walletType: 'HDWALLET' }), exceptedException);
   });
-  it('should work', async () => {
-    const wallet = await fullWallet.sweepWallet();
-    console.log(wallet.export());
-    console.log(mnemonic);
-  });
+  // it('should work', async () => {
+  //   const wallet = await fullWallet.sweepWallet();
+  //   console.log(wallet.export());
+  //   console.log(mnemonic);
+  // });
   after(() => {
     emptyWallet.disconnect();
     fullWallet.disconnect();
