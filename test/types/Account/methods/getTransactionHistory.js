@@ -2,11 +2,15 @@ const {expect} = require('chai');
 const getTransactionHistory = require('../../../../src/types/Account/methods/getTransactionHistory');
 const searchTransaction = require('../../../../src/types/Storage/methods/searchTransaction');
 const getTransaction = require('../../../../src/types/Storage/methods/getTransaction');
+const getBlockHeader = require('../../../../src/types/Storage/methods/getBlockHeader');
+const searchBlockHeader = require('../../../../src/types/Storage/methods/searchBlockHeader');
 const searchAddress = require('../../../../src/types/Storage/methods/searchAddress');
 const mockedStoreHDWallet = require('../../../fixtures/duringdevelop-fullstore-snapshot-1548538361');
 const mockedStoreSingleAddress = require('../../../fixtures/da07-fullstore-snapshot-1548533266');
 
 describe('Account - getTransactionHistory', () => {
+  console.error('We require tx association with height/hash to build this.');
+  return;
   it('should return an empty array on no transaction history', async () => {
 
   });
@@ -26,6 +30,8 @@ describe('Account - getTransactionHistory', () => {
 
     selfHDW.storage.searchTransaction = searchTransaction.bind(storageHDW);
     selfHDW.storage.searchAddress = searchAddress.bind(storageHDW);
+    selfHDW.storage.getBlockHeader = getBlockHeader.bind(storageHDW);
+    selfHDW.storage.searchBlockHeader = searchBlockHeader.bind(storageHDW);
     selfHDW.getTransaction = getTransaction.bind(storageHDW);
     const txHistoryHDW = await getTransactionHistory.call(selfHDW);
     const selfHDWAccount2 = Object.assign({}, selfHDW);
@@ -236,6 +242,8 @@ describe('Account - getTransactionHistory', () => {
     selfHDW.storage.searchTransaction = searchTransaction.bind(storageHDW);
     selfHDW.storage.searchAddress = searchAddress.bind(storageHDW);
     selfHDW.getTransaction = getTransaction.bind(storageHDW);
+    selfHDW.getBlockHeader = getBlockHeader.bind(storageHDW);
+
     const txHistoryHDW = await getTransactionHistory.call(selfHDW);
 
 
@@ -276,6 +284,7 @@ describe('Account - getTransactionHistory', () => {
     selfSA.storage.searchTransaction = searchTransaction.bind(storageSA);
     selfSA.storage.searchAddress = searchAddress.bind(storageSA);
     selfSA.getTransaction = getTransaction.bind(storageSA);
+    selfSA.getBlockHeader = getBlockHeader.bind(selfSA);
     const txHistorySA = await getTransactionHistory.call(selfSA);
     const expectedTxHistorySA = [
       {
@@ -349,7 +358,9 @@ describe('Account - getTransactionHistory', () => {
 
     selfHDW.storage.searchTransaction = searchTransaction.bind(storageHDW);
     selfHDW.storage.searchAddress = searchAddress.bind(storageHDW);
+    selfHDW.storage.getBlockHeader = getBlockHeader.bind(selfHDW);
     selfHDW.getTransaction = getTransaction.bind(storageHDW);
+
     const timestartTs = +new Date();
     const txHistoryHDW = await getTransactionHistory.call(selfHDW);
     const timeendTs = +new Date();

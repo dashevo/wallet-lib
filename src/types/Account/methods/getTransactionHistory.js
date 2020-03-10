@@ -4,6 +4,16 @@ const { dashToDuffs, duffsToDash } = require('../../../utils');
 // Will filter out transaction that are not concerning us
 // (which can happen in the case of multiple account in store)
 const getFilteredTransactions = async function getFilteredTransactions(storage, walletId, accountIndex) {
+  /**
+   * From transaction's hash, we would need to be able to find the time of such execution.
+   * Previously we used 'confirmations' value to estimate the height block where it would
+   * be included.
+   * This has been removed, and there is no way for us to easily get the block height
+   * or hash from a tx.
+   * In order to support this feature, it would require us to have the whole raw block set
+   * in order to find a tx in a block.
+   */
+  return new Error('Removed feature - unable to calculate time between transactions');
   const txids = [];
   const txs = [];
   const store = storage.getStore();
@@ -53,7 +63,8 @@ const getFilteredTransactions = async function getFilteredTransactions(storage, 
       hash: txid, nLockTime, vin, vout,
     } = tx;
 
-    const time = storage.getBlockHeader(nLockTime);
+    const block = storage.getBlockHeader(txid);
+    // const time = storage.getBlockHeader(txid);
 
     txs.push({
       txid,
