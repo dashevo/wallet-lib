@@ -73,7 +73,9 @@ class Wallet {
     } else if ('HDPrivateKey' in opts) {
       this.fromHDPrivateKey(opts.HDPrivateKey);
     } else if ('privateKey' in opts) {
-      this.fromPrivateKey(opts.privateKey);
+      this.fromPrivateKey((opts.privateKey === null)
+        ? new Dashcore.PrivateKey(network).toString()
+        : opts.privateKey);
     } else if ('HDPublicKey' in opts) {
       this.fromHDPublicKey(opts.HDPublicKey);
     } else {
