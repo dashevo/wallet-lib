@@ -1,4 +1,5 @@
 const { WALLET_TYPES } = require('../../../CONSTANTS');
+const EVENTS = require('../../../EVENTS');
 const logger = require('../../../logger');
 /**
  * This will sweep any paper wallet with remaining UTXOS to another Wallet created
@@ -12,40 +13,40 @@ const logger = require('../../../logger');
  * @return {Wallet} - Return a new random mnemonic created Wallet.
  */
 async function sweepWallet(opts = {}) {
-  return new Promise((resolve, reject) => {
-    if (this.walletType !== WALLET_TYPES.SINGLE_ADDRESS) {
-      reject(new Error('Can only sweep wallet initialized from privateKey'));
+  const self = this;
+  // eslint-disable-next-line no-async-promise-executor,consistent-return
+  return new Promise(async (resolve, reject) => {
+    if (self.walletType !== WALLET_TYPES.SINGLE_ADDRESS) {
+      return reject(new Error('Can only sweep wallet initialized from privateKey'));
     }
-    const account = this.getAccount({ index: 0 });
-    const currentPublicAddress = account.getAddress(0).address;
+    const account = self.getAccount({ index: 0 });
+    const currentPublicAddress = account.getAddress().address;
+    await account.isReady();
+    const balance = await account.getTotalBalance();
+    if (!balance > 0) {
+      return reject(new Error(`Cannot sweep an empty private key (current balance: ${balance})`));
+    }
+    try {
+      const walletOpts = {
+        offlineMode: true,
+        network: self.network,
+        transporter: self.transporter,
+        ...opts,
+      };
+      const newWallet = new self.constructor(walletOpts);
+      const recipient = newWallet.getAccount({ index: 0 }).getUnusedAddress().address;
+      const tx = account.createTransaction({
+        satoshis: balance,
+        recipient,
+      });
+      const txid = await account.broadcastTransaction(tx);
+      logger.info(`SweepWallet: ${balance} of ${currentPublicAddress} to ${recipient} transfered. Txid :${txid}`);
 
-    account.on('ready', async function () {
-      const balance = await account.getTotalBalance();
-      if (!balance > 0) {
-        reject(new Error(`Cannot sweep an empty private key (current balance: ${balance})`));
-      }
-      try {
-        const walletOpts = {
-          offlineMode: true,
-          network: this.network,
-          transporter: this.transporter,
-          ...opts,
-        };
-        const newWallet = new this.constructor(walletOpts);
-        const recipient = newWallet.getAccount({ index: 0 }).getUnusedAddress().address;
-        const tx = account.createTransaction({
-          amount: balance,
-          recipient,
-        });
-        const txid = await account.broadcastTransaction(tx);
-        logger.info(`SweepWallet: ${balance} of ${currentPublicAddress} to ${recipient} transfered. Txid :${txid}`);
-
-        return resolve(newWallet);
-      } catch (err) {
-        logger.error(`Failed to sweep wallet - ${err}`);
-        reject(err);
-      }
-    });
+      return resolve(newWallet);
+    } catch (err) {
+      logger.error(`Failed to sweep wallet - ${err}`);
+      return reject(err);
+    }
   });
 }
 module.exports = sweepWallet;
