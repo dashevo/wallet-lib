@@ -20,7 +20,8 @@ describe('Plugins - StandardPlugin', function suite() {
   it('should inject an event emitter', () => {
     const emitter = new EventEmitter();
     plugin.inject('parentEvents', { on: emitter.on, emit: emitter.emit });
-    expect(plugin.parentEvents).to.deep.equal(emitter);
+    expect(plugin.parentEvents.on).to.deep.equal(emitter.on);
+    expect(plugin.parentEvents.emit).to.deep.equal(emitter.emit);
   });
   it('should provide methods', () => {
     expect(plugin.provideSomething()).to.equal(true);

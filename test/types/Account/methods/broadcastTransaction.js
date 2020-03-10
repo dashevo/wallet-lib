@@ -3,6 +3,7 @@ const Dashcore = require('@dashevo/dashcore-lib');
 const broadcastTransaction = require('../../../../src/types/Account/methods/broadcastTransaction');
 const validRawTxs = require('../../../fixtures/rawtx').valid;
 const invalidRawTxs = require('../../../fixtures/rawtx').invalid;
+const { expectThrowsAsync } = require('../../../test.utils');
 
 describe('Account - broadcastTransaction', () => {
   it('should throw error on missing transport', async () => {
@@ -12,13 +13,14 @@ describe('Account - broadcastTransaction', () => {
         isValid: false,
       },
     };
+    expectThrowsAsync(async () => await broadcastTransaction.call(self, validRawTxs.tx2to2Testnet), expectedException1);
 
-    return broadcastTransaction
-      .call(self, validRawTxs.tx2to2Testnet)
-      .then(
-        () => Promise.reject(new Error('Expected method to reject.')),
-        err => expect(err).to.be.a('Error').with.property('message', expectedException1),
-      );
+    // return broadcastTransaction
+    //   .call(self, validRawTxs.tx2to2Testnet)
+    //   .then(
+    //     (e) => Promise.reject(new Error('Expected method to reject.'+e)),
+    //     err => expect(err).to.be.a('Error').with.property('message', expectedException1),
+    //   );
   });
   it('should throw error on invalid rawtx (string)', async () => {
     const expectedException1 = 'A valid transaction object or it\'s hex representation is required';
@@ -28,12 +30,7 @@ describe('Account - broadcastTransaction', () => {
       },
     };
 
-    return broadcastTransaction
-      .call(self, invalidRawTxs.notRelatedString)
-      .then(
-        () => Promise.reject(new Error('Expected method to reject.')),
-        err => expect(err).to.be.a('Error').with.property('message', expectedException1),
-      );
+    expectThrowsAsync(async () => await broadcastTransaction.call(self, invalidRawTxs.notRelatedString), expectedException1);
   });
   it('should throw error on invalid rawtx (hex)', async () => {
     const expectedException1 = 'A valid transaction object or it\'s hex representation is required';
@@ -43,12 +40,7 @@ describe('Account - broadcastTransaction', () => {
       },
     };
 
-    return broadcastTransaction
-      .call(self, invalidRawTxs.truncatedRawTx)
-      .then(
-        () => Promise.reject(new Error('Expected method to reject.')),
-        err => expect(err).to.be.a('Error').with.property('message', expectedException1),
-      );
+    expectThrowsAsync(async () => await broadcastTransaction.call(self, invalidRawTxs.truncatedRawTx), expectedException1);
   });
   it('should work on valid Transaction object', async () => {
     let sendCalled = +1;

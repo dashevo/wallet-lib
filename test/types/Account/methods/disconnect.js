@@ -9,6 +9,13 @@ const emitted = [];
 describe('Account - disconnect', () => {
   const self = {
     emit: (eventName) => emitted.push(eventName),
+    removeAllListeners: () => null,
+    storage:{
+      removeAllListeners: () => null,
+      startWorker: () => null,
+      saveState: () => null,
+      stopWorker: () => null,
+    },
     transporter: {
       isValid: true,
       connect: () => { transportConnected = true; },

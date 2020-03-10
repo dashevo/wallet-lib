@@ -21,7 +21,7 @@ describe('Wallet - sweepWallet', () => {
     emptyWallet = new Wallet({ privateKey: paperWallet.privateKey, network: 'livenet' });
     emptyAccount = emptyWallet.getAccount();
 
-    fullWallet = new Wallet({ privateKey: testnetPaperWallet.privateKey, network: 'testnet' });
+    fullWallet = new Wallet({ privateKey: testnetPaperWallet.privateKey, network: 'testnet', transporter: { devnetName: 'palinka' } });
     fullAccount = fullWallet.getAccount();
   });
   it('should pass sanitary check', () => {

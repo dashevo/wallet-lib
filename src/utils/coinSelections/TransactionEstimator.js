@@ -92,7 +92,16 @@ class TransactionEstimator {
     if (inputs.length < 1) return false;
 
     const addInput = (input) => {
-      if (!is.utxo(input)) throw new Error('Expected valid input to import');
+      if (!is.utxo(input)) {
+        try {
+          // Tries to get retro-compatibility from insight old format
+          // FIXME: Maybe update tests with newer format now.
+          input.script = input.scriptPubKey;
+          input = new Transaction.Output(input);
+        } catch (e) {
+          throw new Error('Expected valid input to import');
+        }
+      }
       self.state.inputs.push(input);
     };
 

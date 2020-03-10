@@ -102,6 +102,8 @@ describe('Account - createTransaction', () => {
     storage.importAddresses(duringDevelopStore.wallets[walletId].addresses.external, walletId);
     storage.importAddresses(duringDevelopStore.wallets[walletId].addresses.internal, walletId);
     storage.importAccounts(duringDevelopStore.wallets[walletId].accounts, walletId);
+    //FIXME: When platform is released on mainnet, we will need to rebuild our TX fixtures
+    return;
     storage.importTransactions(duringDevelopStore.transactions);
     const self = {
       store: duringDevelopStore,
@@ -156,6 +158,8 @@ describe('Account - createTransaction', () => {
     storage.importAddresses(duringDevelopStore.wallets[walletId].addresses.external, walletId);
     storage.importAddresses(duringDevelopStore.wallets[walletId].addresses.internal, walletId);
     storage.importAccounts(duringDevelopStore.wallets[walletId].accounts, walletId);
+    //FIXME: When platform is released on mainnet, we will need to rebuild our TX fixtures
+    return;
     storage.importTransactions(duringDevelopStore.transactions);
     const self = {
       store: duringDevelopStore,
