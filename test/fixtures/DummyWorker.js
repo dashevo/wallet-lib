@@ -6,7 +6,7 @@ class DummyWorker extends Worker {
       name: 'DummyWorker',
       dependencies: [],
       executeOnStart: true,
-      workerIntervalTime: 50*1000
+      workerIntervalTime: 50 * 1000,
     });
   }
 

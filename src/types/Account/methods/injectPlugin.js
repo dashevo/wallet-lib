@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const {
   InjectionErrorCannotInject,
-  InjectionErrorCannotInjectUnknownDependency,
+  InjectionErrorCannotInjectUnknownDependency: InjectionErrorCannotInjectUnknownDep,
 } = require('../../../errors');
 const { is } = require('../../../utils');
 /**
@@ -67,7 +67,7 @@ module.exports = async function injectPlugin(
             plugin.inject(dependencyName, this.plugins.standard[loweredDependencyName], true);
           } else if (injectedDPAs.includes(loweredDependencyName)) {
             plugin.inject(dependencyName, this.plugins.DPAs[loweredDependencyName], true);
-          } else reject(new InjectionErrorCannotInjectUnknownDependency(pluginName, dependencyName));
+          } else reject(new InjectionErrorCannotInjectUnknownDep(pluginName, dependencyName));
         }
       });
 
@@ -107,7 +107,7 @@ module.exports = async function injectPlugin(
                 started: false,
               };
               self.plugins.watchers[pluginName] = watcher;
-              // eslint-disable-next-line no-return-assign,no-param-reassign
+              // eslint-disable-next-line no-return-assign,no-param-reassign,max-len
               const startWatcher = (_watcher) => { _watcher.started = true; _watcher.ready = true; };
 
               const onStartedEvent = () => startWatcher(watcher);

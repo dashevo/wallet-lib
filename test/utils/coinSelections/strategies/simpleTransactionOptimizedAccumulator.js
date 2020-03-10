@@ -168,14 +168,10 @@ describe('CoinSelection - Strategy - simpleTransactionOptimizedAccumulator', () 
     res2e10.utxos[1] = res2e10.utxos[1].toJSON();
     expect(res2e10).to.deep.equal(expectedRes2e10);
 
-    res6e10.utxos = res6e10.utxos.map((utxo) => {
-      return utxo.toJSON();
-    });
+    res6e10.utxos = res6e10.utxos.map((utxo) => utxo.toJSON());
     expect(res6e10).to.deep.equal(expectedRes6e10);
 
-    res999e8.utxos = res999e8.utxos.map((utxo) => {
-      return utxo.toJSON();
-    });
+    res999e8.utxos = res999e8.utxos.map((utxo) => utxo.toJSON());
     expect(res999e8).to.deep.equal(expectedRes999e8);
 
     expect(() => simpleTransactionOptimizedAccumulator.call(self, utxosList, outputsList1e11)).to.throw(('Unsufficient utxo amount'));

@@ -15,14 +15,14 @@ describe('Account - getTransaction', () => {
       importTransactions: () => null,
     };
     const walletId = Object.keys(mockedStore.wallets)[0];
-    mockedWallet = Object.assign({
+    mockedWallet = {
       walletId,
       index: 0,
       storage: storageHDW,
-      transporter:{
+      transporter: {
         getTransaction: () => fetchTransactionInfoCalledNb += 1,
-      }
-    });
+      },
+    };
   });
   it('should correctly get a existing transaction', async () => {
     const tx = await getTransaction.call(mockedWallet, '92150f239013c961db15bc91d904404d2ae0520929969b59b69b17493569d0d5');

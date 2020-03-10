@@ -31,5 +31,3 @@ describe('Account - connect', () => {
     self.plugins.workers.dummyWorker.stopWorker();
   });
 });
-
-

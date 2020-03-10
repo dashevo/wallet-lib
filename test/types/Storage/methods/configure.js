@@ -30,7 +30,7 @@ describe('Storage - configure', async () => {
   it('should successfully emit', () => {
     const emitted = [];
     const self = {
-      emit: emitType => (emitted.push(emitType)),
+      emit: (emitType) => (emitted.push(emitType)),
       autosaveIntervalTime: 1000,
       startWorker: noop,
     };

@@ -6,7 +6,7 @@ class DAPIClient extends BaseTransporter {
     super({ ...props, type: 'DAPIClient' });
     try {
       // This allows to not have dapi-client shipped by default.
-      // eslint-disable-next-line global-require
+      // eslint-disable-next-line global-require,import/no-extraneous-dependencies
       const Client = require('@dashevo/dapi-client');
       this.client = new Client(props);
     } catch (err) {

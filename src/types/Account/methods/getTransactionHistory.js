@@ -3,7 +3,7 @@ const { dashToDuffs, duffsToDash } = require('../../../utils');
 
 // Will filter out transaction that are not concerning us
 // (which can happen in the case of multiple account in store)
-const getFilteredTransactions = async function getFilteredTransactions(storage, walletId, accountIndex) {
+const getFilteredTransactions = async function (/* storage, walletId, accountIndex */) {
   /**
    * From transaction's hash, we would need to be able to find the time of such execution.
    * Previously we used 'confirmations' value to estimate the height block where it would
@@ -14,6 +14,7 @@ const getFilteredTransactions = async function getFilteredTransactions(storage, 
    * in order to find a tx in a block.
    */
   return new Error('Removed feature - unable to calculate time between transactions');
+  /*
   const txids = [];
   const txs = [];
   const store = storage.getStore();
@@ -76,6 +77,7 @@ const getFilteredTransactions = async function getFilteredTransactions(storage, 
   });
 
   return txs;
+   */
 };
 
 const sortByTimeDesc = (a, b) => (b.time - a.time);

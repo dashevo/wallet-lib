@@ -1,15 +1,14 @@
-const DAPIClient = require('@dashevo/dapi-client');
 const logger = require('../logger');
-const { is, hasProp } = require('../utils/index');
+const { is } = require('../utils/index');
 // const { Transaction } = require('@dashevo/dashcore-lib');
-const transportList = {
-  dapi: DAPIClient,
-};
+// const transportList = {
+//   dapi: DAPIClient,
+// };
 
 function isValidTransport(transport) {
-  if (is.string(transport)) {
-    return hasProp(transportList, transport);
-  }
+  // if (is.string(transport)) {
+  //   return hasProp(transportList, transport);
+  // }
   if (is.obj(transport)) {
     let valid = true;
     const expectedKeys = [
@@ -43,28 +42,26 @@ class Transporter {
     if (transportArg) {
       let transport = transportArg;
       if (is.string(transportArg)) {
-        const loweredTransportName = transportArg.toString().toLowerCase();
-        if (Object.keys(transportList).includes(loweredTransportName)) {
-          // TODO : Remove me toward release
-          if (transportArg === 'dapi') {
-            transport = new DAPIClient({
-              seeds: [{ service: '18.236.131.253:3000' }],
-              timeout: 20000,
-              retries: 5,
-            });
-          } else {
-            transport = new transportList[loweredTransportName]();
-          }
-          this.isValid = isValidTransport(transport);
+        // const loweredTransportName = transportArg.toString().toLowerCase();
+        // TODO : Remove me toward release
+        if (transportArg === 'dapi') {
+          // eslint-disable-next-line global-require,import/no-extraneous-dependencies
+          const DAPIClient = require('@dashevo/dapi-client');
+          transport = new DAPIClient({
+            seeds: [{ service: '18.236.131.253:3000' }],
+            timeout: 20000,
+            retries: 5,
+          });
         }
+        this.isValid = isValidTransport(transport);
       } else {
         this.isValid = isValidTransport(transportArg);
       }
-      this.type = transporter.type || transporter.constructor.name;
+      this.type = transport.type || transport.constructor.name;
       this.transport = transport;
     }
   }
-};
+}
 
 // Transporter.prototype.disconnect = require('./methods/disconnect');
 // Transporter.prototype.fetchAndReturn = require('./methods/fetchAndReturn');

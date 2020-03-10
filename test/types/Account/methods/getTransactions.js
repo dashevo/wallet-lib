@@ -6,10 +6,10 @@ const getTransactions = require('../../../../src/types/Account/methods/getTransa
 describe('Account - getTransactions', () => {
   it('should get the transactions', () => {
     const getStore = () => mockedStore;
-    const transactions = getTransactions.call(Object.assign({}, {
+    const transactions = getTransactions.call({
       storage: { getStore },
       walletId: '123456789',
-    }), 'internal');
+    }, 'internal');
     expect(transactions).to.equal(mockedStore.transactions);
   });
 });

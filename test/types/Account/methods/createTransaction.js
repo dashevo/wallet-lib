@@ -102,7 +102,7 @@ describe('Account - createTransaction', () => {
     storage.importAddresses(duringDevelopStore.wallets[walletId].addresses.external, walletId);
     storage.importAddresses(duringDevelopStore.wallets[walletId].addresses.internal, walletId);
     storage.importAccounts(duringDevelopStore.wallets[walletId].accounts, walletId);
-    //FIXME: When platform is released on mainnet, we will need to rebuild our TX fixtures
+    // FIXME: When platform is released on mainnet, we will need to rebuild our TX fixtures
     return;
     storage.importTransactions(duringDevelopStore.transactions);
     const self = {
@@ -118,7 +118,7 @@ describe('Account - createTransaction', () => {
       generateAddress,
       keyChain: new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(duringDevelopMnemonic, 'testnet', '') }),
       storage,
-      emit: _.noop
+      emit: _.noop,
     };
 
     const txOpts1 = {
@@ -158,7 +158,7 @@ describe('Account - createTransaction', () => {
     storage.importAddresses(duringDevelopStore.wallets[walletId].addresses.external, walletId);
     storage.importAddresses(duringDevelopStore.wallets[walletId].addresses.internal, walletId);
     storage.importAccounts(duringDevelopStore.wallets[walletId].accounts, walletId);
-    //FIXME: When platform is released on mainnet, we will need to rebuild our TX fixtures
+    // FIXME: When platform is released on mainnet, we will need to rebuild our TX fixtures
     return;
     storage.importTransactions(duringDevelopStore.transactions);
     const self = {
@@ -174,7 +174,7 @@ describe('Account - createTransaction', () => {
       strategy: () => { throw new Error(); }, // Ensure it call the passed option
       keyChain: new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(duringDevelopMnemonic, 'testnet', '') }),
       storage,
-      emit: _.noop ,
+      emit: _.noop,
     };
     const txOpts1 = {
       recipient: addressesFixtures.testnet.valid.yereyozxENB9jbhqpbg1coE5c39ExqLSaG.addr,

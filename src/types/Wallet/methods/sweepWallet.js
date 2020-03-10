@@ -1,5 +1,4 @@
 const { WALLET_TYPES } = require('../../../CONSTANTS');
-const EVENTS = require('../../../EVENTS');
 const logger = require('../../../logger');
 /**
  * This will sweep any paper wallet with remaining UTXOS to another Wallet created

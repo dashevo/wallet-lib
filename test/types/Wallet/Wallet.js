@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const Dashcore = require('@dashevo/dashcore-lib');
 const knifeMnemonic = require('../../fixtures/knifeeasily');
 const gatherSailMnemonic = require('../../fixtures/gathersail');
 const fluidMnemonic = require('../../fixtures/fluidDepth');
@@ -6,7 +7,6 @@ const cR4t6ePrivateKey = require('../../fixtures/cR4t6e_pk');
 const { WALLET_TYPES } = require('../../../src/CONSTANTS');
 const { Wallet } = require('../../../src');
 const inMem = require('../../../src/adapters/InMem');
-const Dashcore = require('@dashevo/dashcore-lib');
 const fromHDPublicKey = require('../../../src/types/Wallet/methods/fromHDPublicKey');
 const gatherSail = require('../../fixtures/gathersail');
 
@@ -43,7 +43,7 @@ describe('Wallet - class', () => {
     });
   });
   it('should create a wallet with mnemonic', () => {
-    const wallet1 = new Wallet(Object.assign({ mnemonic: knifeMnemonic.mnemonic }, mocks));
+    const wallet1 = new Wallet({ mnemonic: knifeMnemonic.mnemonic, ...mocks });
     expect(wallet1.walletType).to.be.equal(WALLET_TYPES.HDWALLET);
     expect(Dashcore.Mnemonic(wallet1.mnemonic).toString()).to.be.equal(wallet1.mnemonic);
 
@@ -56,7 +56,7 @@ describe('Wallet - class', () => {
     expect(wallet1.injectDefaultPlugins).to.be.deep.equal(true);
     expect(wallet1.walletId).to.be.equal(knifeMnemonic.walletIdTestnet);
 
-    const opts2 = Object.assign({ mnemonic: knifeMnemonic.mnemonic, network: 'livenet' }, mocks);
+    const opts2 = { mnemonic: knifeMnemonic.mnemonic, network: 'livenet', ...mocks };
     const wallet2 = new Wallet(opts2);
     expect(wallet2.walletType).to.be.equal(WALLET_TYPES.HDWALLET);
     expect(wallet2.network).to.be.deep.equal(Dashcore.Networks.mainnet.toString());
@@ -70,7 +70,7 @@ describe('Wallet - class', () => {
     });
   });
   it('should create a wallet with HDPrivateKey', () => {
-    const wallet1 = new Wallet(Object.assign({ HDPrivateKey: knifeMnemonic.HDRootPrivateKeyTestnet, network: 'testnet' }, mocks));
+    const wallet1 = new Wallet({ HDPrivateKey: knifeMnemonic.HDRootPrivateKeyTestnet, network: 'testnet', ...mocks });
     expect(wallet1.walletType).to.be.equal(WALLET_TYPES.HDWALLET);
     expect(wallet1.mnemonic).to.be.equal(null);
 
@@ -87,7 +87,7 @@ describe('Wallet - class', () => {
     });
   });
   it('should create a wallet with HDPublicKey', () => {
-    const wallet1 = new Wallet(Object.assign({ HDPublicKey: gatherSailMnemonic.testnet.external.hdpubkey, network: 'testnet' }, mocks));
+    const wallet1 = new Wallet({ HDPublicKey: gatherSailMnemonic.testnet.external.hdpubkey, network: 'testnet', ...mocks });
     expect(wallet1.walletType).to.be.equal(WALLET_TYPES.HDPUBLIC);
     expect(wallet1.mnemonic).to.be.equal(null);
 
@@ -104,7 +104,7 @@ describe('Wallet - class', () => {
     });
   });
   it('should create a wallet with PrivateKey', () => {
-    const wallet1 = new Wallet(Object.assign({ privateKey: cR4t6ePrivateKey.privateKey, network: 'testnet' }, mocks));
+    const wallet1 = new Wallet({ privateKey: cR4t6ePrivateKey.privateKey, network: 'testnet', ...mocks });
     expect(wallet1.walletType).to.be.equal(WALLET_TYPES.SINGLE_ADDRESS);
     expect(wallet1.mnemonic).to.be.equal(null);
 
@@ -122,7 +122,9 @@ describe('Wallet - class', () => {
     });
   });
   it('should have an offline Mode', () => {
-    const wallet = new Wallet(Object.assign({ offlineMode: true, privateKey: cR4t6ePrivateKey.privateKey, network: 'testnet' }, mocks));
+    const wallet = new Wallet({
+      offlineMode: true, privateKey: cR4t6ePrivateKey.privateKey, network: 'testnet', ...mocks,
+    });
     expect(wallet.offlineMode).to.equal(true);
     wallet.storage.on('CONFIGURED', () => {
       wallet.disconnect();
@@ -130,7 +132,7 @@ describe('Wallet - class', () => {
   });
 });
 describe('Wallet - Get/Create Account', () => {
-  const wallet1 = new Wallet(Object.assign({ mnemonic: fluidMnemonic.mnemonic }, mocks));
+  const wallet1 = new Wallet({ mnemonic: fluidMnemonic.mnemonic, ...mocks });
 
   it('should be able to create/get a wallet', () => {
     const acc1 = wallet1.createAccount({ injectDefaultPlugins: false });

@@ -1,4 +1,4 @@
-const {expect} = require('chai');
+const { expect } = require('chai');
 const getTransactionHistory = require('../../../../src/types/Account/methods/getTransactionHistory');
 const searchTransaction = require('../../../../src/types/Storage/methods/searchTransaction');
 const getTransaction = require('../../../../src/types/Storage/methods/getTransaction');
@@ -21,11 +21,11 @@ describe('Account - getTransactionHistory', () => {
       mappedAddress: {},
     };
     const walletIdHDW = Object.keys(mockedStoreHDWallet.wallets)[0];
-    const selfHDW = Object.assign({
+    const selfHDW = {
       walletId: walletIdHDW,
       index: 0,
       storage: storageHDW,
-    });
+    };
 
 
     selfHDW.storage.searchTransaction = searchTransaction.bind(storageHDW);
@@ -34,7 +34,7 @@ describe('Account - getTransactionHistory', () => {
     selfHDW.storage.searchBlockHeader = searchBlockHeader.bind(storageHDW);
     selfHDW.getTransaction = getTransaction.bind(storageHDW);
     const txHistoryHDW = await getTransactionHistory.call(selfHDW);
-    const selfHDWAccount2 = Object.assign({}, selfHDW);
+    const selfHDWAccount2 = { ...selfHDW };
     selfHDWAccount2.index = 1;
 
     const expectedTxHistoryHDW = [
@@ -76,14 +76,14 @@ describe('Account - getTransactionHistory', () => {
       },
       {
         fees: 930,
-        from: [{address: 'yQSVFizTKcPLz2V7zoZ3HkkJ7sQmb5jXAs', amount: '350', valueSat: 35000000000},
+        from: [{ address: 'yQSVFizTKcPLz2V7zoZ3HkkJ7sQmb5jXAs', amount: '350', valueSat: 35000000000 },
           {
             address: 'yNY6spErvvm9C8at2KQpvAfd6TPumgyETh',
             amount: '440.99997209',
             valueSat: 44099997209,
 
           },
-          {address: 'yhnTNo6tkmr8tA4SAL8gcci1z5rPHuaoxA', amount: '125', valueSat: 12500000000},
+          { address: 'yhnTNo6tkmr8tA4SAL8gcci1z5rPHuaoxA', amount: '125', valueSat: 12500000000 },
           {
             address: 'ySVpgHLkgrrrsbaWJhW5GMHZjeSkADrsTJ',
             amount: '49.99999753',
@@ -141,7 +141,7 @@ describe('Account - getTransactionHistory', () => {
       {
         fees: 247,
         from: [
-          {address: 'yRf8x9bov39e2vHtibjeG35ZNF4BCpSZGe', amount: '450', valueSat: 45000000000},
+          { address: 'yRf8x9bov39e2vHtibjeG35ZNF4BCpSZGe', amount: '450', valueSat: 45000000000 },
         ],
         time: 1548153589,
         to: [{
@@ -233,11 +233,11 @@ describe('Account - getTransactionHistory', () => {
       mappedAddress: {},
     };
     const walletIdHDW = Object.keys(mockedStoreHDWallet.wallets)[0];
-    const selfHDW = Object.assign({
+    const selfHDW = {
       walletId: walletIdHDW,
       index: 1,
       storage: storageHDW,
-    });
+    };
 
     selfHDW.storage.searchTransaction = searchTransaction.bind(storageHDW);
     selfHDW.storage.searchAddress = searchAddress.bind(storageHDW);
@@ -276,11 +276,11 @@ describe('Account - getTransactionHistory', () => {
       mappedAddress: {},
     };
     const walletIdSA = Object.keys(mockedStoreSingleAddress.wallets)[0];
-    const selfSA = Object.assign({
+    const selfSA = {
       walletId: walletIdSA,
       accountId: 0,
       storage: storageSA,
-    });
+    };
     selfSA.storage.searchTransaction = searchTransaction.bind(storageSA);
     selfSA.storage.searchAddress = searchAddress.bind(storageSA);
     selfSA.getTransaction = getTransaction.bind(storageSA);
@@ -327,8 +327,8 @@ describe('Account - getTransactionHistory', () => {
       {
         fees: 522,
         from: [
-          {address: 'yhvXpqQjfN9S4j5mBKbxeGxiETJrrLETg5', amount: '1000', valueSat: 100000000000},
-          {address: 'yifmFokBdParjkfZp3Bu5oR9gTtHtPEU3b', amount: '2.99998582', valueSat: 299998582},
+          { address: 'yhvXpqQjfN9S4j5mBKbxeGxiETJrrLETg5', amount: '1000', valueSat: 100000000000 },
+          { address: 'yifmFokBdParjkfZp3Bu5oR9gTtHtPEU3b', amount: '2.99998582', valueSat: 299998582 },
         ],
         time: 1548505964,
         to: [{
@@ -349,11 +349,11 @@ describe('Account - getTransactionHistory', () => {
       mappedAddress: {},
     };
     const walletIdHDW = Object.keys(mockedStoreHDWallet.wallets)[0];
-    const selfHDW = Object.assign({
+    const selfHDW = {
       walletId: walletIdHDW,
       index: 0,
       storage: storageHDW,
-    });
+    };
 
 
     selfHDW.storage.searchTransaction = searchTransaction.bind(storageHDW);

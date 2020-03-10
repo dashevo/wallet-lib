@@ -1,4 +1,3 @@
-const { Transaction } = require('@dashevo/dashcore-lib');
 const { is } = require('../../../../utils');
 
 module.exports = async function getTransaction(txid) {

@@ -23,7 +23,7 @@ const wallet = new Wallet({
   plugins: [WalletConsolidator, DPADoc, new ColdStorageWorker({ address: coldStorageAddress })],
 });
 
-const account = wallet.getAccount({index:0});
+const account = wallet.getAccount({ index: 0 });
 
 const start = async () => {
   logger.info('Balance', account.getTotalBalance());

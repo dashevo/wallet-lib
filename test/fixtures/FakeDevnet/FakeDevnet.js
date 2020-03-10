@@ -7,7 +7,7 @@ const blocksData = require('./data/blocks.js');
  */
 class FakeDevnet {
   constructor() {
-    this.height = Object.keys(blocksData.heights)[0]
+    this.height = Object.keys(blocksData.heights)[0];
     this.blockHash = blocksData.heights[this.height];
 
     this.relayFee = 0.00001;

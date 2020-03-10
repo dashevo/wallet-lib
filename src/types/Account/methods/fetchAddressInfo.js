@@ -47,7 +47,6 @@ async function fetchAddressInfo(addressObj, fetchUtxo = true) {
             const promise = self.getTransaction(txid);
             promises.push(promise);
           }
-
         });
         await Promise.all(promises);
       }

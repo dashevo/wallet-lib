@@ -10,7 +10,7 @@ describe('Account - disconnect', () => {
   const self = {
     emit: (eventName) => emitted.push(eventName),
     removeAllListeners: () => null,
-    storage:{
+    storage: {
       removeAllListeners: () => null,
       startWorker: () => null,
       saveState: () => null,

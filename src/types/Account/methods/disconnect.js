@@ -1,4 +1,3 @@
-const util = require('util');
 /**
  * This method will disconnect from all the opened streams, will stop all running workers
  * and force a saving of the state.
@@ -13,6 +12,7 @@ module.exports = async function disconnect() {
 
   if (this.plugins.workers) {
     const workersKey = Object.keys(this.plugins.workers);
+    // eslint-disable-next-line no-restricted-syntax
     for (const key of workersKey) {
       // eslint-disable-next-line no-await-in-loop
       await this.plugins.workers[key].stopWorker();
@@ -27,7 +27,7 @@ module.exports = async function disconnect() {
   if (this.readinessInterval) {
     await clearInterval(this.readinessInterval);
     await clearTimeout(this.readinessInterval);
-    delete this.readinessInterval
+    delete this.readinessInterval;
   }
   return true;
 };

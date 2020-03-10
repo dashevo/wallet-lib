@@ -22,7 +22,7 @@ const defaultDAPIOpts = {
  *
  * @param {String|Object|Transporter} props - name of the transporter or options object
  * @param {String} props.type - name of the transporter
- * @param {String} props.devnetName - name of the devNet (for DAPIClient allows to connect to "palinka")
+ * @param {String} props.devnetName - name of the devnet to connect ('evonet' (def),"palinka")
  * @return {boolean}
  */
 module.exports = function resolve(props = { type: 'DAPIClient' }) {

@@ -11,8 +11,9 @@ async function _initializeAccount(account, userUnsafePlugins) {
   const self = account;
   // We run faster in offlineMode to speed up the process when less happens.
   const readinessIntervalTime = (account.offlineMode) ? 50 : 200;
+  // TODO: perform rejection with a timeout
   // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async (resolve) => {
     if (account.injectDefaultPlugins) {
       // TODO: Should check in other accounts if a similar is setup already
       // TODO: We want to sort them by dependencies and deal with the await this way

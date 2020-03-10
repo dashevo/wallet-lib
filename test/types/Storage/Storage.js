@@ -1,9 +1,9 @@
 const { expect } = require('chai');
 
 const localForage = require('localforage');
+const Dashcore = require('@dashevo/dashcore-lib');
 const Storage = require('../../../src/types/Storage/Storage');
 const { CONFIGURED } = require('../../../src/EVENTS');
-const Dashcore = require('@dashevo/dashcore-lib');
 
 describe('Storage - constructor', () => {
   it('It should create a storage', () => {
@@ -33,7 +33,7 @@ describe('Storage - constructor', () => {
     const storage = new Storage();
     return storage.configure(storageOpts1).then(
       () => Promise.reject(new Error('Expected method to reject.')),
-      err => expect(err).to.be.a('Error').with.property('message', expectedException1),
+      (err) => expect(err).to.be.a('Error').with.property('message', expectedException1),
     ).then(() => {
       storage.stopWorker();
     });
@@ -44,7 +44,15 @@ describe('Storage - constructor', () => {
     await storage.createChain(Dashcore.Networks.testnet);
 
     const defaultWalletId = 'squawk7700';
-    const expectedStore1 = { wallets: {}, transactions: {}, chains: { testnet: { name: 'testnet', blockHeight: -1, blockHeaders: {}, mappedBlockHeaderHeights: {} } } };
+    const expectedStore1 = {
+      wallets: {},
+      transactions: {},
+      chains: {
+        testnet: {
+          name: 'testnet', blockHeight: -1, blockHeaders: {}, mappedBlockHeaderHeights: {},
+        },
+      },
+    };
     expect(storage.getStore()).to.deep.equal(expectedStore1);
 
     await storage.createWallet();
@@ -60,7 +68,11 @@ describe('Storage - constructor', () => {
         },
       },
       transactions: {},
-      chains: { testnet: { name: 'testnet', blockHeight: -1, blockHeaders: {}, mappedBlockHeaderHeights: {} } },
+      chains: {
+        testnet: {
+          name: 'testnet', blockHeight: -1, blockHeaders: {}, mappedBlockHeaderHeights: {},
+        },
+      },
     };
     expect(storage.getStore()).to.deep.equal(expectedStore2);
     expect(storage.store).to.deep.equal(expectedStore2);

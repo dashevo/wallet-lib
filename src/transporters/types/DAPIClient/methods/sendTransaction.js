@@ -1,4 +1,3 @@
-const Dashcore = require('@dashevo/dashcore-lib');
 const { is } = require('../../../../utils');
 
 module.exports = async function sendTransaction(serializedTransaction) {

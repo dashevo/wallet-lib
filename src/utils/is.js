@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 // Todo : Some validators here are really proto type of methods, urgent impr is needed here.
 const {
-  PrivateKey, HDPrivateKey, HDPublicKey, Transaction, Mnemonic, Address
+  PrivateKey, HDPrivateKey, HDPublicKey, Transaction, Mnemonic, Address,
 } = require('@dashevo/dashcore-lib');
 
 const is = {

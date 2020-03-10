@@ -8,11 +8,11 @@ describe('CoinSelection - Strategy - simpleDescendingAccumulator', () => {
     const self = {
     };
 
-    const utxosList = getUTXOS.call(Object.assign({}, {
+    const utxosList = getUTXOS.call({
       store: duringDevelopStore,
       getStore: () => this.store,
       walletId: '5061b8276c',
-    }));
+    });
 
     const outputsList1e4 = [{ address: 'yU7sNM4j6fzKtbah24gCXdN636piQN8F2f', satoshis: 1e4 }];
     const outputsList1e5 = [{ address: 'yU7sNM4j6fzKtbah24gCXdN636piQN8F2f', satoshis: 1e5 }];
@@ -27,7 +27,7 @@ describe('CoinSelection - Strategy - simpleDescendingAccumulator', () => {
 
     const expectedRes1e4 = {
       utxos: [{
-         satoshis: 10000000000, script: '76a9143a9202121ee9ef906e567101326f2ecf8ad4ecbc88ac',
+        satoshis: 10000000000, script: '76a9143a9202121ee9ef906e567101326f2ecf8ad4ecbc88ac',
       }],
       outputs: [{ address: 'yU7sNM4j6fzKtbah24gCXdN636piQN8F2f', satoshis: 10000, scriptType: 'P2PKH' }],
       feeCategory: 'normal',

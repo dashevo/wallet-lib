@@ -223,9 +223,7 @@ describe('CoinSelection - Strategy - simpleAscendingAccumulator', () => {
     res6e10.utxos[4] = res6e10.utxos[4].toJSON();
     res6e10.utxos[5] = res6e10.utxos[5].toJSON();
     expect(res6e10).to.deep.equal(expectedRes6e10);
-    res999e8.utxos = res999e8.utxos.map((utxo) => {
-      return utxo.toJSON();
-    });
+    res999e8.utxos = res999e8.utxos.map((utxo) => utxo.toJSON());
     // res999e8.utxos[0] = res999e8.utxos[0].toJSON();
     expect(res999e8).to.deep.equal(expectedRes999e8);
     expect(() => simpleAscendingAccumulator.call(self, utxosList, outputsList1e11)).to.throw(('Unsufficient utxo amount'));

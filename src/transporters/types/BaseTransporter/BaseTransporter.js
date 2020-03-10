@@ -7,7 +7,7 @@ class BaseTransporter extends EventEmitter {
     this.state = {
       block: null,
       blockHeader: null,
-      addressesTransactionsMap:{},
+      addressesTransactionsMap: {},
       subscriptions: {
         blocks: null,
         blockHeaders: null,
