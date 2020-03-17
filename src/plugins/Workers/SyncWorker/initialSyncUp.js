@@ -25,6 +25,9 @@ module.exports = async function initialSyncUp() {
     let expectedTxNumberToFetch = 0;
     let numberOfFetchedTx = 0;
     let fetchedAddresses = 0;
+    logger.silly(`SyncWorker - initialSyncUp - addr fetched : ${fetchedAddresses}/${expectedAddrNumberToFetch}`);
+    logger.silly(`SyncWorker - initialSyncUp - tx fetched : ${numberOfFetchedTx}/${expectedTxNumberToFetch}`);
+
     const waiterTxFetchedListernerFn = async () => {
       numberOfFetchedTx += 1;
       logger.silly(`SyncWorker - init txWaiter : fetched : ${numberOfFetchedTx}/${expectedTxNumberToFetch}`);
