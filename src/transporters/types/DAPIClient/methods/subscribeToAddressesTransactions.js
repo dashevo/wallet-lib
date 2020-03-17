@@ -40,7 +40,7 @@ async function executor(forcedAddressList = null) {
 
 function startExecutor() {
   const self = this;
-  console.log('DAPIClient.subscribeToAddressesTransactions.startExecutor');
+  logger.silly('DAPIClient.subscribeToAddressesTransactions.startExecutor');
   this.state.executors.addresses = setInterval(() => executor.call(self), fastFetchThreshold);
 }
 
