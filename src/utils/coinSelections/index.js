@@ -17,8 +17,6 @@ module.exports = function coinSelection(utxosList, outputsList, deductFee = fals
     if (!is.utxo(utxo)) {
       try {
         // Tries to get retro-compatibility from insight old format
-        // FIXME: Maybe update tests with newer format now.
-        utxo.script = utxo.scriptPubKey;
         utxo = new Transaction.Output(utxo);
       } catch (e) {
         throw new InvalidUTXO(utxo);

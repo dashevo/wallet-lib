@@ -38,7 +38,7 @@ async function executor(forcedAddressList = null) {
       });
     }
   });
-  addressList.forEach((address, i) => {
+  addressList.forEach((address) => {
     self.announce(EVENTS.FETCHED_ADDRESS, { address, utxos: fetchedUtxos[address] });
   });
 }
