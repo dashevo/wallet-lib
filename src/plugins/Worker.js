@@ -45,14 +45,18 @@ class Worker extends StandardPlugin {
     if (this.worker) this.stopWorker();
     // every minutes, check the pool
     this.worker = setInterval(this.execWorker.bind(self), this.workerIntervalTime);
+    const timeout = setTimeout(() => {
+      throw new Error(`Worker ${self.name} failed to start.`);
+    }, 20000);
     if (this.executeOnStart === true) {
       if (this.onStart) {
         await this.onStart();
       }
     }
     const eventType = `WORKER/${this.name.toUpperCase()}/STARTED`;
-    self.parentEvents.emit(eventType, { type: eventType, payload: null });
-    self.state.started = true;
+    this.parentEvents.emit(eventType, { type: eventType, payload: null });
+    this.state.started = true;
+    clearTimeout(timeout);
     if (this.executeOnStart) await this.execWorker();
   }
 
