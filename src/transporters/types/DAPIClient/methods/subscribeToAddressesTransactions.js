@@ -20,21 +20,26 @@ async function executor(forcedAddressList = null) {
   const { addresses } = self.state.subscriptions;
   const addressList = forcedAddressList || Object.keys(addresses);
   logger.silly(`DAPIClient.subscribeToAddrTx.executor[${addressList}]`);
-
+  const fetchedUtxos = {};
   addressList.forEach((address) => {
     addresses[address].last = +new Date();
+    fetchedUtxos[address] = [];
   });
 
   const utxos = (await self.getUTXO(addressList)).items;
+
   utxos.forEach((utxo) => {
     const { address, txid, outputIndex } = utxo;
+    fetchedUtxos[address].push(utxo);
     if (self.state.addressesTransactionsMap[address][txid] === undefined) {
       self.getTransaction(txid).then((tx) => {
         self.state.addressesTransactionsMap[address][txid] = outputIndex;
         self.announce(EVENTS.FETCHED_TRANSACTION, tx);
       });
     }
-    self.announce(EVENTS.FETCHED_ADDRESS, { address, utxos });
+  });
+  addressList.forEach((address, i) => {
+    self.announce(EVENTS.FETCHED_ADDRESS, { address, utxos: fetchedUtxos[address] });
   });
 }
 
