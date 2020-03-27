@@ -36,5 +36,5 @@ For browser usage, you can also directly rely on unpkg :
 
 ## Licence
 
-[MIT](https://github.com/dashevo/wallet-lib/blob/master/LICENCE.md) © Dash Core Group, Inc.
+[MIT](/LICENSE) © Dash Core Group, Inc.
 
