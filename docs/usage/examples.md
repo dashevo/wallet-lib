@@ -3,8 +3,6 @@
 ## Table of Contents
 
 - [Offline / Cold-wallet usage](#offline-cold-wallet-usage)
-- [Server usage](#server-usage)
-- [Client usage](#client-usage)
 
 ## Offline cold-wallet usage : 
 
@@ -16,11 +14,3 @@ And thus allowing you to use the wallet-library without connectivity.
 
 See here [sample code](/examples/offline-wallet.js) 
 
-## Server usage
-
-See here [sample code](/examples/server-usage.md) 
-
-
-## Client usage
-
-See here [sample code](/examples/client-usage.md) 
