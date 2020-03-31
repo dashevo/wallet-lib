@@ -66,7 +66,7 @@ const updateAddress = function (addressObj, walletId) {
         newObject.balanceSat += utxo.satoshis;
       } catch (e) {
         logger.error(`Unable to find locally ${txid}`);
-        throw new Error(e);
+        if (!(e instanceof TransactionNotInStore)) throw new Error(e);
       }
     });
   }
