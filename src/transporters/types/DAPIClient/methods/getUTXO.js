@@ -26,7 +26,7 @@ module.exports = async function getUTXO(address) {
     const promises = [];
     const numberOfPromises = Math.floor((firstRequest.totalItems - 1000) / 1000);
 
-    for (let i = 0; i < numberOfPromises; i++) {
+    for (let i = 0; i < numberOfPromises; i = +1) {
       from = to;
       to += 1000;
       promises.push(fetchAndReturnUTXO(from, to));
