@@ -26,7 +26,7 @@ async function executor(forcedAddressList = null) {
     fetchedUtxos[address] = [];
   });
 
-  const utxos = (await self.getUTXO(addressList)).items;
+  const utxos = (await self.getUTXO(addressList));
 
   utxos.forEach((utxo) => {
     const { address, txid, outputIndex } = utxo;
