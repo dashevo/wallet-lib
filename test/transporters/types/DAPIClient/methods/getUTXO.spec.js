@@ -21,6 +21,6 @@ describe('transporters - DAPIClient - .getUTXO', () => {
   it('should works', async () => {
     transporter.client.getUTXO = () => fixture;
     const res = await transporter.getUTXO('yYpSw2n2TRzoQaUShNsPo541z4bz4EJkGN');
-    expect(res).to.deep.equal(fixture);
+    expect(res).to.deep.equal(fixture.items);
   });
 });
