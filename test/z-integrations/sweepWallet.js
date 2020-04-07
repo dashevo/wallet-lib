@@ -118,7 +118,7 @@ describe('Wallet - sweepWallet', function suite() {
         if (balance < 2500) throw new Error('Failed to fund wallet1');
         if (balance2 < 2500) throw new Error('Failed to fund wallet2');
         done();
-      }, 5000);
+      }, 9000);
     })();
   });
   it('should work', async () => {
