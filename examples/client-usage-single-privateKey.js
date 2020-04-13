@@ -12,7 +12,6 @@ const start = async () => {
   const address = account.getUnusedAddress();
   console.log('Unused Address :', address);
 
-
   const balance = account.getTotalBalance();
   console.log('balance :', balance);
 
