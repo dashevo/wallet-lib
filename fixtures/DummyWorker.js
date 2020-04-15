@@ -1,4 +1,4 @@
-const Worker = require('../../src/plugins/Worker');
+const Worker = require('../src/plugins/Worker');
 
 class DummyWorker extends Worker {
   constructor() {
