@@ -12,9 +12,10 @@ function getIdentityHDKey(keyIndex = 0) {
 
   return identityFeatureKey
     .deriveChild(accountIndex, true)
-  // In dpp 12.0, Identity.Types has been removed.
+  // In dpp 12.0, Identity.Types has been removed. However indexing was starting by USER:1
+  // kept for retro-compatibility with previous usage
   // TODO: To be changed when changes associated with derivation are specified in a DIP.
-    .deriveChild(0, false)
+    .deriveChild(1, false)
     .deriveChild(keyIndex, false);
 }
 
