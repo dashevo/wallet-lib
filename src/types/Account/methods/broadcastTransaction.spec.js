@@ -3,7 +3,7 @@ const Dashcore = require('@dashevo/dashcore-lib');
 const broadcastTransaction = require('./broadcastTransaction');
 const validRawTxs = require('../../../../fixtures/rawtx').valid;
 const invalidRawTxs = require('../../../../fixtures/rawtx').invalid;
-const { expectThrowsAsync } = require('../../../test.utils');
+const expectThrowsAsync = require('../../../utils/expectThrowsAsync');
 
 describe('Account - broadcastTransaction', () => {
   it('should throw error on missing transport', async () => {

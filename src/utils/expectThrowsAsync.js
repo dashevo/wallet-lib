@@ -19,4 +19,4 @@ const expectThrowsAsync = async (method, errorMessage) => {
     expect(error.message).to.equal(errorMessage);
   }
 };
-module.exports = { expectThrowsAsync };
+module.exports = expectThrowsAsync

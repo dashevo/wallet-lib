@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const { Wallet } = require('../../../index');
-const { expectThrowsAsync } = require('../../../test.utils');
+const expectThrowsAsync = require('../../../utils/expectThrowsAsync');
 const sweepWallet = require('./sweepWallet');
 
 const paperWallet = {
