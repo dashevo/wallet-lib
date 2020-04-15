@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const { expect } = require('chai');
 
 const expectThrowsAsync = async (method, errorMessage) => {
@@ -19,4 +20,4 @@ const expectThrowsAsync = async (method, errorMessage) => {
     expect(error.message).to.equal(errorMessage);
   }
 };
-module.exports = expectThrowsAsync
+module.exports = expectThrowsAsync;
