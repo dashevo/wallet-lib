@@ -1,36 +1,28 @@
-const { expect } = require('chai');
-const Dashcore = require('@dashevo/dashcore-lib');
-const _ = require('lodash');
-const createTransaction = require('./createTransaction');
-const getUnusedAddress = require('./getUnusedAddress');
-const getAddress = require('./getAddress');
-const generateAddress = require('./generateAddress');
-const getPrivateKeys = require('./getPrivateKeys');
-const searchTransaction = require('../../Storage/methods/searchTransaction');
-const getStore = require('../../Storage/methods/getStore');
-const getUTXOS = require('./getUTXOS');
-const KeyChain = require('../../KeyChain/KeyChain');
-const Storage = require('../../Storage/Storage');
-const { simpleDescendingAccumulator } = require('../../../utils/coinSelections/strategies');
+const {expect} = require('chai');
+const {HDPrivateKey} = require('@dashevo/dashcore-lib');
 
-const { mnemonicToHDPrivateKey } = require('../../../utils');
+const createTransaction = require('./createTransaction');
+const mnemonic = require('../../../../fixtures/wallets/mnemonics/during-develop-before').mnemonic;
+const FakeDevnet = require('../../../../fixtures/FakeDevnet/FakeDevnet');
+
+const _ = require('lodash');
+// const createTransaction = require('./createTransaction');
+const getUTXOS = require('./getUTXOS');
+const {simpleDescendingAccumulator} = require('../../../utils/coinSelections/strategies');
 
 const addressesFixtures = require('../../../../fixtures/addresses.json');
 const validStore = require('../../../../fixtures/walletStore').valid.orange.store;
-const duringDevelopStore = require('../../../../fixtures/duringdevelop-fullstore-snapshot-1548538361');
 
-const duringDevelopMnemonic = 'during develop before curtain hazard rare job language become verb message travel';
-
-const craftedStrategy = (utxosList, outputsList, deductFee = false, feeCategory = 'normal') => {
+const craftedGenerousMinerStrategy = (utxosList, outputsList, deductFee = false, feeCategory = 'normal') => {
   const TransactionEstimator = require('../../../utils/coinSelections/TransactionEstimator.js');
-  const { sortAndVerifyUTXOS } = require('../../../utils/coinSelections/helpers');
+  const {sortAndVerifyUTXOS} = require('../../../utils/coinSelections/helpers');
 
   const txEstimator = new TransactionEstimator(feeCategory);
 
   // We add our outputs, theses will change only in case deductfee being true
   txEstimator.addOutputs(outputsList);
 
-  const sort = [{ sortBy: 'satoshis', direction: 'descending' }];
+  const sort = [{sortBy: 'satoshis', direction: 'descending'}];
   const sortedUtxosList = sortAndVerifyUTXOS(utxosList, sort);
 
   const totalOutputValue = txEstimator.getTotalOutputValue();
@@ -51,7 +43,7 @@ const craftedStrategy = (utxosList, outputsList, deductFee = false, feeCategory 
   // TODO : handle case when we do not match it.
   txEstimator.addInputs(simplyAccumulatedUtxos);
 
-  const estimatedFee = txEstimator.getFeeEstimate();
+  const estimatedFee = txEstimator.getFeeEstimate() + 10;
   if (deductFee === true) {
     // Then we check that we will be able to do it
     const inValue = txEstimator.getInValue();
@@ -63,7 +55,7 @@ const craftedStrategy = (utxosList, outputsList, deductFee = false, feeCategory 
       // TODO : Here we can add some process to check up that we clearly have enough to deduct fee
     }
   }
-  // console.log('estimatedFee are', estimatedFee, 'satoshis');
+
   return {
     utxos: txEstimator.getInputs(),
     outputs: txEstimator.getOutputs(),
@@ -74,6 +66,8 @@ const craftedStrategy = (utxosList, outputsList, deductFee = false, feeCategory 
 };
 
 describe('Account - createTransaction', () => {
+  let mockWallet;
+
   it('sould warn on missing inputs', () => {
     const self = {
       store: validStore,
@@ -96,96 +90,102 @@ describe('Account - createTransaction', () => {
     expect(() => createTransaction.call(self, mockOpts2)).to.throw(expectedException2);
     expect(() => createTransaction.call(self, mockOpts3)).to.throw(expectedException3);
   });
-  it('should create valid transaction', () => {
-    const walletId = '5061b8276c';
-    const storage = new Storage();
-    storage.importAddresses(duringDevelopStore.wallets[walletId].addresses.external, walletId);
-    storage.importAddresses(duringDevelopStore.wallets[walletId].addresses.internal, walletId);
-    storage.importAccounts(duringDevelopStore.wallets[walletId].accounts, walletId);
-    // FIXME: When platform is released on mainnet, we will need to rebuild our TX fixtures
-    return;
-    storage.importTransactions(duringDevelopStore.transactions);
-    const self = {
-      store: duringDevelopStore,
-      walletId,
-      getUTXOS,
-      getUnusedAddress,
-      getAddress,
-      index: 0,
-      BIP44PATH: 'm/44\'/1\'/0\'',
-      getPrivateKeys,
-      strategy: simpleDescendingAccumulator,
-      generateAddress,
-      keyChain: new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(duringDevelopMnemonic, 'testnet', '') }),
-      storage,
-      emit: _.noop,
+  it('should create valid and deterministic transactions', async function () {
+    const transporter = new FakeDevnet();
+    transporter.setHeight(21546);
+    const utxos = await transporter.getUTXO.call(transporter, ['yQ1fb64aeLfgqFKyeV9Hg9KTaTq5ehHm22']);
+    mockWallet = {
+      getUTXOS: () => utxos,
+      getUnusedAddress: () => {
+        return {"address": 'yMGXHsi8gstbd5wqfqkqcfsbwJjGBt5sWu'}
+      },
+      getPrivateKeys: (addrList) => {
+        if (addrList.length === 1 && addrList[0] === 'yQ1fb64aeLfgqFKyeV9Hg9KTaTq5ehHm22') {
+          return [new HDPrivateKey('tprv8jG3ctd1DEVADnLP3hwS1Gfzjxf5E4WL2UutfJkhAQs7rVu2b3Ryv4WQ46mddZyMbGaSUYnY9wFeuFRAejapjoB1LGzTfM55mxMhZ1X4eGX')]
+        }
+      },
+      keyChain: {
+        sign: (tx, privateKeys) => tx.sign(privateKeys),
+      },
+      storage: {
+        searchTransaction: (txid) => {
+          const tx = transporter.getTransaction(txid);
+          if (tx) {
+            return {found: true, result: tx, hash: txid}
+          } else {
+            return {found: false, hash: txid}
+          }
+        }
+      }
     };
+    const expectedTx1 = '0300000001b64e23b6bd8c1016c8595ab6256e97ac5a33a95b5c68cc99410bf88867023910000000006a47304402200f8851bfcba02f1375c9d14cc1e4a1f442a6ba04dade5060124b6d245738eb1502206f2655f5e3714e9a1aa46de58124ec44d4da36884db0f1a39e6cad912ce009fc012103987110fc08c848657176385b37a77fb7f6d89bc873bb4334146ffe44ac126566ffffffff0250c30000000000001976a9140a6a961f1c664a9cd004c593381dd4d9f1f5463588acb9059a3b000000001976a9140a6a961f1c664a9cd004c593381dd4d9f1f5463588ac00000000';
+    const expectedTx2 = '0300000001b64e23b6bd8c1016c8595ab6256e97ac5a33a95b5c68cc99410bf88867023910000000006b483045022100fc88e4585654961610e375b19f33b52d10e1c7efa5ef91531c627129538cf7ef0220108a281374a691522b5deb51ce3249723efe9541e57a4de87bdd8ba7ce43ce8e012103987110fc08c848657176385b37a77fb7f6d89bc873bb4334146ffe44ac126566ffffffff0b804a5d05000000001976a9140a6a961f1c664a9cd004c593381dd4d9f1f5463588ac804a5d05000000001976a91403ab1053a3bc741a012607893c66565c6815b9d888ac804a5d05000000001976a9146c773e3b74a16931f995288645f4f6379076048688ac804a5d05000000001976a914429dfc6b9a9d86463ea65b55d8cedb26a5e04f3388ac804a5d05000000001976a91434cb4bfb6e27ed0067e47c55da615bf7230e23f888ac804a5d05000000001976a914eb9a36fab9220e5e966fdcfe1abf2ee43308cb5d88ac804a5d05000000001976a9144c9f7ef1c5af5f0d2b219a035a46c7f54035b0a288ac804a5d05000000001976a9141c44d8966f001ddb7cea277edc33b02f151b603788ac804a5d05000000001976a914f4159f063a076038a484cf9d027808dbac118a1a88ac804a5d05000000001976a9147bc630538f5bb87d3166b6cf5f69853809235f4388acdcdef505000000001976a9140a6a961f1c664a9cd004c593381dd4d9f1f5463588ac00000000';
 
-    const txOpts1 = {
-      recipient: addressesFixtures.testnet.valid.yereyozxENB9jbhqpbg1coE5c39ExqLSaG.addr,
-      satoshis: 1e8,
-    };
-    const tx1 = createTransaction.call(self, txOpts1);
-    expect(tx1.constructor.name).to.equal('Transaction');
-    expect(tx1.isFullySigned()).to.equal(true);
-    expect(tx1.verify()).to.equal(true);
-    const expectedRawTx1 = '0300000001bf4a70ad9d24deb6f374e088208af950c7a2e68d03cfa0a0f3e8e6553d3744dd000000006a47304402202708fb9d0f98720be46cf3db0075e07738a6333475992faf1b8a1e8479c926770220476785d5367c06461af528c975dbd924fcb8cc65c2d412a1bfb377dc675f65340121028614ed50b56e0430d6bb954320b0bc23f0420c3d6e0a2efcd163f414765b6c0cffffffff0200e1f505000000001976a914cb594917ad4e5849688ec63f29a0f7f3badb5da688ac09f41b78030000001976a9149c2e6d97ccb044a3e3ef44319dc1c53cf451988988ac00000000';
-    expect(tx1.toString()).to.equal(expectedRawTx1);
 
-    // Only satoshis was changed to equal amount. Should then be similar than first rawtx.
-    const txOpts2 = {
-      recipient: addressesFixtures.testnet.valid.yereyozxENB9jbhqpbg1coE5c39ExqLSaG.addr,
-      amount: 1,
-    };
-    const tx2 = createTransaction.call(self, txOpts2);
-    expect(tx2.toString()).to.equal(expectedRawTx1);
+    const tx1 = await createTransaction.call(mockWallet, {
+      recipient: 'yMGXHsi8gstbd5wqfqkqcfsbwJjGBt5sWu',
+      satoshis: 50000,
+    });
+    expect(tx1.toString('hex')).to.deep.equal(expectedTx1);
 
-    const tx2Json = tx2.toJSON();
-    expect(tx2Json.outputs.length).to.equal(2);
-    expect(tx2Json.outputs[0].satoshis).to.equal(1e8);
-    expect(tx2Json.outputs[1].satoshis).to.equal(14899999753);
-    expect(tx2Json.fee).to.equal(247);
-
-    expect(tx2.outputs[0].script.toAddress().toString()).to.equal('yereyozxENB9jbhqpbg1coE5c39ExqLSaG');
-    expect(tx2.outputs[1].script.toAddress().toString()).to.equal('yaZFt1VnAbi72mtyjDNV4AwTECqdg5Bv95');
-
-    expect(tx2.inputs[0].script.toAddress().toString()).to.equal('XsXC8nUKVdN7EQepL5Sg4XDwNvP5zjayY4');
-    expect(tx2.inputs[0].output._satoshis).to.equal(15000000000);
+    const tx2 = await createTransaction.call(mockWallet, {
+      recipients: [
+        {
+          address: 'yMGXHsi8gstbd5wqfqkqcfsbwJjGBt5sWu',
+          satoshis: 90000000
+        }, {
+          address: 'yLeqoVqqGf4hFDwsiJwKiLPpeJbZHJpwo7',
+          satoshis: 90000000
+        }, {
+          address: 'yWCxg5NdRXDagFokjwdLMYNDqfEKmLPtua',
+          satoshis: 90000000
+        }, {
+          address: 'ySPghvb9M1PqjhRYKv7iivQEuebM2aXs9f',
+          satoshis: 90000000
+        }, {
+          address: 'yR8bXVFZAM1ysc8s4GfVTirNhTEzKizY19',
+          satoshis: 90000000
+        }, {
+          address: 'yhoCPK6WyqtB5GmZjVqxy3faR5JMUKbt8x',
+          satoshis: 90000000
+        }, {
+          address: 'yTJbGkT7TYVY4MYbTgdSDdq19A3VmjyEUo',
+          satoshis: 90000000
+        }, {
+          address: 'yNtvF5g6qnbRsUJ8ggap3pd53HEmkngEJu',
+          satoshis: 90000000
+        }, {
+          address: 'yia3dGyRdh7xZLDtum1rdCLRqabyBQbcWL',
+          satoshis: 90000000
+        }, {
+          address: 'yXbuPCJagq4XH85hgxqsNv92kSUFroTWUA',
+          satoshis: 90000000
+        },
+      ]
+    });
+    expect(tx2.toString('hex')).to.equal(expectedTx2);
   });
-  it('should be able to create a transaction with specific strategy', () => {
-    const walletId = '5061b8276c';
-    const storage = new Storage();
-    storage.importAddresses(duringDevelopStore.wallets[walletId].addresses.external, walletId);
-    storage.importAddresses(duringDevelopStore.wallets[walletId].addresses.internal, walletId);
-    storage.importAccounts(duringDevelopStore.wallets[walletId].accounts, walletId);
-    // FIXME: When platform is released on mainnet, we will need to rebuild our TX fixtures
-    return;
-    storage.importTransactions(duringDevelopStore.transactions);
-    const self = {
-      store: duringDevelopStore,
-      walletId,
-      getUTXOS,
-      getUnusedAddress,
-      getAddress,
-      index: 0,
-      BIP44PATH: 'm/44\'/1\'/0\'',
-      getPrivateKeys,
-      generateAddress,
-      strategy: () => { throw new Error(); }, // Ensure it call the passed option
-      keyChain: new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(duringDevelopMnemonic, 'testnet', '') }),
-      storage,
-      emit: _.noop,
-    };
-    const txOpts1 = {
-      recipient: addressesFixtures.testnet.valid.yereyozxENB9jbhqpbg1coE5c39ExqLSaG.addr,
-      satoshis: 100e8,
-      strategy: craftedStrategy,
-    };
-    const tx1 = createTransaction.call(self, txOpts1);
-    const expectedRawTx1 = '0300000001bf4a70ad9d24deb6f374e088208af950c7a2e68d03cfa0a0f3e8e6553d3744dd010000006b483045022100da2c81b18703d4a92c644a317e81e9684adad9a1bc200bf45a591d5c7865b3b502206967ee9c23c5292414109e40238561649e284c4af5850d3f8032d3dac184e9df012103fffaacbf96c63a6758b45a5c3ca0d1984781ed6991050169cd578b607d546b4dffffffff0200e40b54020000001976a914cb594917ad4e5849688ec63f29a0f7f3badb5da688ac12b81dd2050000001976a9149c2e6d97ccb044a3e3ef44319dc1c53cf451988988ac00000000';
-    expect(tx1.toString()).to.equal(expectedRawTx1);
-  });
-  it('should be able to have a passed change address', () => {
+  it('should be able to create transaction with specific strategy', async function () {
+    const expectedTxStd = '0300000001b64e23b6bd8c1016c8595ab6256e97ac5a33a95b5c68cc99410bf88867023910000000006a47304402200f8851bfcba02f1375c9d14cc1e4a1f442a6ba04dade5060124b6d245738eb1502206f2655f5e3714e9a1aa46de58124ec44d4da36884db0f1a39e6cad912ce009fc012103987110fc08c848657176385b37a77fb7f6d89bc873bb4334146ffe44ac126566ffffffff0250c30000000000001976a9140a6a961f1c664a9cd004c593381dd4d9f1f5463588acb9059a3b000000001976a9140a6a961f1c664a9cd004c593381dd4d9f1f5463588ac00000000';
+    const expectedTxStrat = '0300000001b64e23b6bd8c1016c8595ab6256e97ac5a33a95b5c68cc99410bf88867023910000000006a4730440220171da851d2915f7faa20a7d7aa66383c93cca6b623d12cdb1919d913abe558aa0220154f7edac296e3e2cd393e46f18baf9f4463aaa0a6d2ce5259055280ed05d878012103987110fc08c848657176385b37a77fb7f6d89bc873bb4334146ffe44ac126566ffffffff0250c30000000000001976a9140a6a961f1c664a9cd004c593381dd4d9f1f5463588acad059a3b000000001976a9140a6a961f1c664a9cd004c593381dd4d9f1f5463588ac00000000';
 
+    const txStdStrategy = await createTransaction.call(mockWallet, {
+      recipient: 'yMGXHsi8gstbd5wqfqkqcfsbwJjGBt5sWu',
+      satoshis: 50000,
+    });
+    expect(txStdStrategy.toString('hex')).to.deep.equal(expectedTxStd);
+
+    mockWallet.strategy = craftedGenerousMinerStrategy
+    const txStrat1 = await createTransaction.call(mockWallet, {
+      recipient: 'yMGXHsi8gstbd5wqfqkqcfsbwJjGBt5sWu',
+      satoshis: 50000,
+    });
+    expect(txStrat1.toString('hex')).to.deep.equal(expectedTxStrat);
+    const txStrat2 = await createTransaction.call(mockWallet, {
+      recipient: 'yMGXHsi8gstbd5wqfqkqcfsbwJjGBt5sWu',
+      satoshis: 50000,
+      strategy: craftedGenerousMinerStrategy
+    });
+    expect(txStrat2.toString('hex')).to.deep.equal(expectedTxStrat);
   });
 });

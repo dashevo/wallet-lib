@@ -24,7 +24,7 @@ class FakeDevnet extends BaseTransporter {
   setHeight(height) {
     if (!height) throw new Error('Height needed');
     this.height = height;
-    console.log(blocksData.heights)
+
     if (!blocksData.heights[this.height]) {
       throw new Error(`Missing block ${this.height}`);
     }
