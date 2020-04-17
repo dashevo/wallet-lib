@@ -1,7 +1,6 @@
 /**
  * Returns a private key for managing an identity
  * @param {number} index - index of an identity
- * @param {string} identityType - type of identity (user, application)
  * @return {PrivateKey}
  */
 function getIdentityHDKey(keyIndex = 0) {
