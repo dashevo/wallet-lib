@@ -1,7 +1,6 @@
 const blocksData = require('./data/blocks/blocks.js');
 const BaseTransporter = require('../../src/transporters/types/BaseTransporter/BaseTransporter');
 
-// const bestBlockDataHeight = 3812;
 const bestBlockDataHeight = 21546;
 /**
  * This is a saved snapshot of some selected blocks and transactions
@@ -12,7 +11,7 @@ const bestBlockDataHeight = 21546;
 class FakeNet extends BaseTransporter {
   constructor(props) {
     super({ ...props, type: 'DAPIClient' });
-    // By default,
+
     this.height = bestBlockDataHeight;
     this.blockHash = blocksData.heights[this.height];
 
@@ -71,4 +70,5 @@ FakeNet.prototype.sendTransaction = require('./methods/sendTransaction');
 FakeNet.prototype.subscribeToAddressesTransactions = require('./methods/subscribeToAddressesTransactions');
 FakeNet.prototype.subscribeToBlockHeaders = require('./methods/subscribeToBlockHeaders');
 FakeNet.prototype.subscribeToBlocks = require('./methods/subscribeToBlocks');
+
 module.exports = FakeNet;
