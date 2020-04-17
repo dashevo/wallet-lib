@@ -1,9 +1,10 @@
 import {Mnemonic, Transaction, AddressObj,AddressInfo, AddressType, transactionId, TransactionInfo, PublicAddress, PrivateKey, Strategy, Network, Plugins} from "../types";
 import {KeyChain} from "../KeyChain/KeyChain";
 import {HDPrivateKey} from "@dashevo/dashcore-lib";
+import {Wallet} from "../../index";
 
 export declare class Account {
-    constructor(options?: Account.Options);
+    constructor(wallet: Wallet, options?: Account.Options);
     index: number;
     debug?: boolean;
     keyChain: KeyChain;
