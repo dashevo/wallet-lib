@@ -19,7 +19,7 @@ async function executor(forcedAddressList = null) {
   const self = this;
   const { addresses } = self.state.subscriptions;
   const addressList = forcedAddressList || Object.keys(addresses);
-  logger.silly(`FakeDevnet.subscribeToAddrTx.executor[${addressList}]`);
+  logger.silly(`FakeNet.subscribeToAddrTx.executor[${addressList}]`);
   const fetchedUtxos = {};
   addressList.forEach((address) => {
     addresses[address].last = +new Date();
@@ -45,7 +45,7 @@ async function executor(forcedAddressList = null) {
 
 function startExecutor() {
   const self = this;
-  logger.silly('FakeDevnet.subscribeToAddressesTransactions.startExecutor');
+  logger.silly('FakeNet.subscribeToAddressesTransactions.startExecutor');
   this.state.executors.addresses = setInterval(() => executor.call(self), fastFetchThreshold);
 }
 
@@ -54,7 +54,7 @@ function startExecutor() {
 //   subscriptions.addresses = null;
 // };
 module.exports = async function subscribeToAddressesTransactions(addressList) {
-  logger.silly(`FakeDevnet.subscribeToAddressesTransactions[${addressList}]`);
+  logger.silly(`FakeNet.subscribeToAddressesTransactions[${addressList}]`);
   if (!Array.isArray(addressList)) throw new Error('Expected array of addresses');
   const { executors, subscriptions, addressesTransactionsMap } = this.state;
 

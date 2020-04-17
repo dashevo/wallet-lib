@@ -4,6 +4,6 @@ const blocks = require('../data/blocks/blocks');
 
 module.exports = async function getBlockByHash(hash) {
   const height = blocks.hashes[hash];
-  const blockfile = JSON.parse(fs.readFileSync(`./fixtures/FakeDevnet/data/blocks/${height}.json`));
+  const blockfile = JSON.parse(fs.readFileSync(`./fixtures/FakeNet/data/blocks/${height}.json`));
   return new Block(Buffer.from(blockfile.block, 'hex'));
 };

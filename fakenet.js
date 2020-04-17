@@ -1,4 +1,4 @@
-const Fakenet = require('./fixtures/FakeDevnet/FakeDevnet');
+const Fakenet = require('./fixtures/FakeNet/FakeNet');
 const { Wallet } = require('./src/index');
 
 const wallet = new Wallet({

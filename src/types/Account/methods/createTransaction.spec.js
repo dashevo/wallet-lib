@@ -3,7 +3,7 @@ const {HDPrivateKey} = require('@dashevo/dashcore-lib');
 
 const createTransaction = require('./createTransaction');
 const mnemonic = require('../../../../fixtures/wallets/mnemonics/during-develop-before').mnemonic;
-const FakeDevnet = require('../../../../fixtures/FakeDevnet/FakeDevnet');
+const FakeNet = require('../../../../fixtures/FakeNet/FakeNet');
 
 const _ = require('lodash');
 // const createTransaction = require('./createTransaction');
@@ -91,7 +91,7 @@ describe('Account - createTransaction', () => {
     expect(() => createTransaction.call(self, mockOpts3)).to.throw(expectedException3);
   });
   it('should create valid and deterministic transactions', async function () {
-    const transporter = new FakeDevnet();
+    const transporter = new FakeNet();
     transporter.setHeight(21546);
     const utxos = await transporter.getUTXO.call(transporter, ['yQ1fb64aeLfgqFKyeV9Hg9KTaTq5ehHm22']);
     mockWallet = {
