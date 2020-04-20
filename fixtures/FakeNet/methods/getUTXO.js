@@ -3,18 +3,17 @@ const { is } = require('../../../src/utils');
 
 function getUtxoOfAddressAtHeight(address, height) {
   let utxos = [];
-  try {
-    const utxofile = JSON.parse(fs.readFileSync(`./fixtures/FakeNet/data/utxos/${address}.json`));
-    for (let i = parseInt(Object.keys(utxofile)[0], 10) - 1; i <= height; i++) {
-      const el = utxofile[i];
-      if (el) {
-        utxos = utxos.concat(el);
-      }
-    }
-  } catch (e) {
-    // s
+  const path = `./fixtures/FakeNet/data/utxos/${address}.json`;
+  if (!fs.existsSync(path)) {
+    return utxos;
   }
-
+  const utxofile = JSON.parse(fs.readFileSync(path));
+  for (let i = parseInt(Object.keys(utxofile)[0], 10) - 1; i <= height; i++) {
+    const el = utxofile[i];
+    if (el) {
+      utxos = utxos.concat(el);
+    }
+  }
   return utxos;
 }
 

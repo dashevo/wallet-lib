@@ -49,10 +49,6 @@ function startExecutor() {
   this.state.executors.addresses = setInterval(() => executor.call(self), fastFetchThreshold);
 }
 
-// const stopExecutor = (subscriptions) => {
-//   subscriptions.addresses = clearInterval(subscriptions.addresses);
-//   subscriptions.addresses = null;
-// };
 module.exports = async function subscribeToAddressesTransactions(addressList) {
   logger.silly(`FakeNet.subscribeToAddressesTransactions[${addressList}]`);
   if (!Array.isArray(addressList)) throw new Error('Expected array of addresses');
