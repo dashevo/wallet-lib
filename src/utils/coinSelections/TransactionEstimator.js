@@ -163,7 +163,6 @@ class TransactionEstimator {
 
   estimateFees() {
     const bytesSize = this.getSize();
-    // const inputNb = this.getInputs().length;
     return ((bytesSize / 1000) * FEES[this.feeCategory.toUpperCase()]);
   }
 
