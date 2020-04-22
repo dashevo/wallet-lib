@@ -21,7 +21,7 @@ describe('transporters', () => {
     };
     const optsDAPI = {
       type: 'DAPIClient',
-      seeds: [{ service: '18.236.131.253:3000' }],
+      seeds: [{ service: '52.43.158.21:3000' }],
     };
     const dapiTransporter = transporters.resolve(optsDAPI);
     expect(dapiTransporter).to.be.instanceOf(transporters.DAPIClient);
@@ -30,7 +30,7 @@ describe('transporters', () => {
     expect(rpcTransporter).to.be.instanceOf(transporters.RPCClient);
 
 
-    const dapiTransporter2 = transporters.resolve({ type: 'dapi', seeds: [{ service: '18.236.131.253:3000' }] });
+    const dapiTransporter2 = transporters.resolve({ type: 'dapi', seeds: [{ service: '52.43.158.21:3000' }] });
     expect(dapiTransporter2).to.be.instanceOf(transporters.DAPIClient);
     expect(dapiTransporter2.type).to.be.equal('DAPIClient');
   });

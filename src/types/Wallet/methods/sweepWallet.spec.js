@@ -9,7 +9,7 @@ const paperWallet = {
 };
 
 describe('Wallet - sweepWallet', function suite() {
-  this.timeout(10000);
+  this.timeout(30000);
   let emptyWallet;
   let emptyAccount;
   before(() => {
@@ -17,7 +17,7 @@ describe('Wallet - sweepWallet', function suite() {
       privateKey: paperWallet.privateKey,
       network: 'testnet',
       // offlineMode: true,
-      transporter: { type: 'DAPIClient' },
+      transporter: { type: 'DAPIClient', noLookup: true },
     });
     emptyAccount = emptyWallet.getAccount();
   });

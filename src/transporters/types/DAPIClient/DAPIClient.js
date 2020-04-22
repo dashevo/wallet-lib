@@ -25,16 +25,19 @@ class DAPIClient extends BaseTransporter {
   }
 
   isReady() {
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       if (this.state.isReady) return resolve(true);
-      const interval = setInterval(() => {
-        if (this.state.isReady) {
+      const self = this;
+      let interval;
+      // eslint-disable-next-line prefer-const
+      interval = setInterval(() => {
+        if (self.state.isReady) {
           clearInterval(interval);
           resolve(true);
         }
       }, 50);
       return interval;
-    }));
+    });
   }
 }
 
