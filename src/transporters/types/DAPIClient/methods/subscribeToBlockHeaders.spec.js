@@ -13,6 +13,7 @@ describe('transporters - DAPIClient - .subscribeToBlockHeaders', function suite(
   this.timeout(21000);
   const transporter = transporters.resolve({ type: 'DAPIClient' });
   it('should works', async () => new Promise(async (resolve, reject) => {
+    await transporter.isReady();
     let getBestBlockHashCalled = 0;
     const blockHeaderAnnounced = [];
     transporter.client.getBestBlockHash = () => {

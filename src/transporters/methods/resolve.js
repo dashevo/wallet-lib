@@ -40,6 +40,7 @@ module.exports = function resolve(props = { type: 'DAPIClient' }) {
     // User may have specified a Transporter class that will be validated and used.
     Transporter = props;
   }
+
   if (!transporter) transporter = new Transporter(opts);
   transporter.isValid = this.validate(transporter);
   return transporter;

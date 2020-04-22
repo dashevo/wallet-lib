@@ -10,7 +10,7 @@ const block = {
   transactions: [],
 };
 describe('transporters - DAPIClient - .getBestBlock', () => {
-  const transporter = transporters.resolve('DAPIClient');
+  const transporter = transporters.resolve({type: 'DAPIClient', noLookup: true});
 
   it('should works', async () => {
     transporter.client.getBestBlockHash = () => bestBlockHash;

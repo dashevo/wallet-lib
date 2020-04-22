@@ -70,10 +70,10 @@ const lookupHostname = async function lookupHostname(hostname) {
     });
   });
 };
-const getSeeds = async function getSeeds(devnetName = 'evonet') {
+const getSeeds = async function getSeeds(devnetName = 'evonet', noLookup = false) {
   switch (devnetName) {
     case 'evonet':
-      if (!dns.lookup) return evonetSeeds;
+      if (!dns.lookup || noLookup) return evonetSeeds;
       return lookupHostname('seed.evonet.networks.dash.org');
     case 'palinka':
       return palinkaSeeds;

@@ -11,7 +11,7 @@ async function _initializeAccount(account, userUnsafePlugins) {
   const self = account;
 
   // Before everything even starts, we need to have the transporter ready
-  if (self.transporter.isReady) {
+  if (self.transporter && self.transporter.isReady) {
     await self.transporter.isReady();
     logger.info('Transporter is ready.');
   }

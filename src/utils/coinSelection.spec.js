@@ -69,7 +69,6 @@ describe('Utils - coinSelection', () => {
       script: '76a9146b1e46d3f3d559dda4468cc30a7b612705eb810f88ac',
       satoshis: 12999997288,
     });
-    console.log(output.script.toAddress('testnet').toString());
     const result = coinSelection([output], [{
       satoshis: 2999997288,
       address: 'ybefxSHaEbDATvq5gVCxjV375NWus3ttV7',

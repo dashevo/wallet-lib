@@ -17,7 +17,7 @@ const fixture = {
   ],
 };
 describe('transporters - DAPIClient - .getUTXO', () => {
-  const transporter = transporters.resolve('DAPIClient');
+  const transporter = transporters.resolve({type: 'DAPIClient', noLookup: true});
   it('should works', async () => {
     transporter.client.getUTXO = () => fixture;
     const res = await transporter.getUTXO('yYpSw2n2TRzoQaUShNsPo541z4bz4EJkGN');

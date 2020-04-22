@@ -10,11 +10,15 @@ class DAPIClient extends BaseTransporter {
       // eslint-disable-next-line global-require,import/no-extraneous-dependencies
       const Client = require('@dashevo/dapi-client');
       this.state.isReady = false;
-      getSeeds(props.devnetName)
-        .then((seeds) => {
-          this.state.isReady = true;
-          this.client = new Client(Object.assign(props, { seeds }));
-        });
+
+      const self = this;
+      (async () => {
+        const seeds = (props.seeds)
+          ? props.seeds
+          : await getSeeds(props.devnetName, props.noLookup);
+        self.state.isReady = true;
+        self.client = new Client(Object.assign(props, { seeds }));
+      })();
     } catch (err) {
       logger.error("The '@dashevo/dapi-client' package is missing! Please install it with 'npm install @dashevo/dapi-client --save' command.");
     }

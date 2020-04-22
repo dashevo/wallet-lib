@@ -16,6 +16,7 @@ describe('transporters - DAPIClient - .subscribeToBlocks', function suite() {
     transporter = transporters.resolve({ type: 'DAPIClient' });
   });
   it('should works', async () => new Promise(async (resolve, reject) => {
+    await transporter.isReady();
     let getBestBlockHashCalled = 0;
     const blockAnnounced = [];
     transporter.client.getBestBlockHash = () => {
