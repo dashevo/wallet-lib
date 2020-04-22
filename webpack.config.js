@@ -21,6 +21,7 @@ const webConfig = {
   node: {
     // Prevent embedded winston to throw error with FS not existing.
     fs: 'empty',
+    dns: 'empty',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
