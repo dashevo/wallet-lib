@@ -1,5 +1,5 @@
-const EVENTS = require('../../../../EVENTS');
-const logger = require('../../../../logger');
+const EVENTS = require('../../../src/EVENTS');
+const logger = require('../../../src/logger');
 // Artifact from previous optimisation made in SyncWorker plugin
 // Kept for reminder when Bloomfilters
 
@@ -19,7 +19,7 @@ async function executor(forcedAddressList = null) {
   const self = this;
   const { addresses } = self.state.subscriptions;
   const addressList = forcedAddressList || Object.keys(addresses);
-  logger.silly(`DAPIClient.subscribeToAddrTx.executor[${addressList}]`);
+  logger.silly(`FakeNet.subscribeToAddrTx.executor[${addressList}]`);
   const fetchedUtxos = {};
   addressList.forEach((address) => {
     addresses[address].last = +new Date();
@@ -45,23 +45,12 @@ async function executor(forcedAddressList = null) {
 
 function startExecutor() {
   const self = this;
-  logger.silly('DAPIClient.subscribeToAddressesTransactions.startExecutor');
-  this.state.executors.addresses = setInterval(() => {
-    try {
-      executor.call(self);
-    } catch (e) {
-      logger.error('DAPIClient.subscribeToAddressesTransactions.executor failed', e);
-      throw e;
-    }
-  }, fastFetchThreshold);
+  logger.silly('FakeNet.subscribeToAddressesTransactions.startExecutor');
+  this.state.executors.addresses = setInterval(() => executor.call(self), fastFetchThreshold);
 }
 
-// const stopExecutor = (subscriptions) => {
-//   subscriptions.addresses = clearInterval(subscriptions.addresses);
-//   subscriptions.addresses = null;
-// };
 module.exports = async function subscribeToAddressesTransactions(addressList) {
-  logger.silly(`DAPIClient.subscribeToAddressesTransactions[${addressList}]`);
+  logger.silly(`FakeNet.subscribeToAddressesTransactions[${addressList}]`);
   if (!Array.isArray(addressList)) throw new Error('Expected array of addresses');
   const { executors, subscriptions, addressesTransactionsMap } = this.state;
 
@@ -77,12 +66,7 @@ module.exports = async function subscribeToAddressesTransactions(addressList) {
   });
 
   if (!executors.addresses) {
-    try {
-      startExecutor.call(this);
-    } catch (e) {
-      logger.error('DAPIClient.subscribeToAddressesTransactions.startingExecutor failed', e);
-      throw e;
-    }
+    startExecutor.call(this);
   }
   if (immediatelyExecutedAddresses.length) {
     await Promise.resolve(executor.call(this, immediatelyExecutedAddresses));

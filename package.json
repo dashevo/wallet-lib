@@ -9,7 +9,7 @@
     "build:dev": "webpack -d --display-error-details --progress",
     "build:prod": "webpack -p --display-error-details --progress",
     "lint:fix": "eslint . --fix",
-    "test": "nyc mocha test/ --recursive",
+    "test": "nyc mocha 'src/**/*.spec.js'",
     "size": "size-limit",
     "size:why": "size-limit --why"
   },
