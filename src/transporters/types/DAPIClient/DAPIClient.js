@@ -1,5 +1,6 @@
 const BaseTransporter = require('../BaseTransporter/BaseTransporter');
 const logger = require('../../../logger');
+const { getSeeds } = require('../../../utils/dns');
 
 class DAPIClient extends BaseTransporter {
   constructor(props) {
@@ -8,10 +9,28 @@ class DAPIClient extends BaseTransporter {
       // This allows to not have dapi-client shipped by default.
       // eslint-disable-next-line global-require,import/no-extraneous-dependencies
       const Client = require('@dashevo/dapi-client');
-      this.client = new Client(props);
+      this.state.isReady = false;
+      getSeeds(props.devnetName)
+        .then((seeds) => {
+          this.state.isReady = true;
+          this.client = new Client(Object.assign(props, { seeds }));
+        });
     } catch (err) {
       logger.error("The '@dashevo/dapi-client' package is missing! Please install it with 'npm install @dashevo/dapi-client --save' command.");
     }
+  }
+
+  isReady() {
+    return new Promise(((resolve) => {
+      if (this.state.isReady) return resolve(true);
+      const interval = setInterval(() => {
+        if (this.state.isReady) {
+          clearInterval(interval);
+          resolve(true);
+        }
+      }, 50);
+      return interval;
+    }));
   }
 }
 

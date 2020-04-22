@@ -9,6 +9,13 @@ const { WALLET_TYPES } = require('../../CONSTANTS');
 // eslint-disable-next-line no-underscore-dangle
 async function _initializeAccount(account, userUnsafePlugins) {
   const self = account;
+
+  // Before everything even starts, we need to have the transporter ready
+  if (self.transporter.isReady) {
+    await self.transporter.isReady();
+    logger.info('Transporter is ready.');
+  }
+
   // We run faster in offlineMode to speed up the process when less happens.
   const readinessIntervalTime = (account.offlineMode) ? 50 : 200;
   // TODO: perform rejection with a timeout
