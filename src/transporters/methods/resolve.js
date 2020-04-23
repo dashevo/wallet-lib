@@ -1,7 +1,7 @@
 const { is } = require('../../utils');
 
 const defaultDAPIOpts = {
-  seeds: [{service: 'seed.evonet.networks.dash.org'}],
+  seeds: [{ service: 'seed.evonet.networks.dash.org' }],
   timeout: 20000,
   retries: 5,
 };
