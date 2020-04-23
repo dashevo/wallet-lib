@@ -9,7 +9,7 @@ const paperWallet = {
 };
 
 describe('Wallet - sweepWallet', function suite() {
-  this.timeout(10000);
+  this.timeout(20000);
   let emptyWallet;
   let emptyAccount;
   before(() => {
