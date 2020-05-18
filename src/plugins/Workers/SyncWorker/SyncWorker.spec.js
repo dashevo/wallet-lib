@@ -23,7 +23,6 @@
 // };
 //
 // opts.fetchStatus = () => false;
-// opts.fetchAddressInfo = () => false;
 // opts.fetchTransactionInfo = () => false;
 // opts.storage.getStore = () => opts.storage.store;
 // let worker = null;

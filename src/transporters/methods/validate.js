@@ -4,7 +4,6 @@ module.exports = function validate(transporter) {
   const { BaseTransporter } = this;
   let isValid = true;
   const expectedKeys = [
-    'getAddressSummary',
     'getTransaction',
     'getUTXO',
     'sendTransaction',
