@@ -1,4 +1,3 @@
-const logger = require('../../../logger');
 const { ValidTransportLayerRequired } = require('../../../errors');
 const { is } = require('../../../utils');
 

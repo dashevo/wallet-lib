@@ -1,5 +1,4 @@
 const { is } = require('../../../utils');
-const logger = require('../../../logger');
 
 /**
  * Get a getBlockHeader from a provided block hash or block height

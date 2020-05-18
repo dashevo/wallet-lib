@@ -1,5 +1,4 @@
 const Dashcore = require('@dashevo/dashcore-lib');
-const logger = require('../../../logger');
 const { is } = require('../../../utils');
 const {
   ValidTransportLayerRequired,

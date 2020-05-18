@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const logger = require('../logger');
 const StandardPlugin = require('./StandardPlugin');
 
 // eslint-disable-next-line no-underscore-dangle

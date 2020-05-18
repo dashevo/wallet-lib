@@ -1,5 +1,4 @@
 const { cloneDeep, xor } = require('lodash');
-const logger = require('../../../logger');
 const { InvalidAddressObject, TransactionNotInStore } = require('../../../errors');
 const { is } = require('../../../utils');
 const EVENTS = require('../../../EVENTS');

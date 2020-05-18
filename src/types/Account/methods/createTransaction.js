@@ -1,7 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 const _ = require('lodash');
 const Dashcore = require('@dashevo/dashcore-lib');
-const logger = require('../../../logger');
 const { CreateTransactionError } = require('../../../errors');
 const { dashToDuffs, coinSelection, is } = require('../../../utils');
 const _loadStrategy = require('../_loadStrategy');

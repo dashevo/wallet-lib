@@ -1,4 +1,3 @@
-const logger = require('../../../logger');
 const { SAVE_STATE_SUCCESS, SAVE_STATE_FAILED } = require('../../../EVENTS');
 
 /**

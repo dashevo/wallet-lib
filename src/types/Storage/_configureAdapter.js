@@ -1,4 +1,3 @@
-const logger = require('../../logger');
 const { InvalidStorageAdapter } = require('../../errors');
 
 module.exports = async function configureAdapter(argAdapter) {
