@@ -184,7 +184,6 @@ Account.prototype.createTransaction = require('./methods/createTransaction');
 Account.prototype.decode = require('./methods/decode');
 Account.prototype.decrypt = require('./methods/decrypt');
 Account.prototype.disconnect = require('./methods/disconnect');
-Account.prototype.fetchAddressInfo = require('./methods/fetchAddressInfo');
 Account.prototype.fetchStatus = require('./methods/fetchStatus');
 
 Account.prototype.forceRefreshAccount = require('./methods/forceRefreshAccount');

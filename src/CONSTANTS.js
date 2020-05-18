@@ -56,7 +56,6 @@ const CONSTANTS = {
       'getTotalBalance',
       'broadcastTransaction',
       'getAddress',
-      'fetchAddressInfo',
       'fetchStatus',
       'getPlugin',
       'sign',
