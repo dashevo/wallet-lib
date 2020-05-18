@@ -74,8 +74,7 @@ async function fetchAddressInfo(addressObj, fetchUtxo = true) {
     }
     return addrInfo;
   } catch (err) {
-    logger.error('Error', err);
-    return false;
+    throw new Error(`Failed to fetch Address Info with error ${err.message}`);
   }
 }
 

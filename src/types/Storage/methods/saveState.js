@@ -16,7 +16,6 @@ const saveState = async function () {
       this.emit(SAVE_STATE_SUCCESS, { type: SAVE_STATE_SUCCESS, payload: this.lastSave });
       return true;
     } catch (err) {
-      logger.error('Storage#saveState', err);
       this.emit(SAVE_STATE_FAILED, { type: SAVE_STATE_FAILED, payload: err });
       throw err;
     }

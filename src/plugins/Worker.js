@@ -82,10 +82,10 @@ class Worker extends StandardPlugin {
       try {
         await this.execute();
       } catch (err) {
-        logger.error(`${this.name} Error`, err);
+        throw new Error(`Worker ${this.name} execution failed with error ${err.message}`);
       }
     } else {
-      logger.error(`${this.name} : Missing execute function`);
+      throw new Error(`Worker ${this.name} : Missing execute function`);
     }
 
     this.isWorkerRunning = false;

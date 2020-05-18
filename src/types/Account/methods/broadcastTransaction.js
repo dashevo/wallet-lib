@@ -60,9 +60,6 @@ async function broadcastTransaction(transaction) {
       throw new Error('Transaction not signed.');
     }
     const txid = await this.transporter.sendTransaction(transaction.toString());
-    if (!is.txid(txid)) {
-      logger.error(txid, 'is said to not be a txid!');
-    }
     // We now need to impact/update our affected inputs
     // so we clear them out from UTXOset.
     const { inputs } = new Dashcore.Transaction(transaction).toObject();
