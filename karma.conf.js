@@ -4,7 +4,7 @@ module.exports = (config) => {
     files: [
       'dist/wallet-lib.min.js',
       {
-        pattern: 'tests/functionnal/browser.js', watched: true,
+        pattern: 'tests/functional/browser.js', watched: true,
       }],
     reporters: ['mocha'],
     port: 9876,
