@@ -7,13 +7,6 @@ node_js:
 before_install:
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
 
-jobs:
-  include:
-    - stage: lint
-      script: npm run lint
-    - stage: size
-      script: npm run size
-
 deploy:
   - provider: script
     skip_cleanup: true
