@@ -4,6 +4,11 @@ node_js:
   - "10"
   - "12"
 
+branches:
+  only:
+    - master
+    - develop
+
 before_install:
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
 
