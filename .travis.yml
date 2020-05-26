@@ -14,11 +14,9 @@ branches:
 before_install:
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
 
-after_install:
-  - npm run build:prod
-
 script:
   - npm run check-package
+  - npm run build:prod
   - npm run test
 
 deploy:
