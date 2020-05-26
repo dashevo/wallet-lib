@@ -13,7 +13,8 @@ const mocks = {
 };
 
 
-describe('Account - class', () => {
+describe('Account - class', function suite() {
+  this.timeout(10000);
   before(() => {
     mocks.wallet = (new (function Wallet() {
       this.walletId = '1234567891';

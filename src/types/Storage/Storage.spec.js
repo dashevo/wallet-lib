@@ -5,7 +5,8 @@ const Dashcore = require('@dashevo/dashcore-lib');
 const Storage = require('./Storage');
 const { CONFIGURED } = require('../../EVENTS');
 
-describe('Storage - constructor', () => {
+describe('Storage - constructor', function suite() {
+  this.timeout(10000);
   it('It should create a storage', () => {
     const storage = new Storage();
     expect(storage.store).to.deep.equal({ wallets: {}, transactions: {}, chains: {} });

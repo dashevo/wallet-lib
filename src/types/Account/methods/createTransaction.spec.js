@@ -14,7 +14,8 @@ const validStore = require('../../../../fixtures/walletStore').valid.orange.stor
 
 const craftedGenerousMinerStrategy = require('../../../../fixtures/strategies/craftedGenerousMinerStrategy');
 
-describe('Account - createTransaction', () => {
+describe('Account - createTransaction', function suite() {
+  this.timeout(10000);
   let mockWallet;
 
   it('sould warn on missing inputs', () => {
