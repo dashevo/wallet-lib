@@ -40,6 +40,10 @@ describe('Account - createTransaction', function suite() {
     expect(() => createTransaction.call(self, mockOpts2)).to.throw(expectedException2);
     expect(() => createTransaction.call(self, mockOpts3)).to.throw(expectedException3);
   });
+  if(process.browser){
+    // FakeNet relies heavily on fs.existSync and fs.readFile which are not available on browser
+    return;
+  }
   it('should create valid and deterministic transactions', async function () {
     const transporter = new FakeNet();
     transporter.setHeight(21546);

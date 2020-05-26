@@ -50,8 +50,10 @@ describe('Account - class', function suite() {
     expect(account.plugins).to.be.deep.equal({
       workers: {}, standard: {}, watchers: {},
     });
-    expect(account.readinessInterval.constructor.name).to.be.equal('Timeout');
-    expect(account.readinessInterval._idleTimeout).to.be.equal(200);
+    if(!process.browser){
+      expect(account.readinessInterval.constructor.name).to.be.equal('Timeout');
+      expect(account.readinessInterval._idleTimeout).to.be.equal(200);
+    }
 
     account.disconnect();
   });
