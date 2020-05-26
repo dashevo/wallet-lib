@@ -15,7 +15,7 @@
     "lint:fix": "eslint . --fix",
     "test:unit": "nyc mocha 'src/**/*.spec.js'",
     "test:browsers": "karma start ./karma.conf.js --single-run",
-    "test": "npm run test:unit && npm run build && npm run test:browsers && npm run lint"
+    "test": "npm run test:unit && npm run test:browsers && npm run lint"
   },
   "repository": {
     "type": "git",
