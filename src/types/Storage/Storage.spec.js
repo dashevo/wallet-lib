@@ -29,6 +29,12 @@ describe('Storage - constructor', function suite() {
     storage.stopWorker();
   });
   it('should handle bad adapter', async () => {
+    if(process.browser){
+      // Local forage is valid adapter on browser.
+      // TODO : add a FsAdapter for (process.browser)?
+      // Will require a install --save-dev for that.
+      return;
+    }
     const expectedException1 = 'Invalid Storage Adapter : No available storage method found.';
     const storageOpts1 = { adapter: localForage };
     const storage = new Storage();
