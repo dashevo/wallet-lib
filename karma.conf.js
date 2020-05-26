@@ -3,9 +3,22 @@ module.exports = (config) => {
     frameworks: ['mocha', 'chai'],
     files: [
       'dist/wallet-lib.min.js',
-      {
-        pattern: 'tests/functional/browser.js', watched: true,
-      }],
+      'karma.test.loader.js',
+      'tests/functional/browser.js',
+    ],
+    preprocessors: {
+      'karma.test.loader.js': ['webpack'],
+    },
+    webpack: {
+      mode: 'development',
+      optimization: {
+        minimize: false,
+      },
+      plugins: [],
+      node: {
+        fs: 'empty',
+      },
+    },
     reporters: ['mocha'],
     port: 9876,
     colors: true,
@@ -20,6 +33,7 @@ module.exports = (config) => {
       'karma-chai',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
+      'karma-webpack',
     ],
     customLaunchers: {
       FirefoxHeadless: {
