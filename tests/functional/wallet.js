@@ -1,13 +1,15 @@
-const { expect } = chai;
+const { expect } = require('chai');
+
 const mnemonic = 'advance garment concert scatter west fringe hurdle estate bubble angry hungry dress';
+
+const { Wallet } = require('../../src/index');
+
 
 let newWallet;
 let wallet;
 let account;
-
 describe('Wallet-lib - functional ', function suite() {
   this.timeout(100000);
-
   describe('Wallet', () => {
     describe('Create a new Wallet', () => {
       it('should create a new wallet with default params', () => {
@@ -71,10 +73,7 @@ describe('Wallet-lib - functional ', function suite() {
       expect(UTXOs.length).to.not.equal(0);
     });
     it('should create a transaction', () => {
-      const newTx = account.createTransaction({
-        recipient: 'ydvgJ2eVSmdKt78ZSVBJ7zarVVtdHGj3yR',
-        satoshis: Math.floor(account.getTotalBalance() / 2),
-      });
+      const newTx = account.createTransaction({ recipient: 'ydvgJ2eVSmdKt78ZSVBJ7zarVVtdHGj3yR', satoshis: Math.floor(account.getTotalBalance() / 2) });
       expect(newTx.constructor.name).to.equal('Transaction');
       expect(newTx.outputs.length).to.not.equal(0);
       expect(newTx.inputs.length).to.not.equal(0);
