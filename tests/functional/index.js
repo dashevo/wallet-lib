@@ -1,15 +1,18 @@
 const { expect } = require('chai');
+
 const mnemonic = 'advance garment concert scatter west fringe hurdle estate bubble angry hungry dress';
 const { Wallet } = require('../../src/index');
 
-describe('SDK', function suite() {
-  this.timeout(100000);
 
-  let wallet;
+let newWallet;
+let wallet;
+let account;
+describe('Wallet-lib - functional ', function suite() {
+  this.timeout(100000);
   describe('Wallet', () => {
     describe('Create a new Wallet', () => {
       it('should create a new wallet with default params', () => {
-        const newWallet = new Wallet();
+        newWallet = new Wallet();
 
         expect(newWallet.walletType).to.be.equal('hdwallet');
         expect(newWallet.plugins).to.be.deep.equal({});
@@ -46,7 +49,6 @@ describe('SDK', function suite() {
       });
     });
   });
-  let account;
   describe('Account', () => {
     it('should await readiness', async () => {
       account = wallet.getAccount();
@@ -69,5 +71,16 @@ describe('SDK', function suite() {
       const UTXOs = account.getUTXOS();
       expect(UTXOs.length).to.not.equal(0);
     });
+    it('should create a transaction', () => {
+      const newTx = account.createTransaction({ recipient: 'ydvgJ2eVSmdKt78ZSVBJ7zarVVtdHGj3yR', satoshis: Math.floor(account.getTotalBalance() / 2) });
+      expect(newTx.constructor.name).to.equal('Transaction');
+      expect(newTx.outputs.length).to.not.equal(0);
+      expect(newTx.inputs.length).to.not.equal(0);
+    });
+  });
+  after('Disconnection', () => {
+    account.disconnect();
+    wallet.disconnect();
+    newWallet.disconnect();
   });
 });
