@@ -63,7 +63,6 @@ describe('SDK', function suite() {
     });
     it('should not have empty balance', () => {
       expect(account.getTotalBalance()).to.not.equal(0);
-      console.log(account.getTotalBalance());
     });
     it('should returns some available UTXO', () => {
       const UTXOs = account.getUTXOS();
