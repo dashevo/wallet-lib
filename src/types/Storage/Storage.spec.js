@@ -28,7 +28,7 @@ describe('Storage - constructor', function suite() {
     expect(configuredEvent).to.equal(true);
     storage.stopWorker();
   });
-  it('should handle bad adapter', async () => {
+  it('should handle bad adapter', async function () {
     if (process.browser){
       // Local forage is  valid adapter on browser.
       this.skip('LocalForage is a valid adapter on browser')

@@ -10,7 +10,7 @@ const simulateChangeEvery = function (ms) {
 };
 describe('Storage - startWorker', function suite() {
   this.timeout(60000);
-  it('should set an interval', () => {
+  it('should set an interval', function () {
     const defaultIntervalValue = 10000;
     const self = {
       autosaveIntervalTime: defaultIntervalValue,

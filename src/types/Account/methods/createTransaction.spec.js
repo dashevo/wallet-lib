@@ -18,7 +18,7 @@ describe('Account - createTransaction', function suite() {
   this.timeout(10000);
   let mockWallet;
 
-  it('sould warn on missing inputs', () => {
+  it('sould warn on missing inputs', function () {
     const self = {
       store: validStore,
       walletId: 'a3771aaf93',
