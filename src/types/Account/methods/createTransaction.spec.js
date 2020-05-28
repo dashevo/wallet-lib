@@ -42,6 +42,7 @@ describe('Account - createTransaction', function suite() {
   });
   if(process.browser){
     // FakeNet relies heavily on fs.existSync and fs.readFile which are not available on browser
+    this.skip('FakeNet do not support browser environment due to FS intensive usage');
     return;
   }
   it('should create valid and deterministic transactions', async function () {
