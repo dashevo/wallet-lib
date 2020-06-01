@@ -24,7 +24,6 @@ async function createAccount(accountOpts) {
 
   const account = new Account(this, opts);
   try {
-    // console.log(account)
     await account.init(this);
     return account;
   } catch (e) {

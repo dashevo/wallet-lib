@@ -16,7 +16,6 @@ describe('Wallet - sweepWallet', function suite() {
     emptyWallet = new Wallet({
       privateKey: paperWallet.privateKey,
       network: 'testnet',
-      // offlineMode: true,
       transporter: { type: 'DAPIClient' },
     });
     emptyAccount = await emptyWallet.getAccount();
