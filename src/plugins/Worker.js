@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const StandardPlugin = require('./StandardPlugin');
-const {WorkerFailedOnExecute, WorkerFailedOnStart} = require('../errors');
+const { WorkerFailedOnExecute, WorkerFailedOnStart } = require('../errors');
 
 // eslint-disable-next-line no-underscore-dangle
 const _defaultOpts = {
@@ -13,26 +13,26 @@ const _defaultOpts = {
 class Worker extends StandardPlugin {
   constructor(opts = JSON.parse(JSON.stringify(_defaultOpts))) {
     const defaultOpts = JSON.parse(JSON.stringify(_defaultOpts));
-    super({type: 'Worker', ...opts});
+    super({ type: 'Worker', ...opts });
     this.worker = null;
     this.workerPass = 0;
     this.isWorkerRunning = false;
 
     this.firstExecutionRequired = _.has(opts, 'firstExecutionRequired')
-        ? opts.firstExecutionRequired
-        : defaultOpts.firstExecutionRequired;
+      ? opts.firstExecutionRequired
+      : defaultOpts.firstExecutionRequired;
 
     this.executeOnStart = _.has(opts, 'executeOnStart')
-        ? opts.executeOnStart
-        : defaultOpts.executeOnStart;
+      ? opts.executeOnStart
+      : defaultOpts.executeOnStart;
 
     this.workerIntervalTime = (opts.workerIntervalTime)
-        ? opts.workerIntervalTime
-        : defaultOpts.workerIntervalTime;
+      ? opts.workerIntervalTime
+      : defaultOpts.workerIntervalTime;
 
     this.workerMaxPass = (opts.workerMaxPass)
-        ? opts.workerMaxPass
-        : defaultOpts.workerMaxPass;
+      ? opts.workerMaxPass
+      : defaultOpts.workerMaxPass;
 
     this.state = {
       started: false,
@@ -53,7 +53,7 @@ class Worker extends StandardPlugin {
         }
       }
       const eventType = `WORKER/${this.name.toUpperCase()}/STARTED`;
-      this.parentEvents.emit(eventType, {type: eventType, payload: null});
+      this.parentEvents.emit(eventType, { type: eventType, payload: null });
       this.state.started = true;
 
       if (this.executeOnStart) await this.execWorker();
@@ -69,7 +69,7 @@ class Worker extends StandardPlugin {
     this.isWorkerRunning = false;
     const eventType = `WORKER/${this.name.toUpperCase()}/STOPPED`;
     this.state.started = false;
-    this.parentEvents.emit(eventType, {type: eventType, payload: null});
+    this.parentEvents.emit(eventType, { type: eventType, payload: null });
   }
 
   async execWorker() {
@@ -97,7 +97,7 @@ class Worker extends StandardPlugin {
     this.workerPass += 1;
     if (!this.state.ready) this.state.ready = true;
     const eventType = `WORKER/${this.name.toUpperCase()}/EXECUTED`;
-    this.parentEvents.emit(eventType, {type: eventType, payload: null});
+    this.parentEvents.emit(eventType, { type: eventType, payload: null });
     return true;
   }
 }

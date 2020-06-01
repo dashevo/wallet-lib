@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const logger = require('../src/logger');
 const { Wallet, EVENTS } = require('../src');
 
@@ -15,6 +16,9 @@ wallet
 
     const transaction = account.createTransaction({ satoshis: 1000, recipient: 'ycyFFyWCPSWbXLZBeYppJqgvBF7bnu8BWQ' });
     const transactionID = await account.broadcastTransaction(transaction);
+
+    logger.info(`Transaction ${transactionID} broadcast`);
+
     account.on(EVENTS.GENERATED_ADDRESS, () => logger.info('GENERATED_ADDRESS'));
     account.on(EVENTS.CONFIRMED_BALANCE_CHANGED, (info) => logger.info('CONFIRMED_BALANCE_CHANGED', info));
     account.on(EVENTS.UNCONFIRMED_BALANCE_CHANGED, (info) => logger.info('UNCONFIRMED_BALANCE_CHANGED', info));

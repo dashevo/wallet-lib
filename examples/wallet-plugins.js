@@ -28,12 +28,13 @@ wallet.getAccount({ index: 0 })
       const consolidate = await walletConsolidator.consolidateWallet();
 
       const preparedTransaction = consolidate.prepareTransaction();
+
       logger.info('RawTx', preparedTransaction.toString());
-    // logger.info('Broadcast', await preparedTransaction.broadcast());
+      logger.info('Broadcast', await preparedTransaction.broadcast());
     };
 
     logger.info('Balance', account.getTotalBalance());
     logger.info('Funding address', account.getUnusedAddress().address);
 
-  // await showcasePlugin();
+    return showcasePlugin();
   });
