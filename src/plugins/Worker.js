@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const StandardPlugin = require('./StandardPlugin');
+const { WorkerFailedOnExecute } = require('../errors');
 
 // eslint-disable-next-line no-underscore-dangle
 const _defaultOpts = {
@@ -81,7 +82,8 @@ class Worker extends StandardPlugin {
       try {
         await this.execute();
       } catch (err) {
-        throw new Error(`Worker ${this.name} execution failed with error ${err.message}`);
+        await this.stopWorker();
+        throw new WorkerFailedOnExecute(this.name, err.message);
       }
     } else {
       throw new Error(`Worker ${this.name} : Missing execute function`);
