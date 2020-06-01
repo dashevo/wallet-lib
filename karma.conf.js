@@ -5,6 +5,7 @@ module.exports = (config) => {
       'dist/wallet-lib.min.js',
       'karma.test.loader.js',
       'tests/functional/wallet.js',
+      'tests/functional/distributable.js',
     ],
     preprocessors: {
       'karma.test.loader.js': ['webpack'],
