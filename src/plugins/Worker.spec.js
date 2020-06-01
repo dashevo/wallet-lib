@@ -47,6 +47,7 @@ describe('Plugins - Worker', function suite() {
   });
   it('should handle faulty worker', function () {
     const faultyWorker = new FaultyWorker();
-    faultyWorker.execute();
+    const expectedException1 = 'Some reason.';
+    expect(() => faultyWorker.execute()).to.throw(expectedException1);
   });
 });

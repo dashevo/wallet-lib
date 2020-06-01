@@ -118,6 +118,11 @@ async function _initializeAccount(account, userUnsafePlugins) {
           return resolve(true);
         }
 
+        if (!account.injectDefaultPlugins) {
+          sendReady();
+          return resolve(true);
+        }
+
         if (!resultBIP44WorkerSearch.found) {
           if (account.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
             sendReady();
