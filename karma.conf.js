@@ -8,6 +8,7 @@ module.exports = (config) => {
     ],
     preprocessors: {
       'karma.test.loader.js': ['webpack'],
+      'tests/functional/wallet.js': ['webpack'],
     },
     webpack: {
       mode: 'development',
