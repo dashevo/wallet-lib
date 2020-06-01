@@ -5,6 +5,9 @@ const InjectionErrorCannotInject = require('./InjectionErrorCannotInject');
 const InjectionErrorCannotInjectUnknownDependency = require('./InjectionErrorCannotInjectUnknownDependency');
 const InjectionToPluginUnallowed = require('./InjectionToPluginUnallowed');
 
+const PluginFailedOnStart = require('./PluginFailedOnStart');
+const WorkerFailedOnExecute = require('./WorkerFailedOnExecute');
+
 const InvalidAddress = require('./InvalidAddress');
 const InvalidAddressObject = require('./InvalidAddressObject');
 const InvalidOutput = require('./InvalidOutput');
@@ -42,6 +45,8 @@ module.exports = {
   InvalidStorageAdapter,
   InvalidTransactionObject,
   InvalidUTXO,
+  PluginFailedOnStart,
+  WorkerFailedOnExecute,
   StorageUnableToAddTransaction,
   TransactionNotInStore,
   UnknownPlugin,
