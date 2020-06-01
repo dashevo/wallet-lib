@@ -14,7 +14,7 @@ wallet
     logger.info('New Address', await account.getUnusedAddress().address);
 
     const transaction = account.createTransaction({ satoshis: 1000, recipient: 'ycyFFyWCPSWbXLZBeYppJqgvBF7bnu8BWQ' });
-    // const transactionID = await account.broadcastTransaction(transaction);
+    const transactionID = await account.broadcastTransaction(transaction);
     account.on(EVENTS.GENERATED_ADDRESS, () => logger.info('GENERATED_ADDRESS'));
     account.on(EVENTS.CONFIRMED_BALANCE_CHANGED, (info) => logger.info('CONFIRMED_BALANCE_CHANGED', info));
     account.on(EVENTS.UNCONFIRMED_BALANCE_CHANGED, (info) => logger.info('UNCONFIRMED_BALANCE_CHANGED', info));
