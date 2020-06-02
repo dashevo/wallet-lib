@@ -35,4 +35,13 @@ describe('transporters', function suite() {
     expect(dapiTransporter2).to.be.instanceOf(transporters.DAPIClient);
     expect(dapiTransporter2.type).to.be.equal('DAPIClient');
   });
+  it('should extend passed options', () => {
+    const options = {
+      type: 'DAPIClient',
+      seeds: [{service: '123.4.5.6'}]
+    }
+
+    const client = transporters.resolve(options);
+    expect(client.client.MNDiscovery.seeds).to.be.deep.equal(options.seeds);
+  });
 });

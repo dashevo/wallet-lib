@@ -32,7 +32,7 @@ module.exports = function resolve(props = { type: 'DAPIClient' }) {
     }
     // TODO: Remove me when DAPIClient has correct seed
     if (Transporter === this.DAPIClient) {
-      opts = defaultDAPIOpts;
+      opts = { ...defaultDAPIOpts, ...props };
     }
   } else if (is.obj(props) && props.type) {
     Transporter = this.getByName(props.type || 'dapi');
