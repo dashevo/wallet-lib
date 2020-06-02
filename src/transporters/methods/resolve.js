@@ -21,6 +21,10 @@ const defaultDAPIOpts = {
  * @return {Transporter}
  */
 module.exports = function resolve(props = { type: 'DAPIClient' }) {
+  // It's already a client, doesn't require to do anything
+  if (props.client) {
+    return props;
+  }
   let opts = {};
   let Transporter = this.getByName('dapi');
   let transporter;
@@ -38,7 +42,7 @@ module.exports = function resolve(props = { type: 'DAPIClient' }) {
     Transporter = this.getByName(props.type || 'dapi');
     // TODO: Remove me when DAPIClient has correct seed
     if (Transporter === this.DAPIClient && !props.seeds) {
-      opts = defaultDAPIOpts;
+      opts = { ...defaultDAPIOpts, ...props };
     }
     opts = Object.assign(opts, props);
   } else {
