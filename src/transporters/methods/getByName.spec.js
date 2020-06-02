@@ -11,5 +11,6 @@ describe('transporters',function suite() {
     expect(transporters.getByName('dapi')).to.equal(transporters.DAPIClientWrapper);
     expect(transporters.getByName('DAPI')).to.equal(transporters.DAPIClientWrapper);
     expect(transporters.getByName('DAPIClient')).to.equal(transporters.DAPIClientWrapper);
+    expect(transporters.getByName('DAPIClientWrapper')).to.equal(transporters.DAPIClientWrapper);
   });
 });

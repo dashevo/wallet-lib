@@ -1,6 +1,28 @@
 const BaseTransporter = require('../BaseTransporter/BaseTransporter');
 const logger = require('../../../logger');
 
+const defaultDAPIOpts = {
+  seeds: [
+    { service: 'seed-1.evonet.networks.dash.org' },
+    { service: 'seed-2.evonet.networks.dash.org' },
+    { service: 'seed-3.evonet.networks.dash.org' },
+    { service: 'seed-4.evonet.networks.dash.org' },
+    { service: 'seed-5.evonet.networks.dash.org' },
+  ],
+  timeout: 20000,
+  retries: 5,
+};
+
+/**
+ * Creates a new DAPIClientWrapper; holds a DAPIClient instance initialized with passed params
+ * @param [props=defaultDAPIOpts]
+ * @param {Array<Object>} [options.seeds] - If no seeds provided default seeds will be used.
+ * @param {number} [options.port] - default port for connection to the DAPI
+ * @param {number} [options.nativeGrpcPort] - Native GRPC port for connection to the DAPI
+ * @param {number} [options.timeout] - timeout for connection to the DAPI
+ * @param {number} [options.retries] - num of retries if there is no response from DAPI node
+ * @constructor
+ */
 class DAPIClientWrapper extends BaseTransporter {
   constructor(props) {
     super({ ...props, type: 'DAPIClientWrapper' });
@@ -8,7 +30,7 @@ class DAPIClientWrapper extends BaseTransporter {
       // This allows to not have dapi-client shipped by default.
       // eslint-disable-next-line global-require,import/no-extraneous-dependencies
       const Client = require('@dashevo/dapi-client');
-      this.client = new Client(props);
+      this.client = new Client({ ...defaultDAPIOpts, ...props });
     } catch (err) {
       logger.error("The '@dashevo/dapi-client' package is missing! Please install it with 'npm install @dashevo/dapi-client --save' command.");
     }
