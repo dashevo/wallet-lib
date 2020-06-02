@@ -31,7 +31,7 @@ module.exports = function resolve(props = { type: defaultTransporterType }) {
     transporter = new Transporter();
   } else {
     const isObjectProps = props.constructor === Object;
-    // We allow to just pass the name in props.type
+    // We allow to pass the name in props.type
     if (isObjectProps) {
       Transporter = this.getByName(props.type || defaultTransporterType);
       transporter = new Transporter(props);
