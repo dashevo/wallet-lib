@@ -25,7 +25,7 @@ module.exports = function resolve(props = { type: 'DAPIClient' }) {
   if (props.client) {
     return props;
   }
-  let opts = {};
+  let opts = { ...defaultDAPIOpts, ...props };
   let Transporter = this.getByName('dapi');
   let transporter;
   if (is.string(props)) {
@@ -46,9 +46,6 @@ module.exports = function resolve(props = { type: 'DAPIClient' }) {
     }
     opts = Object.assign(opts, props);
   } else {
-    if (props === undefined) {
-      return resolve('dapi');
-    }
     // User may have specified a whole instance of his client.
     if (props.constructor.name !== Function.name) {
       transporter = props;
