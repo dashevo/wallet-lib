@@ -1,9 +1,13 @@
+# [7.1.1](https://github.com/dashevo/wallet-lib/compare/v7.1.0...v7.1.1) (2020-06-03)
+    
+- **Fixes:**
+    - fix: broadcastTransaction not throwing an error when a transaction wasn't broadcasted (#133)
+
 # [7.1.0](https://github.com/dashevo/wallet-lib/compare/v7.0.0...v7.1.0) (2020-06-03)
     
 - **Fixes:**
     - fix: unavailable previous transactions history (#131)
     - fix: transporter.resolve to extend passed options (#130)
-
 
 # [7.0.0](https://github.com/dashevo/wallet-lib/compare/v6.1.2...v7.0.0) (2020-06-01)
 
