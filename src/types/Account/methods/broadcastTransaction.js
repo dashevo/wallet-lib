@@ -38,7 +38,6 @@ function impactAffectedInputs({ inputs }) {
  * @param transaction {Transaction|RawTransaction} - A txobject or it's hexadecimal representation
  * @return {Promise<*>}
  */
-// FIXME : IsIS needs to be removed.
 async function broadcastTransaction(transaction) {
   if (!this.transporter.isValid) throw new ValidTransportLayerRequired('broadcast');
 
