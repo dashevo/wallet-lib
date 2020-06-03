@@ -15,6 +15,7 @@ const announce = function (type, el) {
     case EVENTS.CONFIRMED_BALANCE_CHANGED:
     case EVENTS.UNCONFIRMED_BALANCE_CHANGED:
     case EVENTS.FETCHED_UNCONFIRMED_TRANSACTION:
+    case EVENTS.FETCHED_UTXO:
     case EVENTS.FETCHED_CONFIRMED_TRANSACTION:
       this.emit(type, { type, payload: el });
       break;

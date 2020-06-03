@@ -16,6 +16,9 @@ module.exports = function announce(eventName, args) {
     case EVENTS.FETCHED_TRANSACTION:
       this.emit(EVENTS.FETCHED_TRANSACTION, { type: EVENTS.FETCHED_TRANSACTION, payload: args });
       break;
+    case EVENTS.FETCHED_UTXO:
+      this.emit(EVENTS.FETCHED_UTXO, { type: EVENTS.FETCHED_UTXO, payload: args });
+      break;
     case EVENTS.FETCHED_ADDRESS:
       this.emit(EVENTS.FETCHED_ADDRESS, { type: EVENTS.FETCHED_ADDRESS, payload: args });
       break;
