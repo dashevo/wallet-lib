@@ -16,6 +16,7 @@ class BaseTransporter extends EventEmitter {
       addressesTransactionsMap: {},
       subscriptions: {
         addresses: {},
+        transactions:[]
       },
     };
   }
