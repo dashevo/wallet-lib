@@ -58,6 +58,7 @@ Storage.prototype.importBlockHeader = require('./methods/importBlockHeader');
 Storage.prototype.importAddresses = require('./methods/importAddresses');
 Storage.prototype.importSingleAddress = require('./methods/importSingleAddress');
 Storage.prototype.importTransaction = require('./methods/importTransaction');
+Storage.prototype.importUTXO = require('./methods/importUTXO');
 Storage.prototype.importTransactions = require('./methods/importTransactions');
 Storage.prototype.rehydrateState = require('./methods/rehydrateState');
 Storage.prototype.saveState = require('./methods/saveState');

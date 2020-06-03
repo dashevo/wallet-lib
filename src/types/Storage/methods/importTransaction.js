@@ -38,15 +38,6 @@ const importTransaction = function importTransaction(transaction) {
       }
     });
 
-    // VOUT
-    const vouts = transaction.outputs;
-    // For all output, we need to insert the utxo + associate the tx to addr.transactions
-    vouts.forEach((vout, voutIndex) => {
-      const search = self.searchAddress(vout.script.toAddress(network).toString());
-      if (search.found) {
-        self.addUTXOToAddress(vout, search.result.address, transaction.hash, voutIndex);
-      }
-    });
     this.lastModified = +new Date();
 
     const blockHeight = transaction.nLockTime;

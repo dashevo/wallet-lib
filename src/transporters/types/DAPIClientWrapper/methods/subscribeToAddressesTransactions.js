@@ -1,3 +1,4 @@
+const { Transaction } = require('@dashevo/dashcore-lib');
 const EVENTS = require('../../../../EVENTS');
 const logger = require('../../../../logger');
 // Artifact from previous optimisation made in SyncWorker plugin
@@ -35,6 +36,11 @@ async function executor(forcedAddressList = null) {
       self.getTransaction(txid).then((tx) => {
         self.state.addressesTransactionsMap[address][txid] = outputIndex;
         self.announce(EVENTS.FETCHED_TRANSACTION, tx);
+        self.announce(EVENTS.FETCHED_UTXO, {
+          output: new Transaction.Output(utxo),
+          transactionHash: txid,
+          outputIndex,
+        });
       });
     }
   });
