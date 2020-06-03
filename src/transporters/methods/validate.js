@@ -9,7 +9,7 @@ module.exports = function validate(transporter, silent = false) {
     'getUTXO',
     'sendTransaction',
   ];
-  // console.log(transporter)
+
   expectedKeys.forEach((key) => {
     if (!transporter[key] && !(transporter.client && transporter.client[key])) {
       isValid = false;

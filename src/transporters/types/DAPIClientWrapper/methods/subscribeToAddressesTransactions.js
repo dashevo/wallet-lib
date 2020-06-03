@@ -55,6 +55,7 @@ function startExecutor() {
     }
   }, fastFetchThreshold);
 }
+
 async function fetchPreviousTransactions(addressList) {
   const self = this;
   addressList.forEach((address) => {
@@ -67,6 +68,7 @@ async function fetchPreviousTransactions(addressList) {
     });
   });
 }
+
 // const stopExecutor = (subscriptions) => {
 //   subscriptions.addresses = clearInterval(subscriptions.addresses);
 //   subscriptions.addresses = null;
