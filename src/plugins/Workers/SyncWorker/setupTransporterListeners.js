@@ -4,17 +4,11 @@ module.exports = function setupListeners() {
   const { storage, transporter } = this;
 
   // For each new transaction emitted by transporter, we import to storage
+  // It will also look-up for UTXO
   transporter.on(EVENTS.FETCHED_TRANSACTION, async (ev) => {
     const { payload: transaction } = ev;
     // Storage.importTransaction will announce the TX to parent
     await storage.importTransaction(transaction);
-  });
-
-  // For each UTXO that we fetch, we store them too as it will be used for payments
-  transporter.on(EVENTS.FETCHED_UTXO, async (ev) => {
-    const { payload: { output, transactionHash, outputIndex } } = ev;
-    // Storage.importUTXO will announce the UTXO to parent
-    await storage.importUTXO(output, transactionHash, outputIndex);
   });
 
   // The same is being done for fetch_address, but we also announce it.

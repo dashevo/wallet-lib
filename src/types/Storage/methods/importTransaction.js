@@ -16,7 +16,7 @@ const importTransaction = function importTransaction(transaction) {
   let hasUpdateStorage = false;
   let outputIndex = -1;
 
-  if (Object.keys(transactions).includes(transaction.hash)) {
+  if (transactions[transaction.hash]) {
     return;
   }
 
@@ -25,8 +25,10 @@ const importTransaction = function importTransaction(transaction) {
   [...inputs, ...outputs].forEach((element) => {
     const isOutput = (element instanceof Output);
     if (isOutput) outputIndex += 1;
+
     if (element.script) {
       const address = element.script.toAddress(network).toString();
+
       if (mappedAddress && mappedAddress[address]) {
         const { path, type, walletId } = mappedAddress[address];
         const addressObject = store.wallets[walletId].addresses[type][path];
@@ -35,10 +37,7 @@ const importTransaction = function importTransaction(transaction) {
         if (!addressObject.transactions.includes(transaction.hash)) {
           addressObject.transactions.push(transaction.hash);
           hasUpdateStorage = true;
-        } else {
-          this.updateTransaction(transaction);
         }
-
         if (!isOutput) {
           const vin = element;
           const utxoKey = `${vin.prevTxId.toString('hex')}-${vin.outputIndex}`;
@@ -46,21 +45,26 @@ const importTransaction = function importTransaction(transaction) {
             const previousOutput = addressObject.utxos[utxoKey];
             addressObject.balanceSat -= previousOutput.satoshis;
             delete addressObject.utxos[utxoKey];
+            hasUpdateStorage = true;
           }
         } else {
           const vout = element;
+
           const utxoKey = `${transaction.hash}-${outputIndex}`;
           if(!addressObject.utxos[utxoKey]){
             addressObject.utxos[utxoKey] = vout;
             addressObject.balanceSat += vout.satoshis;
+            hasUpdateStorage = true
           }
         }
       }
     }
   });
 
-  this.lastModified = +new Date();
-  // Announce all confirmed transaction imported, not just ours.
-  this.announce(FETCHED_CONFIRMED_TRANSACTION, { transaction });
+  if(hasUpdateStorage){
+    this.lastModified = +new Date();
+    // Announce only confirmed transaction imported that are our.
+    this.announce(FETCHED_CONFIRMED_TRANSACTION, { transaction });
+  }
 };
 module.exports = importTransaction;
