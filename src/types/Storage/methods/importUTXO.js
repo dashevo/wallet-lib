@@ -11,7 +11,7 @@ const importUTXO = function importUTXO(output, transactionHash, outputIndex) {
   const { network } = this;
   if (!output) throw new Error('Expect output to import');
   if (!transactionHash) throw new Error('Expect transactionHash of the output to be provided');
-  if (!outputIndex) throw new Error('Expect outputIndex to be provided');
+  if (outputIndex === undefined) throw new Error('Expect outputIndex to be provided');
 
   if (output.constructor !== Transaction.Output) {
     throw new Error(`Invalid output: Expected ${Output.name} but got ${output.constructor.name} - ${JSON.stringify(output.toJSON())}`);

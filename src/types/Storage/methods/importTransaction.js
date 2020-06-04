@@ -38,6 +38,23 @@ const importTransaction = function importTransaction(transaction) {
       }
     });
 
+    // VOUT
+    const vouts = transaction.outputs;
+    // For all output, we need to insert the utxo + associate the tx to addr.transactions
+    vouts.forEach((vout, voutIndex) => {
+      const search = self.searchAddress(vout.script.toAddress(network).toString());
+      if (search.found) {
+        const newAddr = cloneDeep(search.result);
+        const utxoKey = `${transaction.hash.toString('hex')}-${voutIndex}`;
+        delete newAddr[utxoKey];
+        if (!newAddr.transactions.includes(transaction.hash)) {
+          newAddr.transactions.push(transaction.hash);
+          newAddr.used = true;
+          self.updateAddress(newAddr, search.walletId);
+        }
+      }
+    });
+
     this.lastModified = +new Date();
 
     const blockHeight = transaction.nLockTime;
