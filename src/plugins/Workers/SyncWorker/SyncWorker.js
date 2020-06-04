@@ -27,7 +27,13 @@ class SyncWorker extends Worker {
       workerIntervalTime: defaultOpts.workerIntervalTime,
       fetchThreshold: defaultOpts.fetchThreshold,
       dependencies: [
-        'storage', 'transporter', 'fetchStatus', 'getTransaction', 'fetchAddressInfo', 'walletId', 'getUnusedAddress',
+        'storage',
+        'transporter',
+        'fetchStatus',
+        'getTransaction',
+        'fetchAddressInfo',
+        'walletId',
+        'getUnusedAddress',
       ],
       ...opts,
     };
@@ -49,15 +55,20 @@ class SyncWorker extends Worker {
   }
 
   async execute() {
-    // We will needed to update the transporter about the addresses we need to listen
+    // We will need to update the transporter about the addresses we need to listen
     // which is something that can change over the course of the use of the lib.
     const addrList = this.getAddressListToSync().map((addr) => addr.address);
+
+    // Setup listener that will listen for Events from transporter
+    // and handle them (mostly for addition request to storage)
+    this.setupListeners();
     await this.transporter.subscribeToAddressesTransactions(addrList);
   }
 }
 
 SyncWorker.prototype.announce = require('./announce');
 SyncWorker.prototype.getAddressListToSync = require('./getAddressListToSync');
+SyncWorker.prototype.setupListeners = require('./setupListeners');
 SyncWorker.prototype.initialSyncUp = require('./initialSyncUp');
 
 module.exports = SyncWorker;
