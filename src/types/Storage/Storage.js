@@ -42,7 +42,6 @@ class Storage extends EventEmitter {
   }
 }
 Storage.prototype.addNewTxToAddress = require('./methods/addNewTxToAddress');
-Storage.prototype.addUTXOToAddress = require('./methods/addUTXOToAddress');
 Storage.prototype.announce = require('./methods/announce');
 Storage.prototype.calculateDuffBalance = require('./methods/calculateDuffBalance');
 Storage.prototype.clearAll = require('./methods/clearAll');
@@ -58,7 +57,6 @@ Storage.prototype.importBlockHeader = require('./methods/importBlockHeader');
 Storage.prototype.importAddresses = require('./methods/importAddresses');
 Storage.prototype.importSingleAddress = require('./methods/importSingleAddress');
 Storage.prototype.importTransaction = require('./methods/importTransaction');
-Storage.prototype.importUTXO = require('./methods/importUTXO');
 Storage.prototype.importTransactions = require('./methods/importTransactions');
 Storage.prototype.rehydrateState = require('./methods/rehydrateState');
 Storage.prototype.saveState = require('./methods/saveState');
