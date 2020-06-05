@@ -36,7 +36,9 @@ const calculateInputsSize = (inputs) => {
 const calculateOutputsSize = (outputs, tx) => {
   let outputsBytes = 0;
   outputs.forEach((output) => {
-    const address = (output.address instanceof Address) ? output.address : Address.fromString(output.address);
+    const address = (output.address instanceof Address)
+      ? output.address
+      : Address.fromString(output.address);
     const pkScript = Script.buildPublicKeyHashOut(address).toBuffer();
     const pkScriptSigBytes = pkScript.length;
     const pkScriptLengthBytes = varIntSizeBytesFromLength(pkScriptSigBytes);
