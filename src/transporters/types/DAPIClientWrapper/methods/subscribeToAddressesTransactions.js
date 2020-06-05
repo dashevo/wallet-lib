@@ -1,4 +1,3 @@
-const { Transaction } = require('@dashevo/dashcore-lib');
 const EVENTS = require('../../../../EVENTS');
 const logger = require('../../../../logger');
 // Artifact from previous optimisation made in SyncWorker plugin

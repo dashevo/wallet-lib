@@ -1,6 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 const _ = require('lodash');
-const { Transaction, PrivateKey, HDPrivateKey, crypto, Script } = require('@dashevo/dashcore-lib');
+const {
+  Transaction, PrivateKey, HDPrivateKey, crypto, Script,
+} = require('@dashevo/dashcore-lib');
 const { CreateTransactionError } = require('../../../errors');
 const { dashToDuffs, coinSelection, is } = require('../../../utils');
 const _loadStrategy = require('../_loadStrategy');

@@ -1,5 +1,4 @@
 const { Transaction } = require('@dashevo/dashcore-lib');
-const is = require('../is');
 const STRATEGIES = require('./strategies');
 const InvalidUTXO = require('../../errors/InvalidUTXO');
 const InvalidOutput = require('../../errors/InvalidOutput');
@@ -13,9 +12,9 @@ module.exports = function coinSelection(utxosList, outputsList, deductFee = fals
 
 
   for (let i = 0; i < utxosList.length; i += 1) {
-    let utxo = utxosList[i];
-    if (!utxo instanceof Transaction.Output) {
-        throw new InvalidUTXO(utxo);
+    const utxo = utxosList[i];
+    if (!(utxo instanceof Transaction.Output)) {
+      throw new InvalidUTXO(utxo);
     }
     utxosValue += utxo.satoshis;
   }

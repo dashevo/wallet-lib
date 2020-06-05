@@ -1,4 +1,3 @@
-const EVENTS = require('../../../EVENTS');
 const logger = require('../../../logger');
 const fetchAndStoreAddressTransactions = require('./utils/fetchAndStoreAddressTransactions');
 
@@ -18,12 +17,14 @@ module.exports = async function initialSyncUp() {
   // that we had received the transactions and store before
   // being able to release initialSyncUp as ready.
   // When we will move to bloomfilter, that part might be more complex.
+  /* eslint-disable-next-line no-async-promise-executor */
   return new Promise(async (resolve) => {
-    for(let address of addrList){
+    // eslint-disable-next-line no-restricted-syntax
+    for (const address of addrList) {
       // We need to wait for fetching and addition to be done sequentially
       // to correctly manage our balance as input can be output in prev tx.
-      // noinspection ES6AwaitOutsideAsyncFunction
-      await fetchAndStoreAddressTransactions(address, transporter, storage)
+      /* eslint-disable-next-line no-await-in-loop */
+      await fetchAndStoreAddressTransactions(address, transporter, storage);
     }
     logger.silly('SyncWorker - initialSyncUp - Fully synced');
     resolve();

@@ -92,7 +92,7 @@ class TransactionEstimator {
     if (inputs.length < 1) return false;
 
     const addInput = (input) => {
-      if (!input instanceof Transaction.Output) {
+      if (!(input instanceof Transaction.Output)) {
         throw new Error('Expected valid input to import');
       }
       self.state.inputs.push(input);

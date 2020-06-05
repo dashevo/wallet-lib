@@ -1,6 +1,5 @@
 const { Transaction } = require('@dashevo/dashcore-lib');
-const { Output, Input } = Transaction;
-const { cloneDeep } = require('lodash');
+const { Output } = Transaction;
 const { InvalidDashcoreTransaction } = require('../../../errors');
 const { FETCHED_CONFIRMED_TRANSACTION } = require('../../../EVENTS');
 /**
@@ -51,17 +50,17 @@ const importTransaction = function importTransaction(transaction) {
           const vout = element;
 
           const utxoKey = `${transaction.hash}-${outputIndex}`;
-          if(!addressObject.utxos[utxoKey]){
+          if (!addressObject.utxos[utxoKey]) {
             addressObject.utxos[utxoKey] = vout;
             addressObject.balanceSat += vout.satoshis;
-            hasUpdateStorage = true
+            hasUpdateStorage = true;
           }
         }
       }
     }
   });
 
-  if(hasUpdateStorage){
+  if (hasUpdateStorage) {
     this.lastModified = +new Date();
     // Announce only confirmed transaction imported that are our.
     this.announce(FETCHED_CONFIRMED_TRANSACTION, { transaction });
