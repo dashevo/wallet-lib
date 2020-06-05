@@ -36,11 +36,6 @@ async function executor(forcedAddressList = null) {
       self.getTransaction(txid).then((tx) => {
         self.state.addressesTransactionsMap[address][txid] = outputIndex;
         self.announce(EVENTS.FETCHED_TRANSACTION, tx);
-        self.announce(EVENTS.FETCHED_UTXO, {
-          output: new Transaction.Output(utxo),
-          transactionHash: txid,
-          outputIndex,
-        });
       });
     }
   });
