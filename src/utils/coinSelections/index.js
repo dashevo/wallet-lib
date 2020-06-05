@@ -14,23 +14,20 @@ module.exports = function coinSelection(utxosList, outputsList, deductFee = fals
 
   for (let i = 0; i < utxosList.length; i += 1) {
     let utxo = utxosList[i];
-    if (!is.utxo(utxo)) {
-      try {
-        // Tries to get retro-compatibility from insight old format
-        utxo = new Transaction.UnspentOutput(utxo);
-      } catch (e) {
+    if (!utxo instanceof Transaction.Output) {
         throw new InvalidUTXO(utxo);
-      }
     }
     utxosValue += utxo.satoshis;
   }
+
   if (!outputsList) { throw new Error('An outputsList is required in order to perform a selection'); }
   if (outputsList.constructor.name !== Array.name) { throw new Error('outputsList must be an array of outputs'); }
   if (outputsList.length < 1) { throw new Error('outputsList must contains at least 1 output'); }
 
   let outputValue = 0;
+
   outputsList.forEach((output) => {
-    if (!is.output(output)) {
+    if (output instanceof Transaction.Output) {
       throw new InvalidOutput(output);
     }
     outputValue += output.satoshis;
