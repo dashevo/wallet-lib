@@ -1,11 +1,8 @@
 const WalletLibError = require('./WalletLibError');
 
 class WorkerFailedOnExecute extends WalletLibError {
-  constructor(pluginName, reason = 'unknown', err) {
+  constructor(pluginName, reason = 'unknown') {
     let message = `Worker ${pluginName} failed onExecute. Reason: ${reason}`;
-    if(err && err.stack){
-      message += err.stack;
-    }
     super(message);
   }
 }
