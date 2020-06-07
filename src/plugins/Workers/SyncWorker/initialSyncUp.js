@@ -1,6 +1,6 @@
 const logger = require('../../../logger');
 const fetchAddressTransactions = require('./utils/fetchAddressTransactions');
-const TransactionOrderer = require('./utils/TransactionOrderer');
+const TransactionOrderer = require('./utils/TransactionOrderer/TransactionOrderer');
 // This method is called as first thing by the SyncWorker.
 // It's only when resolved that the Wallet will be ready (for what SyncWorker do)
 // And therefore that's where we need to deal with all necessary step
