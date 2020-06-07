@@ -1,7 +1,7 @@
 const {Transaction} = require('@dashevo/dashcore-lib');
 const {expect} = require('chai');
 const TransactionOrderer = require('./TransactionOrderer');
-const transactionsFixtures = require('../../../../../fixtures/plugins/SyncWorker/transactions.set.1.json');
+const transactionsFixtures = require('../../../../../../fixtures/plugins/SyncWorker/transactions.set.1.json');
 
 const tx0 = new Transaction(transactionsFixtures[0]); // Predecessor : none; Successor : tx1
 const tx1 = new Transaction(transactionsFixtures[1]); // Predecessor : tx0; Successor : tx21
@@ -19,7 +19,7 @@ describe('SyncWorker - utils - TransactionOrderer', () => {
   before(() => {
     transactionOrderer = new TransactionOrderer();
   })
-  describe.skip(".insertion simple", () => {
+  describe(".insertion simple", () => {
     it('should handle wrong input', function () {
       const expectedException = `Expect input of type Transaction`;
 
@@ -51,7 +51,7 @@ describe('SyncWorker - utils - TransactionOrderer', () => {
       expect(transactionOrderer.transactions[1]).to.equal(tx1);
     });
   });
-  describe.skip('.lookup', ()=>{
+  describe('.lookup', ()=>{
     it('should be able to lookup from hash', function () {
       const tx = transactionOrderer.lookupByTransactionHash(tx0.hash);
       expect(tx).to.deep.equal({tx:tx0, pos:0});
@@ -60,7 +60,7 @@ describe('SyncWorker - utils - TransactionOrderer', () => {
       expect(notFound).to.deep.equal(null);
     });
   });
-  describe.skip('.insertion predecessors', ()=> {
+  describe('.insertion predecessors', ()=> {
     // TODO: multiples inputs tests and ordered verifications.
     it('should lookup inputs predecessors', function () {
       const res1 = transactionOrderer.lookupInputsPredecessors(tx23);
@@ -71,14 +71,14 @@ describe('SyncWorker - utils - TransactionOrderer', () => {
       expect(res2).to.deep.equal([{tx: tx0, pos: 0}]);
     });
   });
-  describe.skip('.reset', ()=>{
+  describe('.reset', ()=>{
     it('should reset', function () {
       transactionOrderer.reset();
       expect(transactionOrderer.transactions.length).to.equal(0);
       expect(transactionOrderer.transactionIds.length).to.equal(0);
     });
   });
-  describe.skip('.insertion successors', ()=>{
+  describe('.insertion successors', ()=>{
     // Todo: with more
     it('should lookup txid successors', function () {
       transactionOrderer.transactions = [tx1];
@@ -98,13 +98,35 @@ describe('SyncWorker - utils - TransactionOrderer', () => {
       expect(transactionOrderer.transactions[0].hash).to.equal(tx0.hash);
       expect(transactionOrderer.transactions[1].hash).to.equal(tx1.hash);
       expect(transactionOrderer.transactions[2].hash).to.equal(tx2.hash);
+      transactionOrderer.insert(tx23);
+      expect(transactionOrderer.transactions[0].hash).to.equal(tx0.hash);
+      expect(transactionOrderer.transactions[1].hash).to.equal(tx1.hash);
+      expect(transactionOrderer.transactions[2].hash).to.equal(tx2.hash);
+      expect(transactionOrderer.transactions[3].hash).to.equal(tx23.hash);
+      transactionOrderer.insert(tx41);
+      expect(transactionOrderer.transactions[0].hash).to.equal(tx0.hash);
+      expect(transactionOrderer.transactions[1].hash).to.equal(tx1.hash);
+      expect(transactionOrderer.transactions[2].hash).to.equal(tx2.hash);
+      expect(transactionOrderer.transactions[3].hash).to.equal(tx23.hash);
+      expect(transactionOrderer.transactions[4].hash).to.equal(tx41.hash);
+      transactionOrderer.insert(tx21);
+      expect(transactionOrderer.transactions[0].hash).to.equal(tx0.hash);
+      expect(transactionOrderer.transactions[1].hash).to.equal(tx1.hash);
+      expect(transactionOrderer.transactions[2].hash).to.equal(tx2.hash);
+      expect(transactionOrderer.transactions[3].hash).to.equal(tx23.hash);
+      expect(transactionOrderer.transactions[4].hash).to.equal(tx21.hash);
+      expect(transactionOrderer.transactions[5].hash).to.equal(tx41.hash);
+      transactionOrderer.insert(tx22);
+      expect(transactionOrderer.transactions[0].hash).to.equal(tx0.hash);
+      expect(transactionOrderer.transactions[1].hash).to.equal(tx1.hash);
+      expect(transactionOrderer.transactions[2].hash).to.equal(tx2.hash);
+      expect(transactionOrderer.transactions[3].hash).to.equal(tx21.hash);
+      expect(transactionOrderer.transactions[4].hash).to.equal(tx41.hash);
+      expect(transactionOrderer.transactions[5].hash).to.equal(tx22.hash);
+      expect(transactionOrderer.transactions[6].hash).to.equal(tx23.hash);
 
-      // transactionOrderer.insert(tx22);
-      // transactionOrderer.insert(tx21);
 
     });
-    return;
-
     it('should insert before a successor', function () {
       transactionOrderer.reset();
       transactionOrderer.insert(tx0);
