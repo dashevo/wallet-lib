@@ -22,7 +22,8 @@ const tx4 = new Transaction(transactionsFixtures[4]); // Duplicate of tx3;
 const tx51 = new Transaction(transactionsFixtures[51]); //
 const tx52 = new Transaction(transactionsFixtures[52]); // Predecssesor: tx41 / Succ : tx23
 
-describe('SyncWorker - utils - TransactionOrderer', () => {
+describe('SyncWorker - utils - TransactionOrderer', function suite() {
+  this.timeout(10000);
   let transactionOrderer;
   before(() => {
     transactionOrderer = new TransactionOrderer();

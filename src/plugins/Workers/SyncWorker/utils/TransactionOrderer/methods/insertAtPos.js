@@ -14,4 +14,4 @@ module.exports = function insertAtPos(transaction, pos) {
     transactions.push(transaction);
     transactionIds.push(transaction.hash);
   }
-}
+};
