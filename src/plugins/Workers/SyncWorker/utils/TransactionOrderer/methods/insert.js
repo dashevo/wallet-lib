@@ -27,7 +27,7 @@ module.exports = function insert(transaction) {
       : null;
 
     let pos = (predecessorPos != null) ? predecessorPos + 1 : null;
-    if (successorPos != null && predecessorPos != null) {
+    if (successorPos != null) {
       pos = successorPos;
     }
 

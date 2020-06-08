@@ -3,16 +3,23 @@ const {expect} = require('chai');
 const TransactionOrderer = require('./TransactionOrderer');
 const transactionsFixtures = require('../../../../../../fixtures/plugins/SyncWorker/transactions.set.1.json');
 
-const tx0 = new Transaction(transactionsFixtures[0]); // Predecessor : none; Successor : tx1
-const tx1 = new Transaction(transactionsFixtures[1]); // Predecessor : tx0; Successor : tx21
-const tx2 = new Transaction(transactionsFixtures[2]); // Predecessor : none; Successor : tx3 & tx4 (duplicate)
-const tx3 = new Transaction(transactionsFixtures[3]); // Predecessor: tx2;
+const tx0 = new Transaction(transactionsFixtures[0]); // Predecessor : none (from faucet); Successor : tx1 & tx20 (dup)
+const tx1 = new Transaction(transactionsFixtures[1]); // Predecessor : tx0; Successor : tx21 (dup: tx40)
+const tx21 = new Transaction(transactionsFixtures[21]); // Predecessor: tx1; Successor: tx41 (dup: tx50)
+const tx41 = new Transaction(transactionsFixtures[41]); // Predecessor: tx21; Successor: tx22 (dup: tx52)
+const tx22 = new Transaction(transactionsFixtures[22]); // Predecessor: tx41; Successor: tx23
+const tx23 = new Transaction(transactionsFixtures[23]); // Predecessor: tx22; Successor: tx33
+const tx33 = new Transaction(transactionsFixtures[33]); // Predecessor: tx23; Successor: tx44
+const tx44 = new Transaction(transactionsFixtures[44]); // Predecessor: tx33; Successor: tx12
+const tx12 = new Transaction(transactionsFixtures[12]); // Predecessor: tx44; Successor: tx25
+
+const tx2 = new Transaction(transactionsFixtures[2]); // Predecessor: none (faucet); Successor : tx3 (dup: tx4)
+const tx3 = new Transaction(transactionsFixtures[3]); // Predecessor: tx2; Successor: tx5
+const tx5 = new Transaction(transactionsFixtures[5]); // Predecessor: tx3; Successor: tx17
+
 const tx4 = new Transaction(transactionsFixtures[4]); // Duplicate of tx3;
-const tx21 = new Transaction(transactionsFixtures[21]); // Predecessor: tx1; Successor: tx41
-const tx22 = new Transaction(transactionsFixtures[22]); // has prevTxId from tx41
-const tx23 = new Transaction(transactionsFixtures[23]); // has prevTxId from tx22
-const tx33 = new Transaction(transactionsFixtures[33]);
-const tx41 = new Transaction(transactionsFixtures[41]); // Predecssesor: tx21
+const tx51 = new Transaction(transactionsFixtures[51]); //
+const tx52 = new Transaction(transactionsFixtures[52]); // Predecssesor: tx41 / Succ : tx23
 
 describe('SyncWorker - utils - TransactionOrderer', () => {
   let transactionOrderer;
@@ -109,14 +116,22 @@ describe('SyncWorker - utils - TransactionOrderer', () => {
       expect(transactionOrderer.transactions[2].hash).to.equal(tx2.hash);
       expect(transactionOrderer.transactions[3].hash).to.equal(tx23.hash);
       expect(transactionOrderer.transactions[4].hash).to.equal(tx41.hash);
-      transactionOrderer.insert(tx21);
+      transactionOrderer.insert(tx33);
       expect(transactionOrderer.transactions[0].hash).to.equal(tx0.hash);
       expect(transactionOrderer.transactions[1].hash).to.equal(tx1.hash);
       expect(transactionOrderer.transactions[2].hash).to.equal(tx2.hash);
       expect(transactionOrderer.transactions[3].hash).to.equal(tx23.hash);
-      expect(transactionOrderer.transactions[4].hash).to.equal(tx21.hash);
+      expect(transactionOrderer.transactions[4].hash).to.equal(tx33.hash);
       expect(transactionOrderer.transactions[5].hash).to.equal(tx41.hash);
       transactionOrderer.insert(tx22);
+      expect(transactionOrderer.transactions[0].hash).to.equal(tx0.hash);
+      expect(transactionOrderer.transactions[1].hash).to.equal(tx1.hash);
+      expect(transactionOrderer.transactions[2].hash).to.equal(tx2.hash);
+      expect(transactionOrderer.transactions[3].hash).to.equal(tx41.hash);
+      expect(transactionOrderer.transactions[4].hash).to.equal(tx22.hash);
+      expect(transactionOrderer.transactions[5].hash).to.equal(tx23.hash);
+      expect(transactionOrderer.transactions[6].hash).to.equal(tx33.hash);
+      transactionOrderer.insert(tx21);
       expect(transactionOrderer.transactions[0].hash).to.equal(tx0.hash);
       expect(transactionOrderer.transactions[1].hash).to.equal(tx1.hash);
       expect(transactionOrderer.transactions[2].hash).to.equal(tx2.hash);
@@ -124,8 +139,7 @@ describe('SyncWorker - utils - TransactionOrderer', () => {
       expect(transactionOrderer.transactions[4].hash).to.equal(tx41.hash);
       expect(transactionOrderer.transactions[5].hash).to.equal(tx22.hash);
       expect(transactionOrderer.transactions[6].hash).to.equal(tx23.hash);
-
-
+      expect(transactionOrderer.transactions[7].hash).to.equal(tx33.hash);
     });
     it('should insert before a successor', function () {
       transactionOrderer.reset();
