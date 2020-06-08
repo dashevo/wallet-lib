@@ -38,7 +38,6 @@
     "@dashevo/dashcore-lib": "^0.18.0",
     "cbor": "^5.0.1",
     "crypto-js": "^4.0.0",
-    "eventemitter2": "^6.0.0",
     "lodash": "^4.17.15",
     "pbkdf2": "^3.0.17",
     "winston": "^3.2.1"
