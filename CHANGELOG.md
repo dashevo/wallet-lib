@@ -2,6 +2,7 @@
     
 - **Fixes:**
     - fix: broadcastTransaction not throwing an error when a transaction wasn't broadcasted (#133)
+    - fix: internal UTXO on Output format and getUTXO returning UnspentOutput + refactor initial sync up (#135)
 
 # [7.1.0](https://github.com/dashevo/wallet-lib/compare/v7.0.0...v7.1.0) (2020-06-03)
     
