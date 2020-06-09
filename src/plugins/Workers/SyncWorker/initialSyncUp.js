@@ -39,5 +39,6 @@ module.exports = async function initialSyncUp() {
     importPromises.push(storage.importTransaction(orderTransaction));
   });
 
-  return Promise.all(importPromises).then(() => logger.silly('SyncWorker - initialSyncUp - Fully synced'));
+  await Promise.all(importPromises);
+  logger.silly('SyncWorker - initialSyncUp - Fully synced');
 };

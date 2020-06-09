@@ -1,7 +1,7 @@
 /**
  * Add a transaction at a specific position
  * @param {Transaction} transaction
- * @param {number|null} pos
+ * @param {number?} pos
  */
 module.exports = function insertAtPos(transaction, pos) {
   const { transactionIds, transactions } = this;

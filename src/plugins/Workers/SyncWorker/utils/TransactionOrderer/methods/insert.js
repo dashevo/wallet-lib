@@ -42,8 +42,6 @@ module.exports = function insert(transaction) {
     } else {
       this.insertAtPos(transaction, pos);
     }
-    // TODO : We should also verify if we need to shift multiples predecessors
-    // TODO : We should check if we need to move successor around
     return true;
   }
   return false;
