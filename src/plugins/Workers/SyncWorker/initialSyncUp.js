@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const logger = require('../../../logger');
 const fetchAddressTransactions = require('./utils/fetchAddressTransactions');
 const TransactionOrderer = require('./utils/TransactionOrderer/TransactionOrderer');
@@ -16,29 +17,22 @@ module.exports = async function initialSyncUp() {
   // that we had received the transactions and store before
   // being able to release initialSyncUp as ready.
   // When we will move to bloomfilter, that part might be more complex.
-  /* eslint-disable-next-line no-async-promise-executor */
-  const promises = [];
-  addrList.forEach((address) => {
-    promises.push(fetchAddressTransactions(address, transporter));
-  });
 
-  let transactions = [];
 
-  const fetchedPromises = await Promise.all(promises);
+  const transactionPromises = addrList.map(_.bind(fetchAddressTransactions, null, _, transporter));
 
-  fetchedPromises.forEach((fetchedTransactions) => {
-    transactions = transactions.concat(fetchedTransactions);
-  });
+  const transactionsByAddresses = await Promise.all(transactionPromises);
+
+  const transactions = _.flatten(transactionsByAddresses);
 
   const ordered = new TransactionOrderer();
 
   transactions.forEach((tx) => ordered.insert(tx));
 
-  const importPromises = [];
-  ordered.transactions.forEach((orderTransaction) => {
-    importPromises.push(storage.importTransaction(orderTransaction));
-  });
+  const importPromises = ordered.transactions
+    .map(_.bind(storage.importTransaction, storage, _, transporter));
 
   await Promise.all(importPromises);
+
   logger.silly('SyncWorker - initialSyncUp - Fully synced');
 };
