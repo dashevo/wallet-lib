@@ -18,8 +18,8 @@ module.exports = async function initialSyncUp() {
   // being able to release initialSyncUp as ready.
   // When we will move to bloomfilter, that part might be more complex.
 
-
-  const transactionPromises = addrList.map(_.bind(fetchAddressTransactions, null, _, transporter));
+  const boundFetchAddressTransactions = _.bind(fetchAddressTransactions, null, _, transporter);
+  const transactionPromises = addrList.map(boundFetchAddressTransactions);
 
   const transactionsByAddresses = await Promise.all(transactionPromises);
 
@@ -29,8 +29,8 @@ module.exports = async function initialSyncUp() {
 
   transactions.forEach((tx) => ordered.insert(tx));
 
-  const importPromises = ordered.transactions
-    .map(_.bind(storage.importTransaction, storage, _, transporter));
+  const boundImportTransaction = _.bind(storage.importTransaction, storage, _, transporter);
+  const importPromises = ordered.transactions.map(boundImportTransaction);
 
   await Promise.all(importPromises);
 
