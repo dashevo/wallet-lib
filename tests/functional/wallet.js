@@ -5,15 +5,7 @@ const {
   PrivateKey,
 } = require('@dashevo/dashcore-lib');
 
-const dotenvSafe = require('dotenv-safe');
-
-const path = require('path');
-
 const { Wallet } = require('../../src/index');
-
-dotenvSafe.config({
-  path: path.resolve(__dirname, '..', '..', '.env'),
-});
 
 function wait(ms) {
   return new Promise((res) => setTimeout(res, ms));

@@ -1,3 +1,9 @@
+/* eslint-disable import/no-extraneous-dependencies */
+const webpack = require('webpack');
+const dotenvSafe = require('dotenv-safe');
+const path = require('path');
+const fs = require('fs');
+
 module.exports = (config) => {
   config.set({
     frameworks: ['mocha', 'chai'],
@@ -14,7 +20,15 @@ module.exports = (config) => {
       optimization: {
         minimize: false,
       },
-      plugins: [],
+      plugins: [
+        new webpack.EnvironmentPlugin(
+          dotenvSafe.parse(
+            fs.readFileSync(
+              path.resolve(__dirname, '.env'),
+            ),
+          ),
+        ),
+      ],
       node: {
         fs: 'empty',
       },
