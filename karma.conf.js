@@ -45,14 +45,7 @@ module.exports = (config) => {
       'karma-mocha-reporter',
       'karma-chai',
       'karma-chrome-launcher',
-      'karma-firefox-launcher',
       'karma-webpack',
     ],
-    customLaunchers: {
-      FirefoxHeadless: {
-        base: 'Firefox',
-        flags: ['-headless'],
-      },
-    },
   });
 };
