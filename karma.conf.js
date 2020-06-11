@@ -1,8 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const webpack = require('webpack');
-const dotenvSafe = require('dotenv-safe');
-const path = require('path');
-const fs = require('fs');
+const dotenvResult = require('dotenv-safe').config();
+
+if (dotenvResult.error) {
+  throw dotenvResult.error;
+}
 
 module.exports = (config) => {
   config.set({
@@ -22,11 +24,7 @@ module.exports = (config) => {
       },
       plugins: [
         new webpack.EnvironmentPlugin(
-          dotenvSafe.parse(
-            fs.readFileSync(
-              path.resolve(__dirname, '.env'),
-            ),
-          ),
+          dotenvResult.parsed,
         ),
       ],
       node: {
