@@ -1,8 +1,8 @@
 # [7.1.4](https://github.com/dashevo/wallet-lib/compare/v7.1.3...v7.1.4) (2020-06-11)
     
 - **Builds, Tests:**
-    - test: test: create a new wallet in functional tests (#140)
-    - build: test: build: simplify distributive and Travis CI builds  (#139)
+    - test: create a new wallet in functional tests (#140)
+    - build: simplify distributive and Travis CI builds (#139)
 
 # [7.1.3](https://github.com/dashevo/wallet-lib/compare/v7.1.2...v7.1.3) (2020-06-10)
     
