@@ -36,9 +36,10 @@ module.exports = (config) => {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: false,
-    browsers: ['ChromeHeadless', 'FirefoxHeadless'],
+    browsers: ['ChromeHeadless'],
     singleRun: false,
     concurrency: Infinity,
+    browserNoActivityTimeout: 7 * 60 * 1000,
     plugins: [
       'karma-mocha',
       'karma-mocha-reporter',

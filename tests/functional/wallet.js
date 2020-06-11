@@ -25,7 +25,14 @@ async function fundAddress(dapiClient, faucetAddress, faucetPrivateKey, address,
 
   const transaction = new Transaction();
 
-  transaction.from(inputs.slice(-1)[0])
+  // We take random coz two browsers run in parallel
+  // and they can take the same inputs
+
+  const inputIndex = Math.floor(
+    Math.random() * Math.floor(inputs.length / 2) * -1,
+  );
+
+  transaction.from(inputs.slice(inputIndex)[0])
     .to(address, amount)
     .change(faucetAddress)
     .fee(668)
