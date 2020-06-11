@@ -11,11 +11,8 @@ module.exports = (config) => {
     },
     webpack: {
       mode: 'development',
-      optimization: {
-        minimize: false,
-      },
-      plugins: [],
       node: {
+        // Prevent embedded winston to throw error with FS not existing.
         fs: 'empty',
       },
     },
