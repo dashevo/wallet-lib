@@ -63,7 +63,8 @@ let newWallet;
 let wallet;
 let account;
 describe('Wallet-lib - functional ', function suite() {
-  this.timeout(100000);
+  this.timeout(700000);
+
   describe('Wallet', () => {
     describe('Create a new Wallet', () => {
       it('should create a new wallet with default params', () => {
