@@ -40,10 +40,10 @@
     "crypto-js": "^4.0.0",
     "lodash": "^4.17.15",
     "pbkdf2": "^3.1.1",
-    "winston": "^3.2.1"
+    "winston": "^3.2.1",
+    "@dashevo/dapi-client": "^0.13.2"
   },
   "devDependencies": {
-    "@dashevo/dapi-client": "^0.13.2",
     "chai": "^4.2.0",
     "dotenv-safe": "^8.2.0",
     "eslint": "^6.8.0",
