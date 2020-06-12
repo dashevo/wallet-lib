@@ -72,25 +72,7 @@ Storage.prototype.stopWorker = require('./methods/stopWorker');
 
 // Identities
 Storage.prototype.insertIdentityIdAtIndex = require('./methods/insertIdentityAtIndex');
-
-/**
- *
- * @param {string} walletId
- * @param {number} identityIndex
- * @return {string|undefined}
- */
-Storage.prototype.getIdentityIdByIndex = function getIdentityIdByIndex(walletId, identityIndex) {
-  return this.store.wallets[walletId].identityIds[identityIndex];
-};
-
-
-/**
- *
- * @param {string} walletId
- * @return {Promise<Array<string|undefined>>}
- */
-Storage.prototype.getIndexedIdentityIds = function getIndexedIdentityIds(walletId) {
-  return this.store.wallets[walletId].identityIds;
-};
+Storage.prototype.getIdentityIdByIndex = require('./methods/getIdentityByIndex');
+Storage.prototype.getIndexedIdentityIds = require('./methods/getIndexedIdentityIds');
 
 module.exports = Storage;
