@@ -70,4 +70,27 @@ Storage.prototype.updateTransaction = require('./methods/updateTransaction');
 Storage.prototype.startWorker = require('./methods/startWorker');
 Storage.prototype.stopWorker = require('./methods/stopWorker');
 
+// Identities
+/**
+ *
+ * @param {string} identityId
+ * @param {number} index
+ */
+Storage.prototype.insertIdentityIdAtIndex = async function insertIdentityAtIndex(walletId, identityId, index) {
+  if (this.store.wallets[walletId].identityIds) {
+    this.store.wallets[walletId].identityIds = [];
+  }
+  this.store.wallets[walletId].identityIds[index] = identityId;
+  this.lastModified = Date.now();
+};
+
+/**
+ *
+ * @param walletId
+ * @return {Promise<string[]>}
+ */
+Storage.prototype.getIdentityIds = function getIdentityIds(walletId) {
+  return this.store.wallets[walletId].identityIds;
+};
+
 module.exports = Storage;

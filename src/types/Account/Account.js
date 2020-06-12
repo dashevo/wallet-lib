@@ -176,6 +176,49 @@ class Account extends EventEmitter {
       this.on(EVENTS.READY, () => resolve(true));
     }));
   }
+
+  /**
+   *
+   * @return {Promise<string[]>}
+   */
+  async getIdentityIds() {
+    return this.storage.identityIds;
+  }
+
+  /**
+   *
+   * @param {string} identityId
+   * @param {number} keyIndex
+   * @return {Promise<HDPrivateKey>}
+   */
+  async getIdentityHDKeyByID(identityId, keyIndex) {
+    const identityIndex = this.storage.getIdentityIds().indexOf(identityId);
+
+    return this.getIdentityHDKeyByIndex(identityIndex, keyIndex);
+  }
+
+  /**
+   *
+   * @param {number} identityIndex
+   * @param {number} keyIndex
+   * @return {Promise<HDPrivateKey>}
+   */
+  async getIdentityHDKeyByIndex(identityIndex, keyIndex) {
+    return this.getIdentityHDKey(identityIndex, keyIndex);
+  }
+
+  /**
+   *
+   * @return {Promise<number>}
+   */
+  async getUnusedIdentityIndex() {
+    // TODO: some stuff with worker
+    const identityIds = this.storage.getIdentityIds();
+
+    const firstMissingIndex = identityIds.findIndex((identityId) => !!identityId);
+
+    return firstMissingIndex > -1 ? firstMissingIndex : identityIds.length;
+  }
 }
 
 Account.prototype.broadcastTransaction = require('./methods/broadcastTransaction');
