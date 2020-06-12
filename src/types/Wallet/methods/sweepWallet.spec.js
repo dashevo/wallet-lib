@@ -16,7 +16,11 @@ describe('Wallet - sweepWallet', function suite() {
     emptyWallet = new Wallet({
       privateKey: paperWallet.privateKey,
       network: 'testnet',
-      transporter: { type: 'DAPIClient' },
+      transporter: {
+        seeds: process.env.DAPI_SEED
+          .split(',')
+          .map((seed) => ({ service: seed })),
+      },
     });
 
     emptyAccount = await emptyWallet.getAccount();
