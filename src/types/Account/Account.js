@@ -176,55 +176,6 @@ class Account extends EventEmitter {
       this.on(EVENTS.READY, () => resolve(true));
     }));
   }
-
-  /**
-   *
-   * @return {string[]}
-   */
-  getIdentityIds() {
-    return this.storage.getIndexedIdentityIds(this.walletId).filter(Boolean);
-  }
-
-  /**
-   *
-   * @param {string} identityId
-   * @param {number} keyIndex
-   * @return {HDPrivateKey}
-   */
-  getIdentityHDKeyById(identityId, keyIndex) {
-    const identityIndex = this.storage.getIndexedIdentityIds(this.walletId).indexOf(identityId);
-
-    if (identityIndex === -1) {
-      throw new Error(`Identity with ID ${identityId} is not associated with wallet, or it's not synced`);
-    }
-
-    return this.getIdentityHDKeyByIndex(identityIndex, keyIndex);
-  }
-
-  /**
-   *
-   * @param {number} identityIndex
-   * @param {number} keyIndex
-   * @return {HDPrivateKey}
-   */
-  getIdentityHDKeyByIndex(identityIndex, keyIndex) {
-    return this.getIdentityHDKey(identityIndex, keyIndex);
-  }
-
-  /**
-   *
-   * @return {Promise<number>}
-   */
-  async getUnusedIdentityIndex() {
-    // Force identities sync before return unused index
-    await this.getWorker('IdentitySyncWorker').execWorker();
-
-    const identityIds = this.storage.getIndexedIdentityIds(this.walletId);
-
-    const firstMissingIndex = identityIds.findIndex((identityId) => !identityId);
-
-    return firstMissingIndex > -1 ? firstMissingIndex : identityIds.length;
-  }
 }
 
 Account.prototype.broadcastTransaction = require('./methods/broadcastTransaction');
@@ -276,5 +227,9 @@ Account.prototype.sign = require('./methods/sign');
 Account.prototype.hasPlugins = require('./methods/hasPlugins');
 
 Account.prototype.getIdentityHDKey = require('./methods/getIdentityHDKey');
+Account.prototype.getIdentityHDKeyByIndex = Account.prototype.getIdentityHDKey;
+Account.prototype.getIdentityIds = require('./methods/getIdentityIds');
+Account.prototype.getIdentityHDKeyById = require('./methods/getIdentityHDKeyById');
+Account.prototype.getUnusedIdentityIndex = require('./methods/getUnusedIdentityIndex');
 
 module.exports = Account;
