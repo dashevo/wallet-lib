@@ -36,7 +36,9 @@ async function _initializeAccount(account, userUnsafePlugins) {
         }
         if (!account.offlineMode) {
           await account.injectPlugin(SyncWorker, true);
-          await account.injectPlugin(IdentitySyncWorker, true);
+          if (account.walletType === WALLET_TYPES.HDWALLET) {
+            await account.injectPlugin(IdentitySyncWorker, true);
+          }
         }
       } catch (err) {
         throw new Error(`Failed to perform standard injections with reason: ${err.message}`);
