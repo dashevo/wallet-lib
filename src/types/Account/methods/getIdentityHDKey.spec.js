@@ -3,10 +3,12 @@ const { expect } = require('chai');
 const { Account, Wallet } = require('../../../index');
 
 let mnemonic;
-let expectedIdentityHDKey;
-let expectedIdentityPrivateKey;
-let expectedIdentityHDKey1;
-let expectedIdentityPrivateKey1;
+let expectedIdentityHDKey0_0;
+let expectedIdentityHDKey0_1;
+let expectedIdentityHDKey1_0;
+let expectedIdentityPrivateKey0_0;
+let expectedIdentityPrivateKey0_1;
+let expectedIdentityPrivateKey1_0;
 let walletMock;
 let account;
 
@@ -16,11 +18,13 @@ describe('Account - getIdentityHDKey', function suite() {
     mnemonic = 'during develop before curtain hazard rare job language become verb message travel';
 
 
-    expectedIdentityHDKey = 'tprv8neTemzR4tDRNCgSvzAnZuzpqC1qiBYQJpsdAZijdMVzhb9zLfPp7A9sY8FeES32rmfAPtiJMWiwTANH2khMvnbH5SYCmPAyr9n6nkRdD8u';
-    expectedIdentityHDKey1 = 'tprv8neTemzR4tDRPzdaAFnwH1StohsurPqsDBMsC2xmRE4t8hE9EAbFPrGpssCXPQCSs39ndQJCY7FaTwvB8mhv9f6otnXBoJYa3MQNZeynaFv';
+    expectedIdentityHDKey0_0 = 'tprv8oH6ANFZK6Ap3rp4bzcafECooaK2Hj7J7bvqBug5UYHYGXaQVK9CfVeVgH4Y4HmLghrPU64bRbzQk82cCv6Sm4E4JjsTRb8WJ75FG2Qwg43';
+    expectedIdentityHDKey0_1 = 'tprv8oH6ANFZK6Ap7Qik5WRLovyK32LPCaqsZGeeh7AMFwxgBTABrDfigb399HTA1KT7vjYVurMvJo4REpcGorKPr2LC6SsSBwVdogg5UYW6C6n';
+    expectedIdentityHDKey1_0 = 'tprv8oxtsevLHCPBCyTVpzhiyYnABQxhJwGp721eAT9dxb8VPBch6kp265Ry4qdL4mcktzLwPF3sZnmhTMd2oqkmSXWK6NHbwEMPFgKv6wUCGBW';
 
-    expectedIdentityPrivateKey = '34c2a49feb85f59eec9fd953d5ff1815af70bc7173ebbd26bc5af810b23961c7';
-    expectedIdentityPrivateKey1 = '0611f36b51b8bf145edf26942b869a52195d16a773ea1729e64f2c76b2324578';
+    expectedIdentityPrivateKey0_0 = '483b7555c139931da369c53d0cbe55bd5fe4461a713504fc777963f9062075e4';
+    expectedIdentityPrivateKey0_1 = 'f2c7ea82ffa0007ab6f27f53cfce5137d597fffa8a6e38cadefb6f9953e88e30';
+    expectedIdentityPrivateKey1_0 = '80ae8ea14f36be65fd53309115ff26e4968686b884abad902b8d5f66637a235a';
     walletMock = new Wallet({
       offlineMode: true,
       mnemonic,
@@ -33,13 +37,20 @@ describe('Account - getIdentityHDKey', function suite() {
   });
 
   it('Should derive a key for identity for a given index', () => {
-    const actualIdentityHDKey = account.getIdentityHDKey(0);
-    const actualIdentityHDKey1 = account.getIdentityHDKey(1);
+    const actualIdentityHDKey0_0 = account.getIdentityHDKey(0);
+    const actualIdentityHDKey0_0_bis = account.getIdentityHDKey(0, 0);
+    const actualIdentityHDKey0_1 = account.getIdentityHDKey(0, 1);
+    const actualIdentityHDKey1_0 = account.getIdentityHDKey(1);
+    const actualIdentityHDKey1_0_bis = account.getIdentityHDKey(1);
 
-    expect(actualIdentityHDKey.toString()).to.be.equal(expectedIdentityHDKey);
-    expect(actualIdentityHDKey1.toString()).to.be.equal(expectedIdentityHDKey1);
+    expect(actualIdentityHDKey0_0.toString()).to.be.equal(expectedIdentityHDKey0_0);
+    expect(actualIdentityHDKey0_0_bis.toString()).to.be.equal(expectedIdentityHDKey0_0);
+    expect(actualIdentityHDKey0_1.toString()).to.be.equal(expectedIdentityHDKey0_1);
+    expect(actualIdentityHDKey1_0.toString()).to.be.equal(expectedIdentityHDKey1_0);
+    expect(actualIdentityHDKey1_0_bis.toString()).to.be.equal(expectedIdentityHDKey1_0);
 
-    expect(actualIdentityHDKey.privateKey.toString()).to.be.equal(expectedIdentityPrivateKey);
-    expect(actualIdentityHDKey1.privateKey.toString()).to.be.equal(expectedIdentityPrivateKey1);
+    expect(actualIdentityHDKey0_0.privateKey.toString()).to.be.equal(expectedIdentityPrivateKey0_0);
+    expect(actualIdentityHDKey0_1.privateKey.toString()).to.be.equal(expectedIdentityPrivateKey0_1);
+    expect(actualIdentityHDKey1_0.privateKey.toString()).to.be.equal(expectedIdentityPrivateKey1_0);
   });
 });
