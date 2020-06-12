@@ -12,7 +12,7 @@ let expectedIdentityPrivateKey1_0;
 let walletMock;
 let account;
 
-describe('Account - getIdentityHDKey', function suite() {
+describe('Account - getIdentityHDKeyByIndex', function suite() {
   this.timeout(10000);
   beforeEach(() => {
     mnemonic = 'during develop before curtain hazard rare job language become verb message travel';
@@ -37,9 +37,9 @@ describe('Account - getIdentityHDKey', function suite() {
   });
 
   it('Should derive a key for identity for a given index', () => {
-    const actualIdentityHDKey0_0 = account.getIdentityHDKey(0, 0);
-    const actualIdentityHDKey0_1 = account.getIdentityHDKey(0, 1);
-    const actualIdentityHDKey1_0 = account.getIdentityHDKey(1, 0);
+    const actualIdentityHDKey0_0 = account.getIdentityHDKeyByIndex(0, 0);
+    const actualIdentityHDKey0_1 = account.getIdentityHDKeyByIndex(0, 1);
+    const actualIdentityHDKey1_0 = account.getIdentityHDKeyByIndex(1, 0);
 
     expect(actualIdentityHDKey0_0.toString()).to.be.equal(expectedIdentityHDKey0_0);
     expect(actualIdentityHDKey0_1.toString()).to.be.equal(expectedIdentityHDKey0_1);

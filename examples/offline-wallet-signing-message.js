@@ -13,7 +13,7 @@ wallet.getAccount()
     const startSigningMessage = () => {
       const message = new Message('Hello world!');
 
-      const idPrivateKey = account.getIdentityHDKey(0, 0).privateKey;
+      const idPrivateKey = account.getIdentityHDKeyByIndex(0, 0).privateKey;
 
       const signed = account.sign(message, idPrivateKey);
       const verify = message.verify(idPrivateKey.toAddress().toString(), signed.toString()); // true

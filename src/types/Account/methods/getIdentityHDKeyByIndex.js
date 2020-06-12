@@ -4,7 +4,7 @@
  * @param {number} keyIndex - keyIndex
  * @return {HDPrivateKey}
  */
-function getIdentityHDKey(identityIndex, keyIndex) {
+function getIdentityHDKeyByIndex(identityIndex, keyIndex) {
   const { keyChain, index: accountIndex } = this;
   const hardenedFeatureRootKey = keyChain.getHardenedDIP9FeaturePath('HDPrivateKey');
 
@@ -18,4 +18,4 @@ function getIdentityHDKey(identityIndex, keyIndex) {
     .deriveChild(keyIndex, true);
 }
 
-module.exports = getIdentityHDKey;
+module.exports = getIdentityHDKeyByIndex;

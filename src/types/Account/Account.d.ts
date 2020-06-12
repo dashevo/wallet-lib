@@ -43,7 +43,6 @@ export declare class Account {
 
     getIdentityIds(): string[];
     getIdentityHDKeyById(identityId: string, keyIndex: number): HDPrivateKey;
-    getIdentityHDKey(identityIndex: number, keyIndex: number): HDPrivateKey;
     getIdentityHDKeyByIndex(identityIndex: number, keyIndex: number): HDPrivateKey;
     getUnusedIdentityIndex(): Promise<number>;
 }
