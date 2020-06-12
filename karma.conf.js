@@ -14,11 +14,12 @@ module.exports = (config) => {
       'tests/functional/wallet.js',
     ],
     preprocessors: {
-      'karma.test.loader.js': ['webpack'],
-      'tests/functional/wallet.js': ['webpack'],
+      'karma.test.loader.js': ['webpack', 'sourcemap'],
+      'tests/functional/wallet.js': ['webpack', 'sourcemap'],
     },
     webpack: {
       mode: 'development',
+      devtool: 'inline-source-map',
       plugins: [
         new webpack.EnvironmentPlugin(
           dotenvResult.parsed,
@@ -44,6 +45,7 @@ module.exports = (config) => {
       'karma-chai',
       'karma-chrome-launcher',
       'karma-webpack',
+      'karma-sourcemap-loader',
     ],
   });
 };
