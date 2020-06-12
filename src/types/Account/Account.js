@@ -182,7 +182,7 @@ class Account extends EventEmitter {
    * @return {Promise<string[]>}
    */
   async getIdentityIds() {
-    return this.storage.identityIds;
+    return this.storage.getIdentityIds().filter((identityId) => !!identityId);
   }
 
   /**
@@ -215,7 +215,7 @@ class Account extends EventEmitter {
     // TODO: some stuff with worker
     const identityIds = this.storage.getIdentityIds();
 
-    const firstMissingIndex = identityIds.findIndex((identityId) => !!identityId);
+    const firstMissingIndex = identityIds.findIndex((identityId) => !identityId);
 
     return firstMissingIndex > -1 ? firstMissingIndex : identityIds.length;
   }
