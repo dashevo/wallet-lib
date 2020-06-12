@@ -1,9 +1,10 @@
 /**
  * Returns a private key for managing an identity
- * @param {number} index - index of an identity
- * @return {PrivateKey}
+ * @param {string} identityId - Identity ID
+ * @param {number} keyIndex - keyIndex
+ * @return {HDPublicKey}
  */
-function getIdentityHDKey(keyIndex = 0) {
+function getIdentityHDKey(identityId, keyIndex = 0) {
   const { keyChain, index: accountIndex } = this;
   const hardenedFeatureRootKey = keyChain.getHardenedDIP9FeaturePath();
 
