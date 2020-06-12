@@ -182,7 +182,7 @@ class Account extends EventEmitter {
    * @return {Promise<string[]>}
    */
   async getIdentityIds() {
-    return this.storage.getIdentityIds().filter((identityId) => !!identityId);
+    return this.storage.getIndexedIdentityIds(this.walletId).filter((identityId) => !!identityId);
   }
 
   /**
@@ -192,7 +192,7 @@ class Account extends EventEmitter {
    * @return {Promise<HDPrivateKey>}
    */
   async getIdentityHDKeyByID(identityId, keyIndex) {
-    const identityIndex = this.storage.getIdentityIds().indexOf(identityId);
+    const identityIndex = this.storage.getIndexedIdentityIds(this.walletId).indexOf(identityId);
 
     return this.getIdentityHDKeyByIndex(identityIndex, keyIndex);
   }
@@ -213,7 +213,7 @@ class Account extends EventEmitter {
    */
   async getUnusedIdentityIndex() {
     // TODO: some stuff with worker
-    const identityIds = this.storage.getIdentityIds();
+    const identityIds = this.storage.getIndexedIdentityIds(this.walletId);
 
     const firstMissingIndex = identityIds.findIndex((identityId) => !identityId);
 

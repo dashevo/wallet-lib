@@ -86,10 +86,10 @@ Storage.prototype.insertIdentityIdAtIndex = async function insertIdentityAtIndex
 
 /**
  *
- * @param walletId
+ * @param {string} walletId
  * @return {Promise<string[]>}
  */
-Storage.prototype.getIdentityIds = function getIdentityIds(walletId) {
+Storage.prototype.getIndexedIdentityIds = function getIndexedIdentityIds(walletId) {
   return this.store.wallets[walletId].identityIds;
 };
 
