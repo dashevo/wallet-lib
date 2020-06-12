@@ -37,17 +37,13 @@ describe('Account - getIdentityHDKey', function suite() {
   });
 
   it('Should derive a key for identity for a given index', () => {
-    const actualIdentityHDKey0_0 = account.getIdentityHDKey(0);
-    const actualIdentityHDKey0_0_bis = account.getIdentityHDKey(0, 0);
+    const actualIdentityHDKey0_0 = account.getIdentityHDKey(0, 0);
     const actualIdentityHDKey0_1 = account.getIdentityHDKey(0, 1);
-    const actualIdentityHDKey1_0 = account.getIdentityHDKey(1);
-    const actualIdentityHDKey1_0_bis = account.getIdentityHDKey(1);
+    const actualIdentityHDKey1_0 = account.getIdentityHDKey(1, 0);
 
     expect(actualIdentityHDKey0_0.toString()).to.be.equal(expectedIdentityHDKey0_0);
-    expect(actualIdentityHDKey0_0_bis.toString()).to.be.equal(expectedIdentityHDKey0_0);
     expect(actualIdentityHDKey0_1.toString()).to.be.equal(expectedIdentityHDKey0_1);
     expect(actualIdentityHDKey1_0.toString()).to.be.equal(expectedIdentityHDKey1_0);
-    expect(actualIdentityHDKey1_0_bis.toString()).to.be.equal(expectedIdentityHDKey1_0);
 
     expect(actualIdentityHDKey0_0.privateKey.toString()).to.be.equal(expectedIdentityPrivateKey0_0);
     expect(actualIdentityHDKey0_1.privateKey.toString()).to.be.equal(expectedIdentityPrivateKey0_1);
