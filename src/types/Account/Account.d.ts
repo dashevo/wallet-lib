@@ -27,8 +27,6 @@ export declare class Account {
     getUnconfirmedBalance(displayDuffs?:boolean): number;
     getBIP44Path(network?:Network, index?:number): string;
 
-    getIdentityHDKey(identityId: string, keyIndex: number): HDPrivateKey;
-
     getNetwork(): Network;
 
     getPlugin(name:string): object;
@@ -42,6 +40,12 @@ export declare class Account {
     injectPlugin(unsafePlugin: Plugins, allowSensitiveOperation:boolean): Promise<boolean>;
     sign(object?:Transaction, privateKeys?:[PrivateKey], sigType?:string): Transaction;
     updateNetwork(network: Network): boolean;
+
+    getIdentityIds(): string[];
+    getIdentityHDKeyById(identityId: string, keyIndex: number): HDPrivateKey;
+    getIdentityHDKey(identityIndex: number, keyIndex: number): HDPrivateKey;
+    getIdentityHDKeyByIndex(identityIndex: number, keyIndex: number): HDPrivateKey;
+    getUnusedIdentityIndex(): Promise<number>;
 }
 export declare interface RecipientOptions {
     satoshis?: number;

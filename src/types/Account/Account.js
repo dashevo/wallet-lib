@@ -179,7 +179,7 @@ class Account extends EventEmitter {
 
   /**
    *
-   * @return {Promise<string[]>}
+   * @return {string[]}
    */
   getIdentityIds() {
     return this.storage.getIndexedIdentityIds(this.walletId).filter(Boolean);
@@ -191,7 +191,7 @@ class Account extends EventEmitter {
    * @param {number} keyIndex
    * @return {HDPrivateKey}
    */
-  getIdentityHDKeyByID(identityId, keyIndex) {
+  getIdentityHDKeyById(identityId, keyIndex) {
     const identityIndex = this.storage.getIndexedIdentityIds(this.walletId).indexOf(identityId);
 
     if (identityIndex === -1) {
