@@ -182,7 +182,7 @@ class Account extends EventEmitter {
    * @return {Promise<string[]>}
    */
   async getIdentityIds() {
-    return this.storage.getIndexedIdentityIds(this.walletId).filter((identityId) => !!identityId);
+    return this.storage.getIndexedIdentityIds(this.walletId).filter(Boolean);
   }
 
   /**
@@ -193,6 +193,10 @@ class Account extends EventEmitter {
    */
   async getIdentityHDKeyByID(identityId, keyIndex) {
     const identityIndex = this.storage.getIndexedIdentityIds(this.walletId).indexOf(identityId);
+
+    if (identityIndex === -1) {
+      throw new Error(`Identity with ID ${identityId} is not associated with wallet, or it's not synced`);
+    }
 
     return this.getIdentityHDKeyByIndex(identityIndex, keyIndex);
   }
@@ -212,7 +216,9 @@ class Account extends EventEmitter {
    * @return {Promise<number>}
    */
   async getUnusedIdentityIndex() {
-    // TODO: some stuff with worker
+    // Force identities sync before return unused index
+    await this.getWorker('IdentitySyncWorker').execWorker();
+
     const identityIds = this.storage.getIndexedIdentityIds(this.walletId);
 
     const firstMissingIndex = identityIds.findIndex((identityId) => !identityId);

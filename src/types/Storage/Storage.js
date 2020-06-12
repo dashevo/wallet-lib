@@ -87,7 +87,7 @@ Storage.prototype.getIdentityIdByIndex = function getIdentityIdByIndex(walletId,
 /**
  *
  * @param {string} walletId
- * @return {Promise<string[]>}
+ * @return {Promise<Array<string|undefined>>}
  */
 Storage.prototype.getIndexedIdentityIds = function getIndexedIdentityIds(walletId) {
   return this.store.wallets[walletId].identityIds;
