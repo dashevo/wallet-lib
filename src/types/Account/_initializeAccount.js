@@ -27,9 +27,6 @@ async function _initializeAccount(account, userUnsafePlugins) {
         if ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(account.walletType)) {
           // Ideally we should move out from worker to event based
           await account.injectPlugin(BIP44Worker, true);
-          if (!account.offlineMode) {
-            await account.injectPlugin(IdentitySyncWorker, true);
-          }
         }
         if (!account.offlineMode) {
           await account.injectPlugin(ChainPlugin, true);
@@ -39,6 +36,9 @@ async function _initializeAccount(account, userUnsafePlugins) {
         }
         if (!account.offlineMode) {
           await account.injectPlugin(SyncWorker, true);
+          if (account.walletType === WALLET_TYPES.HDWALLET) {
+            await account.injectPlugin(IdentitySyncWorker, true);
+          }
         }
       } catch (err) {
         throw new Error(`Failed to perform standard injections with reason: ${err.message}`);
