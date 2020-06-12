@@ -189,9 +189,9 @@ class Account extends EventEmitter {
    *
    * @param {string} identityId
    * @param {number} keyIndex
-   * @return {Promise<HDPrivateKey>}
+   * @return {HDPrivateKey}
    */
-  async getIdentityHDKeyByID(identityId, keyIndex) {
+  getIdentityHDKeyByID(identityId, keyIndex) {
     const identityIndex = this.storage.getIndexedIdentityIds(this.walletId).indexOf(identityId);
 
     if (identityIndex === -1) {
@@ -205,9 +205,9 @@ class Account extends EventEmitter {
    *
    * @param {number} identityIndex
    * @param {number} keyIndex
-   * @return {Promise<HDPrivateKey>}
+   * @return {HDPrivateKey}
    */
-  async getIdentityHDKeyByIndex(identityIndex, keyIndex) {
+  getIdentityHDKeyByIndex(identityIndex, keyIndex) {
     return this.getIdentityHDKey(identityIndex, keyIndex);
   }
 

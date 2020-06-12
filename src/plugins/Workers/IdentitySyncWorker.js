@@ -58,8 +58,8 @@ class IdentitySyncWorker extends Worker {
         // until gap limit will be reached
         index += 1;
       }
-      // eslint-disable-next-line no-await-in-loop
-      const { privateKey } = await this.getIdentityHDKeyByIndex(index, 0);
+
+      const { privateKey } = this.getIdentityHDKeyByIndex(index, 0);
       const publicKey = privateKey.toPublicKey();
 
       // eslint-disable-next-line no-await-in-loop
