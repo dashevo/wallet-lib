@@ -27,7 +27,7 @@ export declare class Account {
     getUnconfirmedBalance(displayDuffs?:boolean): number;
     getBIP44Path(network?:Network, index?:number): string;
 
-    getIdentityHDKey(index: number): HDPrivateKey;
+    getIdentityHDKey(identityId: string, keyIndex: number): HDPrivateKey;
 
     getNetwork(): Network;
 

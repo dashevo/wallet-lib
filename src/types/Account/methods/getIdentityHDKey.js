@@ -1,22 +1,21 @@
 /**
  * Returns a private key for managing an identity
- * @param {string} identityId - Identity ID
+ * @param {number} identityIndex - Identity index
  * @param {number} keyIndex - keyIndex
- * @return {HDPublicKey}
+ * @return {HDPrivateKey}
  */
-function getIdentityHDKey(identityId, keyIndex = 0) {
+function getIdentityHDKey(identityIndex, keyIndex) {
   const { keyChain, index: accountIndex } = this;
-  const hardenedFeatureRootKey = keyChain.getHardenedDIP9FeaturePath();
+  const hardenedFeatureRootKey = keyChain.getHardenedDIP9FeaturePath('HDPrivateKey');
 
   const identityFeatureKey = hardenedFeatureRootKey.deriveChild(5, true);
 
   return identityFeatureKey
     .deriveChild(accountIndex, true)
-  // In dpp 12.0, Identity.Types has been removed. However indexing was starting by USER:1
-  // kept for retro-compatibility with previous usage
-  // TODO: To be changed when changes associated with derivation are specified in a DIP.
-    .deriveChild(1, false)
-    .deriveChild(keyIndex, false);
+    // ECDSA key type
+    .deriveChild(0, true)
+    .deriveChild(identityIndex, false)
+    .deriveChild(keyIndex, true);
 }
 
 module.exports = getIdentityHDKey;
