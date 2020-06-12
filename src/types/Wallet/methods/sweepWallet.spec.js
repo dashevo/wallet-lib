@@ -8,7 +8,7 @@ const paperWallet = {
   privateKey: 'XE6ZTNwkjyuryGho75fAfCBBtL8rMy9ttLq1ANLF1TmMo2zwZXHq',
 };
 
-describe.only('Wallet - sweepWallet', function suite() {
+describe('Wallet - sweepWallet', function suite() {
   this.timeout(60000);
   let emptyWallet;
   let emptyAccount;

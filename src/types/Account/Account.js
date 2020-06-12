@@ -227,7 +227,7 @@ Account.prototype.sign = require('./methods/sign');
 Account.prototype.hasPlugins = require('./methods/hasPlugins');
 
 Account.prototype.getIdentityHDKey = require('./methods/getIdentityHDKey');
-Account.prototype.getIdentityHDKeyByIndex = Account.prototype.getIdentityHDKey;
+Account.prototype.getIdentityHDKeyByIndex = require('./methods/getIdentityHDKey');
 Account.prototype.getIdentityIds = require('./methods/getIdentityIds');
 Account.prototype.getIdentityHDKeyById = require('./methods/getIdentityHDKeyById');
 Account.prototype.getUnusedIdentityIndex = require('./methods/getUnusedIdentityIndex');
