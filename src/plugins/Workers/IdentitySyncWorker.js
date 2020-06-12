@@ -16,8 +16,8 @@ class IdentitySyncWorker extends Worker {
       dependencies: [
         'storage',
         'transporter',
-        'getIdentityHDKeyByIndex',
         'walletId',
+        'getIdentityHDKeyByIndex',
       ],
       ...options,
     });
@@ -35,8 +35,6 @@ class IdentitySyncWorker extends Worker {
 
       unusedIndices.push(index);
     });
-
-    unusedIndices.push(indexedIds.length);
 
     logger.silly('IdentitySyncWorker - sync start');
 
