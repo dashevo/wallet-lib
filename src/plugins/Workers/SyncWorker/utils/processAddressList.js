@@ -2,7 +2,7 @@ const _ = require('lodash');
 const fetchAddressTransactions = require('./fetchAddressTransactions');
 const TransactionOrderer = require('./TransactionOrderer/TransactionOrderer');
 
-module.exports = async function processAddressList(addressList){
+module.exports = async function processAddressList(addressList) {
   const { transporter, storage } = this;
 
   const boundFetchAddressTransactions = _.bind(fetchAddressTransactions, null, _, transporter);
@@ -20,4 +20,4 @@ module.exports = async function processAddressList(addressList){
   const importPromises = ordered.transactions.map(boundImportTransaction);
 
   await Promise.all(importPromises);
-}
+};
