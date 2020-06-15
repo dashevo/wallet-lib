@@ -48,7 +48,7 @@ const importTransaction = function importTransaction(transaction) {
           addressObject.transactions.push(transaction.hash);
           hasUpdateStorage = true;
         }
-        
+
         // If mark as already procesed on first run, skipping.
         if (processedAddressesForTx.includes(addressObject.address)) {
           return;
@@ -66,12 +66,11 @@ const importTransaction = function importTransaction(transaction) {
         } else {
           const vout = element;
 
-            const utxoKey = `${transaction.hash}-${outputIndex}`;
-            if (!addressObject.utxos[utxoKey]) {
-              addressObject.utxos[utxoKey] = vout;
-              addressObject.balanceSat += vout.satoshis;
-              hasUpdateStorage = true;
-            }
+          const utxoKey = `${transaction.hash}-${outputIndex}`;
+          if (!addressObject.utxos[utxoKey]) {
+            addressObject.utxos[utxoKey] = vout;
+            addressObject.balanceSat += vout.satoshis;
+            hasUpdateStorage = true;
           }
         }
       }
