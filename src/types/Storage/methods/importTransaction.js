@@ -15,8 +15,9 @@ const importTransaction = function importTransaction(transaction) {
   let hasUpdateStorage = false;
   let outputIndex = -1;
 
-  // If we already had this transaction locally, we won't add it again, but we still need to continue processing it
-  // as we might have new address generated (on BIP44 wallets) since the first checkup.
+  // If we already had this transaction locally, we won't add it again,
+  // but we still need to continue processing it as we might have new
+  // address generated (on BIP44 wallets) since the first checkup.
   if (!transactions[transaction.hash]) {
     transactions[transaction.hash] = transaction;
   }
