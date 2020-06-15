@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const fetchAddressTransactions = require('./fetchAddressTransactions');
 const TransactionOrderer = require('./TransactionOrderer/TransactionOrderer');
 
