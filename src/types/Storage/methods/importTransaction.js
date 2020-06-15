@@ -15,11 +15,11 @@ const importTransaction = function importTransaction(transaction) {
   let hasUpdateStorage = false;
   let outputIndex = -1;
 
-  if (transactions[transaction.hash]) {
-    return;
+  // If we already had this transaction locally, we won't add it again, but we still need to continue processing it
+  // as we might have new address generated (on BIP44 wallets) since the first checkup.
+  if (!transactions[transaction.hash]) {
+    transactions[transaction.hash] = transaction;
   }
-
-  transactions[transaction.hash] = transaction;
 
   [...inputs, ...outputs].forEach((element) => {
     const isOutput = (element instanceof Output);
@@ -36,24 +36,24 @@ const importTransaction = function importTransaction(transaction) {
         if (!addressObject.transactions.includes(transaction.hash)) {
           addressObject.transactions.push(transaction.hash);
           hasUpdateStorage = true;
-        }
-        if (!isOutput) {
-          const vin = element;
-          const utxoKey = `${vin.prevTxId.toString('hex')}-${vin.outputIndex}`;
-          if (addressObject.utxos[utxoKey]) {
-            const previousOutput = addressObject.utxos[utxoKey];
-            addressObject.balanceSat -= previousOutput.satoshis;
-            delete addressObject.utxos[utxoKey];
-            hasUpdateStorage = true;
-          }
-        } else {
-          const vout = element;
+          if (!isOutput) {
+            const vin = element;
+            const utxoKey = `${vin.prevTxId.toString('hex')}-${vin.outputIndex}`;
+            if (addressObject.utxos[utxoKey]) {
+              const previousOutput = addressObject.utxos[utxoKey];
+              addressObject.balanceSat -= previousOutput.satoshis;
+              delete addressObject.utxos[utxoKey];
+              hasUpdateStorage = true;
+            }
+          } else {
+            const vout = element;
 
-          const utxoKey = `${transaction.hash}-${outputIndex}`;
-          if (!addressObject.utxos[utxoKey]) {
-            addressObject.utxos[utxoKey] = vout;
-            addressObject.balanceSat += vout.satoshis;
-            hasUpdateStorage = true;
+            const utxoKey = `${transaction.hash}-${outputIndex}`;
+            if (!addressObject.utxos[utxoKey]) {
+              addressObject.utxos[utxoKey] = vout;
+              addressObject.balanceSat += vout.satoshis;
+              hasUpdateStorage = true;
+            }
           }
         }
       }
