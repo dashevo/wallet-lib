@@ -2,6 +2,7 @@ import {Mnemonic, PrivateKey, HDPublicKey, Strategy, Network, Plugins, AddressIn
 import {Account} from "../Account/Account";
 import {MappedAddress} from "../Storage/Storage";
 import {HDPrivateKey} from "@dashevo/dashcore-lib";
+import {Transporter} from "../../transporters/Transporter";
 
 export declare class Wallet {
     offlineMode: boolean;
@@ -9,6 +10,8 @@ export declare class Wallet {
     injectDefaultPlugins: boolean;
     plugins:[Plugins];
     passphrase?:string;
+    transporter: Transporter;
+
     constructor(options?: Wallet.Options);
     createAccount(accOptions: Account.Options): Promise<Account>;
     disconnect(): void;

@@ -1,5 +1,6 @@
 import {PrivateKey, Network,} from "../types";
 import {HDPrivateKey, HDPublicKey} from "@dashevo/dashcore-lib";
+import {Transaction} from "@dashevo/dashcore-lib/typings/transaction/Transaction";
 
 export declare class KeyChain {
     constructor(options?: KeyChain.Options);
@@ -22,8 +23,7 @@ export declare class KeyChain {
     getKeyForPath(path: string, type?: HDKeyTypesParam): HDKeyTypes;
     getPrivateKey(): HDPrivateKey|PrivateKey;
 
-    // TODO : dashcore-lib miss an implementation definition of crypto.Signature
-    sign(object: any, privateKeys:[any], sigType: object): any;
+    sign(object: Transaction, privateKeys:[any], sigType: number): any;
 
 }
 type HDKeyTypes = HDPublicKey | HDPrivateKey;

@@ -15,6 +15,7 @@ import {
 import { KeyChain } from "../KeyChain/KeyChain";
 import { HDPrivateKey } from "@dashevo/dashcore-lib";
 import { Wallet } from "../../index";
+import {Transporter} from "../../transporters/Transporter";
 
 export declare class Account {
     constructor(wallet: Wallet, options?: Account.Options);
@@ -23,9 +24,13 @@ export declare class Account {
     injectDefaultPlugins?: boolean = true;
     allowSensitiveOperations?: boolean = false;
     debug?: boolean = false;
+    cacheTx?: boolean = true;
+    cacheBlockHeaders?: boolean = true;
+    label?: string = null;
     strategy?: Strategy = simpleTransactionOptimizedAccumulator;
     keyChain: KeyChain;
     state: any;
+    transporter: Transporter;
 
     isReady(): Promise<boolean>;
     isInitialized(): Promise<boolean>;
@@ -51,13 +56,14 @@ export declare class Account {
     getTransactions(): [Transaction];
     getUnusedAddress(type?: AddressType, skip?: number): AddressObj;
     getUTXOS(): [object];
-    injectPlugin(unsafePlugin: Plugins, allowSensitiveOperation: boolean): Promise<boolean>;
-    sign(object?: Transaction, privateKeys?: [PrivateKey], sigType?: string): Transaction;
     updateNetwork(network: Network): boolean;
     getIdentityIds(): string[];
     getIdentityHDKeyById(identityId: string, keyIndex: number): HDPrivateKey;
     getIdentityHDKeyByIndex(identityIndex: number, keyIndex: number): HDPrivateKey;
     getUnusedIdentityIndex(): Promise<number>;
+    hasPlugins([Plugin]): {found:Boolean, results:[{name: string}]};
+    injectPlugin(unsafePlugin: Plugins, allowSensitiveOperation?: boolean, awaitOnInjection?: boolean): Promise<any>;
+    sign(object: Transaction, privateKeys: [PrivateKey], sigType?: string): Transaction;
 }
 
 export declare interface RecipientOptions {
@@ -71,12 +77,17 @@ export declare namespace Account {
         index?: number,
         network?: Network;
         debug?: boolean;
+        label?: string;
         plugins?: [Plugins];
         cacheBlockHeaders?: boolean;
         cacheTx?: boolean;
         allowSensitiveOperations?: boolean;
         injectDefaultPlugins?: boolean;
         strategy?: Strategy;
+        cache?:{
+            transactions?:TransactionsMap,
+            addresses?:WalletObj.addresses
+        }
     }
 
     interface createTransactionOptions {

@@ -77,6 +77,10 @@ export declare type WalletObj = {
     }
 }
 
+export declare type TransactionsMap = {
+    [txid: string]: Transaction
+};
+
 export declare type  AccountMap = {
     [pathName: string]: Account
 }
