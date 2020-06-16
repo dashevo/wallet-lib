@@ -13,11 +13,13 @@ export declare class Wallet {
     transporter: Transporter;
     network: Network;
     walletId: string;
-    accounts: [];
+    accounts: [undefined];
     storage: Storage;
     store: Storage.store;
 
-    constructor(defaultWalletOptions?: Wallet.IWalletOptions);
+    constructor(opts:Wallet.IWalletOptions = Wallet.defaultWalletOptions){
+    };
+
     createAccount(accOptions: Account.Options): Promise<Account>;
     disconnect(): void;
     exportWallet():Mnemonic["toString"];
@@ -32,7 +34,6 @@ export declare class Wallet {
 }
 
 export declare namespace Wallet {
-     // @ts-ignore
     const defaultWalletOptions: Wallet.IWalletOptions = {
         debug: false,
         offlineMode: false,
