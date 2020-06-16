@@ -19,6 +19,7 @@ export declare class Storage {
     autosaveIntervalTime: number;
     network: Network;
     mappedAddress: MappedAddressMap;
+    store: {};
 
     addNewTxToAddress(tx: TransactionInfo, address: AddressObj): boolean;
 
@@ -133,6 +134,9 @@ export declare namespace Storage {
         autosave?: boolean;
         autosaveIntervalTime?: number;
         network?: Network;
+    }
+    interface store {
+
     }
 }
 
