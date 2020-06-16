@@ -6,7 +6,7 @@
 
 - **Breaking changes:**   
     * Previously, the documentation stated a usage on `createTransaction()` with multiples recipients as such: `recipients:[{recipient,satoshis}]`.   
-    However the code where still refering and expecting recipients `recipients:[{address,satoshis}]`.  
+    However, the code where still referring and expecting recipients `recipients:[{address,satoshis}]`.  
     This version fixes that inconsistency. 
      
 # [7.13.2](https://github.com/dashevo/wallet-lib/compare/v7.13.1...v7.13.2) (2020-06-15)
