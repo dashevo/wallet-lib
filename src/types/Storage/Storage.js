@@ -42,7 +42,6 @@ class Storage extends EventEmitter {
   }
 }
 Storage.prototype.addNewTxToAddress = require('./methods/addNewTxToAddress');
-Storage.prototype.addUTXOToAddress = require('./methods/addUTXOToAddress');
 Storage.prototype.announce = require('./methods/announce');
 Storage.prototype.calculateDuffBalance = require('./methods/calculateDuffBalance');
 Storage.prototype.clearAll = require('./methods/clearAll');
@@ -70,5 +69,10 @@ Storage.prototype.updateAddress = require('./methods/updateAddress');
 Storage.prototype.updateTransaction = require('./methods/updateTransaction');
 Storage.prototype.startWorker = require('./methods/startWorker');
 Storage.prototype.stopWorker = require('./methods/stopWorker');
+
+// Identities
+Storage.prototype.insertIdentityIdAtIndex = require('./methods/insertIdentityAtIndex');
+Storage.prototype.getIdentityIdByIndex = require('./methods/getIdentityByIndex');
+Storage.prototype.getIndexedIdentityIds = require('./methods/getIndexedIdentityIds');
 
 module.exports = Storage;

@@ -41,6 +41,7 @@ class Worker extends StandardPlugin {
   }
 
   async startWorker() {
+    let payloadResult = null;
     const self = this;
     try {
       if (this.worker) this.stopWorker();
@@ -49,16 +50,16 @@ class Worker extends StandardPlugin {
 
       if (this.executeOnStart === true) {
         if (this.onStart) {
-          await this.onStart();
+          payloadResult = await this.onStart();
         }
       }
       const eventType = `WORKER/${this.name.toUpperCase()}/STARTED`;
-      this.parentEvents.emit(eventType, { type: eventType, payload: null });
+      this.parentEvents.emit(eventType, { type: eventType, payload: payloadResult });
       this.state.started = true;
 
       if (this.executeOnStart) await this.execWorker();
     } catch (err) {
-      throw new WorkerFailedOnStart(this.name, err.message);
+      throw new WorkerFailedOnStart(this.name, err.message, err);
     }
   }
 
@@ -73,6 +74,7 @@ class Worker extends StandardPlugin {
   }
 
   async execWorker() {
+    let payloadResult = null;
     if (this.isWorkerRunning) {
       return false;
     }
@@ -84,10 +86,10 @@ class Worker extends StandardPlugin {
 
     if (this.execute) {
       try {
-        await this.execute();
+        payloadResult = await this.execute();
       } catch (err) {
         await this.stopWorker();
-        throw new WorkerFailedOnExecute(this.name, err.message);
+        throw new WorkerFailedOnExecute(this.name, err.message, err);
       }
     } else {
       throw new Error(`Worker ${this.name} : Missing execute function`);
@@ -97,7 +99,7 @@ class Worker extends StandardPlugin {
     this.workerPass += 1;
     if (!this.state.ready) this.state.ready = true;
     const eventType = `WORKER/${this.name.toUpperCase()}/EXECUTED`;
-    this.parentEvents.emit(eventType, { type: eventType, payload: null });
+    this.parentEvents.emit(eventType, { type: eventType, payload: payloadResult });
     return true;
   }
 }

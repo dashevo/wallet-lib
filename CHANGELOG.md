@@ -1,3 +1,65 @@
+# [7.13.3](https://github.com/dashevo/wallet-lib/compare/v7.13.2...v7.13.3) (2020-06-16)
+
+- **Fixes:**  
+    * fix!: createTransaction should be checking for 'recipient' instead of 'address' in 'txOpts.recipients' ([#152](https://github.com/dashevo/wallet-lib/pull/152))
+    * fix: transaction hash not present on address ([#151](https://github.com/dashevo/wallet-lib/pull/151))
+
+- **Breaking changes:**   
+    * Previously, the documentation stated a usage on `createTransaction()` with multiples recipients as such: `recipients:[{recipient,satoshis}]`.   
+    However, the code where still referring and expecting recipients `recipients:[{address,satoshis}]`.  
+    This version fixes that inconsistency. 
+     
+# [7.13.2](https://github.com/dashevo/wallet-lib/compare/v7.13.1...v7.13.2) (2020-06-15)
+
+- **Features:**
+    * feature: Worker will now have ability to return a value on onStart and onExecute ([#149](https://github.com/dashevo/wallet-lib/pull/149))
+    
+- **Fixes:**
+    * fix: comportement on new address with existing transaction in store ([#147](https://github.com/dashevo/wallet-lib/pull/147))
+    * fix: SyncUp plugin not awaiting long enough ([#149](https://github.com/dashevo/wallet-lib/pull/149))
+
+# [7.13.1](https://github.com/dashevo/wallet-lib/compare/v7.13.0...v7.13.1) (2020-06-15)
+
+- **Fixes:**
+    * fix(Storage): identityIds being restate to empty array ([#143](https://github.com/dashevo/wallet-lib/pull/143))
+
+# [7.13.0](https://github.com/dashevo/wallet-lib/compare/v7.1.4...v7.13.0) (2020-06-13)
+
+- **Feat:**
+    * sync of identities associated with wallet ([#142](https://github.com/dashevo/wallet-lib/pull/142))
+
+- **Breaking changes:**
+    * `Account#getIdentityHDKey` is removed in favor of `Account#getIdentityHDKeyByIndex(identityIndex, keyIndex)`
+    * `debug` option temporary disabled
+
+# [7.1.4](https://github.com/dashevo/wallet-lib/compare/v7.1.3...v7.1.4) (2020-06-11)
+    
+- **Builds, Tests:**
+    - test: create a new wallet in functional tests (#140)
+    - build: simplify distributive and Travis CI builds (#139)
+
+# [7.1.3](https://github.com/dashevo/wallet-lib/compare/v7.1.2...v7.1.3) (2020-06-10)
+    
+- **Chore:**
+    - chore: Update dashcore-lib version (#138)
+
+# [7.1.2](https://github.com/dashevo/wallet-lib/compare/v7.1.1...v7.1.2) (2020-06-10)
+    
+- **Feat:**
+    - feat: TransactionOrderer (#136)
+
+# [7.1.1](https://github.com/dashevo/wallet-lib/compare/v7.1.0...v7.1.1) (2020-06-03)
+    
+- **Fixes:**
+    - fix: broadcastTransaction not throwing an error when a transaction wasn't broadcasted (#133)
+    - fix: internal UTXO on Output format and getUTXO returning UnspentOutput + refactor initial sync up (#135)
+
+# [7.1.0](https://github.com/dashevo/wallet-lib/compare/v7.0.0...v7.1.0) (2020-06-03)
+    
+- **Fixes:**
+    - fix: unavailable previous transactions history (#131)
+    - fix: transporter.resolve to extend passed options (#130)
+
 # [7.0.0](https://github.com/dashevo/wallet-lib/compare/v6.1.2...v7.0.0) (2020-06-01)
 
 - **Impr:**
