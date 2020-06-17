@@ -10,12 +10,14 @@ import {
     PrivateKey,
     Strategy,
     Network,
-    Plugins
+    Plugins, RawTransaction, StatusInfo
 } from "../types";
 import { KeyChain } from "../KeyChain/KeyChain";
 import { HDPrivateKey } from "@dashevo/dashcore-lib";
 import { Wallet } from "../../index";
 import {Transporter} from "../../transporters/Transporter";
+import {BlockHeader} from "@dashevo/dashcore-lib/typings/block/BlockHeader";
+import {UnspentOutput} from "@dashevo/dashcore-lib/typings/transaction/UnspentOutput";
 
 export declare class Account {
     constructor(wallet: Wallet, options?: Account.Options);
@@ -34,36 +36,39 @@ export declare class Account {
 
     isReady(): Promise<boolean>;
     isInitialized(): Promise<boolean>;
-    broadcastTransaction(rawtx: string, isIS?: boolean): Promise<transactionId>;
+    getBIP44Path(network?: Network, index?: number): string;
+    getNetwork(): Network;
+
+    broadcastTransaction(rawtx: Transaction|RawTransaction): Promise<transactionId>;
     connect(): boolean;
     createTransaction(opts: Account.createTransactionOptions): Transaction;
-    disconnect(): boolean;
-    fetchAddressInfo(addresObj: AddressObj, fetchUtxo?: boolean): Promise<AddressInfo | false>;
-    fetchStatus(): Promise<object | false>
+    decode(method: string, data: any): any;
+    decrypt(method: string, data: any, secret: string, [encoding=CryptoJS.enc.Utf8]: "hex"|string): string;
+    disconnect(): Promise<Boolean>;
+    fetchAddressInfo(addresObj: AddressObj, [fetchUtxo=true]: boolean): Promise<AddressInfo | false>;
+    fetchStatus(): Promise<StatusInfo|{blocks:number}>
     forceRefreshAccount(): boolean;
     generateAddress(path: string): AddressObj;
     getAddress(index: number, _type: AddressType): AddressObj;
-    getAddresses(rawtx: string, isIS: boolean): [AddressObj];
-    getTotalBalance(displayDuffs?: boolean): number;
+    getAddresses(_type: AddressType): [AddressObj];
+    getBlockHeader(identifier: string|number):Promise<BlockHeader>
     getConfirmedBalance(displayDuffs?: boolean): number;
-    getUnconfirmedBalance(displayDuffs?: boolean): number;
-    getBIP44Path(network?: Network, index?: number): string;
-    getNetwork(): Network;
-    getPlugin(name: string): object;
-    getPrivateKeys(addressList: [PublicAddress]): [PrivateKey];
-    getTransaction(txid: transactionId): Transaction;
-    getTransactionHistory(): [object];
-    getTransactions(): [Transaction];
-    getUnusedAddress(type?: AddressType, skip?: number): AddressObj;
-    getUTXOS(): [object];
-    updateNetwork(network: Network): boolean;
-    getIdentityIds(): string[];
     getIdentityHDKeyById(identityId: string, keyIndex: number): HDPrivateKey;
     getIdentityHDKeyByIndex(identityIndex: number, keyIndex: number): HDPrivateKey;
+    getIdentityIds(): string[];
+    getPlugin(name: string): Object;
+    getPrivateKeys(addressList: [PublicAddress]): [PrivateKey];
+    getTotalBalance(displayDuffs?: boolean): number;
+    getTransaction(txid: transactionId): Transaction;
+    getTransactions(): [Transaction];
+    getUTXOS(): [UnspentOutput];
+    getUnconfirmedBalance(displayDuffs?: boolean): number;
+    getUnusedAddress(type?: AddressType, skip?: number): AddressObj;
     getUnusedIdentityIndex(): Promise<number>;
+    getWorker(workerName: string): Object;
     hasPlugins([Plugin]): {found:Boolean, results:[{name: string}]};
     injectPlugin(unsafePlugin: Plugins, allowSensitiveOperation?: boolean, awaitOnInjection?: boolean): Promise<any>;
-    sign(object: Transaction, privateKeys: [PrivateKey], sigType?: string): Transaction;
+    sign(object: Transaction, privateKeys: [PrivateKey], sigType?: number): Transaction;
 }
 
 export declare interface RecipientOptions {

@@ -19,6 +19,7 @@ export declare type Seed<T extends object = object> = T & {
 export declare type Transaction<T extends object = object> = T & {
     toString(): string;
 };
+export declare type RawTransaction = string;
 export declare type TransactionInfo<T extends object = object> = T & {
     txid:string;
     blockhash:string;
@@ -45,8 +46,24 @@ export declare type AddressObj<T extends object = object> = T & {
 export declare type AddressInfoMap<T extends object = object> = T & {
     [pathName: string]: AddressInfo
 }
+export declare type StatusInfo<T extends object = object> = T & {
+    coreVersion: number;
+    protocolVersion: number;
+    blocks: number;
+    timeOffset: number;
+    connections: number;
+    proxy: string;
+    difficulty: number;
+    testnet: false;
+    relayFee: number;
+    errors: string;
+    network: Network
+}
 export declare type AddressInfo<T extends AddressObj = AddressObj> = T & {
+    path: string;
+    address: string;
     balanceSat: number;
+    index: number;
     fetchedLast:number;
     unconfirmedBalanceSat: number;
     transaction: object;

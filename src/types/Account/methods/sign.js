@@ -1,7 +1,7 @@
 /**
  * To any object passed (Transaction, ST,..), will try to sign the message given passed keys.
  * @param {Transaction} object - The object to sign
- * @param {[Transaction]} privateKeys - A set of private keys to sign the inputs with
+ * @param {[PrivateKey]} privateKeys - A set of private keys to sign the inputs with
  * @param {number} [sigType] - a valid signature value (Dashcore.Signature)
  * @return {Transaction} transaction - the signed transaction
  */
