@@ -72,7 +72,7 @@ Storage.prototype.stopWorker = require('./methods/stopWorker');
 
 // Identities
 Storage.prototype.insertIdentityIdAtIndex = require('./methods/insertIdentityAtIndex');
-Storage.prototype.getIdentityIdByIndex = require('./methods/getIdentityByIndex');
+Storage.prototype.getIdentityIdByIndex = require('./methods/getIdentityIdByIndex');
 Storage.prototype.getIndexedIdentityIds = require('./methods/getIndexedIdentityIds');
 
 module.exports = Storage;
