@@ -30,6 +30,7 @@ class DAPIClientWrapper extends BaseTransporter {
       // This allows to not have dapi-client shipped by default.
       // eslint-disable-next-line global-require,import/no-extraneous-dependencies
       const Client = require('@dashevo/dapi-client');
+      this.network = props.network || 'testnet';
       this.client = new Client({ ...defaultDAPIOpts, ...props });
     } catch (err) {
       if (!err.message || !err.message.includes("Cannot find module '@dashevo/dapi-client'")) {
@@ -60,5 +61,6 @@ DAPIClientWrapper.prototype.subscribeToAddressesTransactions = require('./method
 DAPIClientWrapper.prototype.subscribeToBlockHeaders = require('./methods/subscribeToBlockHeaders');
 DAPIClientWrapper.prototype.subscribeToBlocks = require('./methods/subscribeToBlocks');
 DAPIClientWrapper.prototype.getIdentityIdByFirstPublicKey = require('./methods/getIdentityIdByFirstPublicKey');
+DAPIClientWrapper.prototype.subscribeToTransactionsWithProofs = require('./methods/subscribeToTransactionsWithProofs');
 
 module.exports = DAPIClientWrapper;
