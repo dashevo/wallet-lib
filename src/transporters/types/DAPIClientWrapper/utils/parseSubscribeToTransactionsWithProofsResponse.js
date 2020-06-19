@@ -18,7 +18,7 @@ const parseSubscribeToTransactionsWithProofsResponse = async (
   const transactions = response.getRawTransactions();
   if (merkleBlockBuffer) {
     const merkleBlock = new MerkleBlock(Buffer.from(merkleBlockBuffer));
-    const prevHash = merkleBlock.header.prevHash.reverse().toString('hex')
+    const prevHash = merkleBlock.header.prevHash.reverse().toString('hex');
     logger.silly('prevHash', prevHash);
     // const currentHeight = await getHeightFromMerkleBlockBuffer(self, merkleBlockBuffer);
     // logger.silly(`DAPIClient.subscribeToTransactionWithProofs[${currentHeight}/${props.currentTipHeight}]`);
