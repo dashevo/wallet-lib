@@ -6,8 +6,6 @@ const {
   is,
 } = require('../../utils');
 
-const transporters = require('../../transporters');
-
 const defaultOptions = {
   debug: false,
   offlineMode: false,
@@ -24,6 +22,8 @@ const fromSeed = require('./methods/fromSeed');
 const fromHDPublicKey = require('./methods/fromHDPublicKey');
 const fromHDPrivateKey = require('./methods/fromHDPrivateKey');
 const generateNewWalletId = require('./methods/generateNewWalletId');
+
+const createTransportFromOptions = require('../../transport/createTransportFromOptions');
 
 /**
  * Instantiate a basic Wallet object,
@@ -110,11 +110,11 @@ class Wallet {
         this.storage.importAddresses(opts.cache.addresses, this.walletId);
       }
     }
-    if (this.offlineMode) {
-      this.transporter = { isValid: false };
-    } else {
-      this.transporter = transporters.resolve(opts.transporter);
+
+    if (!this.offlineMode) {
+      this.transport = createTransportFromOptions(opts.transport);
     }
+
     this.accounts = [];
     this.interface = opts.interface;
     this.savedBackup = false; // TODO: When true, we delete mnemonic from internals
