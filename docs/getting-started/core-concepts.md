@@ -14,7 +14,7 @@ In order to access your UTXO, you will have to provide a valid mnemonic that wil
 
 Since the introduction of [deterministic wallet](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki), a Wallet is actually composed of multiple account. 
 
-For manipulation account, `Wallet.getAccount()` takes an optional (default: 0) account Id. 
+For manipulating multiple accounts, `Wallet.getAccount()` takes optional [options](/wallet/getAccount.md) where index allow to either access or create a specific account index. 
 
 ## Instantiation types
 
