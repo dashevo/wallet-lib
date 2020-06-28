@@ -60,6 +60,14 @@ const wallet = new Wallet({
 })
 ```
 
+### Creation from HDPrivateKey 
+
+```js
+const wallet = new Wallet({
+  HDPublicKey: 'tpubDEB6BgW9JvZRWVbFmwwGuJ2vifakABuxQWdY9yXbFC2rc3zagie1RkhwUEnahb1dzaapchEVeKqKcx99TzkjNvjXcmoQkLJwsYnA1J5bGNj'
+})
+```
+
 ### Creation from Seed 
 
 ```js
