@@ -36,10 +36,14 @@ const opts = {
   mnemonic: "arena light cheap control apple buffalo indicate rare motor valid accident isolate",
 };
 const wallet = new Wallet(opts);
-wallet.getAccount()
-    .then((account)=>{
-        console.log('Account ready to be used')
-    });
+wallet.getAccount().then((account) => {
+  // At this point, account has fetch all UTXOs if they exists
+  const balance = account.getTotalBalance();
+  console.log(`Balance: ${balance}`);
+
+  // We easily can get a new address to fund
+  const { address } = account.getUnusedAddress();
+});
 ```
 
 In above code, we did not specify any `transport` instance, which by default, is equivalent to using DAPI as a transporter; The `adapter` being not set, we will use by default an in-memory (without persistance) adapter.    
@@ -64,9 +68,7 @@ const options = {
   recipient:'yLptqWxjgTxtwKJuLHoGY222NnoeqYuN8h',
   satoshis:100000
 };
-account
-  .createTransaction(options)
-  .then((tx)=> console.log(tx));
+const transaction = account.createTransaction(options)
 ```
 
 ## Broadcast the transaction 
@@ -77,7 +79,7 @@ const txid = await account.broadcastTransaction(transaction);
 
 ## Some rules of thumb
 
-- There is multiple event listeners(socker sync,...), running intervals (service worker,...),
+- There is multiple event listeners (socket sync,...), running intervals (service worker,...),
 therefore a good way to quit an instance would be to call `account.disconnect()` which will care to
 call `clearWorker(), closeSocket()` of the differents elements. You can still decide to remove them by hand if you want.
 - Some classic examples of usage can be seen here : [Examples](/usage/examples.md)
