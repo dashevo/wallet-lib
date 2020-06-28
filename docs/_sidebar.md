@@ -75,6 +75,7 @@
         - [`.startWorker()`](storage/startWorker.md)
         - [`.stopWorker()`](storage/stopWorker.md)
         - [`.stopWorker()`](storage/stopWorker.md)
+        - [`.updateTransaction()`](storage/updateTransaction.md)
     - Events
         - [`ready`](events/ready.md)
         - [`FETCHED/UNCONFIRMED_TRANSACTION`](events/fetched_unconfirmed_transaction.md)
