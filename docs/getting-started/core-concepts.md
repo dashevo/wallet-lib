@@ -25,3 +25,4 @@ In some other cases, you might want to instantiate Wallet from another input suc
 - `privateKey`: This allow to manage a single privateKey/publicKey set. Therefore, you will only have a single unique address to receive money. 
 - `HDPublicKey`: This allow a "watch-only" mode. You won't be able to spend anything, but this will allow you to track and monitor in real-time the addresses set of this public key. Use-case might be to always pay to another new 
 
+[Learn more about instantiation documentation](/wallet/Wallet.md)
