@@ -70,6 +70,7 @@
         - [`.saveState()`](storage/saveState.md)
         - [`.searchAddress()`](storage/searchAddress.md)
         - [`.searchAddressesWithTx()`](storage/searchAddressesWithTx.md)
+        - [`.searchBlockHeader()`](storage/searchBlockHeader.md)
         - [`.searchTransaction()`](storage/searchTransaction.md)
         - [`.searchWallet()`](storage/searchWallet.md)
         - [`.startWorker()`](storage/startWorker.md)
