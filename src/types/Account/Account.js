@@ -35,7 +35,7 @@ const defaultOptions = {
   plugins: [],
   injectDefaultPlugins: true,
   debug: false,
-  strategy: simpleDescendingAccumulator(),
+  strategy: simpleDescendingAccumulator,
 };
 
 /* eslint-disable no-underscore-dangle */
