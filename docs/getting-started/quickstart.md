@@ -79,7 +79,7 @@ const txid = await account.broadcastTransaction(transaction);
 
 ## Some rules of thumb
 
-- There is multiple event listeners (socket sync,...), running intervals (service worker,...),
+- There are multiple event listeners (socket sync,...), running intervals (service worker,...),
 therefore a good way to quit an instance would be to call `account.disconnect()` which will care to
 call `clearWorker(), closeSocket()` of the differents elements. You can still decide to remove them by hand if you want.
 - Some classic examples of usage can be seen here : [Examples](/usage/examples.md)
