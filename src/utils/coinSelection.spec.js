@@ -331,7 +331,7 @@ describe('Utils - coinSelection', function suite() {
 
       while(inputValue<outputValue){
         if(copiedUtxos.length === 0){
-          throw new Error('Not enought utxo');
+          throw new Error('Not enought UTXOs');
         }
         // Take a random item and add it to selection
         const utxo = copiedUtxos.splice(Math.floor(Math.random() * copiedUtxos.length),1)[0];
