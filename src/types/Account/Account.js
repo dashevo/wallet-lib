@@ -5,7 +5,7 @@ const { WALLET_TYPES } = require('../../CONSTANTS');
 const { is } = require('../../utils');
 const EVENTS = require('../../EVENTS');
 const Wallet = require('../Wallet/Wallet.js');
-const { simpleTransactionOptimizedAccumulator } = require('../../utils/coinSelections/strategies');
+const { simpleDescendingAccumulator } = require('../../utils/coinSelections/strategies');
 
 function getNextUnusedAccountIndexForWallet(wallet) {
   if (wallet && wallet.accounts) {
@@ -35,7 +35,7 @@ const defaultOptions = {
   plugins: [],
   injectDefaultPlugins: true,
   debug: false,
-  strategy: simpleTransactionOptimizedAccumulator,
+  strategy: simpleDescendingAccumulator,
 };
 
 /* eslint-disable no-underscore-dangle */
@@ -84,9 +84,16 @@ class Account extends EventEmitter {
     this.storage = wallet.storage;
 
     // Forward all storage event
-    this.storage.on('**', (ev) => {
-      this.emit(ev.type, ev);
-    });
+    this.storage.on(EVENTS.CONFIGURED, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.REHYDRATE_STATE_FAILED, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.REHYDRATE_STATE_SUCCESS, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.FETCHED_CONFIRMED_TRANSACTION, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.UNCONFIRMED_BALANCE_CHANGED, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.CONFIRMED_BALANCE_CHANGED, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.BLOCKHEADER, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.BLOCKHEIGHT_CHANGED, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.BLOCK, (ev) => this.emit(ev.type, ev));
+
     if (this.debug) {
       this.emit = (...args) => {
         const { type } = args[1];
