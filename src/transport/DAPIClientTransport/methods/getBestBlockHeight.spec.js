@@ -25,7 +25,7 @@ describe('transports - DAPIClientTransport - .getBestBlockHeight', function suit
     transport.disconnect();
   })
 
-  it('should works', async () => {
+  it('should work', async () => {
     const res = await transport.getBestBlockHeight();
 
     expect(res).to.deep.equal(fixture.blocks);

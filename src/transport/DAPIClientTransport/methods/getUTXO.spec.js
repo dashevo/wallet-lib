@@ -37,7 +37,7 @@ describe('transports - DAPIClientTransport - .getUTXO', function suite() {
     transport.disconnect();
   })
 
-  it('should works', async () => {
+  it('should work', async () => {
     const res = await transport.getUTXO('yYpSw2n2TRzoQaUShNsPo541z4bz4EJkGN');
 
     expect(res).to.deep.equal(fixture.items);

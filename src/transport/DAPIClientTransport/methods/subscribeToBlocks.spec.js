@@ -41,7 +41,7 @@ describe('transports - DAPIClientTransport - .subscribeToBlocks', function suite
     transport.disconnect();
   })
 
-  it('should works', async () => new Promise(async (resolve, reject) => {
+  it('should work', async () => new Promise(async (resolve, reject) => {
     transport.on(EVENTS.BLOCK, (ev) => {
       expect(ev.type).to.equal(EVENTS.BLOCK);
       blockAnnounced.push(ev.payload);

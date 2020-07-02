@@ -46,7 +46,7 @@ describe('transports - DAPIClientTransport - .getBestBlockHeader', function suit
     transport.disconnect();
   })
 
-  it('should works', async () => {
+  it('should work', async () => {
     const res = await transport.getBestBlockHeader();
 
     expect(res).to.deep.equal(new Block(block).header);

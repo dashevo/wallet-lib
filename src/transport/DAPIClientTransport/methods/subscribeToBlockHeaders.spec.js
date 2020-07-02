@@ -42,7 +42,7 @@ describe('transports - DAPIClientTransport - .subscribeToBlockHeaders', function
     transport.disconnect();
   })
 
-  it('should works', async () => new Promise(async (resolve, reject) => {
+  it('should work', async () => new Promise(async (resolve, reject) => {
     transport.on(EVENTS.BLOCKHEADER, (ev) => {
       expect(ev.type).to.equal(EVENTS.BLOCKHEADER);
       blockHeaderAnnounced.push(ev.payload);

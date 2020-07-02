@@ -23,7 +23,7 @@ describe('transports - DAPIClientTransport - .getBlockByHeight', function suite(
     transport.disconnect();
   })
 
-  it('should works', async () => {
+  it('should work', async () => {
     const res = await transport.getBlockByHeight(6200);
 
     expect(res.hash).to.equal('000000c33ad38337e9bf648842f3cc08b146739d561ce468bd373ee815595436');

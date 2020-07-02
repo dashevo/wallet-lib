@@ -23,7 +23,7 @@ describe('transports - DAPIClientTransport - .getBestBlockHash', function suite(
     transport.disconnect();
   })
 
-  it('should works', async () => {
+  it('should work', async () => {
     const res = await transport.getBestBlockHash();
 
     expect(res).to.deep.equal(fixture);

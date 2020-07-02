@@ -23,7 +23,7 @@ describe('transports - DAPIClientTransport .getTransaction', function suite() {
     transport.disconnect();
   })
 
-  it('should works', async () => {
+  it('should work', async () => {
     const res = await transport.getTransaction('2c0ee853b91b23d881f96f0128bbb5ebb90c9ef7e7bdb4eda360b0e5abf97239');
 
     expect(res.hash).to.equal('2c0ee853b91b23d881f96f0128bbb5ebb90c9ef7e7bdb4eda360b0e5abf97239');

@@ -23,7 +23,7 @@ describe('transports - DAPIClientTransport - .getBlockByHash', function suite() 
     transport.disconnect();
   })
 
-  it('should works', async () => {
+  it('should work', async () => {
     const res = await transport.getBlockByHash('0000025d24ebe65454bd51a61bab94095a6ad1df996be387e31495f764d8e2d9');
 
     expect(res.hash).to.equal('0000025d24ebe65454bd51a61bab94095a6ad1df996be387e31495f764d8e2d9');
