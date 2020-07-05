@@ -29,7 +29,7 @@ const tx = account.createTransaction({recipients, change});
 
 By default, wallet-lib is shipped with two different strategies : 
 
-- **simpleDescendingStrategy** : Will try to use as much small inputs as possible up to meeting the necessary amount required.  
+- **simpleDescendingStrategy** : Will try to use as many small inputs as possible to meet the amount required.  
     Allow fee to be optimized for the smallest size at the cost of breaking big inputs in smaller size.
 - **simpleAscendingStrategy** : Will try to use as much small inputs as possible up to meeting the necessary amount required.  
     Allow to get rid of many small inputs at the cost of potential bigger fee.
