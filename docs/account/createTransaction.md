@@ -44,7 +44,7 @@ const specialStrategy = (utxosList, outputsList, deductFee = false, feeCategory 
 };
 const txOpts1 = {
      recipient, satoshis,
-     strategy: 'simpleAscensingStrategy',
+     strategy: 'simpleAscendingStrategy',
 };
 const txOpts2 = {
      recipient, satoshis,
@@ -53,4 +53,3 @@ const txOpts2 = {
 const tx1 = account.createTransaction(txOpts1);
 const tx2 = account.createTransaction(txOpts2);
 ```
-
