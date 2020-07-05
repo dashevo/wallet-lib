@@ -15,9 +15,10 @@ import {
 import { KeyChain } from "../KeyChain/KeyChain";
 import { HDPrivateKey } from "@dashevo/dashcore-lib";
 import { Wallet } from "../../index";
-import {Transporter} from "../../transporters/Transporter";
-import {BlockHeader} from "@dashevo/dashcore-lib/typings/block/BlockHeader";
-import {UnspentOutput} from "@dashevo/dashcore-lib/typings/transaction/UnspentOutput";
+import { Transporter } from "../../transporters/Transporter";
+import { BlockHeader } from "@dashevo/dashcore-lib/typings/block/BlockHeader";
+import { UnspentOutput } from "@dashevo/dashcore-lib/typings/transaction/UnspentOutput";
+import { Storage } from "../Storage/Storage";
 
 export declare class Account {
     constructor(wallet: Wallet, options?: Account.Options);
@@ -32,6 +33,9 @@ export declare class Account {
     strategy?: Strategy = simpleTransactionOptimizedAccumulator;
     keyChain: KeyChain;
     state: any;
+    storage: Storage;
+    store: Storage.store;
+    walletId: string;
     transporter: Transporter;
 
     isReady(): Promise<boolean>;
