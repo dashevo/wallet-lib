@@ -1,16 +1,14 @@
 import {
-    Mnemonic,
     Transaction,
     AddressObj,
     AddressInfo,
     AddressType,
     transactionId,
-    TransactionInfo,
     PublicAddress,
     PrivateKey,
     Strategy,
     Network,
-    Plugins, RawTransaction, StatusInfo
+    Plugins, RawTransaction, StatusInfo, TransactionsMap, WalletObj
 } from "../types";
 import { KeyChain } from "../KeyChain/KeyChain";
 import { HDPrivateKey } from "@dashevo/dashcore-lib";
@@ -24,13 +22,13 @@ export declare class Account {
     constructor(wallet: Wallet, options?: Account.Options);
 
     index: number;
-    injectDefaultPlugins?: boolean = true;
-    allowSensitiveOperations?: boolean = false;
-    debug?: boolean = false;
-    cacheTx?: boolean = true;
-    cacheBlockHeaders?: boolean = true;
-    label?: string = null;
-    strategy?: Strategy = simpleTransactionOptimizedAccumulator;
+    injectDefaultPlugins?: boolean;
+    allowSensitiveOperations?: boolean;
+    debug?: boolean;
+    cacheTx?: boolean;
+    cacheBlockHeaders?: boolean;
+    label?: string | null;
+    strategy?: Strategy;
     keyChain: KeyChain;
     state: any;
     storage: Storage;
@@ -47,9 +45,9 @@ export declare class Account {
     connect(): boolean;
     createTransaction(opts: Account.createTransactionOptions): Transaction;
     decode(method: string, data: any): any;
-    decrypt(method: string, data: any, secret: string, [encoding=CryptoJS.enc.Utf8]: "hex"|string): string;
+    decrypt(method: string, data: any, secret: string, encoding: "hex"|string): string;
     disconnect(): Promise<Boolean>;
-    fetchAddressInfo(addresObj: AddressObj, [fetchUtxo=true]: boolean): Promise<AddressInfo | false>;
+    fetchAddressInfo(addresObj: AddressObj, fetchUtxo: boolean): Promise<AddressInfo | false>;
     fetchStatus(): Promise<StatusInfo|{blocks:number}>
     forceRefreshAccount(): boolean;
     generateAddress(path: string): AddressObj;
@@ -95,7 +93,7 @@ export declare namespace Account {
         strategy?: Strategy;
         cache?:{
             transactions?:TransactionsMap,
-            addresses?:WalletObj.addresses
+            addresses?:WalletObj["addresses"]
         }
     }
 

@@ -17,8 +17,7 @@ export declare class Wallet {
     storage: Storage;
     store: Storage.store;
 
-    constructor(opts:Wallet.IWalletOptions = Wallet.defaultWalletOptions){
-    };
+    constructor(opts:Wallet.IWalletOptions)
 
     createAccount(accOptions: Account.Options): Promise<Account>;
     disconnect(): void;
@@ -34,23 +33,13 @@ export declare class Wallet {
 }
 
 export declare namespace Wallet {
-    const defaultWalletOptions: Wallet.IWalletOptions = {
-        debug: false,
-        offlineMode: false,
-        network: 'testnet',
-        plugins: [],
-        passphrase: null,
-        transporter: undefined,
-        injectDefaultPlugins: true,
-        allowSensitiveOperations: false,
-    };
     interface IWalletOptions {
         offlineMode?: boolean;
         debug?: boolean;
         transporter?: string|object|any;
         network?: Network;
         plugins?: undefined[]|[Plugins];
-        passphrase?: string;
+        passphrase?: string|null;
         injectDefaultPlugins?: boolean;
         allowSensitiveOperations?: boolean;
         mnemonic?: Mnemonic|string|null;

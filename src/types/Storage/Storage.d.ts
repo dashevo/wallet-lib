@@ -6,9 +6,9 @@ import {
     TransactionInfo,
     WalletObj, WalletType
 } from "../types";
-import {BlockHeader} from "@dashevo/dashcore-lib";
-import {CONSTANTS} from "../..";
-import {Transaction} from "@dashevo/dashcore-lib/typings/transaction/Transaction";
+import { BlockHeader } from "@dashevo/dashcore-lib";
+import { Account } from "../..";
+import { Transaction } from "@dashevo/dashcore-lib/typings/transaction/Transaction";
 
 export declare namespace Storage {
     interface IStorageOptions {
@@ -17,12 +17,6 @@ export declare namespace Storage {
         autosaveIntervalTime?: number;
         network?: Network;
     }
-    const defaultStorageOptions: Storage.IStorageOptions = {
-        rehydrate: true,
-        autosave: true,
-        autosaveIntervalTime: CONSTANTS.STORAGE.autosaveIntervalTime,
-        network: 'testnet',
-    };
     interface store {
         wallets: {},
         transactions: {},
@@ -32,7 +26,7 @@ export declare namespace Storage {
 
 
 export declare class Storage {
-    constructor(options?: Storage.IStorageOptions = Storage.defaultStorageOptions);
+    constructor(options?: Storage.IStorageOptions);
     store: {};
     rehydrate: boolean;
     autosave: boolean;

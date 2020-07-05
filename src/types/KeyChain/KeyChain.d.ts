@@ -3,10 +3,6 @@ import {HDPrivateKey, HDPublicKey} from "@dashevo/dashcore-lib";
 import {Transaction} from "@dashevo/dashcore-lib/typings/transaction/Transaction";
 
 export declare namespace KeyChain {
-    const defaultKeyChainOptions: KeyChain.IKeyChainOptions = {
-        network: 'testnet',
-        keys: {}
-    };
     interface IKeyChainOptions {
         network?: Network;
         keys?: [Keys]
@@ -14,7 +10,7 @@ export declare namespace KeyChain {
 }
 
 export declare class KeyChain {
-    constructor(options?: KeyChain.IKeyChainOptions = KeyChain.defaultKeyChainOptions);
+    constructor(options?: KeyChain.IKeyChainOptions);
     network: Network;
     keys: [Keys];
 
