@@ -14,7 +14,7 @@ From being able to display an account balance, to paying to another address, pas
 
 Wallet-lib allows you to easily work with Wallets/Accounts for HDWallets, or from just a single private key.  
 It also allows you to monitor public keys and HDPubKey.  
-You might also wish to have your own set of plugins or your own coin selection logic.  
+You might also wish to create your own set of plugins or your own coin selection logic.  
 
 ### Install
 
