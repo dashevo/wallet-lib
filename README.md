@@ -46,7 +46,7 @@ const wallet = new Wallet({adapter: localforage});
 
 In your file, where you want to execute it :
 
-```
+```js
 const { Wallet, EVENTS } = require('@dashevo/wallet-lib');
 
 const wallet = new Wallet();
