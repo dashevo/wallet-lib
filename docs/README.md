@@ -1,7 +1,9 @@
 ## Wallet-lib
 
-[![Package Version](https://img.shields.io/github/package-json/v/dashevo/wallet-lib.svg?&style=flat-square)](https://www.npmjs.org/package/@dashevo/wallet-lib)
-[![Build Status](https://img.shields.io/travis/com/dashevo/wallet-lib.svg?branch=master&style=flat-square)](https://travis-ci.com/dashevo/wallet-lib)
+[![NPM Version](https://img.shields.io/npm/v/@dashevo/wallet-lib)](https://www.npmjs.com/package/@dashevo/wallet-lib)
+[![Build Status](https://travis-ci.com/dashevo/wallet-lib.svg?branch=master)](https://travis-ci.com/dashevo/wallet-lib)
+[![Release Date](https://img.shields.io/github/release-date/dashevo/wallet-lib)](https://github.com/dashevo/wallet-lib/releases/latest)
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen)](https://github.com/RichardLitt/standard-readme)
 
 > A pure and extensible JavaScript Wallet Library for Dash
 
