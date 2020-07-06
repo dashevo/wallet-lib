@@ -3,19 +3,20 @@
 [![Package Version](https://img.shields.io/github/package-json/v/dashevo/wallet-lib.svg?&style=flat-square)](https://www.npmjs.org/package/@dashevo/wallet-lib)
 [![Build Status](https://img.shields.io/travis/com/dashevo/wallet-lib.svg?branch=master&style=flat-square)](https://travis-ci.com/dashevo/wallet-lib)
 
-> A pure and extensible JavaScript Wallet Library for Dash
+A pure and extensible JavaScript Wallet Library for Dash
 
-Find more in the : 
-- [Documentation](https://dashevo.github.io/wallet-lib/#/)
-- [Examples & snippets](https://dashevo.github.io/wallet-lib/#/usage/examples)
+## Table of Contents
+- [Install](#install)
+- [Usage](#usage)
+- [Documentation](#documentation)
+- [Maintainers](#maintainers)
+- [Contributing](#contributing)
+- [License](#license)
 
-## State
 
-Under active development. 
+## Background
 
-## Principles
-
-Dash is a powerful new peer-to-peer platform for the next generation of financial technology. The decentralized nature of the Dash network allows for highly resilient Dash infrastructure, and the developer community needs reliable, open-source tools to implement Dash apps and services.
+[Dash](https://www.dash.org) is a powerful new peer-to-peer platform for the next generation of financial technology. The decentralized nature of the Dash network allows for highly resilient Dash infrastructure, and the developer community needs reliable, open-source tools to implement Dash apps and services.
 
 ## Install
 
@@ -67,14 +68,20 @@ Insight-Client has been removed from MVP and is not working since Wallet-lib v3.
 - [LocalForage](https://github.com/localForage/localForage)
 - [ReactNative AsyncStorage](https://facebook.github.io/react-native/docs/asyncstorage)
 
-## Examples
+## Documentation
 
-You can see here, some [Examples](/docs/usage/examples.md).
+You can see some [Examples here](/docs/usage/examples.md).
 
-## Credits
+More extensive documentation is available at https://dashevo.github.io/wallet-lib along with additional [examples & snippets](https://dashevo.github.io/wallet-lib/#/usage/examples).
 
-Wallet-Lib is maintained by the Dash Core Developers.
-We want to thanks all member of the community that have submited suggestions, issues and pull requests.
+## Maintainers
+
+Wallet-Lib is maintained by the [Dash Core Developers](https://www.github.com/dashevo).
+We want to thank all members of the community that have submitted suggestions, issues and pull requests.
+
+## Contributing
+
+Feel free to dive in! [Open an issue](https://github.com/dashevo/wallet-lib/issues/new/choose) or submit PRs.
 
 ## License
 
