@@ -31,7 +31,7 @@ npm install @dashevo/wallet-lib
 
 ### CDN Standalone
 
-For browser usage, you can also directly rely on unpkg. Below, we also assume you use localforage as your persistance adapter.
+For browser usage, you can also directly rely on unpkg. Below, we also assume you use [localForage](https://github.com/localForage/localForage) as your persistance adapter.
 
 ```
 <script src="https://unpkg.com/@dashevo/wallet-lib"></script>
@@ -82,7 +82,7 @@ You can see here, some [Examples](/docs/usage/examples.md).
 ## Credits
 
 Wallet-Lib is maintained by the Dash Core Developers.
-We want to thanks all member of the community that have submited suggestions, issues and pull requests.
+We want to thank all member of the community that have submitted suggestions, issues and pull requests.
 
 ## License
 

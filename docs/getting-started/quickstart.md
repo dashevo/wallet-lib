@@ -12,7 +12,7 @@ npm install @dashevo/wallet-lib
 
 ### CDN Standalone
 
-For browser usage, you can also directly rely on unpkg for wallet-lib, and localforage as adapter for persistance.  
+For browser usage, you can also directly rely on unpkg for wallet-lib, and [localForage](https://github.com/localForage/localForage) as adapter for persistance.  
 
 ```
 <script src="https://unpkg.com/@dashevo/wallet-lib"></script>
@@ -46,20 +46,15 @@ wallet.getAccount().then((account) => {
 });
 ```
 
-In above code, we did not specify any `transport` instance, which by default, is equivalent to using DAPI as a transporter; The `adapter` being not set, we will use by default an in-memory (without persistance) adapter.    
-One can set any adapter that contains a valid adapter syntax (getItem, setItem), such as [localforage](https://www.npmjs.com/package/localforage).
-
-As you can see, we are waiting for the `ready` event to be thrown before using the Wallet.  
-The purpose of this is to ensure that wallet-lib has pre-fetched all required elements (such as your UTXO set) and perform all required tasks (prefetch, sync, validate, workers exec,...) before starting playing with an account.  
-Nothing force you to do so, this is mostly an helper provided to you.  
-
+In above code, we did not specify any `transport` instance, as by default, wallet-lib is using DAPI as a transporter; The `adapter` being not set, we will use by default an in-memory (without persistance) adapter.    
+One can set any adapter that contains a valid adapter syntax (getItem, setItem), such as [localForage](https://www.npmjs.com/package/localforage).
 
 Quick note :
-- If no mnemonic is provided (nor any privatekey, HDPubKey,...) or if mnemonic is `null`, a mnemonic will be created for you automatically.  
+- If no mnemonic is provided (nor any privatekey, HDPubKey,...), or if mnemonic is `null`, a mnemonic will be created for you automatically.  
 - **By default, if not provided, network value will be `testnet`**.
-- If no adapter specified, Wallet-lib will use a in-memory store (and warn you about it).
+- If no adapter specified, Wallet-lib will use an in-memory store (and warn you about it).
 - If no transport specified, Wallet-lib will connect to DAPI.
-- `wallet.getAccount()` is by default equivalent to `wallet.getAccount(0)`, where 0 correspond of the account index as per [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki).
+- `wallet.getAccount()` is by default equivalent to `wallet.getAccount({ index:0 })`, where 0 correspond of the account index as per [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki).
 
 ## Make a payment to an address
 
@@ -81,5 +76,5 @@ const txid = await account.broadcastTransaction(transaction);
 
 - There are multiple event listeners (socket sync,...), running intervals (service worker,...),
 therefore a good way to quit an instance would be to call `account.disconnect()` which will care to
-call `clearWorker(), closeSocket()` of the differents elements. You can still decide to remove them by hand if you want.
+call `clearWorker(), closeSocket()` of the different elements. You can still decide to remove them by hand if you want.
 - Some classic examples of usage can be seen here : [Examples](/usage/examples.md)

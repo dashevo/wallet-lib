@@ -10,7 +10,7 @@ You can fetch the current instance of DAPI directly from the wallet :
 
 ```js
   const wallet = new Wallet();
-  const dapiInstance = wallet.transport;
+  const client = wallet.transport;
 ```
 
 ## Modify the seeds
@@ -24,5 +24,5 @@ const transporter = new DAPIClient({
       timeout: 20000,
       retries: 5,
 });
-const wallet = new Wallet({transporter:transporter});
+const wallet = new Wallet({transport:transporter});
 ```
