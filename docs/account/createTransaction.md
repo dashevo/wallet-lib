@@ -53,3 +53,5 @@ const txOpts2 = {
 const tx1 = account.createTransaction(txOpts1);
 const tx2 = account.createTransaction(txOpts2);
 ```
+
+See more information about [coinSelection](/usage/coinSelection).
