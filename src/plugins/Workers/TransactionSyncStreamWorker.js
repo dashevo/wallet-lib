@@ -11,7 +11,7 @@ const is = require('../../utils/is');
 class TransactionSyncStreamWorker extends Worker {
   constructor(options) {
     super({
-      name: 'IdentitySyncWorker',
+      name: 'TransactionSyncStreamWorker',
       executeOnStart: true,
       firstExecutionRequired: true,
       workerIntervalTime: 60 * 1000,
@@ -184,7 +184,7 @@ class TransactionSyncStreamWorker extends Worker {
     const stream = await this.transporter
       .subscribeToTransactionsWithProofs(addresses, { fromBlockHeight, count });
 
-    return new Promise(((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       let transactions = [];
       stream
         .on('data', (response) => {
@@ -194,9 +194,9 @@ class TransactionSyncStreamWorker extends Worker {
             .filterWalletTransactions(transactionsFromResponse, addresses, network);
 
           transactions = transactions.concat(walletTransactions);
-          // TODO: save transactions data to the storage
+          const addressesGeneratedCount = this.storage.importTransactions(transactions);
 
-          const addressesGeneratedCount = this.fillAddressesToGapLimit();
+          // const addressesGeneratedCount = this.fillAddressesToGapLimit();
           if (addressesGeneratedCount > 0) {
             // If there are some new addresses being imported
             // to the storage, that mean that we hit the gap limit
@@ -214,7 +214,7 @@ class TransactionSyncStreamWorker extends Worker {
         .on('end', () => {
           resolve(transactions);
         });
-    }));
+    });
   }
 
   /**
@@ -229,19 +229,20 @@ class TransactionSyncStreamWorker extends Worker {
   /**
    *
    * @param {string} network
-   * @return {Promise<unknown>}
+   * @return {Promise<void>}
    */
   async initialSync(network) {
     // TODO: read the last synced block hash from the storage
-    let fromBlockHeight = 0;
-    let count = await this.getBestBlockHeight();
+    let currentBlockHeight = 0;
+    const bestBlockHeight = await this.getBestBlockHeight();
+    let blocksLeft = bestBlockHeight - currentBlockHeight;
 
-    while (fromBlockHeight !== count) {
+    while (blocksLeft !== 0) {
       // Every time the gap limit is hit, we need to restart historical stream
       // until we synced up to the last block
-      fromBlockHeight = this.getLastSyncedBlockHeight();
-      count -= fromBlockHeight;
-      await this.syncUpToTheGapLimit(fromBlockHeight, count, network);
+      currentBlockHeight = this.getLastSyncedBlockHeight();
+      blocksLeft -= currentBlockHeight;
+      await this.syncUpToTheGapLimit(currentBlockHeight, bestBlockHeight, network);
     }
   }
 }

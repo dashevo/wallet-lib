@@ -1,8 +1,10 @@
 const { Transaction } = require('@dashevo/dashcore-lib');
+const fillGapLimit = require('./fillAddressesToGapLimit');
+
 /**
  * Import an array of transactions or a transaction object to the store
  * @param transactions
- * @return {boolean}
+ * @return {number}
  * */
 const importTransactions = function (transactions) {
   const type = transactions.constructor.name;
@@ -25,6 +27,7 @@ const importTransactions = function (transactions) {
   } else {
     throw new Error('Invalid transaction. Cannot import.');
   }
-  return true;
+
+  return fillGapLimit();
 };
 module.exports = importTransactions;
