@@ -10,7 +10,7 @@ There are multiples strategy algorithms provided with Wallet-lib, that you can c
 
 | Strategy                      | Description                                                                                                                                                                   |  
 |-------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| simpleDescendingAccumulator   | Will try to use as many small inputs as possible to meet the amount required. Allows the fee to be optimized for the smallest size at the cost of breaking big inputs.        |
+| simpleDescendingAccumulator   | Will maximize the uses of big inputs to meet the amount required. Allows the fee to be optimized for the smallest size at the cost of breaking big inputs.                    |
 | simpleAscendingAccumulator    | Will try to use as many small inputs as possible to meet the amount required. Allows using many small inputs at the cost of a potentially bigger fee.                         |
 
 By default, the algorithm that is being used is `simpleDescendingAccumulator`. 
