@@ -78,7 +78,6 @@
         - [`.stopWorker()`](storage/stopWorker.md)
         - [`.updateTransaction()`](storage/updateTransaction.md)
     - Events
-        - [`ready`](events/ready.md)
         - [`FETCHED/UNCONFIRMED_TRANSACTION`](events/fetched_unconfirmed_transaction.md)
         - [`FETCHED/CONFIRMED_TRANSACTION`](events/fetched_confirmed_transaction.md)
         - [`CONFIRMED_BALANCE_CHANGED`](events/confirmed_balance_changed.md)
@@ -91,5 +90,6 @@
     - [Writing a new plugin](plugins/writing-a-new-plugin.md)
     - [Wallet workers](plugins/wallet-workers.md)
     - [Community plugins](plugins/community-plugins.md)
-    
+- Develop
+    - [Logging](develop/logging.md)
 - [License](https://github.com/dashevo/wallet-lib/blob/master/LICENSE)
