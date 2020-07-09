@@ -24,6 +24,8 @@ class TransactionSyncStreamWorker extends Worker {
       ],
       ...options,
     });
+
+    this.syncIncomingTransactions = false;
   }
 
   /**
@@ -64,76 +66,6 @@ class TransactionSyncStreamWorker extends Worker {
       spentOutputs,
       unspentOutputs,
     };
-  }
-
-  /**
-   * Generates new adresses up to the gap limit and returns how many addresses
-   * were added to the storage
-   * @return {number} - number of generated addresses
-   */
-  fillAddressesToGapLimit() {
-    let generated = 0;
-    let unusedAddress = 0;
-    const store = this.storage.getStore();
-    const addresses = store.wallets[this.walletId].addresses.external;
-    let addressesPaths = Object.keys(addresses);
-    const { walletType } = this;
-    const accountIndex = this.index;
-
-    let prevPath;
-
-    // Ensure that all our above paths are contiguous
-    const missingIndexes = getMissingIndexes(addressesPaths);
-
-    // Gets missing addresses and adds them to the storage
-    // Please note that getAddress adds new addresses to storage, which it probably shouldn't
-    missingIndexes.forEach((index) => {
-      this.getAddress(index, 'external');
-      if (walletType === WALLET_TYPES.HDWALLET) {
-        this.getAddress(index, 'internal');
-      }
-    });
-
-    const sortByIndex = (a, b) => parseInt(a.split('/')[5], 10) - parseInt(b.split('/')[5], 10);
-    addressesPaths = Object
-      .keys(store.wallets[this.walletId].addresses.external)
-      .filter((el) => parseInt(el.split('/')[3], 10) === accountIndex)
-      .sort(sortByIndex);
-
-    // Scan already generated addresse and count how many are unused
-    addressesPaths.forEach((path) => {
-      const el = addresses[path];
-      if (!el.used && el.path.length > 0) {
-        el.used = true;
-        throw new Error(`Conflicting information ${JSON.stringify(el)}`);
-      }
-      if (!el.used) unusedAddress += 1;
-      if (!isContiguousPath(path, prevPath)) {
-        throw new Error('Addresses are expected to be contiguous');
-      }
-      prevPath = path;
-    });
-
-    // Unused addresses are counted in the foreach above
-    const addressToGenerate = BIP44_ADDRESS_GAP - unusedAddress;
-    if (addressToGenerate > 0) {
-      const lastElemPath = addressesPaths[addressesPaths.length - 1];
-      const lastElem = addresses[lastElemPath];
-
-      const startingIndex = (is.def(lastElem)) ? lastElem.index + 1 : 0;
-      const lastIndex = addressToGenerate + startingIndex;
-      if (lastIndex > startingIndex) {
-        for (let i = startingIndex; i <= lastIndex; i += 1) {
-          this.getAddress(i, 'external');
-          generated += 1;
-          if (walletType === WALLET_TYPES.HDWALLET) {
-            this.getAddress(i, 'internal');
-          }
-        }
-      }
-    }
-
-    return generated;
   }
 
   /**
@@ -184,6 +116,8 @@ class TransactionSyncStreamWorker extends Worker {
     const stream = await this.transporter
       .subscribeToTransactionsWithProofs(addresses, { fromBlockHeight, count });
 
+    this.stream = stream;
+
     return new Promise((resolve, reject) => {
       let transactions = [];
       stream
@@ -224,6 +158,26 @@ class TransactionSyncStreamWorker extends Worker {
   getLastSyncedBlockHeight() {
     // TODO: implement the method
     return 1;
+  }
+
+  async sync(network) {
+    this.syncIncomingTransactions = true;
+    let currentBlockHeight = this.getLastSyncedBlockHeight();
+
+    while (this.syncIncomingTransactions) {
+      // Every time the gap limit is hit, we need to restart historical stream
+      // until we synced up to the last block
+      currentBlockHeight = this.getLastSyncedBlockHeight();
+      await this.syncUpToTheGapLimit(currentBlockHeight, 0, network);
+    }
+  }
+
+  stopWorker() {
+    this.syncIncomingTransactions = false;
+
+    if (this.stream) {
+      this.stream.end();
+    }
   }
 
   /**
