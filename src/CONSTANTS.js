@@ -79,6 +79,7 @@ const CONSTANTS = {
       'offlineMode',
       'transporter',
       'walletId',
+      'network',
     ],
   },
   STORAGE: {
