@@ -4,7 +4,7 @@ Wallet-lib will log multiples events happening which might help you to debug, or
 
 ### Log levels 
 
-Theses are the different level used internally sorted from the less verbose to the most.
+These are the different levels used internally sorted from the least verbose to the most.
  
 - `error` - Warn about issues that are near critical (but are not straight thrown errors).
 - `warn` - Warn about issues that aren't so critical.
