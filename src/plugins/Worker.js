@@ -63,14 +63,18 @@ class Worker extends StandardPlugin {
     }
   }
 
-  stopWorker() {
+  async stopWorker() {
+    let payloadResult = null;
     clearInterval(this.worker);
     this.worker = null;
     this.workerPass = 0;
     this.isWorkerRunning = false;
     const eventType = `WORKER/${this.name.toUpperCase()}/STOPPED`;
+    if (this.onStop) {
+      payloadResult = await this.onStop();
+    }
     this.state.started = false;
-    this.parentEvents.emit(eventType, { type: eventType, payload: null });
+    this.parentEvents.emit(eventType, { type: eventType, payload: payloadResult });
   }
 
   async execWorker() {
