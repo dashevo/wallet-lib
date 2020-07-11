@@ -26,7 +26,7 @@ class Worker extends StandardPlugin {
       ? opts.executeOnStart
       : defaultOpts.executeOnStart;
 
-    this.workerIntervalTime = (opts.workerIntervalTime)
+    this.workerIntervalTime = _.has(opts, 'workerIntervalTime')
       ? opts.workerIntervalTime
       : defaultOpts.workerIntervalTime;
 
@@ -44,9 +44,11 @@ class Worker extends StandardPlugin {
     let payloadResult = null;
     const self = this;
     try {
-      if (this.worker) this.stopWorker();
-      // every minutes, check the pool
-      this.worker = setInterval(this.execWorker.bind(self), this.workerIntervalTime);
+      if (this.worker) await this.stopWorker();
+
+      if (this.workerIntervalTime > 0) {
+        this.worker = setInterval(this.execWorker.bind(self), this.workerIntervalTime);
+      }
 
       if (this.executeOnStart === true) {
         if (this.onStart) {
@@ -64,12 +66,14 @@ class Worker extends StandardPlugin {
   }
 
   async stopWorker() {
+    console.log('stop');
     let payloadResult = null;
     clearInterval(this.worker);
     this.worker = null;
     this.workerPass = 0;
     this.isWorkerRunning = false;
     const eventType = `WORKER/${this.name.toUpperCase()}/STOPPED`;
+    console.log(this);
     if (this.onStop) {
       payloadResult = await this.onStop();
     }
@@ -83,7 +87,7 @@ class Worker extends StandardPlugin {
       return false;
     }
     if (this.workerMaxPass !== null && this.workerPass >= this.workerMaxPass) {
-      this.stopWorker();
+      await this.stopWorker();
       return false;
     }
     this.isWorkerRunning = true;
