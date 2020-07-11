@@ -77,8 +77,12 @@ const CONSTANTS = {
     ],
     SAFE_PROPERTIES: [
       'offlineMode',
+      'index',
+      'BIP44PATH',
       'transporter',
       'walletId',
+      'walletType',
+      'strategy',
       'network',
     ],
   },
