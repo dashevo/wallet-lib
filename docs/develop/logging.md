@@ -1,6 +1,6 @@
 ## Logging
 
-Wallet-lib will log multiples events happening which might help you to debug, or getting a better understanding at what is happening internally. 
+Wallet-lib will log multiple events happening which might help you to debug, or get a better understanding at what is happening internally. 
 
 ### Log levels 
 
