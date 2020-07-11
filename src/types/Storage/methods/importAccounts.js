@@ -5,6 +5,8 @@
  * @return {boolean}
  */
 const importAccounts = function (accounts, walletId) {
+  console.log('====', accounts, walletId);
+
   if (!walletId) throw new Error('Expected walletId to import addresses');
   if (!this.searchWallet(walletId).found) {
     this.createWallet(walletId);

@@ -95,26 +95,20 @@ class Account extends EventEmitter {
         super.emit(...args);
       };
     }
-    if (this.walletType === WALLET_TYPES.HDWALLET) {
-      this.storage.importAccounts({
-        label: this.label,
-        path: this.BIP44PATH,
-        network: this.network,
-      }, this.walletId);
-    }
-    if (this.walletType === WALLET_TYPES.HDPUBLIC) {
-      this.storage.importSingleAddress({
-        label: this.label,
-        path: '/0',
-        network: this.network,
-      }, this.walletId);
+    if ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(this.walletType)) {
+      this.storage.createAccount(
+        this.walletId,
+        this.BIP44PATH,
+        this.network,
+        this.label,
+      );
     }
     if (this.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
-      this.storage.importSingleAddress({
-        label: this.label,
-        path: '0',
-        network: this.network,
-      }, this.walletId);
+      this.storage.createSingleAddress(
+        this.walletId,
+        this.network,
+        this.label,
+      );
     }
 
     this.keyChain = wallet.keyChain;
