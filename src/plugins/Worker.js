@@ -61,19 +61,18 @@ class Worker extends StandardPlugin {
 
       if (this.executeOnStart) await this.execWorker();
     } catch (err) {
+      if (console.trace) console.trace(err);
       throw new WorkerFailedOnStart(this.name, err.message, err);
     }
   }
 
   async stopWorker() {
-    console.log('stop');
     let payloadResult = null;
     clearInterval(this.worker);
     this.worker = null;
     this.workerPass = 0;
     this.isWorkerRunning = false;
     const eventType = `WORKER/${this.name.toUpperCase()}/STOPPED`;
-    console.log(this);
     if (this.onStop) {
       payloadResult = await this.onStop();
     }
@@ -97,6 +96,7 @@ class Worker extends StandardPlugin {
         payloadResult = await this.execute();
       } catch (err) {
         await this.stopWorker();
+        if (console.trace) console.trace(err);
         throw new WorkerFailedOnExecute(this.name, err.message, err);
       }
     } else {
