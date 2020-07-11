@@ -31,7 +31,7 @@ npm install @dashevo/wallet-lib
 
 ### CDN Standalone
 
-For browser usage, you can also directly rely on unpkg. Below, we also assume you use [localForage](https://github.com/localForage/localForage) as your persistance adapter.
+For browser usage, you can also directly rely on unpkg. Below, we also assume you use [localForage](https://github.com/localForage/localForage) as your persistence adapter.
 
 ```
 <script src="https://unpkg.com/@dashevo/wallet-lib"></script>

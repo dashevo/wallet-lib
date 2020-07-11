@@ -12,7 +12,7 @@ npm install @dashevo/wallet-lib
 
 ### CDN Standalone
 
-For browser usage, you can also directly rely on unpkg for wallet-lib, and [localForage](https://github.com/localForage/localForage) as adapter for persistance.  
+For browser usage, you can also directly rely on unpkg for wallet-lib, and [localForage](https://github.com/localForage/localForage) as adapter for persistence.  
 
 ```
 <script src="https://unpkg.com/@dashevo/wallet-lib"></script>
@@ -46,8 +46,8 @@ wallet.getAccount().then((account) => {
 });
 ```
 
-In above code, we did not specify any `transport` instance, as by default, wallet-lib is using DAPI as a transporter; The `adapter` being not set, we will use by default an in-memory (without persistance) adapter.    
-One can set any adapter that contains a valid adapter syntax (getItem, setItem), such as [localForage](https://www.npmjs.com/package/localforage).
+In above code, we did not specify any `transport` instance, as by default, wallet-lib is using DAPI as a transporter; The `adapter` not being set, we will use by default an in-memory (without persistence) adapter.    
+One can set any adapter that contains a valid adapter syntax (getItem, setItem), such as [localForage](https://www.npmjs.com/package/localforage), you can learn more about [creating your own persistence adapter](develop/persistence.md).
 
 Quick note :
 - If no mnemonic is provided (nor any privatekey, HDPubKey,...), or if mnemonic is `null`, a mnemonic will be created for you automatically.  
