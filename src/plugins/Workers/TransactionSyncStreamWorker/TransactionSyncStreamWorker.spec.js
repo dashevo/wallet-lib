@@ -17,7 +17,8 @@ describe('Workers - TransactionSyncStreamWorker', function suite() {
     storage,
     walletId: Object.keys(storage.store.wallets)[0],
     getAddress: ()=> {},
-    network: 'testnet'
+    network: 'testnet',
+    BIP44PATH: `m/44'/1'/0'`
   }
 
   it('should initiate', () => {
