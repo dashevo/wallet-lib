@@ -1,5 +1,4 @@
 const logger = require('../../../logger');
-const { HDPUBLIC, HDWALLET } = require('../../../CONSTANTS').WALLET_TYPES;
 const processAddressList = require('./utils/processAddressList');
 
 // This method is called as first thing by the SyncWorker.
@@ -20,7 +19,6 @@ module.exports = async function initialSyncUp() {
     // When we will move to bloomfilter, that part might be more complex.
     // eslint-disable-next-line no-await-in-loop
     generated = await processAddressList.call(this, addrList);
-    console.log({generated})
   }
 
   logger.silly('SyncWorker - initialSyncUp - Fully synced');

@@ -1,3 +1,5 @@
+const logger = require('../../../../logger');
+
 /**
  *
  * @param {number} fromBlockHeight
@@ -17,18 +19,18 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
     let transactions = [];
     stream
       .on('data', (response) => {
-        console.log(response);
         const transactionsFromResponse = this.constructor
           .getTransactionListFromStreamResponse(response);
         const walletTransactions = this.constructor
           .filterWalletTransactions(transactionsFromResponse, addresses, network);
 
         transactions = transactions.concat(walletTransactions.transactions);
-        console.log({transactions});
+
         if (transactions.length) {
           const addressesGeneratedCount = this.importTransactions(transactions);
-          console.log({addressesGeneratedCount});
+
           if (addressesGeneratedCount > 0) {
+            logger.silly('TransactionSyncStreamWorker - end stream - new addresses generated');
             // If there are some new addresses being imported
             // to the storage, that mean that we hit the gap limit
             // and we need to update the bloom filter with new addresses,

@@ -111,11 +111,9 @@ async function _initializeAccount(account, userUnsafePlugins) {
     //   if (await exec() !== 0) return recursivelyGenerateAddresses();
     //   return true;
     // };
-    console.log('ReadinessIntervalB4');
 
     // eslint-disable-next-line no-param-reassign,consistent-return
     account.readinessInterval = setInterval(() => {
-      console.log('ReadinessInterval');
       const watchedPlugins = Object.keys(account.plugins.watchers);
       let readyPlugins = 0;
       watchedPlugins.forEach((pluginName) => {

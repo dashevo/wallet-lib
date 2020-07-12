@@ -58,12 +58,14 @@ function ensureAccountAddressesToGapLimit(walletStore, walletType, accountIndex,
 
   // Unused addresses are counted in the foreach above
   const addressToGenerate = BIP44_ADDRESS_GAP - unusedAddresses;
+
   if (addressToGenerate > 0) {
     const lastElemPath = externalAddressesPaths[externalAddressesPaths.length - 1];
     const lastElem = externalAddresses[lastElemPath];
 
     const startingIndex = (is.def(lastElem)) ? lastElem.index + 1 : 0;
-    const lastIndex = addressToGenerate + startingIndex;
+    const lastIndex = addressToGenerate + startingIndex - 1;
+
     if (lastIndex > startingIndex) {
       for (let i = startingIndex; i <= lastIndex; i += 1) {
         getAddress(i, 'external');

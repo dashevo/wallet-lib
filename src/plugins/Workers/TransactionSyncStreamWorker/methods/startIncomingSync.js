@@ -3,9 +3,6 @@ module.exports = async function startIncomingSync() {
   this.syncIncomingTransactions = true;
   const currentBlockHeight = this.getLastSyncedBlockHeight();
 
-  console.log({currentBlockHeight});
-  // console.log({network, currentBlockHeight});
-
   // while (this.syncIncomingTransactions) {
   // Every time the gap limit is hit, we need to restart historical stream
   // until we synced up to the last block
