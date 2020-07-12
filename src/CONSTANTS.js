@@ -55,6 +55,7 @@ const CONSTANTS = {
       'getUnconfirmedBalance',
       'getTotalBalance',
       'broadcastTransaction',
+      'importTransactions',
       'getAddress',
       'fetchStatus',
       'getPlugin',

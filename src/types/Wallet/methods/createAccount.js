@@ -14,10 +14,10 @@ async function createAccount(accountOpts) {
   const Account = require('../../Account/Account.js');
 
   const {
-    injectDefaultPlugins, debug, plugins, allowSensitiveOperations,
+    injectDefaultPlugins, debug, plugins, allowSensitiveOperations, useSPV,
   } = this;
   const baseOpts = {
-    injectDefaultPlugins, debug, allowSensitiveOperations, plugins,
+    injectDefaultPlugins, debug, allowSensitiveOperations, plugins, useSPV,
   };
   if (this.walletType === WALLET_TYPES.SINGLE_ADDRESS) { baseOpts.privateKey = this.privateKey; }
   const opts = Object.assign(baseOpts, accountOpts);

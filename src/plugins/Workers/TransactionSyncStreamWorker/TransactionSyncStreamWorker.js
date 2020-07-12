@@ -17,11 +17,15 @@ class TransactionSyncStreamWorker extends Worker {
       workerIntervalTime: 0,
       gapLimit: 10,
       dependencies: [
+        'importTransactions',
         'storage',
         'transporter',
         'walletId',
         'getAddress',
         'network',
+        'index',
+        'BIP44PATH',
+        'walletType',
       ],
       ...options,
     });
@@ -99,7 +103,7 @@ class TransactionSyncStreamWorker extends Worker {
    * @returns {Promise<void>}
    */
   async execute() {
-    await this.startIncomingSync();
+    // await this.startIncomingSync();
   }
 
   async onStop() {
@@ -111,6 +115,7 @@ class TransactionSyncStreamWorker extends Worker {
 }
 
 TransactionSyncStreamWorker.prototype.getAddressesToSync = require('./methods/getAddressesToSync');
+TransactionSyncStreamWorker.prototype.getBestBlockHeight = require('./methods/getBestBlockHeight');
 TransactionSyncStreamWorker.prototype.getLastSyncedBlockHeight = require('./methods/getLastSyncedBlockHeight');
 TransactionSyncStreamWorker.prototype.startHistoricalSync = require('./methods/startHistoricalSync');
 TransactionSyncStreamWorker.prototype.startIncomingSync = require('./methods/startIncomingSync');

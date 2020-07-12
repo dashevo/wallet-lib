@@ -33,6 +33,7 @@ class SyncWorker extends Worker {
         'fetchStatus',
         'getTransaction',
         'walletId',
+        'importTransactions',
         'getUnusedAddress',
       ],
       ...opts,

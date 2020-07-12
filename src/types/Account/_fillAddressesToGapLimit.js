@@ -1,8 +1,8 @@
-const { BIP44_ADDRESS_GAP, WALLET_TYPES } = require('../../../CONSTANTS');
-const is = require('../../../utils/is');
+const { BIP44_ADDRESS_GAP, WALLET_TYPES } = require('../../CONSTANTS');
+const is = require('../../utils/is');
 
-const getMissingIndexes = require('../../../plugins/Workers/BIP44Worker/utils/getMissingIndexes');
-const isContiguousPath = require('../../../plugins/Workers/BIP44Worker/utils/isContiguousPath');
+const getMissingIndexes = require('../../plugins/Workers/BIP44Worker/utils/getMissingIndexes');
+const isContiguousPath = require('../../plugins/Workers/BIP44Worker/utils/isContiguousPath');
 
 /**
  *
@@ -13,7 +13,8 @@ const isContiguousPath = require('../../../plugins/Workers/BIP44Worker/utils/isC
  * @param getAddress
  * @return {number}
  */
-function fillAddressesToGapLimit(store, walletType, walletId, accountIndex, getAddress) {
+// eslint-disable-next-line no-underscore-dangle
+function _fillAddressesToGapLimit(store, walletType, walletId, accountIndex, getAddress) {
   let generated = 0;
   let unusedAddress = 0;
   const addresses = store.wallets[walletId].addresses.external;
@@ -75,4 +76,4 @@ function fillAddressesToGapLimit(store, walletType, walletId, accountIndex, getA
   return generated;
 }
 
-module.exports = fillAddressesToGapLimit;
+module.exports = _fillAddressesToGapLimit;

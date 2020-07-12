@@ -14,6 +14,7 @@ const defaultOptions = {
   network: 'testnet',
   plugins: [],
   passphrase: null,
+  useSPV: false,
   injectDefaultPlugins: true,
   allowSensitiveOperations: false,
 };
@@ -58,6 +59,7 @@ class Wallet {
     this.passphrase = passphrase;
     this.offlineMode = _.has(opts, 'offlineMode') ? opts.offlineMode : defaultOptions.offlineMode;
     this.debug = _.has(opts, 'debug') ? opts.debug : defaultOptions.debug;
+    this.useSPV = _.has(opts, 'useSPV') ? opts.useSPV : defaultOptions.useSPV;
     this.allowSensitiveOperations = _.has(opts, 'allowSensitiveOperations') ? opts.allowSensitiveOperations : defaultOptions.allowSensitiveOperations;
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
 

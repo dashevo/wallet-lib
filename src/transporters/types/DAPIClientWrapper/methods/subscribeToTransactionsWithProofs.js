@@ -24,6 +24,7 @@ module.exports = async function subscribeToTransactionWithProofs(
   addressList.forEach((address) => {
     bloomfilter.insert(Buffer.from(address));
   });
+
   if (!opts.fromBlockHeight && !opts.fromBlockHash) {
     throw new Error('fromBlockHeight or fromBlockHash needs to be specified');
   }

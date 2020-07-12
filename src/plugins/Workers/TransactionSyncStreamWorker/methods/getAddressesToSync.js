@@ -7,7 +7,7 @@ module.exports = function getAddressesToSync() {
     const walletPaths = Object.keys(walletAddresses);
     if (walletPaths.length > 0) {
       walletPaths.forEach((path) => {
-        const address = walletAddresses[path];
+        const { address } = walletAddresses[path];
         addressList.push(address);
       });
     }
