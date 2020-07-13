@@ -22,7 +22,7 @@ A Wallet instance can be created from multiples types, which impact how much the
 In general, we expect you to initialize from a `mnemonic` or an `seed` (HD seed) or an `HDPrivateKey`, which allows wallet-lib to deal with HD Wallet (deterministic wallet).  
 
 In some other cases, you might want to instantiate Wallet from another input such as : 
-- `privateKey`: This allows to manage a single privateKey/publicKey set. Therefore, you will only have a single unique address to receive money. 
-- `HDPublicKey`: This allows a "watch-only" mode. You won't be able to spend anything, but this will allow you to track and monitor in real-time the addresses set of this public key. Use-case might be to always pay to another new 
+- `privateKey`: This allows managing a single privateKey/publicKey set. Therefore, you will only have a single unique address to receive money. 
+- `HDPublicKey`: This allows a "watch-only" mode. You won't be able to spend anything, but this will allow you to track and monitor in real-time the address set of this public key. Use-case might be to always pay to another new 
 
 [Learn more about instantiation documentation](/wallet/Wallet.md)

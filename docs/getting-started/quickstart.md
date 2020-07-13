@@ -37,7 +37,7 @@ const opts = {
 };
 const wallet = new Wallet(opts);
 wallet.getAccount().then((account) => {
-  // At this point, account has fetched all UTXOs if they exists
+  // At this point, account has fetched all UTXOs if they exist
   const balance = account.getTotalBalance();
   console.log(`Balance: ${balance}`);
 
