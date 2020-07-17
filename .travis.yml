@@ -21,7 +21,7 @@ addons:
       - docker-ce
 
 env:
-  - DOCKER_COMPOSE_VERSION=1.25.5 DAPI_SEED=127.0.0.1 NETWORK=regtest
+  - DOCKER_COMPOSE_VERSION=1.25.5
 
 before_install:
   - sudo rm /usr/local/bin/docker-compose
