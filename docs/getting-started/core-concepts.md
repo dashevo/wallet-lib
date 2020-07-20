@@ -23,6 +23,6 @@ In general, we expect you to initialize from a `mnemonic` or an `seed` (HD seed)
 
 In some other cases, you might want to instantiate Wallet from another input such as : 
 - `privateKey`: This allows managing a single privateKey/publicKey set. Therefore, you will only have a single unique address to receive money. 
-- `HDPublicKey`: This allows a "watch-only" mode. You won't be able to spend anything, but this will allow you to track and monitor in real-time the address set of this public key. This allows you to derivate, from a single key (shared by another user, third-party merchant), a unique unused addresses.  
+- `HDPublicKey`: This allows a "watch-only" mode. You won't be able to spend anything, but this will allow you to track and monitor in real-time the address set of this public key. This allows you to derive unique unused addresses from a single key (shared by another user, third-party merchant).
 
 [Learn more about instantiation documentation](/wallet/Wallet.md)
