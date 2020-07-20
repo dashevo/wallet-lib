@@ -8,8 +8,8 @@ export declare class Wallet {
     offlineMode: boolean;
     allowSensitiveOperations: boolean;
     injectDefaultPlugins: boolean;
-    plugins:[Plugins];
-    passphrase:string;
+    plugins: [Plugins];
+    passphrase?: string;
     transporter: Transporter;
     network: Network;
     walletId: string;
@@ -18,7 +18,7 @@ export declare class Wallet {
     store: Storage.store;
 
     constructor(opts:Wallet.IWalletOptions)
-
+  
     createAccount(accOptions: Account.Options): Promise<Account>;
     disconnect(): void;
     exportWallet():Mnemonic["toString"];
@@ -32,20 +32,32 @@ export declare class Wallet {
     sweepWallet(): Promise<Account>
 }
 
+declare interface DAPIClientOptions {
+    dapiAddressProvider?: any;
+    dapiAddresses?: Array<any | string>;
+    seeds?: Array<any | string>;
+    network?: string;
+    networkType?: string;
+    timeout?: number;
+    retries?: number;
+    baseBanTime?: number;
+}
+
+
 export declare namespace Wallet {
     interface IWalletOptions {
         offlineMode?: boolean;
         debug?: boolean;
-        transporter?: string|object|any;
-        network?: Network;
+        transport?: DAPIClientOptions | Transport;
+        network?: Network | string;
         plugins?: undefined[]|[Plugins];
         passphrase?: string|null;
         injectDefaultPlugins?: boolean;
         allowSensitiveOperations?: boolean;
-        mnemonic?: Mnemonic|string|null;
-        seed?: Mnemonic|string;
-        privateKey?: PrivateKey|string;
-        HDPrivateKey?: HDPrivateKey|string;
-        HDPublicKey?: HDPublicKey|string;
+        mnemonic?: Mnemonic | string | null;
+        seed?: Mnemonic | string;
+        privateKey?: PrivateKey | string;
+        HDPrivateKey?: HDPrivateKey | string;
+        HDPublicKey?: HDPublicKey | string;
     }
 }

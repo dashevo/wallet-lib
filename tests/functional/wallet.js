@@ -7,8 +7,26 @@ const {
 
 const { Wallet } = require('../../src/index');
 
+const isRegtest = process.env.NETWORK === 'regtest' || process.env.NETWORK === 'local';
+
 function wait(ms) {
   return new Promise((res) => setTimeout(res, ms));
+}
+
+/**
+ *
+ * @param {Account} walletAccount
+ * @return {Promise<void>}
+ */
+async function waitForBalanceToChange(walletAccount) {
+  const originalBalance = walletAccount.getTotalBalance();
+
+  let currentIteration = 0;
+  while (walletAccount.getTotalBalance() === originalBalance
+  && currentIteration <= 40) {
+    await wait(500);
+    currentIteration++;
+  }
 }
 
 /**
@@ -21,7 +39,13 @@ function wait(ms) {
  * @return {Promise<string>}
  */
 async function fundAddress(dapiClient, faucetAddress, faucetPrivateKey, address, amount) {
-  const { items: inputs } = await dapiClient.getUTXO(faucetAddress);
+  let { items: inputs } = await dapiClient.core.getUTXO(faucetAddress);
+
+  if (isRegtest) {
+    const { blocks } = await dapiClient.core.getStatus();
+
+    inputs = inputs.filter((input) => input.height < blocks - 100);
+  }
 
   const transaction = new Transaction();
 
@@ -38,25 +62,33 @@ async function fundAddress(dapiClient, faucetAddress, faucetPrivateKey, address,
     .fee(668)
     .sign(faucetPrivateKey);
 
-  let { blocks: currentBlockHeight } = await dapiClient.getStatus();
+  let { blocks: currentBlockHeight } = await dapiClient.core.getStatus();
 
-  const transactionId = await dapiClient.sendTransaction(transaction.toBuffer());
+  const transactionId = await dapiClient.core.broadcastTransaction(transaction.toBuffer());
 
   const desiredBlockHeight = currentBlockHeight + 1;
 
-  do {
-    // eslint-disable-next-line no-await-in-loop
-    ({ blocks: currentBlockHeight } = await dapiClient.getStatus());
-    // eslint-disable-next-line no-await-in-loop
-    await wait(30000);
-  } while (currentBlockHeight < desiredBlockHeight);
+  if (isRegtest) {
+    const privateKey = new PrivateKey();
+
+    await dapiClient.core.generateToAddress(
+        1,
+        privateKey.toAddress(process.env.NETWORK).toString(),
+    );
+  } else {
+    do {
+      // eslint-disable-next-line no-await-in-loop
+      ({blocks: currentBlockHeight} = await dapiClient.core.getStatus());
+      // eslint-disable-next-line no-await-in-loop
+      await wait(30000);
+    } while (currentBlockHeight < desiredBlockHeight);
+  }
 
   return transactionId;
 }
 
 const seeds = process.env.DAPI_SEED
-  .split(',')
-  .map((seed) => ({ service: seed }));
+  .split(',');
 
 let newWallet;
 let wallet;
@@ -68,7 +100,7 @@ describe('Wallet-lib - functional ', function suite() {
     describe('Create a new Wallet', () => {
       it('should create a new wallet with default params', () => {
         newWallet = new Wallet({
-          transporter: {
+          transport: {
             seeds,
           },
           network: process.env.NETWORK,
@@ -92,7 +124,7 @@ describe('Wallet-lib - functional ', function suite() {
       it('should load a wallet from mnemonic', () => {
         wallet = new Wallet({
           mnemonic: newWallet.mnemonic,
-          transporter: {
+          transport: {
             seeds,
           },
           network: process.env.NETWORK,
@@ -127,12 +159,16 @@ describe('Wallet-lib - functional ', function suite() {
         .toString();
 
       await fundAddress(
-        wallet.transporter.client,
+        wallet.transport.client,
         faucetAddress,
         faucetPrivateKey,
         account.getAddress().address,
         20000,
       );
+
+      if (isRegtest) {
+        await waitForBalanceToChange(account);
+      }
     });
 
     it('should has unusedAddress with index 1', () => {

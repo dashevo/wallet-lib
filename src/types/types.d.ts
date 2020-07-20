@@ -70,14 +70,12 @@ export declare type AddressInfo<T extends AddressObj = AddressObj> = T & {
     used:boolean;
     utxos:[object]
 }
-export declare type Network = "livenet" | "testnet";
 
-
+export declare type Network = "livenet" | "testnet" | "evonet" | "regtest" | "local" | "devnet" | "mainnet";
 export declare type Strategy = "simpleDescendingAccumulator"
     | "simpleAscendingAccumulator"
     | 'simpleTransactionOptimizedAccumulator'
     | Function;
-
 export declare type AddressType = "external" | "internal" | "misc";
 // todo: actually, I would vote to move hdextpublic to hdextpubkey
 export declare type WalletType = "single_address" | "hdwallet" | "hdextpublic";
