@@ -19,10 +19,14 @@ By using your own DAPI-Client instance and passing it to the Wallet constructor 
 
 ```js 
 const DAPIClient = require('@dashevo/dapi-client');
-const transporter = new DAPIClient({
-      seeds: [{ service: '18.236.131.253:3000' }],
-      timeout: 20000,
-      retries: 5,
+const { Wallet } = require('./src');
+const DAPIClientTransport = require('./src/transport/DAPIClientTransport/DAPIClientTransport.js');
+
+const client = new DAPIClient({
+  seeds: [{ service: '18.236.131.253:3000' }],
+  timeout: 20000,
+  retries: 5,
 });
-const wallet = new Wallet({transport:transporter});
+const transport = new DAPIClientTransport(client);
+const wallet = new Wallet({ transport });
 ```
