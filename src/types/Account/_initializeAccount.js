@@ -120,6 +120,7 @@ async function _initializeAccount(account, userUnsafePlugins) {
         if (account.plugins.watchers[pluginName].ready === true) {
           logger.debug(`Initializing - ${readyPlugins}/${watchedPlugins.length} plugins`);
           readyPlugins += 1;
+          logger.debug(`Initialized ${pluginName} - ${readyPlugins}/${watchedPlugins.length} plugins`);
         }
       });
       logger.debug(`Initializing - ${readyPlugins}/${watchedPlugins.length} plugins`);

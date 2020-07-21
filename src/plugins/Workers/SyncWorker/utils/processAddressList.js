@@ -3,9 +3,9 @@ const fetchAddressTransactions = require('./fetchAddressTransactions');
 const TransactionOrderer = require('./TransactionOrderer/TransactionOrderer');
 
 module.exports = async function processAddressList(addressList) {
-  const { transporter, importTransactions } = this;
+  const { transport, storage, importTransactions } = this;
 
-  const boundFetchAddressTransactions = _.bind(fetchAddressTransactions, null, _, transporter);
+  const boundFetchAddressTransactions = _.bind(fetchAddressTransactions, null, _, transport);
   const transactionPromises = addressList.map(boundFetchAddressTransactions);
 
   const transactionsByAddresses = await Promise.all(transactionPromises);
@@ -16,6 +16,7 @@ module.exports = async function processAddressList(addressList) {
 
   transactions.forEach((tx) => ordered.insert(tx));
 
+  // const boundImportTransaction = _.bind(storage.importTransaction, storage, _, transport);
   const boundImportTransaction = _.bind(importTransactions, _);
 
   const importPromises = ordered.transactions.map(boundImportTransaction);

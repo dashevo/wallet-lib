@@ -5,7 +5,7 @@ const { WALLET_TYPES } = require('../../CONSTANTS');
 const { is } = require('../../utils');
 const EVENTS = require('../../EVENTS');
 const Wallet = require('../Wallet/Wallet.js');
-const { simpleTransactionOptimizedAccumulator } = require('../../utils/coinSelections/strategies');
+const { simpleDescendingAccumulator } = require('../../utils/coinSelections/strategies');
 
 function getNextUnusedAccountIndexForWallet(wallet) {
   if (wallet && wallet.accounts) {
@@ -35,7 +35,7 @@ const defaultOptions = {
   plugins: [],
   injectDefaultPlugins: true,
   debug: false,
-  strategy: simpleTransactionOptimizedAccumulator,
+  strategy: simpleDescendingAccumulator,
 };
 
 /* eslint-disable no-underscore-dangle */
@@ -79,16 +79,23 @@ class Account extends EventEmitter {
 
     this.label = (opts && opts.label && is.string(opts.label)) ? opts.label : null;
 
-    // If transporter is null or invalid, we won't try to fetch anything
-    this.transporter = wallet.transporter;
+    // If transport is null or invalid, we won't try to fetch anything
+    this.transport = wallet.transport;
 
     this.store = wallet.storage.store;
     this.storage = wallet.storage;
 
     // Forward all storage event
-    this.storage.on('**', (ev) => {
-      this.emit(ev.type, ev);
-    });
+    this.storage.on(EVENTS.CONFIGURED, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.REHYDRATE_STATE_FAILED, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.REHYDRATE_STATE_SUCCESS, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.FETCHED_CONFIRMED_TRANSACTION, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.UNCONFIRMED_BALANCE_CHANGED, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.CONFIRMED_BALANCE_CHANGED, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.BLOCKHEADER, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.BLOCKHEIGHT_CHANGED, (ev) => this.emit(ev.type, ev));
+    this.storage.on(EVENTS.BLOCK, (ev) => this.emit(ev.type, ev));
+
     if (this.debug) {
       this.emit = (...args) => {
         const { type } = args[1];
@@ -180,51 +187,34 @@ Account.prototype.createTransaction = require('./methods/createTransaction');
 Account.prototype.decode = require('./methods/decode');
 Account.prototype.decrypt = require('./methods/decrypt');
 Account.prototype.disconnect = require('./methods/disconnect');
-Account.prototype.fetchStatus = require('./methods/fetchStatus');
-
-Account.prototype.forceRefreshAccount = require('./methods/forceRefreshAccount');
-
-Account.prototype.encrypt = require('./methods/encrypt');
-
 Account.prototype.encode = require('./methods/encode');
-
+Account.prototype.encrypt = require('./methods/encrypt');
+Account.prototype.fetchAddressInfo = require('./methods/fetchAddressInfo');
+Account.prototype.fetchStatus = require('./methods/fetchStatus');
+Account.prototype.forceRefreshAccount = require('./methods/forceRefreshAccount');
 Account.prototype.generateAddress = require('./methods/generateAddress');
-
 Account.prototype.getAddress = require('./methods/getAddress');
-
 Account.prototype.getAddresses = require('./methods/getAddresses');
 Account.prototype.getBlockHeader = require('./methods/getBlockHeader');
 Account.prototype.getConfirmedBalance = require('./methods/getConfirmedBalance');
-Account.prototype.getUnconfirmedBalance = require('./methods/getUnconfirmedBalance');
-
-Account.prototype.getTotalBalance = require('./methods/getTotalBalance');
-
+Account.prototype.getIdentityHDKeyById = require('./methods/getIdentityHDKeyById');
+Account.prototype.getIdentityHDKeyByIndex = require('./methods/getIdentityHDKeyByIndex');
+Account.prototype.getIdentityIds = require('./methods/getIdentityIds');
 Account.prototype.getPlugin = require('./methods/getPlugin');
-
-Account.prototype.getWorker = require('./methods/getWorker');
-
 Account.prototype.getPrivateKeys = require('./methods/getPrivateKeys');
-
+Account.prototype.getTotalBalance = require('./methods/getTotalBalance');
 Account.prototype.getTransaction = require('./methods/getTransaction');
-
 Account.prototype.getTransactionHistory = require('./methods/getTransactionHistory');
-
 Account.prototype.getTransactions = require('./methods/getTransactions');
-
+Account.prototype.getUnconfirmedBalance = require('./methods/getUnconfirmedBalance');
 Account.prototype.getUnusedAddress = require('./methods/getUnusedAddress');
-
+Account.prototype.getUnusedIdentityIndex = require('./methods/getUnusedIdentityIndex');
 Account.prototype.getUTXOS = require('./methods/getUTXOS');
-
+Account.prototype.getWorker = require('./methods/getWorker');
+Account.prototype.hasPlugins = require('./methods/hasPlugins');
 Account.prototype.injectPlugin = require('./methods/injectPlugin');
 Account.prototype.importTransactions = require('./methods/importTransactions');
 
 Account.prototype.sign = require('./methods/sign');
-
-Account.prototype.hasPlugins = require('./methods/hasPlugins');
-
-Account.prototype.getIdentityHDKeyByIndex = require('./methods/getIdentityHDKeyByIndex');
-Account.prototype.getIdentityIds = require('./methods/getIdentityIds');
-Account.prototype.getIdentityHDKeyById = require('./methods/getIdentityHDKeyById');
-Account.prototype.getUnusedIdentityIndex = require('./methods/getUnusedIdentityIndex');
 
 module.exports = Account;

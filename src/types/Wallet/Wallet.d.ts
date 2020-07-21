@@ -1,48 +1,63 @@
 import {Mnemonic, PrivateKey, HDPublicKey, Strategy, Network, Plugins, AddressInfoMap, WalletType} from "../types";
 import {Account} from "../Account/Account";
-import {MappedAddress} from "../Storage/Storage";
+import {Storage} from "../Storage/Storage";
 import {HDPrivateKey} from "@dashevo/dashcore-lib";
+import {Transporter} from "../../transporters/Transporter";
 
 export declare class Wallet {
     offlineMode: boolean;
     allowSensitiveOperations: boolean;
     injectDefaultPlugins: boolean;
-    plugins:[Plugins];
-    passphrase?:string;
-    constructor(options?: Wallet.Options);
+    plugins: [Plugins];
+    passphrase?: string;
+    transporter: Transporter;
+    network: Network;
+    walletId: string;
+    accounts: [undefined];
+    storage: Storage;
+    store: Storage.store;
+
+    constructor(opts:Wallet.IWalletOptions)
+  
     createAccount(accOptions: Account.Options): Promise<Account>;
     disconnect(): void;
     exportWallet():Mnemonic["toString"];
-    fromMnemonic(mnemonic: Mnemonic):void;
-    fromPrivateKey(privateKey: PrivateKey):void;
     fromHDPrivateKey(privateKey: HDPrivateKey):void;
     fromHDPublicKey(HDPublicKey:HDPublicKey):void;
+    fromMnemonic(mnemonic: Mnemonic):void;
+    fromPrivateKey(privateKey: PrivateKey):void;
     fromSeed(seed:string):void;
-    generateNewWalletId():void;
-    getAccount(accOptions?: Wallet.getAccOptions): Promise<Account>;
-    updateNetwork(network:Network):boolean;
-
+    generateNewWalletId():string;
+    getAccount(accOptions?: Account.Options): Promise<Account>;
+    sweepWallet(): Promise<Account>
 }
+
+declare interface DAPIClientOptions {
+    dapiAddressProvider?: any;
+    dapiAddresses?: Array<any | string>;
+    seeds?: Array<any | string>;
+    network?: string;
+    networkType?: string;
+    timeout?: number;
+    retries?: number;
+    baseBanTime?: number;
+}
+
 
 export declare namespace Wallet {
-
-    interface Options {
-        debug?: boolean;
+    interface IWalletOptions {
         offlineMode?: boolean;
-        transporter?: string|object|any;
-        network?: Network;
-        plugins?: [Plugins];
-        passphrase?: string;
+        debug?: boolean;
+        transport?: DAPIClientOptions | Transport;
+        network?: Network | string;
+        plugins?: undefined[]|[Plugins];
+        passphrase?: string|null;
         injectDefaultPlugins?: boolean;
-        mnemonic?: Mnemonic|string|null;
-        seed?: Mnemonic|string;
-        privateKey?: PrivateKey|string;
-        HDPrivateKey?: HDPrivateKey|string;
-        HDPublicKey?: HDPublicKey|string;
-    }
-    interface getAccOptions extends Account.Options{
-        index?:number;
+        allowSensitiveOperations?: boolean;
+        mnemonic?: Mnemonic | string | null;
+        seed?: Mnemonic | string;
+        privateKey?: PrivateKey | string;
+        HDPrivateKey?: HDPrivateKey | string;
+        HDPublicKey?: HDPublicKey | string;
     }
 }
-
-

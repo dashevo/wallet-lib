@@ -2,8 +2,8 @@ const { is } = require('../../../utils');
 
 /**
  * Get a getBlockHeader from a provided block hash or block height
- * @param identifier - Block Hash or blockHeight
- * @return {Promise<*>}
+ * @param {string|number} identifier - Block Hash or blockHeight
+ * @return {Promise<BlockHeader>}
  */
 async function getBlockHeader(identifier) {
   const search = await this.storage.searchBlockHeader(identifier);
@@ -12,8 +12,8 @@ async function getBlockHeader(identifier) {
   }
   const blockHeight = (is.num(identifier)) ? identifier : null;
   const blockHeader = (is.num(identifier))
-    ? await this.transporter.getBlockByHeight(blockHeight)
-    : await this.transporter.getBlockHeaderByHash(identifier);
+    ? await this.transport.getBlockByHeight(blockHeight)
+    : await this.transport.getBlockHeaderByHash(identifier);
 
   if (this.cacheBlockHeaders) {
     await this.storage.importBlockHeader(blockHeader, blockHeight);
