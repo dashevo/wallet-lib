@@ -2,6 +2,6 @@
  * Return best block height
  * @return {number}
  */
-module.exports = async function getBestBlockHeight() {
-  return this.transporter.getBestBlockHeight();
+module.exports = async function getBestBlockHeightFromTransport() {
+  return this.transport.getBestBlockHeight();
 };

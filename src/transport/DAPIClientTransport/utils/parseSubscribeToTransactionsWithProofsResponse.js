@@ -1,9 +1,9 @@
 const {
   Transaction, MerkleBlock,
 } = require('@dashevo/dashcore-lib');
-const logger = require('../../../../logger');
+const logger = require('../../../logger');
 const getHeightFromMerkleBlockBuffer = require('./getHeightFromMerkleBlockBuffer');
-const EVENTS = require('../../../../EVENTS');
+const EVENTS = require('../../../EVENTS');
 
 const parseSubscribeToTransactionsWithProofsResponse = async (
   self,

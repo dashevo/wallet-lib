@@ -1,8 +1,7 @@
 const EVENTS = require('../../../EVENTS');
 
 module.exports = function setupListeners() {
-  const { storage, transport } = this;
-  const { storage, transporter, importTransactions } = this;
+  const { transport, importTransactions } = this;
 
   // For each new transaction emitted by transport, we import to storage
   // It will also look-up for UTXO

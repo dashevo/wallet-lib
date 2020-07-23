@@ -13,7 +13,7 @@ describe('Workers - TransactionSyncStreamWorker', function suite() {
   storage.createWallet();
 
   let mockParent = {
-    transporter: {},
+    transport: {},
     storage,
     walletId: Object.keys(storage.store.wallets)[0],
     getAddress: ()=> {},

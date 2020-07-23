@@ -1,9 +1,9 @@
 const {
-  BloomFilter
+  BloomFilter,
 } = require('@dashevo/dashcore-lib');
-const logger = require('../../../../logger');
+const logger = require('../../../logger');
 
-const { BLOOM_FALSE_POSITIVE_RATE } = require('../../../../CONSTANTS');
+const { BLOOM_FALSE_POSITIVE_RATE } = require('../../../CONSTANTS');
 
 /**
  * From a given addressList will create and submit a bloomfilter to DAPI
@@ -37,5 +37,5 @@ module.exports = async function subscribeToTransactionWithProofs(
     opts.fromBlockHeight = 1;
   }
 
-  return client.subscribeToTransactionsWithProofs(bloomfilter, opts);
+  return client.core.subscribeToTransactionsWithProofs(bloomfilter, opts);
 };

@@ -1,5 +1,5 @@
 const {
-  Transaction,
+  Transaction, MerkleBlock,
 } = require('@dashevo/dashcore-lib');
 const getMissingIndexes = require('../BIP44Worker/utils/getMissingIndexes');
 const isContiguousPath = require('../BIP44Worker/utils/isContiguousPath');
@@ -18,8 +18,9 @@ class TransactionSyncStreamWorker extends Worker {
       gapLimit: 10,
       dependencies: [
         'importTransactions',
+        'importBlockHeader',
         'storage',
-        'transporter',
+        'transport',
         'walletId',
         'getAddress',
         'network',
@@ -78,6 +79,20 @@ class TransactionSyncStreamWorker extends Worker {
    * @param response
    * @return {[]}
    */
+  static getMerkleBlockFromStreamResponse(response) {
+    let merkleBlock = null;
+    const rawMerkleBlock = response.getRawMerkleBlock();
+    if (rawMerkleBlock) {
+      merkleBlock = new MerkleBlock(Buffer.from(rawMerkleBlock));
+    }
+    return merkleBlock;
+  }
+
+  /**
+   *
+   * @param response
+   * @return {[]}
+   */
   static getTransactionListFromStreamResponse(response) {
     let walletTransactions = [];
     const transactions = response.getRawTransactions();
@@ -103,20 +118,23 @@ class TransactionSyncStreamWorker extends Worker {
    * @returns {Promise<void>}
    */
   async execute() {
-    // await this.startIncomingSync();
+    await this.startIncomingSync();
   }
 
   async onStop() {
     this.syncIncomingTransactions = false;
     if (this.stream) {
-      this.stream.end();
+      const { stream } = this;
+      this.stream = null;
+      stream.cancel();
     }
   }
 }
 
 TransactionSyncStreamWorker.prototype.getAddressesToSync = require('./methods/getAddressesToSync');
-TransactionSyncStreamWorker.prototype.getBestBlockHeight = require('./methods/getBestBlockHeight');
+TransactionSyncStreamWorker.prototype.getBestBlockHeightFromTransport = require('./methods/getBestBlockHeight');
 TransactionSyncStreamWorker.prototype.getLastSyncedBlockHeight = require('./methods/getLastSyncedBlockHeight');
+TransactionSyncStreamWorker.prototype.setLastSyncedBlockHeight = require('./methods/setLastSyncedBlockHeight');
 TransactionSyncStreamWorker.prototype.startHistoricalSync = require('./methods/startHistoricalSync');
 TransactionSyncStreamWorker.prototype.startIncomingSync = require('./methods/startIncomingSync');
 TransactionSyncStreamWorker.prototype.syncUpToTheGapLimit = require('./methods/syncUpToTheGapLimit');
