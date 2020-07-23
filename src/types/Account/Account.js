@@ -189,7 +189,6 @@ Account.prototype.decrypt = require('./methods/decrypt');
 Account.prototype.disconnect = require('./methods/disconnect');
 Account.prototype.encode = require('./methods/encode');
 Account.prototype.encrypt = require('./methods/encrypt');
-Account.prototype.fetchAddressInfo = require('./methods/fetchAddressInfo');
 Account.prototype.fetchStatus = require('./methods/fetchStatus');
 Account.prototype.forceRefreshAccount = require('./methods/forceRefreshAccount');
 Account.prototype.generateAddress = require('./methods/generateAddress');
@@ -214,6 +213,7 @@ Account.prototype.getWorker = require('./methods/getWorker');
 Account.prototype.hasPlugins = require('./methods/hasPlugins');
 Account.prototype.injectPlugin = require('./methods/injectPlugin');
 Account.prototype.importTransactions = require('./methods/importTransactions');
+Account.prototype.importBlockHeader = require('./methods/importBlockHeader');
 
 Account.prototype.sign = require('./methods/sign');
 

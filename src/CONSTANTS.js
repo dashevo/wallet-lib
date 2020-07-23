@@ -56,6 +56,7 @@ const CONSTANTS = {
       'getTotalBalance',
       'broadcastTransaction',
       'importTransactions',
+      'importBlockHeader',
       'getAddress',
       'fetchStatus',
       'getPlugin',
@@ -97,7 +98,7 @@ const CONSTANTS = {
   VERSION_BYTES: 4,
   N_LOCKTIME_BYTES: 4,
 
-  BLOOM_FALSE_POSITIVE_RATE: 0.01,
+  BLOOM_FALSE_POSITIVE_RATE: 0.1,
 
 };
 module.exports = CONSTANTS;
