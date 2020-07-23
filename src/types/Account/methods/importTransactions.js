@@ -1,3 +1,4 @@
+const logger = require('../../../logger');
 const ensureAddressesToGapLimit = require('../../../utils/bip44/ensureAddressesToGapLimit');
 
 /**
@@ -19,6 +20,7 @@ module.exports = async function importTransactions(transactions) {
   const localWalletStore = store.wallets[walletId];
 
   storage.importTransactions(transactions);
+  logger.silly(`Account.importTransactions(len: ${transactions.length})`);
 
   // After each imports, we will need to ensure we keep our gap of 20 unused addresses
   return ensureAddressesToGapLimit(
