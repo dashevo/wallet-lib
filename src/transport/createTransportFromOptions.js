@@ -15,6 +15,8 @@ function createTransportFromOptions(options) {
     return options;
   }
 
+  options.network = 'evonet';
+
   const client = new DAPIClient(options);
 
   return new DAPIClientTransport(client);

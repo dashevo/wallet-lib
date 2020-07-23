@@ -72,7 +72,6 @@ class Account extends EventEmitter {
     this.index = _.has(opts, 'index') ? opts.index : getNextUnusedAccountIndexForWallet(wallet);
     this.strategy = _loadStrategy(_.has(opts, 'strategy') ? opts.strategy : defaultOptions.strategy);
     this.network = getNetwork(wallet.network).toString();
-
     this.BIP44PATH = getBIP44Path(this.network, this.index);
 
     this.transactions = {};
