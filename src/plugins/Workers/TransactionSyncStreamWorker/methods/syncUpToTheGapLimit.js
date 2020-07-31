@@ -28,7 +28,6 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
         const merkleBlockFromResponse = this.constructor
           .getMerkleBlockFromStreamResponse(response);
 
-
         if (merkleBlockFromResponse) {
           self.importBlockHeader(merkleBlockFromResponse.header, currentBlockHeight);
           currentBlockHeight += 1;
@@ -62,6 +61,7 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
       })
       .on('error', (err) => {
         logger.silly('TransactionSyncStreamWorker - end stream on error');
+        self.stream = null;
         stream.cancel();
         reject(err);
       })

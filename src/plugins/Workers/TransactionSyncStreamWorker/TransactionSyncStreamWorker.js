@@ -118,7 +118,12 @@ class TransactionSyncStreamWorker extends Worker {
    * @returns {Promise<void>}
    */
   async execute() {
-    await this.startIncomingSync();
+    console.time('execute');
+    this.startIncomingSync().catch((e) => {
+      console.warn(e);
+      console.timeEnd('execute');
+      this.execute();
+    });
   }
 
   async onStop() {
