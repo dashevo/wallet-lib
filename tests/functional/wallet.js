@@ -103,6 +103,7 @@ describe('Wallet-lib - functional ', function suite() {
           transport: {
             seeds,
           },
+          useSPV: true,
           network: process.env.NETWORK,
         });
 
@@ -127,6 +128,7 @@ describe('Wallet-lib - functional ', function suite() {
           transport: {
             seeds,
           },
+          useSPV: true,
           network: process.env.NETWORK,
         });
 

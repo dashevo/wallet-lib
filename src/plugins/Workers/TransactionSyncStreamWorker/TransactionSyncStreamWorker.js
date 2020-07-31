@@ -76,7 +76,7 @@ class TransactionSyncStreamWorker extends Worker {
 
   /**
    *
-   * @param response
+   * @param {module:dashevo/dapi-client} response
    * @return {[]}
    */
   static getMerkleBlockFromStreamResponse(response) {

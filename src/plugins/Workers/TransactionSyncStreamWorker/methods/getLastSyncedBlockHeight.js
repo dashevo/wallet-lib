@@ -12,7 +12,7 @@ module.exports = function getLastSyncedBlockHeight() {
     : accountsStore[this.BIP44PATH.toString()];
 
   // Fix Genesis issue on DCore
-  if (blockHeight === 0) blockHeight = 3700;
+  if (blockHeight === 0) blockHeight = 1;
 
   return blockHeight;
 };

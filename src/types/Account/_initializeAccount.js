@@ -54,7 +54,7 @@ async function _initializeAccount(account, userUnsafePlugins) {
         }
       } catch (err) {
         if (console.trace) console.trace(err);
-        throw new Error(`Failed to perform standard injections with reason: ${err.message}`);
+        reject(new Error(`Failed to perform standard injections with reason: ${err.message}`));
       }
     }
 
@@ -66,7 +66,7 @@ async function _initializeAccount(account, userUnsafePlugins) {
             WorkerFailedOnExecute,
             InjectionToPluginUnallowed,
           ].includes(e.constructor)) {
-            throw new Error(`Failed to inject plugin: ${UnsafePlugin.name}, reason: ${e.message}`);
+            reject(new Error(`Failed to inject plugin: ${UnsafePlugin.name}, reason: ${e.message}`));
           }
           return reject(e);
         });
