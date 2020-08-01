@@ -36,4 +36,16 @@ describe('Workers - TransactionSyncStreamWorker', function suite() {
   it('should stop', async function () {
     await worker.stopWorker();
   });
+  it('should sync historical data', async function () {
+    expect.fail('Not implemented');
+  });
+  it('should reconnect to the historical stream when gap limit is filled', async function () {
+    expect.fail('Not implemented');
+  });
+  it('should reconnect to the historical stream if stream is closed with an error', async function () {
+    expect.fail('Not implemented');
+  });
+  it('should reconnect to the historical stream if stream is closed by the server', async function () {
+    expect.fail('Not implemented');
+  });
 });
