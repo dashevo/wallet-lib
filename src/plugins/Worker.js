@@ -66,7 +66,6 @@ class Worker extends StandardPlugin {
 
       if (this.executeOnStart) await this.execWorker();
     } catch (err) {
-      if (console.trace) console.trace(err);
       throw new WorkerFailedOnStart(this.name, err.message, err);
     }
   }
@@ -102,7 +101,6 @@ class Worker extends StandardPlugin {
         payloadResult = await this.execute();
       } catch (err) {
         await this.stopWorker(err.message);
-        if (console.trace) console.trace(err);
         throw new WorkerFailedOnExecute(this.name, err.message, err);
       }
     } else {
