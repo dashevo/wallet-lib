@@ -55,7 +55,6 @@ async function _initializeAccount(account, userUnsafePlugins) {
           }
         }
       } catch (err) {
-        if (console.trace) console.trace(err);
         reject(new Error(`Failed to perform standard injections with reason: ${err.message}`));
       }
     }

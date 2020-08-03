@@ -2,6 +2,7 @@ const {
   Transaction, MerkleBlock,
 } = require('@dashevo/dashcore-lib');
 const Worker = require('../../Worker');
+const logger = require('../../../logger');
 
 class TransactionSyncStreamWorker extends Worker {
   constructor(options) {
@@ -115,7 +116,7 @@ class TransactionSyncStreamWorker extends Worker {
   async execute() {
     this.startIncomingSync()
       .catch((e) => {
-        console.warn(e);
+        logger.debug(e);
         this.execute();
       });
   }

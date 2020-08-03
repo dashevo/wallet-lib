@@ -5,7 +5,7 @@ const { Transaction } = require('@dashevo/dashcore-lib');
  * @param {[Transaction]|Transaction} transactions
  * @return {number}
  * */
-const importTransactions = function (transactions) {
+const importTransactions = function importTransactions(transactions) {
   const type = transactions.constructor.name;
   const self = this;
   if (type === Transaction.name) {

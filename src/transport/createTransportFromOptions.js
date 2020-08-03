@@ -15,9 +15,10 @@ function createTransportFromOptions(options) {
     return options;
   }
 
-  options.network = 'evonet';
+  const opts = { ...options };
+  opts.network = 'evonet';
 
-  const client = new DAPIClient(options);
+  const client = new DAPIClient(opts);
 
   return new DAPIClientTransport(client);
 }

@@ -5,7 +5,7 @@ const logger = require('../../../../logger');
  * @param {number} fromBlockHeight
  * @param {number} count
  * @param {string} network
- * @return {Promise<unknown>}
+ * @return {Promise<Transaction[]>}
  */
 module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, network) {
   const self = this;
