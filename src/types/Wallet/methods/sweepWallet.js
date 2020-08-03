@@ -22,7 +22,7 @@ async function sweepWallet(opts = {}) {
     const currentPublicAddress = account.getAddress().address;
     await account.isReady();
     const balance = await account.getTotalBalance();
-    if (!balance > 0) {
+    if (!(balance > 0)) {
       return reject(new Error(`Cannot sweep an empty private key (current balance: ${balance})`));
     }
     let newWallet;

@@ -29,7 +29,7 @@ const parseUtxos = (utxos) => {
  * @param opts.strategy - Overwrite default strategy
  * @return {Transaction} - Transaction object
  */
-function createTransaction(opts) {
+function createTransaction(opts = {}) {
   const self = this;
   const tx = new Transaction();
 
@@ -50,7 +50,7 @@ function createTransaction(opts) {
       throw new Error('An amount in dash or in satoshis is expected to create a transaction');
     }
     const satoshis = (opts.amount && !opts.satoshis) ? dashToDuffs(opts.amount) : opts.satoshis;
-    if (!opts || (!opts.recipient)) {
+    if (!opts || !opts.recipient) {
       throw new Error('A recipient is expected to create a transaction');
     }
     outputs = [{ address: opts.recipient, satoshis }];

@@ -30,7 +30,6 @@ const importAddress = function (addressObj, walletId) {
     default:
       type = 'misc';
   }
-  if (!walletId) throw new Error('Invalid walletId. Cannot import');
   if (!modifiedAddressObject.index) modifiedAddressObject.index = index;
   if (addressesStore[type][path]) {
     if (addressesStore[type][path].fetchedLast < modifiedAddressObject.fetchedLast) {
