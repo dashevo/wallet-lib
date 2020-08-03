@@ -27,12 +27,15 @@ async function _initializeAccount(account, userUnsafePlugins) {
 
 
       try {
-        ensureAddressesToGapLimit(
-          account.store.wallets[account.walletId],
-          account.walletType,
-          account.index,
-          account.getAddress.bind(account),
-        );
+        if ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(account.walletType)) {
+          ensureAddressesToGapLimit(
+              account.store.wallets[account.walletId],
+              account.walletType,
+              account.index,
+              account.getAddress.bind(account),
+          );
+        }
+
         if (account.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
           await account.getAddress('0'); // We force what is usually done by the BIP44Worker.
         }
@@ -155,12 +158,17 @@ async function _initializeAccount(account, userUnsafePlugins) {
         //   }
         //   throw new Error('Unable to initialize. BIP44 Worker not found.');
         // }
-        ensureAddressesToGapLimit(
-          account.store.wallets[account.walletId],
-          account.walletType,
-          account.index,
-          account.getAddress.bind(account),
-        );
+        console.log(account.walletType, [WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(account.walletType));
+
+        if ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(account.walletType)) {
+          ensureAddressesToGapLimit(
+            account.store.wallets[account.walletId],
+            account.walletType,
+            account.index,
+            account.getAddress.bind(account),
+          );
+        }
+
         sendReady();
         return resolve(true);
         // return recursivelyGenerateAddresses(isSyncWorkerActive)

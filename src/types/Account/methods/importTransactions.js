@@ -1,4 +1,5 @@
 const logger = require('../../../logger');
+const { WALLET_TYPES } = require('../../../CONSTANTS');
 const ensureAddressesToGapLimit = require('../../../utils/bip44/ensureAddressesToGapLimit');
 
 /**
@@ -22,11 +23,15 @@ module.exports = async function importTransactions(transactions) {
   storage.importTransactions(transactions);
   logger.silly(`Account.importTransactions(len: ${transactions.length})`);
 
-  // After each imports, we will need to ensure we keep our gap of 20 unused addresses
-  return ensureAddressesToGapLimit(
-    localWalletStore,
-    walletType,
-    index,
-    getAddress.bind(this),
-  );
+  if ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(walletType)) {
+    // After each imports, we will need to ensure we keep our gap of 20 unused addresses
+    return ensureAddressesToGapLimit(
+      localWalletStore,
+      walletType,
+      index,
+      getAddress.bind(this),
+    );
+  }
+
+  return 0;
 };
