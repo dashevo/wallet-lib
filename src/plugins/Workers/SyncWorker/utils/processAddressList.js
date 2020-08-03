@@ -17,14 +17,13 @@ module.exports = async function processAddressList(addressList) {
 
   const transactions = _.flatten(transactionsByAddresses);
 
-  const ordered = new TransactionOrderer();
+  const transactionOrderer = new TransactionOrderer();
 
-  transactions.forEach((tx) => ordered.insert(tx));
+  transactions.forEach((tx) => transactionOrderer.insert(tx));
 
-  // const boundImportTransaction = _.bind(storage.importTransaction, storage, _, transport);
   const boundImportTransaction = _.bind(importTransactions, _);
 
-  const importPromises = ordered.transactions.map(boundImportTransaction);
+  const importPromises = transactionOrderer.transactions.map(boundImportTransaction);
 
   const generatedList = await Promise.all(importPromises);
 

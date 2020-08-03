@@ -1,5 +1,5 @@
 const {
-  BloomFilter,
+  BloomFilter, Address,
 } = require('@dashevo/dashcore-lib');
 const logger = require('../../../logger');
 
@@ -22,7 +22,8 @@ module.exports = async function subscribeToTransactionWithProofs(
   const bloomfilter = BloomFilter.create(addressList.length, BLOOM_FALSE_POSITIVE_RATE);
 
   addressList.forEach((address) => {
-    bloomfilter.insert(Buffer.from(address));
+    const addressModel = new Address(address);
+    bloomfilter.insert(addressModel.hashBuffer);
   });
 
   if (!opts.fromBlockHeight && !opts.fromBlockHash) {

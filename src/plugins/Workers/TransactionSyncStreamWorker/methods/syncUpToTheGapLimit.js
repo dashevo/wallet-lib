@@ -5,7 +5,7 @@ const logger = require('../../../../logger');
  * @param {number} fromBlockHeight
  * @param {number} count
  * @param {string} network
- * @return {Promise<Transaction[]>}
+ * @return {Promise<undefined>}
  */
 module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, network) {
   const self = this;
@@ -21,7 +21,6 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
   self.stream = stream;
 
   return new Promise((resolve, reject) => {
-    let transactions = [];
 
     stream
       .on('data', (response) => {
@@ -38,10 +37,8 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
         const walletTransactions = this.constructor
           .filterWalletTransactions(transactionsFromResponse, addresses, network);
 
-        transactions = transactions.concat(walletTransactions.transactions);
-
-        if (transactions.length) {
-          const addressesGeneratedCount = self.importTransactions(transactions);
+        if (walletTransactions.transactions.length) {
+          const addressesGeneratedCount = self.importTransactions(walletTransactions.transactions);
 
           if (addressesGeneratedCount > 0) {
             logger.silly('TransactionSyncStreamWorker - end stream - new addresses generated');
@@ -68,7 +65,7 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
       .on('end', () => {
         logger.silly('TransactionSyncStreamWorker - end stream on request');
         self.stream = null;
-        resolve(transactions);
+        resolve();
       });
   });
 };

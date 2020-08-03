@@ -41,7 +41,6 @@ async function waitForBalanceToChange(walletAccount) {
 async function fundAddress(dapiClient, faucetAddress, faucetPrivateKey, address, amount) {
   let { items: inputs } = await dapiClient.core.getUTXO(faucetAddress);
 
-  console.log(faucetPrivateKey.toWIF());
   if (isRegtest) {
     const { blocks } = await dapiClient.core.getStatus();
 

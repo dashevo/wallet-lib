@@ -55,7 +55,9 @@ async function _initializeAccount(account, userUnsafePlugins) {
           }
         }
       } catch (err) {
-        reject(new Error(`Failed to perform standard injections with reason: ${err.message}`));
+        const newerr = new Error(`Failed to perform standard injections with reason: ${err.message}`);
+        newerr.stack = err.stack;
+        reject(newerr);
       }
     }
 
