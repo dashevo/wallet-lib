@@ -1,12 +1,7 @@
 const {
   Transaction, MerkleBlock,
 } = require('@dashevo/dashcore-lib');
-const getMissingIndexes = require('../BIP44Worker/utils/getMissingIndexes');
-const isContiguousPath = require('../BIP44Worker/utils/isContiguousPath');
-
 const Worker = require('../../Worker');
-const { BIP44_ADDRESS_GAP, WALLET_TYPES } = require('../../../CONSTANTS');
-const is = require('../../../utils/is');
 
 class TransactionSyncStreamWorker extends Worker {
   constructor(options) {

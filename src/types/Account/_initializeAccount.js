@@ -25,14 +25,13 @@ async function _initializeAccount(account, userUnsafePlugins) {
       // if not, then is it marked as requiring a first exec
       // if yes add to watcher list.
 
-
       try {
         if ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(account.walletType)) {
           ensureAddressesToGapLimit(
-              account.store.wallets[account.walletId],
-              account.walletType,
-              account.index,
-              account.getAddress.bind(account),
+            account.store.wallets[account.walletId],
+            account.walletType,
+            account.index,
+            account.getAddress.bind(account),
           );
         }
 
@@ -91,30 +90,6 @@ async function _initializeAccount(account, userUnsafePlugins) {
       }
     };
 
-    // The need for this function is to pre-generate the address when syncWorker is also doing so
-    // We then ensure first syncWorker to do it's job (which will fetch all used address)
-    // and only then lookup for remaining needed 20 unused address.
-    // Without that, waiting a tick would result similarly.
-    // const recursivelyGenerateAddresses = async (isSyncWorkerActive = true) => {
-    //   // const bip44worker = account.getWorker('BIP44Worker');
-    //
-    //   const exec = async () => {
-    //     if (isSyncWorkerActive) {
-    //       const syncWorker = account.getWorker('syncWorker');
-    //       await syncWorker.execute();
-    //     }
-    //     return ensureAddressesToGapLimit(
-    //       account.store.wallets[account.walletId],
-    //       account.walletType,
-    //       account.index,
-    //       account.getAddress.bind(account),
-    //     );
-    //     // return bip44worker.ensureEnoughAddress();
-    //   };
-    //   if (await exec() !== 0) return recursivelyGenerateAddresses();
-    //   return true;
-    // };
-
     // eslint-disable-next-line no-param-reassign,consistent-return
     account.readinessInterval = setInterval(() => {
       const watchedPlugins = Object.keys(account.plugins.watchers);
@@ -136,10 +111,6 @@ async function _initializeAccount(account, userUnsafePlugins) {
         // while SyncWorker fetch'em on network
         clearInterval(self.readinessInterval);
 
-        // const resultBIP44WorkerSearch = account.hasPlugins(BIP44Worker);
-        const resultSyncWorkerSearch = account.hasPlugins(SyncWorker);
-        const isSyncWorkerActive = resultSyncWorkerSearch.found;
-
         if (account.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
           account.generateAddress(0);
           sendReady();
@@ -150,15 +121,6 @@ async function _initializeAccount(account, userUnsafePlugins) {
           sendReady();
           return resolve(true);
         }
-
-        // if (!resultBIP44WorkerSearch.found) {
-        //   if (account.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
-        //     sendReady();
-        //     return resolve(true);
-        //   }
-        //   throw new Error('Unable to initialize. BIP44 Worker not found.');
-        // }
-        console.log(account.walletType, [WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(account.walletType));
 
         if ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(account.walletType)) {
           ensureAddressesToGapLimit(
@@ -171,15 +133,6 @@ async function _initializeAccount(account, userUnsafePlugins) {
 
         sendReady();
         return resolve(true);
-        // return recursivelyGenerateAddresses(isSyncWorkerActive)
-        //   .then(() => {
-        //     sendReady();
-        //     return resolve(true);
-        //   })
-        //   .catch((err) => {
-        //     if (console.trace) console.trace(err);
-        //     throw new Error(`Unable to generate addresses :${err}`);
-        //   });
       }
     }, readinessIntervalTime);
   });
