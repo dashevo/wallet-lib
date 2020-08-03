@@ -63,8 +63,6 @@ class Account extends EventEmitter {
     this.debug = _.has(opts, 'debug') ? opts.debug : defaultOptions.debug;
     // if (this.debug) process.env.LOG_LEVEL = 'debug';
 
-    this.useSPV = _.has(opts, 'useSPV') ? opts.useSPV : false;
-
     this.walletType = wallet.walletType;
     this.offlineMode = wallet.offlineMode;
 

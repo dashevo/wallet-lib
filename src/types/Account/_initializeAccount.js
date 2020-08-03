@@ -41,14 +41,8 @@ async function _initializeAccount(account, userUnsafePlugins) {
         if (!account.offlineMode) {
           await account.injectPlugin(ChainPlugin, true);
 
-          // In order to keep in sync with blockchain, we maintain two different workers :
-          // - bloomfilter sync via the TransactionSyncStreamWorker
-          // - DAPI transaction fetching via SyncWorker
-          if (account.useSPV) {
-            await account.injectPlugin(TransactionSyncStreamWorker, true);
-          } else {
-            await account.injectPlugin(SyncWorker, true);
-          }
+          // Transaction sync worker
+          await account.injectPlugin(TransactionSyncStreamWorker, true);
 
           if (account.walletType === WALLET_TYPES.HDWALLET) {
             await account.injectPlugin(IdentitySyncWorker, true);
