@@ -120,7 +120,7 @@ class TransactionSyncStreamWorker extends Worker {
   async execute() {
     this.startIncomingSync()
       .catch((e) => {
-        console.warn( e);
+        console.warn(e);
         this.execute();
       });
   }
