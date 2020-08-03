@@ -21,7 +21,6 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
   self.stream = stream;
 
   return new Promise((resolve, reject) => {
-
     stream
       .on('data', (response) => {
         const merkleBlockFromResponse = this.constructor
