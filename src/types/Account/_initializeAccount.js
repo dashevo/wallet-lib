@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const logger = require('../../logger');
 const TransactionSyncStreamWorker = require('../../plugins/Workers/TransactionSyncStreamWorker/TransactionSyncStreamWorker');
-const SyncWorker = require('../../plugins/Workers/SyncWorker/SyncWorker');
 const ChainPlugin = require('../../plugins/Plugins/ChainPlugin');
 // const BIP44Worker = require('../../plugins/Workers/BIP44Worker/BIP44Worker');
 const IdentitySyncWorker = require('../../plugins/Workers/IdentitySyncWorker');
