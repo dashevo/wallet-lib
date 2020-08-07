@@ -6,8 +6,8 @@ const DAPIClientTransport = require('./DAPIClientTransport/DAPIClientTransport')
 
 /**
  *
- * @param {DAPIClientOptions|Transport} options
- * @returns {Transport}
+ * @param {DAPIClientOptions|Transport|DAPIClientTransport} options
+ * @returns {Transport|DAPIClientTransport}
  */
 function createTransportFromOptions(options) {
   if (!_.isPlainObject(options)) {
@@ -15,10 +15,7 @@ function createTransportFromOptions(options) {
     return options;
   }
 
-  const opts = { ...options };
-  opts.network = 'evonet';
-
-  const client = new DAPIClient(opts);
+  const client = new DAPIClient(options);
 
   return new DAPIClientTransport(client);
 }
