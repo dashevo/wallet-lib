@@ -2,18 +2,7 @@ const {
   Transaction, MerkleBlock,
 } = require('@dashevo/dashcore-lib');
 
-const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
-
 const Worker = require('../../Worker');
-const logger = require('../../../logger');
-
-const GRPC_RETRY_ERRORS = [
-  GrpcErrorCodes.DEADLINE_EXCEEDED,
-  GrpcErrorCodes.UNAVAILABLE,
-  GrpcErrorCodes.INTERNAL,
-  GrpcErrorCodes.CANCELLED,
-  GrpcErrorCodes.UNKNOWN,
-];
 
 class TransactionSyncStreamWorker extends Worker {
   constructor(options) {
@@ -125,16 +114,11 @@ class TransactionSyncStreamWorker extends Worker {
    * @returns {Promise<void>}
    */
   async execute() {
-    this.startIncomingSync()
-      .catch((e) => {
-        if (GRPC_RETRY_ERRORS.includes(e.code)) {
-          logger.debug('Error on transaction sync', e);
+    // We shouldn't block workers execution process with transaction syncing
+    // it should proceed in background
 
-          return this.execute();
-        }
-
-        return e;
-      });
+    // noinspection ES6MissingAwait
+    this.startIncomingSync();
   }
 
   async onStop() {
