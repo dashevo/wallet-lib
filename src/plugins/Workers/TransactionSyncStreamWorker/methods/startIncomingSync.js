@@ -1,9 +1,33 @@
+const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
+
 const logger = require('../../../../logger');
+
+const GRPC_RETRY_ERRORS = [
+  GrpcErrorCodes.DEADLINE_EXCEEDED,
+  GrpcErrorCodes.UNAVAILABLE,
+  GrpcErrorCodes.INTERNAL,
+  GrpcErrorCodes.CANCELLED,
+  GrpcErrorCodes.UNKNOWN,
+];
 
 module.exports = async function startIncomingSync() {
   const { network } = this;
-  const bestBlockHeight = await this.getBestBlockHeightFromTransport();
+  const lastSyncedBlockHeight = await this.getLastSyncedBlockHeight();
   const count = 0;
-  logger.debug(`TransactionSyncStreamWorker - IncomingSync - Started from ${bestBlockHeight}, count: ${count}`);
-  return this.syncUpToTheGapLimit(bestBlockHeight, count, network);
+
+  logger.debug(`TransactionSyncStreamWorker - IncomingSync - Started from ${lastSyncedBlockHeight}`);
+
+  try {
+    await this.syncUpToTheGapLimit(lastSyncedBlockHeight, count, network);
+  } catch (e) {
+    if (GRPC_RETRY_ERRORS.includes(e.code)) {
+      logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHeight}`);
+
+      await startIncomingSync();
+
+      return;
+    }
+
+    throw e;
+  }
 };
