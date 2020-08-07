@@ -6,7 +6,14 @@ const ChainPlugin = require('../../plugins/Plugins/ChainPlugin');
 const IdentitySyncWorker = require('../../plugins/Workers/IdentitySyncWorker');
 const EVENTS = require('../../EVENTS');
 const { WALLET_TYPES } = require('../../CONSTANTS');
-const { PluginFailedOnStart, WorkerFailedOnExecute, InjectionToPluginUnallowed } = require('../../errors');
+
+const {
+  PluginFailedOnStart,
+  WorkerFailedOnExecute,
+  InjectionToPluginUnallowed,
+  PluginInjectionError,
+} = require('../../errors');
+
 const ensureAddressesToGapLimit = require('../../utils/bip44/ensureAddressesToGapLimit');
 
 // eslint-disable-next-line no-underscore-dangle
@@ -47,10 +54,8 @@ async function _initializeAccount(account, userUnsafePlugins) {
             await account.injectPlugin(IdentitySyncWorker, true);
           }
         }
-      } catch (err) {
-        const newerr = new Error(`Failed to perform standard injections with reason: ${err.message}`);
-        newerr.stack = err.stack;
-        reject(newerr);
+      } catch (e) {
+        reject(new PluginInjectionError(e));
       }
     }
 
