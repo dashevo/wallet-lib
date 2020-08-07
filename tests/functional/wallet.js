@@ -41,12 +41,6 @@ async function waitForBalanceToChange(walletAccount) {
 async function fundAddress(dapiClient, faucetAddress, faucetPrivateKey, address, amount) {
   let { items: inputs } = await dapiClient.core.getUTXO(faucetAddress);
 
-  if (isRegtest) {
-    const { blocks } = await dapiClient.core.getStatus();
-
-    inputs = inputs.filter((input) => input.height < blocks - 100);
-  }
-
   const transaction = new Transaction();
 
   // We take random coz two browsers run in parallel

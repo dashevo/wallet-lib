@@ -1,8 +1,19 @@
 const {
   Transaction, MerkleBlock,
 } = require('@dashevo/dashcore-lib');
+
+const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
+
 const Worker = require('../../Worker');
 const logger = require('../../../logger');
+
+const GRPC_RETRY_ERRORS = [
+  GrpcErrorCodes.DEADLINE_EXCEEDED,
+  GrpcErrorCodes.UNAVAILABLE,
+  GrpcErrorCodes.INTERNAL,
+  GrpcErrorCodes.CANCELLED,
+  GrpcErrorCodes.UNKNOWN,
+];
 
 class TransactionSyncStreamWorker extends Worker {
   constructor(options) {
@@ -72,7 +83,7 @@ class TransactionSyncStreamWorker extends Worker {
 
   /**
    *
-   * @param {module:dashevo/dapi-client} response
+   * @param {TransactionsWithProofsResponse} response
    * @return {[]}
    */
   static getMerkleBlockFromStreamResponse(response) {
@@ -116,17 +127,22 @@ class TransactionSyncStreamWorker extends Worker {
   async execute() {
     this.startIncomingSync()
       .catch((e) => {
-        logger.debug(e);
-        this.execute();
+        if (GRPC_RETRY_ERRORS.includes(e.code)) {
+          logger.debug('Error on transaction sync', e);
+
+          return this.execute();
+        }
+
+        return e;
       });
   }
 
   async onStop() {
     this.syncIncomingTransactions = false;
+
     if (this.stream) {
-      const { stream } = this;
+      this.stream.cancel();
       this.stream = null;
-      stream.cancel();
     }
   }
 }
