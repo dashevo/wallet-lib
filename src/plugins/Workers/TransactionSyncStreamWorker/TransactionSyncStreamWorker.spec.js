@@ -28,12 +28,12 @@ describe('Workers - TransactionSyncStreamWorker', function suite() {
 
   }
 
-  it.skip('should initiate', () => {
+  it('should initiate', () => {
     worker = new TransactionSyncStreamWorker();
     Object.assign(worker, mockParent);
     worker.parentEvents = mockParentEmitter;
   });
-  it.skip('should start', async function () {
+  it('should start', async function () {
     worker.setLastSyncedBlockHeight(0);
 
     await worker.startWorker();
@@ -45,16 +45,16 @@ describe('Workers - TransactionSyncStreamWorker', function suite() {
   it.skip('should stop', async function () {
     await worker.stopWorker();
   });
-  it.skip('should sync historical data', async function () {
+  it('should sync historical data', async function () {
     expect.fail('Not implemented');
   });
-  it.skip('should reconnect to the historical stream when gap limit is filled', async function () {
+  it('should reconnect to the historical stream when gap limit is filled', async function () {
     expect.fail('Not implemented');
   });
-  it.skip('should reconnect to the historical stream if stream is closed with an error', async function () {
+  it('should reconnect to the historical stream if stream is closed with an error', async function () {
     expect.fail('Not implemented');
   });
-  it.skip('should reconnect to the historical stream if stream is closed by the server', async function () {
+  it('should reconnect to the historical stream if stream is closed by the server', async function () {
     expect.fail('Not implemented');
   });
 });
