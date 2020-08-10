@@ -39,26 +39,19 @@ async function waitForBalanceToChange(walletAccount) {
  * @return {Promise<string>}
  */
 async function fundAddress(dapiClient, faucetAddress, faucetPrivateKey, address, amount) {
-  let { items: inputs } = await dapiClient.core.getUTXO(faucetAddress);
+  const wallet = new Wallet({
+    transport: {
+      seeds,
+    },
+    network: process.env.NETWORK,
+    privateKey: faucetPrivateKey
+  });
+  const account = await wallet.getAccount();
 
-  const transaction = new Transaction();
-
-  // We take random coz two browsers run in parallel
-  // and they can take the same inputs
-
-  const inputIndex = Math.floor(
-    Math.random() * Math.floor(inputs.length / 2) * -1,
-  );
-
-  transaction.from(inputs.slice(inputIndex)[0])
-    .to(address, amount)
-    .change(faucetAddress)
-    .fee(668)
-    .sign(faucetPrivateKey);
+  const tx = await account.createTransaction({satoshis: amount, recipient: address });
+  await account.broadcastTransaction(tx);
 
   let { blocks: currentBlockHeight } = await dapiClient.core.getStatus();
-
-  const transactionId = await dapiClient.core.broadcastTransaction(transaction.toBuffer());
 
   const desiredBlockHeight = currentBlockHeight + 1;
 
@@ -78,7 +71,7 @@ async function fundAddress(dapiClient, faucetAddress, faucetPrivateKey, address,
     } while (currentBlockHeight < desiredBlockHeight);
   }
 
-  return transactionId;
+  return tx.id;
 }
 
 const seeds = process.env.DAPI_SEED
