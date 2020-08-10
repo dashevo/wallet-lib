@@ -145,17 +145,25 @@ describe('Wallet-lib - functional ', function suite() {
         .toAddress(process.env.NETWORK)
         .toString();
 
+      const balanceBeforeTopUp = account.getTotalBalance();
+      const amountToTopUp = 20000;
+
       await fundAddress(
         wallet.transport.client,
         faucetAddress,
         faucetPrivateKey,
         account.getAddress().address,
-        20000,
+        amountToTopUp,
       );
 
       if (isRegtest) {
         await waitForBalanceToChange(account);
       }
+
+      const balanceAfterTopUp = account.getTotalBalance();
+
+      expect(balanceBeforeTopUp).to.be.equal(0);
+      expect(balanceAfterTopUp).to.be.equal(amountToTopUp);
     });
 
     it('should has unusedAddress with index 1', () => {
