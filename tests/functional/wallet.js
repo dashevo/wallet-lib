@@ -47,7 +47,7 @@ async function fundAddress(faucetWallet, address, amount) {
     );
   }
 
-  return tx.id;
+  await waitForTransaction(account, tx.id);
 }
 
 const seeds = process.env.DAPI_SEED
@@ -104,6 +104,7 @@ describe('Wallet-lib - functional ', function suite() {
         expect(exported.split(' ').length).to.equal(12);
       });
     });
+
     describe('Load a wallet', () => {
       it('should load a wallet from mnemonic', () => {
         wallet = new Wallet({
@@ -129,6 +130,7 @@ describe('Wallet-lib - functional ', function suite() {
       });
     });
   });
+
   describe('Account', () => {
     it('should await readiness', async () => {
       account = await wallet.getAccount();
@@ -145,13 +147,11 @@ describe('Wallet-lib - functional ', function suite() {
       const balanceBeforeTopUp = account.getTotalBalance();
       const amountToTopUp = 20000;
 
-      const txid = await fundAddress(
+      await fundAddress(
         faucetWallet,
         account.getAddress().address,
         amountToTopUp,
       );
-
-      await waitForTransaction(account, txid);
 
       const balanceAfterTopUp = account.getTotalBalance();
 
@@ -163,13 +163,16 @@ describe('Wallet-lib - functional ', function suite() {
       const unusedAddress = account.getUnusedAddress();
       expect(unusedAddress.index).to.equal(1);
     });
+
     it('should not have empty balance', () => {
       expect(account.getTotalBalance()).to.not.equal(0);
     });
+
     it('should returns some available UTXO', () => {
       const UTXOs = account.getUTXOS();
       expect(UTXOs.length).to.not.equal(0);
     });
+
     it('should create a transaction', () => {
       const newTx = account.createTransaction({ recipient: 'ydvgJ2eVSmdKt78ZSVBJ7zarVVtdHGj3yR', satoshis: Math.floor(account.getTotalBalance() / 2) });
       expect(newTx.constructor.name).to.equal('Transaction');
