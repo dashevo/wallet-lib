@@ -1,54 +1,10 @@
 const { expect } = require('chai');
 
-const {
-  PrivateKey,
-} = require('@dashevo/dashcore-lib');
+const { Wallet } = require('../../src/index');
 
-const { Wallet, EVENTS } = require('../../src/index');
+const { fundWallet } = require('../../src/utils');
 
 const isRegtest = process.env.NETWORK === 'regtest' || process.env.NETWORK === 'local';
-
-/**
- *
- * @param {Account} walletAccount
- * @param {string} txid - transaction id
- * @return {Promise<void>}
- */
-function waitForTransaction(walletAccount, txid) {
-  return new Promise((resolve => {
-    walletAccount.on(EVENTS.FETCHED_CONFIRMED_TRANSACTION, (event) => {
-      const transaction = event.payload.transaction;
-      if (transaction.id === txid) {
-        return resolve();
-      }
-    });
-  }));
-}
-
-/**
- *
- * @param {Wallet} faucetWallet
- * @param {Address} address
- * @param {number} amount
- * @return {Promise<string>}
- */
-async function fundAddress(faucetWallet, address, amount) {
-  const account = await faucetWallet.getAccount();
-
-  const tx = await account.createTransaction({satoshis: amount, recipient: address });
-  await account.broadcastTransaction(tx);
-
-  if (isRegtest) {
-    const privateKey = new PrivateKey();
-
-    await faucetWallet.transport.client.core.generateToAddress(
-        1,
-        privateKey.toAddress(process.env.NETWORK).toString(),
-    );
-  }
-
-  await waitForTransaction(account, tx.id);
-}
 
 const seeds = process.env.DAPI_SEED
   .split(',');
@@ -56,20 +12,18 @@ const seeds = process.env.DAPI_SEED
 let newWallet;
 let wallet;
 let account;
-let faucetPrivateKey;
 let faucetWallet;
 
 describe('Wallet-lib - functional ', function suite() {
   this.timeout(700000);
 
   before(() => {
-    faucetPrivateKey = PrivateKey.fromString(process.env.FAUCET_PRIVATE_KEY);
     faucetWallet = new Wallet({
       transport: {
         seeds,
       },
       network: process.env.NETWORK,
-      privateKey: faucetPrivateKey
+      privateKey: process.env.FAUCET_PRIVATE_KEY
     });
   });
 
@@ -139,18 +93,14 @@ describe('Wallet-lib - functional ', function suite() {
     });
 
     it('populate balance with dash', async () => {
-      const faucetPrivateKey = PrivateKey.fromString(process.env.FAUCET_PRIVATE_KEY);
-      const faucetAddress = faucetPrivateKey
-        .toAddress(process.env.NETWORK)
-        .toString();
-
       const balanceBeforeTopUp = account.getTotalBalance();
       const amountToTopUp = 20000;
 
-      await fundAddress(
+      await fundWallet(
         faucetWallet,
-        account.getAddress().address,
+        wallet,
         amountToTopUp,
+        { mineBlock: isRegtest },
       );
 
       const balanceAfterTopUp = account.getTotalBalance();
@@ -174,7 +124,11 @@ describe('Wallet-lib - functional ', function suite() {
     });
 
     it('should create a transaction', () => {
-      const newTx = account.createTransaction({ recipient: 'ydvgJ2eVSmdKt78ZSVBJ7zarVVtdHGj3yR', satoshis: Math.floor(account.getTotalBalance() / 2) });
+      const newTx = account.createTransaction({
+        recipient: 'ydvgJ2eVSmdKt78ZSVBJ7zarVVtdHGj3yR',
+        satoshis: Math.floor(account.getTotalBalance() / 2)
+      });
+
       expect(newTx.constructor.name).to.equal('Transaction');
       expect(newTx.outputs.length).to.not.equal(0);
       expect(newTx.inputs.length).to.not.equal(0);
