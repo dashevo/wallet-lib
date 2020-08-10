@@ -11,12 +11,16 @@ const isRegtest = process.env.NETWORK === 'regtest' || process.env.NETWORK === '
 /**
  *
  * @param {Account} walletAccount
+ * @param {string} txid - transaction id
  * @return {Promise<void>}
  */
-function waitForBalanceToChange(walletAccount) {
+function waitForTransaction(walletAccount, txid) {
   return new Promise((resolve => {
-    walletAccount.on(EVENTS.FETCHED_CONFIRMED_TRANSACTION, () => {
-      return resolve();
+    walletAccount.on(EVENTS.FETCHED_CONFIRMED_TRANSACTION, (event) => {
+      const transaction = event.payload.transaction;
+      if (transaction.id === txid) {
+        return resolve();
+      }
     });
   }));
 }
@@ -141,13 +145,13 @@ describe('Wallet-lib - functional ', function suite() {
       const balanceBeforeTopUp = account.getTotalBalance();
       const amountToTopUp = 20000;
 
-      await fundAddress(
+      const txid = await fundAddress(
         faucetWallet,
         account.getAddress().address,
         amountToTopUp,
       );
 
-      await waitForBalanceToChange(account);
+      await waitForTransaction(account, txid);
 
       const balanceAfterTopUp = account.getTotalBalance();
 
