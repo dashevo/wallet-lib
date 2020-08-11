@@ -57,4 +57,7 @@ describe('Workers - TransactionSyncStreamWorker', function suite() {
   it('should reconnect to the historical stream if stream is closed by the server', async function () {
     expect.fail('Not implemented');
   });
+  it('should start incoming transaction sync after all historical data is retrieved', async function () {
+    expect.fail('Not implemented');
+  });
 });
