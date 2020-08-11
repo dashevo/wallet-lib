@@ -11,7 +11,6 @@ class DAPIClientTransport extends AbstractTransport {
   }
 }
 
-DAPIClientTransport.prototype.getAddressSummary = require('./methods/getAddressSummary');
 DAPIClientTransport.prototype.getBestBlock = require('./methods/getBestBlock');
 DAPIClientTransport.prototype.getBestBlockHeader = require('./methods/getBestBlockHeader');
 DAPIClientTransport.prototype.getBestBlockHash = require('./methods/getBestBlockHash');
@@ -22,7 +21,6 @@ DAPIClientTransport.prototype.getBlockHeaderByHash = require('./methods/getBlock
 DAPIClientTransport.prototype.getBlockHeaderByHeight = require('./methods/getBlockHeaderByHeight');
 DAPIClientTransport.prototype.getStatus = require('./methods/getStatus');
 DAPIClientTransport.prototype.getTransaction = require('./methods/getTransaction');
-DAPIClientTransport.prototype.getUTXO = require('./methods/getUTXO');
 DAPIClientTransport.prototype.sendTransaction = require('./methods/sendTransaction');
 DAPIClientTransport.prototype.subscribeToAddressesTransactions = require('./methods/subscribeToAddressesTransactions');
 DAPIClientTransport.prototype.subscribeToBlockHeaders = require('./methods/subscribeToBlockHeaders');
