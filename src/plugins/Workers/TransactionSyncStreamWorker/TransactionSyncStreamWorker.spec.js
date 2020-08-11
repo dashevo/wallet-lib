@@ -3,61 +3,88 @@ const TransactionSyncStreamWorker = require('./TransactionSyncStreamWorker');
 const Storage = require('../../../types/Storage/Storage');
 const EventEmitter = require('events');
 
-describe('Workers - TransactionSyncStreamWorker', function suite() {
+const BIP44PATH = `m/44'/1'/0'`
+
+describe('TransactionSyncStreamWorker', function suite() {
   this.timeout(60000);
   let worker;
-  let mockParentEmitter = Object.create(EventEmitter.prototype);
+  let mockParentEmitter;
+  let storage;
+  let walletId;
+  let dependenciesMock;
 
+  beforeEach(() => {
+    storage = new Storage();
+    mockParentEmitter = Object.create(EventEmitter.prototype);
+    storage.createWallet();
+    walletId = Object.keys(storage.store.wallets)[0];
+    dependenciesMock = {
+      transport: {
+        getBestBlockHeight: () => 42,
+        subscribeToTransactionsWithProofs: (addrList) => true
+      },
+      storage,
+      walletId,
+      getAddress: () => {},
+      network: 'testnet',
+      BIP44PATH
+    }
+    storage.store.wallets[walletId].accounts[BIP44PATH] = {
 
-  const storage = new Storage();
-  storage.createWallet();
-  const walletId = Object.keys(storage.store.wallets)[0];
-  const BIP44PATH = `m/44'/1'/0'`
-  let mockParent = {
-    transport: {
-      getBestBlockHeight:()=> 42,
-      subscribeToTransactionsWithProofs: (addrList) => true
-    },
-    storage,
-    walletId,
-    getAddress: ()=> {},
-    network: 'testnet',
-    BIP44PATH
-  }
-  storage.store.wallets[walletId].accounts[BIP44PATH] = {
-
-  }
-
-  it('should initiate', () => {
+    }
     worker = new TransactionSyncStreamWorker();
-    Object.assign(worker, mockParent);
+
+    Object.assign(worker, dependenciesMock);
     worker.parentEvents = mockParentEmitter;
   });
-  it('should start', async function () {
-    worker.setLastSyncedBlockHeight(0);
 
-    await worker.startWorker();
-    // Test that we do try to read from storage the last best block height ?
-    await new Promise(((resolve, reject) => {
-      setTimeout(resolve, 1000000);
-    }))
+  afterEach(() => {
+    worker.stopWorker();
+  })
+
+  it('should initiate', () => {
+
   });
-  it.skip('should stop', async function () {
-    await worker.stopWorker();
+
+  describe("Historical data", () => {
+    it('should sync historical data from the last saved block', async function () {
+      worker
+    });
+    it("should sync historical data from the genesis if there's no previous sync data", async function () {
+      expect.fail("Not implemented");
+    });
+    it('should reconnect to the historical stream when gap limit is filled', async function () {
+      expect.fail('Not implemented');
+    });
+    it('should reconnect to the historical stream if stream is closed due to operational GRPC error', async function () {
+      expect.fail('Not implemented');
+    });
+    it('should not reconnect to the historical stream if stream in case of any other error', async function () {
+      expect.fail('Not implemented');
+    });
+    it('should reconnect to the historical stream if stream is closed by the server', async function () {
+      expect.fail('Not implemented');
+    });
   });
-  it('should sync historical data', async function () {
-    expect.fail('Not implemented');
-  });
-  it('should reconnect to the historical stream when gap limit is filled', async function () {
-    expect.fail('Not implemented');
-  });
-  it('should reconnect to the historical stream if stream is closed with an error', async function () {
-    expect.fail('Not implemented');
-  });
-  it('should reconnect to the historical stream if stream is closed by the server', async function () {
-    expect.fail('Not implemented');
-  });
-  it('should start incoming transaction sync after all historical data is retrieved', async function () {
-    expect.fail('Not implemented');
+
+  describe("Incoming data", () => {
+    it('should sync incoming transactions and save it to the storage', async function () {
+      expect.fail('Not implemented');
+    })
+    it('should receive own sent transactions and save it to the storage', async function () {
+      expect.fail('Not implemented');
+    });
+    it('should start incoming transaction sync after all historical data is retrieved', async function () {
+      expect.fail('Not implemented');
+    });
+    it('should reconnect to the incoming stream when gap limit is filled', async function () {
+      expect.fail('Not implemented');
+    });
+    it('should reconnect to the incoming stream if stream is closed due to operational GRPC error', async function () {
+      expect.fail('Not implemented');
+    });
+    it('should not reconnect to the incoming stream if stream in case of any other error', async function () {
+      expect.fail('Not implemented');
+    });
   });
 });
