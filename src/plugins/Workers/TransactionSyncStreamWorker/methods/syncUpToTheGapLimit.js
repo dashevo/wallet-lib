@@ -50,16 +50,14 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
             // DO not setting null this.stream allow to know we
             // need to reset our stream (as we pass along the error)
             stream.cancel();
-            // });
-            // this.syncIncomingTransactions = false;
           }
         }
       })
       .on('error', (err) => {
         logger.silly('TransactionSyncStreamWorker - end stream on error');
         self.stream = null;
-        stream.cancel();
         reject(err);
+        // stream.cancel();
       })
       .on('end', () => {
         logger.silly('TransactionSyncStreamWorker - end stream on request');

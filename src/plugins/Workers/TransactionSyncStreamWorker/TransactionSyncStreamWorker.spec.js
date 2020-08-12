@@ -437,6 +437,17 @@ describe('TransactionSyncStreamWorker', function suite() {
       }, 10);
 
       await worker.execute();
+
+      const transactionsInStorage = Object
+          .values(storage.getStore().transactions)
+          .map((t) => t.toJSON());
+
+      const expectedTransactions = transactionsSent
+          .map((t) => t.toJSON());
+
+      expect(worker.stream).to.be.null;
+      expect(transactionsInStorage.length).to.be.equal(3);
+      expect(transactionsInStorage).to.have.deep.members(expectedTransactions);
     })
     it('should receive own sent transactions and save it to the storage', async function () {
       expect.fail('Not implemented');
