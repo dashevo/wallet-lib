@@ -328,12 +328,11 @@ describe('TransactionSyncStreamWorker', function suite() {
 
   describe("Historical data", () => {
     it('should sync historical data from the last saved block', async function () {
+      const transaction = new Transaction().to('yXswboqtttE8qUMbxZTYKqxJB9NZExQB7R', 1000);
       console.time('a');
       setTimeout(() => {
         try {
           expect(worker.stream).is.not.null;
-
-          const transaction = new Transaction().to('yXswboqtttE8qUMbxZTYKqxJB9NZExQB7R', 1000);
           //const merkleBlock = new MerkleBlock();
 
           streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({ rawTransactions: [transaction.toBuffer()] }));
@@ -345,8 +344,12 @@ describe('TransactionSyncStreamWorker', function suite() {
         }
       }, 10);
       await worker.onStart();
+
+      const expectedTransactionsInStore = {};
+      expectedTransactionsInStore[transaction.id] = transaction;
+
       expect(worker.stream).to.be.null;
-      expect(storage.getStore().transactions).to.be.deep.equal([]);
+      expect(storage.getStore().transactions).to.be.deep.equal(expectedTransactionsInStore);
     });
     it("should sync historical data from the genesis if there's no previous sync data", async function () {
       expect.fail("Not implemented");
