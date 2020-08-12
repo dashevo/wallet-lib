@@ -75,7 +75,7 @@ describe('TransactionSyncStreamWorker', function suite() {
 
   beforeEach(function beforeEach() {
     network = 'testnet';
-    address = new PrivateKey().toAddress(network);
+    address = "yXswboqtttE8qUMbxZTYKqxJB9NZExQB7R";
 
     streamMock = new StreamMock();
 
@@ -373,7 +373,7 @@ describe('TransactionSyncStreamWorker', function suite() {
       await worker.onStart();
 
       const expectedTransactionsInStore = {};
-      expectedTransactionsInStore[transaction.id] = transaction;
+      expectedTransactionsInStore[transaction.id] = new Transaction(transaction.toBuffer());
 
       expect(worker.stream).to.be.null;
       expect(storage.getStore().transactions).to.be.deep.equal(expectedTransactionsInStore);
