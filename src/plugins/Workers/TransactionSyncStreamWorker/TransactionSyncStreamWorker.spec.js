@@ -1,8 +1,14 @@
 const { expect } = require('chai');
+const EventEmitter = require('events');
+
+const {
+  PrivateKey,
+  Transaction,
+  MerkleBlock,
+} = require('@dashevo/dashcore-lib')
+
 const TransactionSyncStreamWorker = require('./TransactionSyncStreamWorker');
 const Storage = require('../../../types/Storage/Storage');
-const EventEmitter = require('events');
-const { Transaction, MerkleBlock } = require('@dashevo/dashcore-lib');
 
 const BIP44PATH = `m/44'/1'/0'`
 
@@ -64,31 +70,47 @@ describe('TransactionSyncStreamWorker', function suite() {
   let walletId;
   let dependenciesMock;
   let streamMock;
+  let address;
+  let network;
 
-  beforeEach(() => {
+  beforeEach(function beforeEach() {
+    network = 'testnet';
+    address = new PrivateKey().toAddress(network);
+
     streamMock = new StreamMock();
 
     storage = new Storage();
     mockParentEmitter = Object.create(EventEmitter.prototype);
     storage.createWallet();
     walletId = Object.keys(storage.store.wallets)[0];
+
     dependenciesMock = {
       transport: {
-        getBestBlockHeight: () => 42,
+        getBestBlockHeight: this.sinonSandbox.stub().returns(42),
         subscribeToTransactionsWithProofs: () => {
           return streamMock;
         }
       },
       storage,
       walletId,
-      getAddress: () => {},
-      network: 'testnet',
+      getAddress: this.sinonSandbox.stub().returns(),
+      network,
       BIP44PATH,
-      getLastSyncedBlockHeight: () => { return 1 }
-    }
+      getLastSyncedBlockHeight: this.sinonSandbox.stub().returns(1),
+    };
+
     storage.store.wallets[walletId].accounts[BIP44PATH] = {
 
-    }
+    };
+
+    storage.store.wallets[walletId].addresses = {
+      'someWalletType': {
+        'someWalletPath': {
+          address,
+        },
+      },
+    };
+
     worker = new TransactionSyncStreamWorker();
 
     Object.assign(worker, dependenciesMock);
@@ -101,23 +123,37 @@ describe('TransactionSyncStreamWorker', function suite() {
 
   describe("Historical data", () => {
     it('should sync historical data from the last saved block', async function () {
-      console.time('a');
+      const lastSavedBlockHeight = 40;
+      const bestBlockHeight = 42;
+
+      dependenciesMock.getLastSyncedBlockHeight
+        .returns(lastSavedBlockHeight);
+      dependenciesMock.transport.getBestBlockHeight
+        .returns(bestBlockHeight);
+
       setTimeout(() => {
         try {
           expect(worker.stream).is.not.null;
 
-          const transaction = new Transaction();
+          const transaction = new Transaction()
+            .to(address, 1);
           //const merkleBlock = new MerkleBlock();
 
-          streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({ rawTransactions: [transaction.toBuffer()] }));
+          for (let i = lastSavedBlockHeight; i <= bestBlockHeight; i++) {
+            streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
+              rawTransactions: [transaction.toBuffer()]
+            }));
+          }
 
           streamMock.emit(StreamMock.EVENTS.end);
         } catch (e) {
-           console.error(e);
+          console.error(e);
           streamMock.emit(StreamMock.EVENTS.error, e);
         }
-      }, 10);
+      }, 10)
+
       await worker.onStart();
+
       expect(worker.stream).to.be.null;
       expect(storage.getStore().transactions).to.be.deep.equal([]);
     });
