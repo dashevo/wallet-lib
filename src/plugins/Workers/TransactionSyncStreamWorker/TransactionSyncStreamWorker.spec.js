@@ -84,7 +84,8 @@ describe('TransactionSyncStreamWorker', function suite() {
       getAddress: () => {},
       network: 'testnet',
       BIP44PATH,
-      getLastSyncedBlockHeight: () => { return 1 }
+      getLastSyncedBlockHeight: () => { return 1 },
+      importTransactions: (...args) => { storage.importTransactions(...args) }
     }
 
     storage.store.wallets[walletId].accounts[BIP44PATH] = {}
