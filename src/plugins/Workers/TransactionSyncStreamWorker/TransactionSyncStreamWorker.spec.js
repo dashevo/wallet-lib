@@ -338,7 +338,7 @@ describe('TransactionSyncStreamWorker', function suite() {
     worker.stopWorker();
   })
 
-  describe("Historical data", () => {
+  describe("#onStart", () => {
     it('should sync historical data from the last saved block', async function () {
       const lastSavedBlockHeight = 40;
       const bestBlockHeight = 42;
@@ -371,7 +371,7 @@ describe('TransactionSyncStreamWorker', function suite() {
           console.error(e);
           streamMock.emit(StreamMock.EVENTS.error, e);
         }
-      }, 10)
+      }, 10);
 
       await worker.onStart();
 
@@ -403,8 +403,39 @@ describe('TransactionSyncStreamWorker', function suite() {
     });
   });
 
-  describe("Incoming data", () => {
+  describe("#execute", () => {
     it('should sync incoming transactions and save it to the storage', async function () {
+      const lastSavedBlockHeight = 59;
+      const bestBlockHeight = 61;
+
+      const transactionsSent = [];
+
+      dependenciesMock.getLastSyncedBlockHeight
+          .returns(lastSavedBlockHeight);
+      dependenciesMock.transport.getBestBlockHeight
+          .returns(bestBlockHeight);
+
+      setTimeout(() => {
+        try {
+          expect(worker.stream).is.not.null;
+
+          for (let i = lastSavedBlockHeight; i <= bestBlockHeight; i++) {
+            const transaction = new Transaction()
+                .to(address, i);
+
+            transactionsSent.push(transaction);
+            streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
+              rawTransactions: [transaction.toBuffer()]
+            }));
+          }
+
+          streamMock.emit(StreamMock.EVENTS.end);
+        } catch (e) {
+          console.error(e);
+          streamMock.emit(StreamMock.EVENTS.error, e);
+        }
+      }, 10);
+
       await worker.execute();
     })
     it('should receive own sent transactions and save it to the storage', async function () {
