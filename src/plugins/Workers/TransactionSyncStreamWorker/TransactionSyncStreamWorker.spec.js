@@ -375,10 +375,16 @@ describe('TransactionSyncStreamWorker', function suite() {
 
       await worker.onStart();
 
+      const transactionsInStorage = Object
+          .values(storage.getStore().transactions)
+          .map((t) => t.toJSON());
+
+      const expectedTransactions = transactionsSent
+          .map((t) => t.toJSON());
+
       expect(worker.stream).to.be.null;
-      expect(Object.values(storage.getStore().transactions).map((t) => t.toJSON())).to.have.deep.members(
-        transactionsSent.map((t) => t.toJSON()),
-      );
+      expect(transactionsInStorage.length).to.be.equal(3);
+      expect(transactionsInStorage).to.have.deep.members(expectedTransactions);
     });
     it("should sync historical data from the genesis if there's no previous sync data", async function () {
       expect.fail("Not implemented");
