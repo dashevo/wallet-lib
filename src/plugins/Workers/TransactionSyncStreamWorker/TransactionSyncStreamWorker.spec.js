@@ -343,8 +343,7 @@ describe('TransactionSyncStreamWorker', function suite() {
       const lastSavedBlockHeight = 40;
       const bestBlockHeight = 42;
 
-      const transaction = new Transaction()
-        .to(address, 1);
+      const transactionsSent = [];
 
       dependenciesMock.getLastSyncedBlockHeight
         .returns(lastSavedBlockHeight);
@@ -358,6 +357,10 @@ describe('TransactionSyncStreamWorker', function suite() {
           //const merkleBlock = new MerkleBlock();
 
           for (let i = lastSavedBlockHeight; i <= bestBlockHeight; i++) {
+            const transaction = new Transaction()
+              .to(address, i);
+
+            transactionsSent.push(transaction);
             streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
               rawTransactions: [transaction.toBuffer()]
             }));
@@ -372,11 +375,10 @@ describe('TransactionSyncStreamWorker', function suite() {
 
       await worker.onStart();
 
-      const expectedTransactionsInStore = {};
-      expectedTransactionsInStore[transaction.id] = new Transaction(transaction.toBuffer());
-
       expect(worker.stream).to.be.null;
-      expect(storage.getStore().transactions).to.be.deep.equal(expectedTransactionsInStore);
+      expect(Object.values(storage.getStore().transactions).map((t) => t.toJSON())).to.have.deep.members(
+        transactionsSent.map((t) => t.toJSON()),
+      );
     });
     it("should sync historical data from the genesis if there's no previous sync data", async function () {
       expect.fail("Not implemented");
