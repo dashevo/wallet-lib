@@ -97,23 +97,240 @@ describe('TransactionSyncStreamWorker', function suite() {
       network,
       BIP44PATH,
       getLastSyncedBlockHeight: this.sinonSandbox.stub().returns(1),
-    };
+      importTransactions: (...args) => { storage.importTransactions(...args) }
+    }
 
-    storage.store.wallets[walletId].accounts[BIP44PATH] = {
-
-    };
-
+    storage.store.wallets[walletId].accounts[BIP44PATH] = {};
     storage.store.wallets[walletId].addresses = {
-      'someWalletType': {
-        'someWalletPath': {
-          address,
+      "external": {
+        "m/44'/1'/0'/0/0": {
+          "path": "m/44'/1'/0'/0/0",
+          "index": 0,
+          "address": "yXswboqtttE8qUMbxZTYKqxJB9NZExQB7R",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
         },
+        "m/44'/1'/0'/0/1": {
+          "path": "m/44'/1'/0'/0/1",
+          "index": 1,
+          "address": "yYfSuEu8P4tUgtyps11gLUVyvttCiq3Gwo",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/2": {
+          "path": "m/44'/1'/0'/0/2",
+          "index": 2,
+          "address": "ybRa2jbhJbgLXby7xz97PrQRLkLqyeGf2k",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/3": {
+          "path": "m/44'/1'/0'/0/3",
+          "index": 3,
+          "address": "yQwfiRd1wHBxtn4ki8pBLVjZzuc6NYGhYa",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/4": {
+          "path": "m/44'/1'/0'/0/4",
+          "index": 4,
+          "address": "ygm5wsfuJ4pGk34G5h1P34xts7zGMwioa9",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/5": {
+          "path": "m/44'/1'/0'/0/5",
+          "index": 5,
+          "address": "ybV7n5bxWupPTPBxWRzuacneqRQU2UH9jN",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/6": {
+          "path": "m/44'/1'/0'/0/6",
+          "index": 6,
+          "address": "ydctvsEEDeBxo3uipJPvqjkWCsNGCWvT9K",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/7": {
+          "path": "m/44'/1'/0'/0/7",
+          "index": 7,
+          "address": "yRkTni2zuqGSwku7gpz4r1WHw6io3bTjhz",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/8": {
+          "path": "m/44'/1'/0'/0/8",
+          "index": 8,
+          "address": "yPgLVocefbnxgcRXfhb6pSsXWqBbT7nUUg",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/9": {
+          "path": "m/44'/1'/0'/0/9",
+          "index": 9,
+          "address": "yQL5rZvBWmTvgURxmMqRZYBTr8tFLgHnbm",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/10": {
+          "path": "m/44'/1'/0'/0/10",
+          "index": 10,
+          "address": "yipMBS1AUBN83trpBqueMkwXeQp7F81Gyi",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/11": {
+          "path": "m/44'/1'/0'/0/11",
+          "index": 11,
+          "address": "yQUnjLwdLFJCsfdX9EoqBSWP6safGNS2Rk",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/12": {
+          "path": "m/44'/1'/0'/0/12",
+          "index": 12,
+          "address": "yPDFE2ACMqMVfamFtibRAwiS9XfH3uTFQ2",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/13": {
+          "path": "m/44'/1'/0'/0/13",
+          "index": 13,
+          "address": "yZ8tiYEe1xF9RKcCKWNEw2naotY8yMSjm8",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/14": {
+          "path": "m/44'/1'/0'/0/14",
+          "index": 14,
+          "address": "yfAGzSefH8ZZpXo6kBX7jD4jL161yidJ4i",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/15": {
+          "path": "m/44'/1'/0'/0/15",
+          "index": 15,
+          "address": "yPmUshFRKn6zacEcjdspzhjfepTnJqcsDG",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/16": {
+          "path": "m/44'/1'/0'/0/16",
+          "index": 16,
+          "address": "yR5naDkvm6r52htNjBvH88ihNEXW19yYuz",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/17": {
+          "path": "m/44'/1'/0'/0/17",
+          "index": 17,
+          "address": "yV55uAEnjxJsBuSxVPtW5R3xPET1DgmEUD",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/18": {
+          "path": "m/44'/1'/0'/0/18",
+          "index": 18,
+          "address": "yeJFybdPdWEf9Jz6jF4DqsT5yERPsdGVzb",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        },
+        "m/44'/1'/0'/0/19": {
+          "path": "m/44'/1'/0'/0/19",
+          "index": 19,
+          "address": "yPmLfbe2YmxUk47GV3Pb4p6iLMHgyBKRS5",
+          "transactions": [],
+          "balanceSat": 0,
+          "unconfirmedBalanceSat": 0,
+          "utxos": {},
+          "fetchedLast": 0,
+          "used": false
+        }
       },
+      "internal": {},
+      "misc": {}
     };
 
     worker = new TransactionSyncStreamWorker();
 
-    Object.assign(worker, dependenciesMock);
+    Object.assign(worker, dependenciesMock, storage);
     worker.parentEvents = mockParentEmitter;
   });
 
@@ -126,6 +343,9 @@ describe('TransactionSyncStreamWorker', function suite() {
       const lastSavedBlockHeight = 40;
       const bestBlockHeight = 42;
 
+      const transaction = new Transaction()
+        .to(address, 1);
+
       dependenciesMock.getLastSyncedBlockHeight
         .returns(lastSavedBlockHeight);
       dependenciesMock.transport.getBestBlockHeight
@@ -135,8 +355,6 @@ describe('TransactionSyncStreamWorker', function suite() {
         try {
           expect(worker.stream).is.not.null;
 
-          const transaction = new Transaction()
-            .to(address, 1);
           //const merkleBlock = new MerkleBlock();
 
           for (let i = lastSavedBlockHeight; i <= bestBlockHeight; i++) {
@@ -154,8 +372,11 @@ describe('TransactionSyncStreamWorker', function suite() {
 
       await worker.onStart();
 
+      const expectedTransactionsInStore = {};
+      expectedTransactionsInStore[transaction.id] = transaction;
+
       expect(worker.stream).to.be.null;
-      expect(storage.getStore().transactions).to.be.deep.equal([]);
+      expect(storage.getStore().transactions).to.be.deep.equal(expectedTransactionsInStore);
     });
     it("should sync historical data from the genesis if there's no previous sync data", async function () {
       expect.fail("Not implemented");
