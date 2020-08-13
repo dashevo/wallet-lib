@@ -1,7 +1,12 @@
 const { expect } = require('chai');
 const EventEmitter = require('events');
+const { WALLET_TYPES } = require('../../../CONSTANTS');
+const importTransactions = require('../../../types/Account/methods/importTransactions');
+const getAddress = require('../../../types/Account/methods/getAddress');
+const generateAddress = require('../../../types/Account/methods/generateAddress');
 
 const {
+  HDPrivateKey,
   PrivateKey,
   Transaction,
   MerkleBlock,
@@ -9,6 +14,7 @@ const {
 
 const TransactionSyncStreamWorker = require('./TransactionSyncStreamWorker');
 const Storage = require('../../../types/Storage/Storage');
+const KeyChain = require('../../../types/KeyChain/KeyChain');
 
 const BIP44PATH = `m/44'/1'/0'`
 
@@ -53,6 +59,8 @@ class StreamMock extends EventEmitter {
     // TODO: emit "stream cancelled error"
     this.emit(StreamMock.EVENTS.error, new Error());
   }
+
+  end() {}
 }
 
 StreamMock.EVENTS = {
@@ -68,270 +76,62 @@ describe('TransactionSyncStreamWorker', function suite() {
   let mockParentEmitter;
   let storage;
   let walletId;
-  let dependenciesMock;
+  let walletType;
+  let accountMock;
   let streamMock;
   let address;
   let network;
+  let addressAtIndex19;
+  let keyChain;
+  let testHDKey;
 
   beforeEach(function beforeEach() {
     network = 'testnet';
-    address = "yXswboqtttE8qUMbxZTYKqxJB9NZExQB7R";
+    testHDKey = "xprv9s21ZrQH143K4PgfRZPuYjYUWRZkGfEPuWTEUESMoEZLC274ntC4G49qxgZJEPgmujsmY52eVggtwZgJPrWTMXmbYgqDVySWg46XzbGXrSZ";
 
     streamMock = new StreamMock();
 
+    walletType = WALLET_TYPES.HDWALLET;
+
     storage = new Storage();
+    keyChain = new KeyChain({ HDPrivateKey: new HDPrivateKey(testHDKey) });
+
+    addressAtIndex19 =
+    testHDKey = new HDPrivateKey(testHDKey).toString();
     mockParentEmitter = Object.create(EventEmitter.prototype);
     storage.createWallet();
     walletId = Object.keys(storage.store.wallets)[0];
 
-    dependenciesMock = {
+    accountMock = new EventEmitter();
+    Object.assign(accountMock, {
       transport: {
         getBestBlockHeight: this.sinonSandbox.stub().returns(42),
-        subscribeToTransactionsWithProofs: () => {
-          return streamMock;
-        }
+        subscribeToTransactionsWithProofs: this.sinonSandbox.stub().returns(streamMock),
       },
       storage,
+      keyChain,
+      store: storage.getStore(),
       walletId,
-      getAddress: this.sinonSandbox.stub().returns(),
+      walletType,
       network,
       BIP44PATH,
-      getLastSyncedBlockHeight: this.sinonSandbox.stub().returns(1),
-      importTransactions: (...args) => { storage.importTransactions(...args) }
-    }
+      getAddress,
+      importTransactions,
+      generateAddress,
+    });
 
+    // That sets the last synced block
     storage.store.wallets[walletId].accounts[BIP44PATH] = {};
-    storage.store.wallets[walletId].addresses = {
-      "external": {
-        "m/44'/1'/0'/0/0": {
-          "path": "m/44'/1'/0'/0/0",
-          "index": 0,
-          "address": "yXswboqtttE8qUMbxZTYKqxJB9NZExQB7R",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/1": {
-          "path": "m/44'/1'/0'/0/1",
-          "index": 1,
-          "address": "yYfSuEu8P4tUgtyps11gLUVyvttCiq3Gwo",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/2": {
-          "path": "m/44'/1'/0'/0/2",
-          "index": 2,
-          "address": "ybRa2jbhJbgLXby7xz97PrQRLkLqyeGf2k",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/3": {
-          "path": "m/44'/1'/0'/0/3",
-          "index": 3,
-          "address": "yQwfiRd1wHBxtn4ki8pBLVjZzuc6NYGhYa",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/4": {
-          "path": "m/44'/1'/0'/0/4",
-          "index": 4,
-          "address": "ygm5wsfuJ4pGk34G5h1P34xts7zGMwioa9",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/5": {
-          "path": "m/44'/1'/0'/0/5",
-          "index": 5,
-          "address": "ybV7n5bxWupPTPBxWRzuacneqRQU2UH9jN",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/6": {
-          "path": "m/44'/1'/0'/0/6",
-          "index": 6,
-          "address": "ydctvsEEDeBxo3uipJPvqjkWCsNGCWvT9K",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/7": {
-          "path": "m/44'/1'/0'/0/7",
-          "index": 7,
-          "address": "yRkTni2zuqGSwku7gpz4r1WHw6io3bTjhz",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/8": {
-          "path": "m/44'/1'/0'/0/8",
-          "index": 8,
-          "address": "yPgLVocefbnxgcRXfhb6pSsXWqBbT7nUUg",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/9": {
-          "path": "m/44'/1'/0'/0/9",
-          "index": 9,
-          "address": "yQL5rZvBWmTvgURxmMqRZYBTr8tFLgHnbm",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/10": {
-          "path": "m/44'/1'/0'/0/10",
-          "index": 10,
-          "address": "yipMBS1AUBN83trpBqueMkwXeQp7F81Gyi",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/11": {
-          "path": "m/44'/1'/0'/0/11",
-          "index": 11,
-          "address": "yQUnjLwdLFJCsfdX9EoqBSWP6safGNS2Rk",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/12": {
-          "path": "m/44'/1'/0'/0/12",
-          "index": 12,
-          "address": "yPDFE2ACMqMVfamFtibRAwiS9XfH3uTFQ2",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/13": {
-          "path": "m/44'/1'/0'/0/13",
-          "index": 13,
-          "address": "yZ8tiYEe1xF9RKcCKWNEw2naotY8yMSjm8",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/14": {
-          "path": "m/44'/1'/0'/0/14",
-          "index": 14,
-          "address": "yfAGzSefH8ZZpXo6kBX7jD4jL161yidJ4i",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/15": {
-          "path": "m/44'/1'/0'/0/15",
-          "index": 15,
-          "address": "yPmUshFRKn6zacEcjdspzhjfepTnJqcsDG",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/16": {
-          "path": "m/44'/1'/0'/0/16",
-          "index": 16,
-          "address": "yR5naDkvm6r52htNjBvH88ihNEXW19yYuz",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/17": {
-          "path": "m/44'/1'/0'/0/17",
-          "index": 17,
-          "address": "yV55uAEnjxJsBuSxVPtW5R3xPET1DgmEUD",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/18": {
-          "path": "m/44'/1'/0'/0/18",
-          "index": 18,
-          "address": "yeJFybdPdWEf9Jz6jF4DqsT5yERPsdGVzb",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        },
-        "m/44'/1'/0'/0/19": {
-          "path": "m/44'/1'/0'/0/19",
-          "index": 19,
-          "address": "yPmLfbe2YmxUk47GV3Pb4p6iLMHgyBKRS5",
-          "transactions": [],
-          "balanceSat": 0,
-          "unconfirmedBalanceSat": 0,
-          "utxos": {},
-          "fetchedLast": 0,
-          "used": false
-        }
-      },
-      "internal": {},
-      "misc": {}
-    };
 
     worker = new TransactionSyncStreamWorker();
 
-    Object.assign(worker, dependenciesMock, storage);
+    Object.assign(worker, accountMock);
+
+    worker.setLastSyncedBlockHeight(1);
     worker.parentEvents = mockParentEmitter;
+
+    address = accountMock.getAddress(0).address;
+    addressAtIndex19 = accountMock.getAddress(19).address;
   });
 
   afterEach(() => {
@@ -343,11 +143,10 @@ describe('TransactionSyncStreamWorker', function suite() {
       const lastSavedBlockHeight = 40;
       const bestBlockHeight = 42;
 
+      worker.setLastSyncedBlockHeight(lastSavedBlockHeight);
       const transactionsSent = [];
 
-      dependenciesMock.getLastSyncedBlockHeight
-        .returns(lastSavedBlockHeight);
-      dependenciesMock.transport.getBestBlockHeight
+      accountMock.transport.getBestBlockHeight
         .returns(bestBlockHeight);
 
       setTimeout(() => {
@@ -386,20 +185,15 @@ describe('TransactionSyncStreamWorker', function suite() {
       expect(transactionsInStorage.length).to.be.equal(3);
       expect(transactionsInStorage).to.have.deep.members(expectedTransactions);
     });
-    it("should sync historical data from the genesis if there's no previous sync data", async function () {
-      expect.fail("Not implemented");
-    });
     it('should reconnect to the historical stream when gap limit is filled', async function () {
       const lastSavedBlockHeight = 40;
       const bestBlockHeight = 42;
 
+      worker.setLastSyncedBlockHeight(lastSavedBlockHeight);
       const transactionsSent = [];
 
-      dependenciesMock.getLastSyncedBlockHeight
-          .returns(lastSavedBlockHeight);
-      dependenciesMock.transport.getBestBlockHeight
-          .returns(bestBlockHeight);
-      dependenciesMock.
+      accountMock.transport.getBestBlockHeight
+        .returns(bestBlockHeight);
 
       setTimeout(() => {
         try {
@@ -409,7 +203,7 @@ describe('TransactionSyncStreamWorker', function suite() {
 
           for (let i = lastSavedBlockHeight; i <= bestBlockHeight; i++) {
             const transaction = new Transaction()
-                .to(address, i);
+                .to(addressAtIndex19, i);
 
             transactionsSent.push(transaction);
             streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
@@ -433,9 +227,15 @@ describe('TransactionSyncStreamWorker', function suite() {
       const expectedTransactions = transactionsSent
           .map((t) => t.toJSON());
 
+
+      const addressesInStorage = storage.getStore().wallets[walletId].addresses.external;
+      expect(Object.keys(addressesInStorage).length).to.be.equal(21);
       expect(worker.stream).to.be.null;
       expect(transactionsInStorage.length).to.be.equal(3);
       expect(transactionsInStorage).to.have.deep.members(expectedTransactions);
+    });
+    it("should sync historical data from the genesis if there's no previous sync data", async function () {
+      expect.fail("Not implemented");
     });
     it('should reconnect to the historical stream if stream is closed due to operational GRPC error', async function () {
       expect.fail('Not implemented');
@@ -455,9 +255,7 @@ describe('TransactionSyncStreamWorker', function suite() {
 
       const transactionsSent = [];
 
-      dependenciesMock.getLastSyncedBlockHeight
-          .returns(lastSavedBlockHeight);
-      dependenciesMock.transport.getBestBlockHeight
+      accountMock.transport.getBestBlockHeight
           .returns(bestBlockHeight);
 
       setTimeout(() => {

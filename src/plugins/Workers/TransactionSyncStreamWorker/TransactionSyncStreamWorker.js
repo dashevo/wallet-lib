@@ -28,6 +28,7 @@ class TransactionSyncStreamWorker extends Worker {
     });
 
     this.syncIncomingTransactions = false;
+    this.stream = null;
   }
 
   /**
@@ -125,7 +126,7 @@ class TransactionSyncStreamWorker extends Worker {
     this.syncIncomingTransactions = false;
 
     if (this.stream) {
-      this.stream.cancel();
+      this.stream.end();
       this.stream = null;
     }
   }
