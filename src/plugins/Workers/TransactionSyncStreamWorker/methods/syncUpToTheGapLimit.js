@@ -23,11 +23,13 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
 
   return new Promise((resolve, reject) => {
     stream
-      .on('data', (response) => {
+      .on('data', async (response) => {
         const merkleBlockFromResponse = this.constructor
           .getMerkleBlockFromStreamResponse(response);
 
         if (merkleBlockFromResponse) {
+          // const currentBlockHash = merkleBlockFromResponse.header.hash;
+          // currentBlockHeight = await self.getBlockHeight();
           self.importBlockHeader(merkleBlockFromResponse.header, currentBlockHeight);
           currentBlockHeight += 1;
         }
@@ -38,8 +40,10 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
           .filterWalletTransactions(transactionsFromResponse, addresses, network);
 
         if (walletTransactions.transactions.length) {
-          const addressesGeneratedCount = self.importTransactions(walletTransactions.transactions);
-          reachedGapLimit = addressesGeneratedCount > 0;
+          const addressesGeneratedCount = await self
+            .importTransactions(walletTransactions.transactions);
+
+          reachedGapLimit = reachedGapLimit || addressesGeneratedCount > 0;
 
           if (reachedGapLimit) {
             logger.silly('TransactionSyncStreamWorker - end stream - new addresses generated');

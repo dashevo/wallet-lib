@@ -4,6 +4,7 @@ const { WALLET_TYPES } = require('../../../CONSTANTS');
 const importTransactions = require('../../../types/Account/methods/importTransactions');
 const getAddress = require('../../../types/Account/methods/getAddress');
 const generateAddress = require('../../../types/Account/methods/generateAddress');
+const _initializeAccount = require('../../../types/Account/_initializeAccount');
 
 const {
   HDPrivateKey,
@@ -15,6 +16,10 @@ const {
 const TransactionSyncStreamWorker = require('./TransactionSyncStreamWorker');
 const Storage = require('../../../types/Storage/Storage');
 const KeyChain = require('../../../types/KeyChain/KeyChain');
+
+function wait(ms) {
+  return new Promise((res) => setTimeout(res, ms));
+}
 
 const BIP44PATH = `m/44'/1'/0'`
 
@@ -60,7 +65,10 @@ class StreamMock extends EventEmitter {
     this.emit(StreamMock.EVENTS.error, new Error());
   }
 
-  end() {}
+  end() {
+    this.emit('end');
+    this.removeAllListeners();
+  }
 }
 
 StreamMock.EVENTS = {
@@ -107,6 +115,7 @@ describe('TransactionSyncStreamWorker', function suite() {
         getBestBlockHeight: this.sinonSandbox.stub().returns(42),
         subscribeToTransactionsWithProofs: this.sinonSandbox.stub().returns(streamMock),
       },
+      injectDefaultPlugins: true,
       storage,
       keyChain,
       store: storage.store,
@@ -118,7 +127,14 @@ describe('TransactionSyncStreamWorker', function suite() {
       getAddress,
       importTransactions,
       generateAddress,
+      injectPlugin: this.sinonSandbox.stub(),
+      plugins: {
+        watchers: [],
+      },
+      state: {}
     });
+
+    _initializeAccount(accountMock, []);
 
     // That sets the last synced block
     storage.store.wallets[walletId].accounts[BIP44PATH] = {};
@@ -149,20 +165,20 @@ describe('TransactionSyncStreamWorker', function suite() {
       accountMock.transport.getBestBlockHeight
         .returns(bestBlockHeight);
 
-      setTimeout(() => {
+      setTimeout(async () => {
         try {
           expect(worker.stream).is.not.null;
 
           //const merkleBlock = new MerkleBlock();
 
           for (let i = lastSavedBlockHeight; i <= bestBlockHeight; i++) {
-            const transaction = new Transaction()
-              .to(address, i);
+            const transaction = new Transaction().to(address, i);
 
             transactionsSent.push(transaction);
             streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
               rawTransactions: [transaction.toBuffer()]
             }));
+            await wait(10);
           }
 
           streamMock.emit(StreamMock.EVENTS.end);
@@ -185,6 +201,7 @@ describe('TransactionSyncStreamWorker', function suite() {
       expect(transactionsInStorage.length).to.be.equal(3);
       expect(transactionsInStorage).to.have.deep.members(expectedTransactions);
     });
+
     it('should reconnect to the historical stream when gap limit is filled', async function () {
       const lastSavedBlockHeight = 40;
       const bestBlockHeight = 42;
@@ -195,20 +212,20 @@ describe('TransactionSyncStreamWorker', function suite() {
       accountMock.transport.getBestBlockHeight
         .returns(bestBlockHeight);
 
-      setTimeout(() => {
+      setTimeout(async () => {
         try {
           expect(worker.stream).is.not.null;
 
           //const merkleBlock = new MerkleBlock();
 
           for (let i = lastSavedBlockHeight; i <= bestBlockHeight; i++) {
-            const transaction = new Transaction()
-                .to(addressAtIndex19, i);
+            const transaction = new Transaction().to(addressAtIndex19, i);
 
             transactionsSent.push(transaction);
             streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
               rawTransactions: [transaction.toBuffer()]
             }));
+            await wait(10);
           }
 
           streamMock.emit(StreamMock.EVENTS.end);
@@ -232,6 +249,15 @@ describe('TransactionSyncStreamWorker', function suite() {
       // We send transaction to index 19, so wallet should generate additional 20 addresses to keep the gap between
       // the last used address
       expect(Object.keys(addressesInStorage).length).to.be.equal(40);
+      // It should reconnect after the gap limit is reached
+      expect(accountMock.transport.subscribeToTransactionsWithProofs.callCount).to.be.equal(2);
+      // 20 external and 20 internal
+      expect(accountMock.transport.subscribeToTransactionsWithProofs.firstCall.args[0].length).to.be.equal(40);
+      expect(accountMock.transport.subscribeToTransactionsWithProofs.firstCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 2});
+      // 20 more of each type, since the last address is used
+      expect(accountMock.transport.subscribeToTransactionsWithProofs.secondCall.args[0].length).to.be.equal(80);
+      expect(accountMock.transport.subscribeToTransactionsWithProofs.secondCall.args[1]).to.be.deep.equal({ fromBlockHeight: 41, count: 1});
+
       expect(worker.stream).to.be.null;
       expect(transactionsInStorage.length).to.be.equal(3);
       expect(transactionsInStorage).to.have.deep.members(expectedTransactions);
