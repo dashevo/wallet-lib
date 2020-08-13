@@ -7,16 +7,14 @@ const isContiguousPath = require('./isContiguousPath');
 
 /**
  * This method ensures there will always be enough local addresses up to gap limit as per BIP44
- * @param {Storage} store
+ * @param {Storage} walletStore
  * @param walletType
- * @param walletId
  * @param accountIndex
  * @param getAddress
  * @return {number}
  */
 function ensureAccountAddressesToGapLimit(walletStore, walletType, accountIndex, getAddress) {
   let generated = 0;
-  let unusedAddresses = 0;
 
   const externalAddresses = walletStore.addresses.external;
   let externalAddressesPaths = Object.keys(externalAddresses);
@@ -42,22 +40,27 @@ function ensureAccountAddressesToGapLimit(walletStore, walletType, accountIndex,
     .filter((el) => parseInt(el.split('/')[3], 10) === accountIndex)
     .sort(sortByIndex);
 
+  let lastUsedIndex = 0;
+  let lastGeneratedIndex = 0;
+
   // Scan already generated addresses and count how many are unused
   externalAddressesPaths.forEach((path) => {
-    const el = externalAddresses[path];
-    // if (!el.used && el.path.length > 0) {
-    //   el.used = true;
-    //   throw new Error(`Conflicting information ${JSON.stringify(el)}`);
-    // }
-    if (!el.used) unusedAddresses += 1;
+    const address = externalAddresses[path];
+
     if (!isContiguousPath(path, prevPath)) {
       throw new Error('Addresses are expected to be contiguous');
     }
+
+    if (address.used) {
+      lastUsedIndex = address.index;
+    }
+
+    lastGeneratedIndex = address.index;
     prevPath = path;
   });
 
-  // Unused addresses are counted in the foreach above
-  const addressToGenerate = BIP44_ADDRESS_GAP - unusedAddresses;
+  const gapBetweenLastUsedAndLastGenerated = lastGeneratedIndex - lastUsedIndex;
+  const addressToGenerate = BIP44_ADDRESS_GAP - gapBetweenLastUsedAndLastGenerated;
 
   if (addressToGenerate > 0) {
     const lastElemPath = externalAddressesPaths[externalAddressesPaths.length - 1];

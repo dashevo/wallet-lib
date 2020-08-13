@@ -96,7 +96,6 @@ describe('TransactionSyncStreamWorker', function suite() {
     storage = new Storage();
     keyChain = new KeyChain({ HDPrivateKey: new HDPrivateKey(testHDKey) });
 
-    addressAtIndex19 =
     testHDKey = new HDPrivateKey(testHDKey).toString();
     mockParentEmitter = Object.create(EventEmitter.prototype);
     storage.createWallet();
@@ -110,9 +109,10 @@ describe('TransactionSyncStreamWorker', function suite() {
       },
       storage,
       keyChain,
-      store: storage.getStore(),
+      store: storage.store,
       walletId,
       walletType,
+      index: 0,
       network,
       BIP44PATH,
       getAddress,
@@ -228,8 +228,10 @@ describe('TransactionSyncStreamWorker', function suite() {
           .map((t) => t.toJSON());
 
 
-      const addressesInStorage = storage.getStore().wallets[walletId].addresses.external;
-      expect(Object.keys(addressesInStorage).length).to.be.equal(21);
+      const addressesInStorage = storage.store.wallets[walletId].addresses.external;
+      // We send transaction to index 19, so wallet should generate additional 20 addresses to keep the gap between
+      // the last used address
+      expect(Object.keys(addressesInStorage).length).to.be.equal(40);
       expect(worker.stream).to.be.null;
       expect(transactionsInStorage.length).to.be.equal(3);
       expect(transactionsInStorage).to.have.deep.members(expectedTransactions);
