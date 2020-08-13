@@ -18,7 +18,11 @@ module.exports = async function startIncomingSync() {
   logger.debug(`TransactionSyncStreamWorker - IncomingSync - Started from ${lastSyncedBlockHeight}`);
 
   try {
-    await this.syncUpToTheGapLimit(lastSyncedBlockHeight, count, network);
+    const gapLimitIsReached = await this.syncUpToTheGapLimit(lastSyncedBlockHeight, count, network);
+    if (gapLimitIsReached) {
+      logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHeight}`);
+      await startIncomingSync.call(this);
+    }
   } catch (e) {
     if (GRPC_RETRY_ERRORS.includes(e.code)) {
       logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHeight}`);

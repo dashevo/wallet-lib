@@ -22,7 +22,11 @@ module.exports = async function startHistoricalSync(network) {
   const start = +new Date();
   logger.debug(`TransactionSyncStreamWorker - HistoricalSync - Started from ${currentBlockHeight}, count: ${count}`);
   try {
-    await this.syncUpToTheGapLimit(currentBlockHeight, count, network);
+    const gapLimitIsReached = await this.syncUpToTheGapLimit(currentBlockHeight, count, network);
+    if (gapLimitIsReached) {
+      logger.debug(`TransactionSyncStreamWorker - HistoricalSync - Restarted from ${bestBlockHeight}, count: ${count}`);
+      await startHistoricalSync.call(this, network);
+    }
   } catch (e) {
     if (GRPC_RETRY_ERRORS.includes(e.code)) {
       if (this.stream === null) {

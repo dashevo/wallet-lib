@@ -19,6 +19,7 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
     throw new Error('Limited to one stream at the same time.');
   }
   self.stream = stream;
+  let reachedGapLimit = false;
 
   return new Promise((resolve, reject) => {
     stream
@@ -38,8 +39,9 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
 
         if (walletTransactions.transactions.length) {
           const addressesGeneratedCount = self.importTransactions(walletTransactions.transactions);
+          reachedGapLimit = addressesGeneratedCount > 0;
 
-          if (addressesGeneratedCount > 0) {
+          if (reachedGapLimit) {
             logger.silly('TransactionSyncStreamWorker - end stream - new addresses generated');
             // If there are some new addresses being imported
             // to the storage, that mean that we hit the gap limit
@@ -49,7 +51,7 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
 
             // DO not setting null this.stream allow to know we
             // need to reset our stream (as we pass along the error)
-            stream.cancel();
+            stream.end();
           }
         }
       })
@@ -57,12 +59,11 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
         logger.silly('TransactionSyncStreamWorker - end stream on error');
         self.stream = null;
         reject(err);
-        // stream.cancel();
       })
       .on('end', () => {
         logger.silly('TransactionSyncStreamWorker - end stream on request');
         self.stream = null;
-        resolve();
+        resolve(reachedGapLimit);
       });
   });
 };

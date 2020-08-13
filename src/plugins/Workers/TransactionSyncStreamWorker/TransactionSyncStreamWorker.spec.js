@@ -390,7 +390,52 @@ describe('TransactionSyncStreamWorker', function suite() {
       expect.fail("Not implemented");
     });
     it('should reconnect to the historical stream when gap limit is filled', async function () {
-      expect.fail('Not implemented');
+      const lastSavedBlockHeight = 40;
+      const bestBlockHeight = 42;
+
+      const transactionsSent = [];
+
+      dependenciesMock.getLastSyncedBlockHeight
+          .returns(lastSavedBlockHeight);
+      dependenciesMock.transport.getBestBlockHeight
+          .returns(bestBlockHeight);
+      dependenciesMock.
+
+      setTimeout(() => {
+        try {
+          expect(worker.stream).is.not.null;
+
+          //const merkleBlock = new MerkleBlock();
+
+          for (let i = lastSavedBlockHeight; i <= bestBlockHeight; i++) {
+            const transaction = new Transaction()
+                .to(address, i);
+
+            transactionsSent.push(transaction);
+            streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
+              rawTransactions: [transaction.toBuffer()]
+            }));
+          }
+
+          streamMock.emit(StreamMock.EVENTS.end);
+        } catch (e) {
+          console.error(e);
+          streamMock.emit(StreamMock.EVENTS.error, e);
+        }
+      }, 10);
+
+      await worker.onStart();
+
+      const transactionsInStorage = Object
+          .values(storage.getStore().transactions)
+          .map((t) => t.toJSON());
+
+      const expectedTransactions = transactionsSent
+          .map((t) => t.toJSON());
+
+      expect(worker.stream).to.be.null;
+      expect(transactionsInStorage.length).to.be.equal(3);
+      expect(transactionsInStorage).to.have.deep.members(expectedTransactions);
     });
     it('should reconnect to the historical stream if stream is closed due to operational GRPC error', async function () {
       expect.fail('Not implemented');
