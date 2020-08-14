@@ -6,7 +6,7 @@ const { WALLET_TYPES } = require('../../../CONSTANTS');
  * @param blockHeader
  * @returns {Promise<number>}
  */
-module.exports = async function importBlockHeader(blockHeader, blockHeight) {
+module.exports = async function importBlockHeader(blockHeader) {
   // At this point, the hash of a blockHeader obtained by doing blockHeader.hash,
   // do not seems to be a valid hash.
   // So we will just assume continuous incremental (by one) importing process.
@@ -23,11 +23,8 @@ module.exports = async function importBlockHeader(blockHeader, blockHeight) {
     ? localWalletStore.accounts[BIP44PATH.toString()]
     : localWalletStore.accounts[index.toString()];
 
-
-  // This assumption is false, this depends on FPR of our bloom.
-  localAccountStore.blockHeight = blockHeight;
   localAccountStore.blockHash = blockHeader.id;
 
   storage.importBlockHeader(blockHeader);
-  logger.silly(`Account.importBlockHeader(${blockHeight})`);
+  logger.silly(`Account.importBlockHeader(${blockHeader.id})`);
 };

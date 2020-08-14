@@ -19,7 +19,7 @@ module.exports = async function startHistoricalSync(network) {
   const lastSyncedBlockHash = this.getLastSyncedBlockHash();
   const bestBlockHeight = await this.getBestBlockHeightFromTransport();
   const lastSyncedBlockHeight = await this.getLastSyncedBlockHeight();
-  const count = bestBlockHeight || 1;
+  const count = bestBlockHeight - lastSyncedBlockHeight || 1;
   const start = +new Date();
 
   try {

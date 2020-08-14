@@ -20,8 +20,15 @@ module.exports = async function syncUpToTheGapLimit({
     throw new Error('fromBlockHash ot fromBlockHeight should be present');
   }
 
+  const options = { count };
+  if (fromBlockHash != null) {
+    options.fromBlockHash = fromBlockHash;
+  } else {
+    options.fromBlockHeight = fromBlockHeight;
+  }
+
   const stream = await this.transport
-    .subscribeToTransactionsWithProofs(addresses, { fromBlockHash, fromBlockHeight, count });
+    .subscribeToTransactionsWithProofs(addresses, options);
 
   if (self.stream) {
     throw new Error('Limited to one stream at the same time.');
@@ -36,9 +43,7 @@ module.exports = async function syncUpToTheGapLimit({
           .getMerkleBlockFromStreamResponse(response);
 
         if (merkleBlockFromResponse) {
-          // const currentBlockHash = merkleBlockFromResponse.header.hash;
-          // currentBlockHeight = await self.getBlockHeight();
-          self.importBlockHeader(merkleBlockFromResponse.header, 0);
+          self.importBlockHeader(merkleBlockFromResponse.header);
         }
 
         const transactionsFromResponse = this.constructor
@@ -68,8 +73,6 @@ module.exports = async function syncUpToTheGapLimit({
       })
       .on('error', (err) => {
         logger.silly('TransactionSyncStreamWorker - end stream on error');
-        console.error(err);
-        self.stream = null;
         reject(err);
       })
       .on('end', () => {

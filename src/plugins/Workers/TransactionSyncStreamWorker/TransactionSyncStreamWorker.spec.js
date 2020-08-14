@@ -4,6 +4,7 @@ const { WALLET_TYPES } = require('../../../CONSTANTS');
 const importTransactions = require('../../../types/Account/methods/importTransactions');
 const getAddress = require('../../../types/Account/methods/getAddress');
 const generateAddress = require('../../../types/Account/methods/generateAddress');
+const importBlockHeader = require('../../../types/Account/methods/importBlockHeader');
 const _initializeAccount = require('../../../types/Account/_initializeAccount');
 
 const {
@@ -49,7 +50,7 @@ class StreamDataResponse {
     const { rawTransactions } = this;
     return {
       getTransactionsList() {
-        return rawTransactions;
+        return rawTransactions || [];
       }
     };
   }
@@ -61,8 +62,9 @@ class StreamMock extends EventEmitter {
   }
 
   cancel() {
-    // TODO: emit "stream cancelled error"
-    this.emit(StreamMock.EVENTS.error, new Error());
+    let err = new Error();
+    err.code = 2;
+    this.emit(StreamMock.EVENTS.error, err);
   }
 
   end() {
@@ -92,10 +94,13 @@ describe('TransactionSyncStreamWorker', function suite() {
   let addressAtIndex19;
   let keyChain;
   let testHDKey;
+  let merkleBlockBuffer;
 
   beforeEach(function beforeEach() {
     network = 'testnet';
     testHDKey = "xprv9s21ZrQH143K4PgfRZPuYjYUWRZkGfEPuWTEUESMoEZLC274ntC4G49qxgZJEPgmujsmY52eVggtwZgJPrWTMXmbYgqDVySWg46XzbGXrSZ";
+    merkleBlockBuffer = Buffer.from([0,0,0,32,61,11,102,108,38,155,164,49,91,246,141,178,126,155,13,118,248,83,250,15,206,21,102,65,104,183,243,167,235,167,60,113,140,110,120,87,208,191,240,19,212,100,228,121,192,125,143,44,226,9,95,98,51,25,139,172,175,27,205,201,158,85,37,8,72,52,36,95,255,255,127,32,2,0,0,0,1,0,0,0,1,140,110,120,87,208,191,240,19,212,100,228,121,192,125,143,44,226,9,95,98,51,25,139,172,175,27,205,201,158,85,37,8,1,1]
+    );
 
     streamMock = new StreamMock();
 
@@ -127,6 +132,7 @@ describe('TransactionSyncStreamWorker', function suite() {
       getAddress,
       importTransactions,
       generateAddress,
+      importBlockHeader,
       injectPlugin: this.sinonSandbox.stub(),
       plugins: {
         watchers: [],
@@ -216,17 +222,20 @@ describe('TransactionSyncStreamWorker', function suite() {
         try {
           expect(worker.stream).is.not.null;
 
-          //const merkleBlock = new MerkleBlock();
+          const transaction = new Transaction().to(addressAtIndex19, 10000);
 
-          for (let i = lastSavedBlockHeight; i <= bestBlockHeight; i++) {
-            const transaction = new Transaction().to(addressAtIndex19, i);
+          streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
+            rawMerkleBlock: merkleBlockBuffer
+          }));
 
-            transactionsSent.push(transaction);
-            streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
-              rawTransactions: [transaction.toBuffer()]
-            }));
-            await wait(10);
-          }
+          await wait(10);
+
+          transactionsSent.push(transaction);
+          streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
+            rawTransactions: [transaction.toBuffer()]
+          }));
+
+          await wait(10);
 
           streamMock.emit(StreamMock.EVENTS.end);
         } catch (e) {
@@ -256,14 +265,11 @@ describe('TransactionSyncStreamWorker', function suite() {
       expect(accountMock.transport.subscribeToTransactionsWithProofs.firstCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 2});
       // 20 more of each type, since the last address is used
       expect(accountMock.transport.subscribeToTransactionsWithProofs.secondCall.args[0].length).to.be.equal(80);
-      expect(accountMock.transport.subscribeToTransactionsWithProofs.secondCall.args[1]).to.be.deep.equal({ fromBlockHeight: 41, count: 1});
+      expect(accountMock.transport.subscribeToTransactionsWithProofs.secondCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 2});
 
       expect(worker.stream).to.be.null;
-      expect(transactionsInStorage.length).to.be.equal(3);
+      expect(transactionsInStorage.length).to.be.equal(1);
       expect(transactionsInStorage).to.have.deep.members(expectedTransactions);
-    });
-    it("should sync historical data from the genesis if there's no previous sync data", async function () {
-      expect.fail("Not implemented");
     });
     it('should reconnect to the historical stream if stream is closed due to operational GRPC error', async function () {
       expect.fail('Not implemented');
