@@ -31,6 +31,7 @@ class TransactionSyncStreamWorker extends Worker {
 
     this.syncIncomingTransactions = false;
     this.stream = null;
+    this.incomingSyncPromise = null;
   }
 
   /**
@@ -117,11 +118,12 @@ class TransactionSyncStreamWorker extends Worker {
    * @returns {Promise<void>}
    */
   async execute() {
+    this.syncIncomingTransactions = true;
     // We shouldn't block workers execution process with transaction syncing
     // it should proceed in background
 
     // noinspection ES6MissingAwait
-    this.startIncomingSync();
+    this.incomingSyncPromise = this.startIncomingSync();
   }
 
   async onStop() {

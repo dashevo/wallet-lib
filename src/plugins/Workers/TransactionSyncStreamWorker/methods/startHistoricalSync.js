@@ -46,12 +46,12 @@ module.exports = async function startHistoricalSync(network) {
       logger.debug(`TransactionSyncStreamWorker - HistoricalSync - Restarted from ${bestBlockHeight}, count: ${count}`);
 
       this.stream = null;
-
       await startHistoricalSync.call(this, network);
 
       return;
     }
 
+    this.stream = null;
     throw e;
   }
 

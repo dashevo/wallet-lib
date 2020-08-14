@@ -25,16 +25,23 @@ module.exports = async function startIncomingSync() {
       options.fromBlockHash = lastSyncedBlockHash;
     }
 
-    const gapLimitIsReached = await this.syncUpToTheGapLimit(options);
-    if (gapLimitIsReached) {
+    await this.syncUpToTheGapLimit(options);
+    // The method above resolves only in two cases: the limit is reached or the server is closed.
+    // In both cases, the stream needs to be restarted, unless syncIncomingTransactions is
+    // set to false, which is signalling the worker not to restart stream.
+    if (this.syncIncomingTransactions) {
       logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHash}`);
       await startIncomingSync.call(this);
     }
   } catch (e) {
+    this.stream = null;
+
     if (GRPC_RETRY_ERRORS.includes(e.code)) {
       logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHash}`);
 
-      await startIncomingSync.call(this);
+      if (this.syncIncomingTransactions) {
+        await startIncomingSync.call(this);
+      }
 
       return;
     }
