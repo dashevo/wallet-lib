@@ -26,7 +26,7 @@ module.exports = async function subscribeToTransactionWithProofs(
     bloomfilter.insert(addressModel.hashBuffer);
   });
 
-  if (!opts.fromBlockHeight && !opts.fromBlockHash) {
+  if (opts.fromBlockHeight == null && opts.fromBlockHash == null) {
     throw new Error('fromBlockHeight or fromBlockHash needs to be specified');
   }
 

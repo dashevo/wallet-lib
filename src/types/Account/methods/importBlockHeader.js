@@ -26,6 +26,7 @@ module.exports = async function importBlockHeader(blockHeader, blockHeight) {
 
   // This assumption is false, this depends on FPR of our bloom.
   localAccountStore.blockHeight = blockHeight;
+  localAccountStore.blockHash = blockHeader.id;
 
   storage.importBlockHeader(blockHeader);
   logger.silly(`Account.importBlockHeader(${blockHeight})`);

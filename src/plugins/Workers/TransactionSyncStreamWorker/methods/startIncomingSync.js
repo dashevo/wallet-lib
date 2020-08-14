@@ -12,20 +12,27 @@ const GRPC_RETRY_ERRORS = [
 
 module.exports = async function startIncomingSync() {
   const { network } = this;
+  const lastSyncedBlockHash = await this.getLastSyncedBlockHash();
   const lastSyncedBlockHeight = await this.getLastSyncedBlockHeight();
   const count = 0;
 
-  logger.debug(`TransactionSyncStreamWorker - IncomingSync - Started from ${lastSyncedBlockHeight}`);
-
   try {
-    const gapLimitIsReached = await this.syncUpToTheGapLimit(lastSyncedBlockHeight, count, network);
+    const options = { count, network };
+    // If there's no blocks synced, start from height 0, otherwise from the last block hash.
+    if (lastSyncedBlockHash == null) {
+      options.fromBlockHeight = lastSyncedBlockHeight;
+    } else {
+      options.fromBlockHash = lastSyncedBlockHash;
+    }
+
+    const gapLimitIsReached = await this.syncUpToTheGapLimit(options);
     if (gapLimitIsReached) {
-      logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHeight}`);
+      logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHash}`);
       await startIncomingSync.call(this);
     }
   } catch (e) {
     if (GRPC_RETRY_ERRORS.includes(e.code)) {
-      logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHeight}`);
+      logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHash}`);
 
       await startIncomingSync.call(this);
 

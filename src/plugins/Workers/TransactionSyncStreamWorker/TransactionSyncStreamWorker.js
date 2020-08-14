@@ -1,8 +1,10 @@
 const {
   Transaction, MerkleBlock,
 } = require('@dashevo/dashcore-lib');
+const { WALLET_TYPES } = require('../../../CONSTANTS');
 
 const Worker = require('../../Worker');
+const logger = require('../../../logger');
 
 class TransactionSyncStreamWorker extends Worker {
   constructor(options) {
@@ -126,16 +128,45 @@ class TransactionSyncStreamWorker extends Worker {
     this.syncIncomingTransactions = false;
 
     if (this.stream) {
-      this.stream.end();
+      try {
+        logger.debug('Cancelling the stream');
+        this.stream.cancel();
+      } catch (e) {
+        logger.debug(e);
+      }
       this.stream = null;
     }
+  }
+
+  setLastSyncedBlockHash(hash) {
+    const { walletId } = this;
+    const accountsStore = this.storage.store.wallets[walletId].accounts;
+
+    const accountStore = (this.walletType === WALLET_TYPES.SINGLE_ADDRESS)
+      ? accountsStore[this.index.toString()]
+      : accountsStore[this.BIP44PATH.toString()];
+
+    accountStore.blockHash = hash;
+
+    return accountStore.blockHash;
+  }
+
+  getLastSyncedBlockHash() {
+    const { walletId } = this;
+    const accountsStore = this.storage.store.wallets[walletId].accounts;
+
+    const { blockHash } = (this.walletType === WALLET_TYPES.SINGLE_ADDRESS)
+      ? accountsStore[this.index.toString()]
+      : accountsStore[this.BIP44PATH.toString()];
+
+    return blockHash;
   }
 }
 
 TransactionSyncStreamWorker.prototype.getAddressesToSync = require('./methods/getAddressesToSync');
 TransactionSyncStreamWorker.prototype.getBestBlockHeightFromTransport = require('./methods/getBestBlockHeight');
-TransactionSyncStreamWorker.prototype.getLastSyncedBlockHeight = require('./methods/getLastSyncedBlockHeight');
 TransactionSyncStreamWorker.prototype.setLastSyncedBlockHeight = require('./methods/setLastSyncedBlockHeight');
+TransactionSyncStreamWorker.prototype.getLastSyncedBlockHeight = require('./methods/getLastSyncedBlockHeight');
 TransactionSyncStreamWorker.prototype.startHistoricalSync = require('./methods/startHistoricalSync');
 TransactionSyncStreamWorker.prototype.startIncomingSync = require('./methods/startIncomingSync');
 TransactionSyncStreamWorker.prototype.syncUpToTheGapLimit = require('./methods/syncUpToTheGapLimit');

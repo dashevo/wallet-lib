@@ -16,15 +16,24 @@ const GRPC_RETRY_ERRORS = [
  * @return {Promise<void>}
  */
 module.exports = async function startHistoricalSync(network) {
-  const currentBlockHeight = this.getLastSyncedBlockHeight();
+  const lastSyncedBlockHash = this.getLastSyncedBlockHash();
   const bestBlockHeight = await this.getBestBlockHeightFromTransport();
-  const count = (bestBlockHeight - currentBlockHeight) || 1;
+  const lastSyncedBlockHeight = await this.getLastSyncedBlockHeight();
+  const count = bestBlockHeight || 1;
   const start = +new Date();
-  logger.debug(`TransactionSyncStreamWorker - HistoricalSync - Started from ${currentBlockHeight}, count: ${count}`);
+
   try {
-    const gapLimitIsReached = await this.syncUpToTheGapLimit(currentBlockHeight, count, network);
+    const options = { count, network };
+    // If there's no blocks synced, start from height 0, otherwise from the last block hash.
+    if (lastSyncedBlockHash == null) {
+      options.fromBlockHeight = lastSyncedBlockHeight;
+    } else {
+      options.fromBlockHash = lastSyncedBlockHash;
+    }
+
+    logger.debug(`TransactionSyncStreamWorker - HistoricalSync - Started from ${options.fromBlockHash || options.fromBlockHeight}, count: ${count}`);
+    const gapLimitIsReached = await this.syncUpToTheGapLimit(options);
     if (gapLimitIsReached) {
-      logger.debug(`TransactionSyncStreamWorker - HistoricalSync - Restarted from ${bestBlockHeight}, count: ${count}`);
       await startHistoricalSync.call(this, network);
     }
   } catch (e) {
@@ -46,7 +55,7 @@ module.exports = async function startHistoricalSync(network) {
     throw e;
   }
 
-  this.setLastSyncedBlockHeight(count);
+  this.setLastSyncedBlockHeight(bestBlockHeight);
 
   logger.debug(`TransactionSyncStreamWorker - HistoricalSync - Synchronized ${count} in ${+new Date() - start}ms`);
 };

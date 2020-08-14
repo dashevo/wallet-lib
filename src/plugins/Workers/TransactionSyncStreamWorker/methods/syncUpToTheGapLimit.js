@@ -2,18 +2,26 @@ const logger = require('../../../../logger');
 
 /**
  *
- * @param {number} fromBlockHeight
+ * @param options
+ * @param {string} [options.fromBlockHash]
  * @param {number} count
  * @param {string} network
+ * @param {number} [options.fromBlockHeight]
  * @return {Promise<undefined>}
  */
-module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, network) {
+module.exports = async function syncUpToTheGapLimit({
+  fromBlockHash, count, network, fromBlockHeight,
+}) {
   const self = this;
   const addresses = this.getAddressesToSync();
-  let currentBlockHeight = fromBlockHeight;
-  logger.debug(`syncing up to the gap limit: - fromBlockHeight: ${fromBlockHeight} Count: ${count}`);
+  logger.debug(`syncing up to the gap limit: - fromBlockHeight: ${fromBlockHash || fromBlockHeight} Count: ${count}`);
+
+  if (fromBlockHash == null && fromBlockHeight == null) {
+    throw new Error('fromBlockHash ot fromBlockHeight should be present');
+  }
+
   const stream = await this.transport
-    .subscribeToTransactionsWithProofs(addresses, { fromBlockHeight, count });
+    .subscribeToTransactionsWithProofs(addresses, { fromBlockHash, fromBlockHeight, count });
 
   if (self.stream) {
     throw new Error('Limited to one stream at the same time.');
@@ -30,8 +38,7 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
         if (merkleBlockFromResponse) {
           // const currentBlockHash = merkleBlockFromResponse.header.hash;
           // currentBlockHeight = await self.getBlockHeight();
-          self.importBlockHeader(merkleBlockFromResponse.header, currentBlockHeight);
-          currentBlockHeight += 1;
+          self.importBlockHeader(merkleBlockFromResponse.header, 0);
         }
 
         const transactionsFromResponse = this.constructor
@@ -55,12 +62,13 @@ module.exports = async function syncUpToTheGapLimit(fromBlockHeight, count, netw
 
             // DO not setting null this.stream allow to know we
             // need to reset our stream (as we pass along the error)
-            stream.end();
+            stream.cancel();
           }
         }
       })
       .on('error', (err) => {
         logger.silly('TransactionSyncStreamWorker - end stream on error');
+        console.error(err);
         self.stream = null;
         reject(err);
       })

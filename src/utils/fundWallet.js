@@ -40,16 +40,6 @@ async function fundWallet(faucetWallet, recipientWallet, amount, options = {}) {
     ...options,
   };
 
-  const faucetAccount = await faucetWallet.getAccount();
-  const recipientAccount = await recipientWallet.getAccount();
-
-  const transaction = await faucetAccount.createTransaction({
-    satoshis: amount,
-    recipient: recipientAccount.getAddress().address,
-  });
-
-  await faucetAccount.broadcastTransaction(transaction);
-
   if (options.mineBlock) {
     const privateKey = new PrivateKey();
 
@@ -59,7 +49,31 @@ async function fundWallet(faucetWallet, recipientWallet, amount, options = {}) {
     );
   }
 
-  await waitForTransaction(recipientAccount, transaction.id);
+  const faucetAccount = await faucetWallet.getAccount();
+  const recipientAccount = await recipientWallet.getAccount();
+
+  const transaction = await faucetAccount.createTransaction({
+    satoshis: amount,
+    recipient: recipientAccount.getAddress().address,
+  });
+
+  let blockPromise;
+
+  await faucetAccount.broadcastTransaction(transaction);
+
+  if (options.mineBlock) {
+    const privateKey = new PrivateKey();
+
+    blockPromise = faucetWallet.transport.client.core.generateToAddress(
+      1,
+      privateKey.toAddress(faucetWallet.network).toString(),
+    );
+  }
+
+  return Promise.all([
+    waitForTransaction(recipientAccount, transaction.id),
+    blockPromise,
+  ]);
 }
 
 module.exports = fundWallet;
