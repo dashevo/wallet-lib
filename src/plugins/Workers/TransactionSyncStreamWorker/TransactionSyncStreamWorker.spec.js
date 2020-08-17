@@ -17,6 +17,9 @@ const TransactionSyncStreamWorker = require('./TransactionSyncStreamWorker');
 const Storage = require('../../../types/Storage/Storage');
 const KeyChain = require('../../../types/KeyChain/KeyChain');
 
+const TxStreamDataResponseMock = require('../../../test/mocks/TxStreamDataResponseMock');
+const TxStreamMock = require('../../../test/mocks/TxStreamMock');
+
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
@@ -26,62 +29,6 @@ function wait(ms) {
 
 const BIP44PATH = `m/44'/1'/0'`
 
-class StreamDataResponse {
-  /**
-   *
-   * @param options
-   * @param {Buffer} [options.rawMerkleBlock]
-   * @param {Buffer[]} [options.rawTransactions]
-   */
-  constructor({rawMerkleBlock, rawTransactions}) {
-    this.rawMerkleBlock = rawMerkleBlock;
-    this.rawTransactions = rawTransactions;
-  }
-
-  /**
-   * @return {Buffer}
-   */
-  getRawMerkleBlock() {
-    return this.rawMerkleBlock;
-  }
-
-  /**
-   * @return {{getTransactionsList: (): Buffer[]}}
-   */
-  getRawTransactions() {
-    const { rawTransactions } = this;
-    return {
-      getTransactionsList() {
-        return rawTransactions || [];
-      }
-    };
-  }
-}
-
-class StreamMock extends EventEmitter {
-  constructor() {
-    super();
-  }
-
-  cancel() {
-    let err = new Error();
-    err.code = 2;
-    this.emit(StreamMock.EVENTS.error, err);
-  }
-
-  end() {
-    this.emit('end');
-    this.removeAllListeners();
-  }
-}
-
-StreamMock.EVENTS = {
-  cancel: 'cancel',
-  data: 'data',
-  end: 'end',
-  error: 'error'
-}
-
 describe('TransactionSyncStreamWorker', function suite() {
   this.timeout(60000);
   let worker;
@@ -90,7 +37,7 @@ describe('TransactionSyncStreamWorker', function suite() {
   let walletId;
   let walletType;
   let accountMock;
-  let streamMock;
+  let txStreamMock;
   let address;
   let network;
   let addressAtIndex19;
@@ -103,7 +50,7 @@ describe('TransactionSyncStreamWorker', function suite() {
     testHDKey = "xprv9s21ZrQH143K4PgfRZPuYjYUWRZkGfEPuWTEUESMoEZLC274ntC4G49qxgZJEPgmujsmY52eVggtwZgJPrWTMXmbYgqDVySWg46XzbGXrSZ";
     merkleBlockBuffer = Buffer.from([0,0,0,32,61,11,102,108,38,155,164,49,91,246,141,178,126,155,13,118,248,83,250,15,206,21,102,65,104,183,243,167,235,167,60,113,140,110,120,87,208,191,240,19,212,100,228,121,192,125,143,44,226,9,95,98,51,25,139,172,175,27,205,201,158,85,37,8,72,52,36,95,255,255,127,32,2,0,0,0,1,0,0,0,1,140,110,120,87,208,191,240,19,212,100,228,121,192,125,143,44,226,9,95,98,51,25,139,172,175,27,205,201,158,85,37,8,1,1]);
 
-    streamMock = new StreamMock();
+    txStreamMock = new TxStreamMock();
 
     walletType = WALLET_TYPES.HDWALLET;
 
@@ -119,7 +66,7 @@ describe('TransactionSyncStreamWorker', function suite() {
     Object.assign(accountMock, {
       transport: {
         getBestBlockHeight: this.sinonSandbox.stub().returns(42),
-        subscribeToTransactionsWithProofs: this.sinonSandbox.stub().returns(streamMock),
+        subscribeToTransactionsWithProofs: this.sinonSandbox.stub().returns(txStreamMock),
       },
       injectDefaultPlugins: true,
       storage,
@@ -180,16 +127,16 @@ describe('TransactionSyncStreamWorker', function suite() {
             const transaction = new Transaction().to(address, i);
 
             transactionsSent.push(transaction);
-            streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
+            txStreamMock.emit(TxStreamMock.EVENTS.data, new TxStreamDataResponseMock({
               rawTransactions: [transaction.toBuffer()]
             }));
             await wait(10);
           }
 
-          streamMock.emit(StreamMock.EVENTS.end);
+          txStreamMock.emit(TxStreamMock.EVENTS.end);
         } catch (e) {
           console.error(e);
-          streamMock.emit(StreamMock.EVENTS.error, e);
+          txStreamMock.emit(TxStreamMock.EVENTS.error, e);
         }
       }, 10);
 
@@ -223,23 +170,23 @@ describe('TransactionSyncStreamWorker', function suite() {
 
           const transaction = new Transaction().to(addressAtIndex19, 10000);
 
-          streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
+          txStreamMock.emit(TxStreamMock.EVENTS.data, new TxStreamDataResponseMock({
             rawMerkleBlock: merkleBlockBuffer
           }));
 
           await wait(10);
 
           transactionsSent.push(transaction);
-          streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
+          txStreamMock.emit(TxStreamMock.EVENTS.data, new TxStreamDataResponseMock({
             rawTransactions: [transaction.toBuffer()]
           }));
 
           await wait(10);
 
-          streamMock.emit(StreamMock.EVENTS.end);
+          txStreamMock.emit(TxStreamMock.EVENTS.end);
         } catch (e) {
           console.error(e);
-          streamMock.emit(StreamMock.EVENTS.error, e);
+          txStreamMock.emit(TxStreamMock.EVENTS.error, e);
         }
       }, 10);
 
@@ -286,11 +233,11 @@ describe('TransactionSyncStreamWorker', function suite() {
 
         const err = new Error('Some error');
         err.code = 4;
-        streamMock.emit(StreamMock.EVENTS.error, err);
+        txStreamMock.emit(TxStreamMock.EVENTS.error, err);
 
         await wait(10);
 
-        streamMock.emit(StreamMock.EVENTS.end);
+        txStreamMock.emit(TxStreamMock.EVENTS.end);
       }, 10);
 
       await worker.onStart();
@@ -323,7 +270,7 @@ describe('TransactionSyncStreamWorker', function suite() {
       setTimeout(async () => {
         expect(worker.stream).is.not.null;
 
-        streamMock.emit(StreamMock.EVENTS.error, new Error('Some random error'));
+        txStreamMock.emit(TxStreamMock.EVENTS.error, new Error('Some random error'));
       }, 10);
 
       await expect(worker.onStart()).to.be.rejectedWith('Some random error');
@@ -361,16 +308,16 @@ describe('TransactionSyncStreamWorker', function suite() {
           const transaction = new Transaction().to(address, i);
 
           transactionsSent.push(transaction);
-          streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
+          txStreamMock.emit(TxStreamMock.EVENTS.data, new TxStreamDataResponseMock({
             rawTransactions: [transaction.toBuffer()]
           }));
           await wait(10);
         }
 
-        streamMock.emit(StreamMock.EVENTS.end);
+        txStreamMock.emit(TxStreamMock.EVENTS.end);
       } catch (e) {
         console.error(e);
-        streamMock.emit(StreamMock.EVENTS.error, e);
+        txStreamMock.emit(TxStreamMock.EVENTS.error, e);
       }
 
       await worker.onStop();
@@ -403,23 +350,23 @@ describe('TransactionSyncStreamWorker', function suite() {
       try {
         const transaction = new Transaction().to(addressAtIndex19, 10000);
 
-        streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
+        txStreamMock.emit(TxStreamMock.EVENTS.data, new TxStreamDataResponseMock({
           rawMerkleBlock: merkleBlockBuffer
         }));
 
         await wait(10);
 
         transactionsSent.push(transaction);
-        streamMock.emit(StreamMock.EVENTS.data, new StreamDataResponse({
+        txStreamMock.emit(TxStreamMock.EVENTS.data, new TxStreamDataResponseMock({
           rawTransactions: [transaction.toBuffer()]
         }));
 
         await wait(10);
 
-        streamMock.emit(StreamMock.EVENTS.end);
+        txStreamMock.emit(TxStreamMock.EVENTS.end);
       } catch (e) {
         console.error(e);
-        streamMock.emit(StreamMock.EVENTS.error, e);
+        txStreamMock.emit(TxStreamMock.EVENTS.error, e);
       }
 
       await worker.onStop();
@@ -464,11 +411,11 @@ describe('TransactionSyncStreamWorker', function suite() {
 
       const err = new Error('Some error');
       err.code = 4;
-      streamMock.emit(StreamMock.EVENTS.error, err);
+      txStreamMock.emit(TxStreamMock.EVENTS.error, err);
 
       await wait(10);
 
-      streamMock.emit(StreamMock.EVENTS.end);
+      txStreamMock.emit(TxStreamMock.EVENTS.end);
 
       await worker.onStop();
 
@@ -499,7 +446,7 @@ describe('TransactionSyncStreamWorker', function suite() {
 
       await wait(10);
 
-      streamMock.emit(StreamMock.EVENTS.end);
+      txStreamMock.emit(TxStreamMock.EVENTS.end);
 
       await wait(10);
 
@@ -533,7 +480,7 @@ describe('TransactionSyncStreamWorker', function suite() {
 
       await wait(10);
 
-      streamMock.emit(StreamMock.EVENTS.error, new Error('Some random error'));
+      txStreamMock.emit(TxStreamMock.EVENTS.error, new Error('Some random error'));
 
       await wait(10);
 
