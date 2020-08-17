@@ -40,6 +40,7 @@ module.exports = async function startHistoricalSync(network) {
     if (GRPC_RETRY_ERRORS.includes(e.code)) {
       if (this.stream === null && e.code === GrpcErrorCodes.CANCELLED) {
         // NOOP on self canceled state (via stop worker)
+        logger.debug('TransactionSyncStreamWorker - HistoricalSync - The Worker is stopped');
         return;
       }
 
