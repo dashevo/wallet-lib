@@ -1,10 +1,6 @@
 const EventEmitter = require('events');
 
 class TxStreamMock extends EventEmitter {
-  constructor() {
-    super();
-  }
-
   cancel() {
     const err = new Error();
     err.code = 2;
