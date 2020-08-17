@@ -4,7 +4,6 @@ const {
 const { WALLET_TYPES } = require('../../../CONSTANTS');
 
 const Worker = require('../../Worker');
-const logger = require('../../../logger');
 
 class TransactionSyncStreamWorker extends Worker {
   constructor(options) {
