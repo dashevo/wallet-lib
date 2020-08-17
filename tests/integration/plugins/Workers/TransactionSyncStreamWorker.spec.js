@@ -1,24 +1,24 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const EventEmitter = require('events');
-const { WALLET_TYPES } = require('../../../CONSTANTS');
-const importTransactions = require('../../../types/Account/methods/importTransactions');
-const getAddress = require('../../../types/Account/methods/getAddress');
-const generateAddress = require('../../../types/Account/methods/generateAddress');
-const importBlockHeader = require('../../../types/Account/methods/importBlockHeader');
-const _initializeAccount = require('../../../types/Account/_initializeAccount');
+const { WALLET_TYPES } = require('../../../../src/CONSTANTS');
+const importTransactions = require('../../../../src/types/Account/methods/importTransactions');
+const getAddress = require('../../../../src/types/Account/methods/getAddress');
+const generateAddress = require('../../../../src/types/Account/methods/generateAddress');
+const importBlockHeader = require('../../../../src/types/Account/methods/importBlockHeader');
+const _initializeAccount = require('../../../../src/types/Account/_initializeAccount');
 
 const {
   HDPrivateKey,
   Transaction,
 } = require('@dashevo/dashcore-lib')
 
-const TransactionSyncStreamWorker = require('./TransactionSyncStreamWorker');
-const Storage = require('../../../types/Storage/Storage');
-const KeyChain = require('../../../types/KeyChain/KeyChain');
+const TransactionSyncStreamWorker = require('../../../../src/plugins/Workers/TransactionSyncStreamWorker/TransactionSyncStreamWorker');
+const Storage = require('../../../../src/types/Storage/Storage');
+const KeyChain = require('../../../../src/types/KeyChain/KeyChain');
 
-const TxStreamDataResponseMock = require('../../../test/mocks/TxStreamDataResponseMock');
-const TxStreamMock = require('../../../test/mocks/TxStreamMock');
+const TxStreamDataResponseMock = require('../../../../src/test/mocks/TxStreamDataResponseMock');
+const TxStreamMock = require('../../../../src/test/mocks/TxStreamMock');
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
