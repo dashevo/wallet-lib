@@ -130,13 +130,9 @@ class TransactionSyncStreamWorker extends Worker {
     this.syncIncomingTransactions = false;
 
     if (this.stream) {
-      try {
-        logger.debug('Cancelling the stream');
-        this.stream.cancel();
-      } catch (e) {
-        logger.debug(e);
-      }
+      const { stream } = this;
       this.stream = null;
+      stream.cancel();
     }
   }
 
