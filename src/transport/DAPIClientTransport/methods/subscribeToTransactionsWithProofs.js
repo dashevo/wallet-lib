@@ -8,7 +8,11 @@ const { BLOOM_FALSE_POSITIVE_RATE } = require('../../../CONSTANTS');
 /**
  * From a given addressList will create and submit a bloomfilter to DAPI
  * and parse response looking for relevant inputs and outputs.
- * @param addressList
+ * @param {string[]} addressList
+ * @param opts
+ * @param {number} [opts.fromBlockHeight]
+ * @param {string} [opts.fromBlockHash]
+ * @param {number} opts.count
  * @return {Promise<void>}
  */
 
