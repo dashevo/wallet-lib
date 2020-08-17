@@ -130,9 +130,15 @@ class TransactionSyncStreamWorker extends Worker {
     this.syncIncomingTransactions = false;
 
     if (this.stream) {
-      const { stream } = this;
+      this.stream.cancel();
+      // When calling stream.cancel(), the stream will emit 'error' event with the code 'CANCELLED'.
+      // There are two cases when this happens: when the gap limit is filled and syncToTheGapLimit
+      // and the stream needs to be restarted with new parameters, and here,
+      // when stopping the worker.
+      // The code in stream worker distinguishes whether it need to reconnect or not by the fact
+      // that the old stream object is present or not. When it is set to null, it won't try to
+      // reconnect to the stream.
       this.stream = null;
-      stream.cancel();
     }
   }
 
