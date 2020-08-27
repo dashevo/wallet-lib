@@ -6,7 +6,7 @@ const EVENTS = require('../EVENTS');
  *
  * @param {Account} walletAccount
  * @param {string} id - transaction id
- * @return {Promise<void>}
+ * @return {Promise<string>}
  */
 function waitForTransaction(walletAccount, id) {
   return new Promise(((resolve) => {
@@ -16,7 +16,7 @@ function waitForTransaction(walletAccount, id) {
       if (transaction.id === id) {
         walletAccount.removeListener(EVENTS.FETCHED_CONFIRMED_TRANSACTION, listener);
 
-        resolve();
+        resolve(transaction.id);
       }
     };
 
