@@ -98,8 +98,12 @@ export declare namespace Account {
     }
 
     interface createTransactionOptions {
-        recipient?: RecipientOptions,
+        recipient?: PublicAddress,
+        satohis?: number,
+        amount?: number,
+
         recipients?: [RecipientOptions]
+        
         change?: string;
         utxos?: [object];
         isInstantSend?: boolean;
