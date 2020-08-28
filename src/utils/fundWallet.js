@@ -51,12 +51,17 @@ async function fundWallet(faucetWallet, recipientWallet, amount, options = {}) {
   }
 
   if (options.isRegtest) {
-    const privateKey = new PrivateKey();
+    const initialHeight = await faucetWallet.transport.client.core.getBestBlockHeight();
+    let height = initialHeight;
+    while (initialHeight + 101 > height) {
+      const privateKey = new PrivateKey();
 
-    await faucetWallet.transport.client.core.generateToAddress(
-      100,
-      privateKey.toAddress(faucetWallet.network).toString(),
-    );
+      await faucetWallet.transport.client.core.generateToAddress(
+        100,
+        privateKey.toAddress(faucetWallet.network).toString(),
+      );
+      height = await faucetWallet.transport.client.core.getBestBlockHeight();
+    }
   }
 
   const faucetAccount = await faucetWallet.getAccount();
