@@ -31,6 +31,7 @@ function waitForTransaction(walletAccount, id) {
  * @param {number} amount
  * @param {Object} [options]
  * @param {boolean} [options.mineBlock=false]
+ * @param {boolean} [options.isRegtest=false]
  * @return {Promise<void>}
  */
 async function fundWallet(faucetWallet, recipientWallet, amount, options = {}) {
@@ -45,6 +46,15 @@ async function fundWallet(faucetWallet, recipientWallet, amount, options = {}) {
 
     await faucetWallet.transport.client.core.generateToAddress(
       1,
+      privateKey.toAddress(faucetWallet.network).toString(),
+    );
+  }
+
+  if (options.isRegtest) {
+    const privateKey = new PrivateKey();
+
+    await faucetWallet.transport.client.core.generateToAddress(
+      100,
       privateKey.toAddress(faucetWallet.network).toString(),
     );
   }

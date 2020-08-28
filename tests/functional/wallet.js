@@ -100,7 +100,7 @@ describe('Wallet-lib - functional ', function suite() {
         faucetWallet,
         wallet,
         amountToTopUp,
-        { mineBlock: isRegtest },
+        { mineBlock: isRegtest, isRegtest },
       );
 
       const balanceAfterTopUp = account.getTotalBalance();
