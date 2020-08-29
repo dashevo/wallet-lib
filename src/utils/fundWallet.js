@@ -51,7 +51,7 @@ async function fundWallet(faucetWallet, recipientWallet, amount, options = {}) {
   }
 
   if (options.isRegtest) {
-    const initialHeight = await faucetWallet.transport.client.core.getBestBlockHeight();
+    const initialHeight = await faucetWallet.transport.getBestBlockHeight();
     let height = initialHeight;
     while (initialHeight + 101 > height) {
       const privateKey = new PrivateKey();
@@ -62,7 +62,7 @@ async function fundWallet(faucetWallet, recipientWallet, amount, options = {}) {
         privateKey.toAddress(faucetWallet.network).toString(),
       );
       // eslint-disable-next-line no-await-in-loop
-      height = await faucetWallet.transport.client.core.getBestBlockHeight();
+      height = await faucetWallet.transport.getBestBlockHeight();
     }
   }
 
