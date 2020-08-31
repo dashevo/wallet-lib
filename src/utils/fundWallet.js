@@ -40,31 +40,22 @@ async function fundWallet(faucetWallet, recipientWallet, amount, options = {}) {
     mineBlock: false,
     ...options,
   };
-
-  if (options.mineBlock) {
-    const privateKey = new PrivateKey();
-
-    await faucetWallet.transport.client.core.generateToAddress(
-      1,
-      privateKey.toAddress(faucetWallet.network).toString(),
-    );
-  }
-
-  if (options.isRegtest) {
-    const initialHeight = await faucetWallet.transport.getBestBlockHeight();
-    let height = initialHeight;
-    while (initialHeight + 101 > height) {
-      const privateKey = new PrivateKey();
-
-      // eslint-disable-next-line no-await-in-loop
-      await faucetWallet.transport.client.core.generateToAddress(
-        100,
-        privateKey.toAddress(faucetWallet.network).toString(),
-      );
-      // eslint-disable-next-line no-await-in-loop
-      height = await faucetWallet.transport.getBestBlockHeight();
-    }
-  }
+  //
+  // if (options.isRegtest) {
+  //   const initialHeight = await faucetWallet.transport.getBestBlockHeight();
+  //   let height = initialHeight;
+  //   while (initialHeight + 101 > height) {
+  //     const privateKey = new PrivateKey();
+  //
+  //     // eslint-disable-next-line no-await-in-loop
+  //     await faucetWallet.transport.client.core.generateToAddress(
+  //       100,
+  //       privateKey.toAddress(faucetWallet.network).toString(),
+  //     );
+  //     // eslint-disable-next-line no-await-in-loop
+  //     height = await faucetWallet.transport.getBestBlockHeight();
+  //   }
+  // }
 
   const faucetAccount = await faucetWallet.getAccount();
   const recipientAccount = await recipientWallet.getAccount();
