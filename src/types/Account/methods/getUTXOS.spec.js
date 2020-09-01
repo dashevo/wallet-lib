@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
 const getUTXOS = require('./getUTXOS');
+const { Transaction } = Dashcore;
 
 const mockedStoreEmpty = {
   wallets: {
@@ -10,7 +11,7 @@ const mockedStoreEmpty = {
   },
   chains: {
     testnet: {
-      blockHeight: 1
+      blockHeight: 10000
     }
   }
 };
@@ -50,13 +51,35 @@ const mockedStore2 = {
   },
   chains: {
     testnet: {
-      blockHeight: 1
+      blockHeight: 10000
     }
   },
   transactions: {
-    dd7afaadedb5f022cec6e33f1c8520aac897df152bd9f876842f3723ab9614bc: {
-      inputs: [{prevTxId: Buffer.from('dd7afaadedb5f022cec6e33f1c8520aac897df152bd9f876842f3723ab9614bc', 'hex')}]
-    },
+    dd7afaadedb5f022cec6e33f1c8520aac897df152bd9f876842f3723ab9614bc: new Transaction({
+      "hash": "f13a95fc3a9b6146590b12fbe48749738a1b3ffe30e42de5b1898f8f9d76b879",
+      "version": 3,
+      "inputs": [
+        {
+          "prevTxId": "0000000000000000000000000000000000000000000000000000000000000000",
+          "outputIndex": 4294967295,
+          "sequenceNumber": 4294967295,
+          "script": "0264080101"
+        }
+      ],
+      "outputs": [
+        {
+          "satoshis": 7972544484,
+          "script": "76a9144c1b05387342497e3c8fbe0b80754ae4b33134c488ac"
+        },
+        {
+          "satoshis": 7972544480,
+          "script": "76a914214035c10a2d2cef9992ca715a0115366edd229e88ac"
+        }
+      ],
+      "nLockTime": 0,
+      "type": 5,
+      "extraPayload": "020064080000aa254fcb634bf1962b67bb64ce178a954353c71d0b6119361390a9fd1a71bd2c0000000000000000000000000000000000000000000000000000000000000000"
+    }),
   }
 };
 
