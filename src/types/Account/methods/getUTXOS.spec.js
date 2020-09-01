@@ -8,6 +8,11 @@ const mockedStoreEmpty = {
       addresses: {},
     },
   },
+  chains: {
+    testnet: {
+      blockHeight: 1
+    }
+  }
 };
 
 const mockedStore2 = {
@@ -43,6 +48,16 @@ const mockedStore2 = {
       },
     },
   },
+  chains: {
+    testnet: {
+      blockHeight: 1
+    }
+  },
+  transactions: {
+    dd7afaadedb5f022cec6e33f1c8520aac897df152bd9f876842f3723ab9614bc: {
+      inputs: [{prevTxId: Buffer.from('dd7afaadedb5f022cec6e33f1c8520aac897df152bd9f876842f3723ab9614bc', 'hex')}]
+    },
+  }
 };
 
 describe('Account - getUTXOS', function suite() {
@@ -52,6 +67,7 @@ describe('Account - getUTXOS', function suite() {
       store: mockedStoreEmpty,
       getStore: mockedStoreEmpty,
       walletId: '123456789',
+      network: 'testnet'
     });
     expect(utxos).to.be.deep.equal([]);
 
@@ -59,6 +75,7 @@ describe('Account - getUTXOS', function suite() {
       store: mockedStore2,
       getStore: mockedStore2,
       walletId: '123456789',
+      network: 'testnet'
     });
 
     expect(utxos2).to.be.deep.equal([new Dashcore.Transaction.UnspentOutput(

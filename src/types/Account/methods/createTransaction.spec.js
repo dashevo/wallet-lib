@@ -24,6 +24,7 @@ describe('Account - createTransaction', function suite() {
       store: validStore,
       walletId: 'a3771aaf93',
       getUTXOS,
+      network: 'testnet'
     };
 
     const mockOpts1 = {};
