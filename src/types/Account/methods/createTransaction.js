@@ -68,16 +68,6 @@ function createTransaction(opts = {}) {
 
   const utxosList = _.has(opts, 'utxos') ? parseUtxos(opts.utxos) : this.getUTXOS();
 
-  utxosList.map((utxo) => {
-    const utxoTx = self.storage.searchTransaction(utxo.txId);
-    if (utxoTx.found) {
-      // eslint-disable-next-line no-param-reassign
-      // console.log(utxoTx.result.vin);
-      // utxo.scriptSig = utxoTx.result.vin[0].scriptSig.hex;
-    }
-    return utxo;
-  });
-
   const feeCategory = (opts.isInstantSend) ? 'instant' : 'normal';
   let selection;
   try {
