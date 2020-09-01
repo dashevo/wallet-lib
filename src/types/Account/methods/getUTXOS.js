@@ -1,6 +1,4 @@
 const { Address, Transaction } = require('@dashevo/dashcore-lib');
-const { NULL_HASH } = require('../../../CONSTANTS');
-const NULL_BUFFER = Buffer.from(NULL_HASH, 'hex');
 /**
  * Return all the utxos
  * @return {UnspentOutput[]}
@@ -23,8 +21,16 @@ function getUTXOS() {
             if (identifier) {
               const [txid, outputIndex] = identifier.split('-');
               const transaction = this.store.transactions[txid];
-              const isCoinbase = Buffer.compare(transaction.inputs[0].prevTxId, NULL_BUFFER) === 0;
-              if (isCoinbase) {
+              if (transaction.isCoinbase()) {
+                // If the transaction is not a special transaction, we can't check its
+                // maturity at the moment of writing this comment.
+                // The wallet library doesn't maintain the header chain and thus we can
+                // figure out the height only from the payload, but old coinbase transactions
+                // doesn't have a payload.
+                if (!transaction.isSpecialTransaction()) {
+                  // eslint-disable-next-line no-continue
+                  continue;
+                }
                 // We check maturity is at least 100 blocks.
                 const { height } = transaction.extraPayload;
                 // another way is to just read _scriptBuffer height value.
