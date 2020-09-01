@@ -32,9 +32,8 @@ function getUTXOS() {
                   continue;
                 }
                 // We check maturity is at least 100 blocks.
-                const { height } = transaction.extraPayload;
                 // another way is to just read _scriptBuffer height value.
-                if (height + 100 > currentBlockHeight) {
+                if (transaction.extraPayload.height + 100 > currentBlockHeight) {
                   // eslint-disable-next-line no-continue
                   continue;
                 }
