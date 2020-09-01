@@ -4,8 +4,6 @@ const { Wallet } = require('../../src/index');
 
 const { fundWallet } = require('../../src/utils');
 
-const isRegtest = process.env.NETWORK === 'regtest' || process.env.NETWORK === 'local';
-
 const seeds = process.env.DAPI_SEED
   .split(',');
 
@@ -99,8 +97,7 @@ describe('Wallet-lib - functional ', function suite() {
       await fundWallet(
         faucetWallet,
         wallet,
-        amountToTopUp,
-        { isRegtest },
+        amountToTopUp
       );
 
       const balanceAfterTopUp = account.getTotalBalance();

@@ -30,7 +30,6 @@ const parseUtxos = (utxos) => {
  * @return {Transaction} - Transaction object
  */
 function createTransaction(opts = {}) {
-  const self = this;
   const tx = new Transaction();
 
   let outputs = [];
