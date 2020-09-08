@@ -12,8 +12,13 @@ function doubleSha256(data) {
   return sha256(sha256(data));
 }
 
+function md5(data) {
+  return hash('md5', data);
+}
+
 module.exports = {
   hash,
   doubleSha256,
   sha256,
+  md5,
 };

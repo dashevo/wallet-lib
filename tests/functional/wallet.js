@@ -3,6 +3,7 @@ const { expect } = require('chai');
 const { Wallet } = require('../../src/index');
 
 const { fundWallet } = require('../../src/utils');
+const { EVENTS } = require('../../src');
 
 const seeds = process.env.DAPI_SEED
   .split(',');
@@ -101,7 +102,9 @@ describe('Wallet-lib - functional ', function suite() {
       );
 
       const balanceAfterTopUp = account.getTotalBalance();
+      const transactions = account.getTransactions();
 
+      expect(Object.keys(transactions).length).to.be.equal(1);
       expect(balanceBeforeTopUp).to.be.equal(0);
       expect(balanceAfterTopUp).to.be.equal(amountToTopUp);
     });
@@ -130,5 +133,28 @@ describe('Wallet-lib - functional ', function suite() {
       expect(newTx.outputs.length).to.not.equal(0);
       expect(newTx.inputs.length).to.not.equal(0);
     });
+
+    it('should be able to restore wallet to the same state with a mnemonic', async () => {
+      const restoredWallet = new Wallet({
+        mnemonic: wallet.mnemonic,
+        transport: {
+          seeds,
+        },
+        network: process.env.NETWORK,
+      });
+      const restoredAccount = await restoredWallet.getAccount();
+
+      const expectedAddresses = account.getAddresses();
+      const expectedTransactions = account.getTransactions();
+
+      const addresses = restoredAccount.getAddresses();
+      const transactions = restoredAccount.getTransactions();
+
+      await new Promise(resolve => restoredAccount.once(EVENTS.BLOCKHEADER, resolve));
+
+      expect(addresses).to.be.deep.equal(expectedAddresses);
+      expect(Object.keys(transactions).length).to.be.equal(1);
+      expect(transactions).to.be.deep.equal(expectedTransactions);
+    })
   });
 });
