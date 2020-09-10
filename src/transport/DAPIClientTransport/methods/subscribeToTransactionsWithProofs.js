@@ -2,7 +2,6 @@ const {
   BloomFilter, Address,
 } = require('@dashevo/dashcore-lib');
 const logger = require('../../../logger');
-const { md5: checksum } = require('../../../utils/crypto');
 
 const { BLOOM_FALSE_POSITIVE_RATE } = require('../../../CONSTANTS');
 
@@ -43,7 +42,6 @@ module.exports = async function subscribeToTransactionWithProofs(
     opts.fromBlockHeight = 1;
   }
 
-  logger.debug(`Bloom filter checksum: ${checksum(Buffer.from(bloomfilter.vData)).toString('hex')}`);
   logger.debug(`Options: ${JSON.stringify(opts)}`);
   return client.core.subscribeToTransactionsWithProofs(bloomfilter, opts);
 };
