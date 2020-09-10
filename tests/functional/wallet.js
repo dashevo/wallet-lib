@@ -14,7 +14,7 @@ let account;
 let faucetWallet;
 
 describe('Wallet-lib - functional ', function suite() {
-  this.timeout(700000);
+  this.timeout(120000);
 
   before(() => {
     faucetWallet = new Wallet({
@@ -144,17 +144,19 @@ describe('Wallet-lib - functional ', function suite() {
       });
       const restoredAccount = await restoredWallet.getAccount();
 
+      // Due to the limitations of DAPI, we need to wait for a block to be mined if we connected in the
+      // moment when transaction already entered the mempool, but haven't been mined yet
+      await new Promise(resolve => restoredAccount.once(EVENTS.BLOCKHEADER, resolve));
+
       const expectedAddresses = account.getAddresses();
       const expectedTransactions = account.getTransactions();
 
       const addresses = restoredAccount.getAddresses();
       const transactions = restoredAccount.getTransactions();
 
-      await new Promise(resolve => restoredAccount.once(EVENTS.BLOCKHEADER, resolve));
-
-      expect(addresses).to.be.deep.equal(expectedAddresses);
       expect(Object.keys(transactions).length).to.be.equal(1);
-      expect(transactions).to.be.deep.equal(expectedTransactions);
-    })
+      expect(addresses).to.be.deep.equal(expectedAddresses);
+      expect(Object.keys(transactions)).to.be.deep.equal(Object.keys(expectedTransactions));
+    });
   });
 });
