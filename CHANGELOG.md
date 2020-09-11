@@ -3,7 +3,7 @@
 
 ### Bug Fixes
 
-* false positive merkle blocks shouldn't be imported into the storage ([#183](https://github.com/dashevo/wallet-lib/issues/183))
+* false positive merkle blocks shouldn't be imported into the storage ([#185](https://github.com/dashevo/wallet-lib/issues/185))
 
 # [7.15.0](https://github.com/dashevo/wallet-lib/compare/v7.14.0...v7.15.0) (2020-09-04)
 
