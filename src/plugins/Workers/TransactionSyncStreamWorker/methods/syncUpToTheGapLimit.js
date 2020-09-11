@@ -80,6 +80,7 @@ module.exports = async function syncUpToTheGapLimit({
           const transactionsInWallet = Object.keys(self.storage.getStore().transactions);
           const isTruePositive = isAnyIntersection(transactionsInHeader, transactionsInWallet);
           if (isTruePositive) {
+            self.setLastSyncedBlockHash(merkleBlockFromResponse.header.hash);
             self.importBlockHeader(merkleBlockFromResponse.header);
           }
         }
