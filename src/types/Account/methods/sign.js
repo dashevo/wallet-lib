@@ -9,7 +9,7 @@ const { PrivateKey, HDPrivateKey } = require('@dashevo/dashcore-lib');
 module.exports = function sign(object, privateKeys = [], sigType) {
   const { network } = this;
 
-  if (!privateKeys || !privateKeys.length) {
+  if (object.inputs && (!privateKeys || !privateKeys.length)) {
     const addressList = [];
     // We seek private key based on inputs
     object.inputs.forEach((input) => {
