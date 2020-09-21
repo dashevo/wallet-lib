@@ -14,8 +14,9 @@ module.exports = function sign(object, privateKeys = [], sigType) {
     // We seek private key based on inputs
     object.inputs.forEach((input) => {
       if (input.script) {
-        const addr = input.script.toAddress(network).toString();
-        addressList.push(addr);
+        // eslint-disable-next-line no-underscore-dangle
+        const addr = input.script.toAddress(network) || input.output._script.toAddress(network);
+        addressList.push(addr.toString());
       }
     });
     this.getPrivateKeys(addressList).forEach((pk) => {
