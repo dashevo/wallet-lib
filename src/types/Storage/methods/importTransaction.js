@@ -12,6 +12,7 @@ const parseStringifiedTransaction = (stringified) => new Transaction(stringified
 const importTransaction = function importTransaction(transaction) {
   if (!(transaction instanceof Transaction)) {
     try {
+      // eslint-disable-next-line no-param-reassign
       transaction = parseStringifiedTransaction(transaction);
     } catch (e) {
       throw new InvalidDashcoreTransaction(transaction);
