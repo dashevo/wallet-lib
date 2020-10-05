@@ -1,5 +1,19 @@
 const logger = require('../../../../logger');
 
+
+async function getBlockHeight(header) {
+  const prevHash = header.prevHash.reverse().toString('hex');
+
+  const prevBlock = await this.transport.getBlockByHash(prevHash);
+  try {
+    const prevBlockHeight = prevBlock.transactions[0].extraPayload.height;
+    return prevBlockHeight + 1;
+  } catch (e) {
+    const prevBlockHeight = prevBlock.transactions[1].extraPayload.height;
+    return prevBlockHeight + 1;
+  }
+}
+
 function isAnyIntersection(arrayA, arrayB) {
   const intersection = arrayA.filter((e) => arrayB.indexOf(e) > -1);
   return intersection.length > 0;
@@ -80,7 +94,9 @@ module.exports = async function syncUpToTheGapLimit({
           const transactionsInWallet = Object.keys(self.storage.getStore().transactions);
           const isTruePositive = isAnyIntersection(transactionsInHeader, transactionsInWallet);
           if (isTruePositive) {
+            const height = await getBlockHeight.call(this, merkleBlockFromResponse.header);
             self.importBlockHeader(merkleBlockFromResponse.header);
+            this.setLastSyncedBlockHeight(height);
           }
         }
       })

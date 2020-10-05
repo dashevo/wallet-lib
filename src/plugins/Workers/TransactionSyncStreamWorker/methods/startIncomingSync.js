@@ -12,32 +12,26 @@ const GRPC_RETRY_ERRORS = [
 
 module.exports = async function startIncomingSync() {
   const { network } = this;
-  const lastSyncedBlockHash = await this.getLastSyncedBlockHash();
   const lastSyncedBlockHeight = await this.getLastSyncedBlockHeight();
   const count = 0;
 
   try {
-    const options = { count, network };
+    const options = { count, network, fromBlockHeight: lastSyncedBlockHeight };
     // If there's no blocks synced, start from height 0, otherwise from the last block hash.
-    if (lastSyncedBlockHash == null) {
-      options.fromBlockHeight = lastSyncedBlockHeight;
-    } else {
-      options.fromBlockHash = lastSyncedBlockHash;
-    }
 
     await this.syncUpToTheGapLimit(options);
     // The method above resolves only in two cases: the limit is reached or the server is closed.
     // In both cases, the stream needs to be restarted, unless syncIncomingTransactions is
     // set to false, which is signalling the worker not to restart stream.
     if (this.syncIncomingTransactions) {
-      logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHash}`);
+      logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHeight}`);
       await startIncomingSync.call(this);
     }
   } catch (e) {
     this.stream = null;
 
     if (GRPC_RETRY_ERRORS.includes(e.code)) {
-      logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHash}`);
+      logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHeight}`);
 
       if (this.syncIncomingTransactions) {
         await startIncomingSync.call(this);

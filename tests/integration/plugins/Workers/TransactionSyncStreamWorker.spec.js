@@ -46,12 +46,16 @@ describe('TransactionSyncStreamWorker', function suite() {
   let testHDKey;
   let merkleBlockBuffer;
   let merkleBlockMock;
+  let prevBlockMock;
 
   beforeEach(function beforeEach() {
     network = 'testnet';
     testHDKey = "xprv9s21ZrQH143K4PgfRZPuYjYUWRZkGfEPuWTEUESMoEZLC274ntC4G49qxgZJEPgmujsmY52eVggtwZgJPrWTMXmbYgqDVySWg46XzbGXrSZ";
     merkleBlockBuffer = Buffer.from([0,0,0,32,61,11,102,108,38,155,164,49,91,246,141,178,126,155,13,118,248,83,250,15,206,21,102,65,104,183,243,167,235,167,60,113,140,110,120,87,208,191,240,19,212,100,228,121,192,125,143,44,226,9,95,98,51,25,139,172,175,27,205,201,158,85,37,8,72,52,36,95,255,255,127,32,2,0,0,0,1,0,0,0,1,140,110,120,87,208,191,240,19,212,100,228,121,192,125,143,44,226,9,95,98,51,25,139,172,175,27,205,201,158,85,37,8,1,1]);
     merkleBlockMock = new MerkleBlock(merkleBlockBuffer);
+    prevBlockMock = Promise.resolve({
+      transactions: [{extraPayload: {height: 40}}]
+    });
 
     txStreamMock = new TxStreamMock();
 
@@ -70,6 +74,7 @@ describe('TransactionSyncStreamWorker', function suite() {
       transport: {
         getBestBlockHeight: this.sinonSandbox.stub().returns(42),
         subscribeToTransactionsWithProofs: this.sinonSandbox.stub().returns(txStreamMock),
+        getBlockByHash: this.sinonSandbox.stub().returns(prevBlockMock),
       },
       injectDefaultPlugins: true,
       storage,
@@ -225,9 +230,9 @@ describe('TransactionSyncStreamWorker', function suite() {
       // 20 more of each type, since the last address is used, but the height is the same, since Merkle Block not received yet
       expect(accountMock.transport.subscribeToTransactionsWithProofs.secondCall.args[0].length).to.be.equal(80);
       expect(accountMock.transport.subscribeToTransactionsWithProofs.secondCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 2});
-      // Block received
+      // Block received, bestBlockHeight didn't change
       expect(accountMock.transport.subscribeToTransactionsWithProofs.thirdCall.args[0].length).to.be.equal(80);
-      expect(accountMock.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 2});
+      expect(accountMock.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHeight: 41, count: 1});
 
       expect(worker.stream).to.be.null;
       expect(transactionsInStorage.length).to.be.equal(2);
@@ -418,7 +423,7 @@ describe('TransactionSyncStreamWorker', function suite() {
       expect(accountMock.transport.subscribeToTransactionsWithProofs.secondCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 0});
       // Block received
       expect(accountMock.transport.subscribeToTransactionsWithProofs.thirdCall.args[0].length).to.be.equal(80);
-      expect(accountMock.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 0});
+      expect(accountMock.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHeight: 41, count: 0});
 
       expect(worker.stream).to.be.null;
       expect(transactionsInStorage.length).to.be.equal(2);
