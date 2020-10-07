@@ -14,6 +14,9 @@ const importTransaction = function importTransaction(transaction) {
     try {
       // eslint-disable-next-line no-param-reassign
       transaction = parseStringifiedTransaction(transaction);
+      if (!transaction.hash || !transaction.inputs.length || !transaction.outputs.length) {
+        throw new InvalidDashcoreTransaction(transaction);
+      }
     } catch (e) {
       throw new InvalidDashcoreTransaction(transaction);
     }
