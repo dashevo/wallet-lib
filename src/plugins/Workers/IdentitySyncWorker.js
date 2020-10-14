@@ -67,7 +67,7 @@ class IdentitySyncWorker extends Worker {
 
       // if identity id is not preset then increment gap count
       // and stop sync if gap limit is reached
-      if (fetchedId === null) {
+      if (fetchedId == null) {
         gapCount += 1;
 
         logger.silly(`IdentitySyncWorker - gap at index ${index}`);
