@@ -54,6 +54,7 @@ async function _initializeAccount(account, userUnsafePlugins) {
           }
         }
       } catch (e) {
+        console.error(e);
         reject(new PluginInjectionError(e));
       }
     }
