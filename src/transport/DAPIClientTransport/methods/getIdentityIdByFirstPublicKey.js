@@ -1,3 +1,4 @@
+const Identifier = require('@dashevo/dpp/lib/Identifier');
 const logger = require('../../../logger');
 
 module.exports = async function getIdentityIdByFirstPublicKey(publicKeyHash) {
@@ -7,5 +8,5 @@ module.exports = async function getIdentityIdByFirstPublicKey(publicKeyHash) {
     [publicKeyHash],
   );
 
-  return identityId;
+  return new Identifier(identityId).toString();
 };
