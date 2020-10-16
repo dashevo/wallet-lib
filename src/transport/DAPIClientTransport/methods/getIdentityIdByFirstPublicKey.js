@@ -8,5 +8,5 @@ module.exports = async function getIdentityIdByFirstPublicKey(publicKeyHash) {
     [publicKeyHash],
   );
 
-  return identityId || new Identifier(identityId).toString();
+  return identityId === null ? identityId : new Identifier(identityId).toString();
 };
