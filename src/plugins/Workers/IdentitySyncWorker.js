@@ -82,6 +82,10 @@ class IdentitySyncWorker extends Worker {
         continue;
       }
 
+      if (typeof fetchedId !== 'string') {
+        throw new Error(`Expected identity id to be a string or null, got ${typeof fetchedId}`);
+      }
+
       // reset gap counter if we got an identity
       // it means gaps are not sequential
       gapCount = 0;
