@@ -1,6 +1,10 @@
 const Identifier = require('@dashevo/dpp/lib/Identifier');
 const logger = require('../../../logger');
 
+/**
+ * @param {Buffer} publicKeyHash
+ * @return {Promise<*|string>}
+ */
 module.exports = async function getIdentityIdByFirstPublicKey(publicKeyHash) {
   logger.silly('DAPIClientTransport.getIdentityIdByFirstPublicKey');
 
@@ -8,5 +12,9 @@ module.exports = async function getIdentityIdByFirstPublicKey(publicKeyHash) {
     [publicKeyHash],
   );
 
-  return identityId === null ? identityId : new Identifier(identityId).toString();
+  if (identityId === null) {
+    return null;
+  }
+
+  return new Identifier(identityId).toString();
 };
