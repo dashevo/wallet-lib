@@ -1,3 +1,4 @@
+const Identifier = require('@dashevo/dpp/lib/Identifier');
 const Worker = require('../Worker');
 
 const logger = require('../../logger');
@@ -96,7 +97,11 @@ class IdentitySyncWorker extends Worker {
       logger.silly(`IdentitySyncWorker - got ${fetchedId} at ${index}`);
 
       // eslint-disable-next-line no-await-in-loop
-      await this.storage.insertIdentityIdAtIndex(this.walletId, fetchedId, index);
+      await this.storage.insertIdentityIdAtIndex(
+        this.walletId,
+        Identifier.from(fetchedId).toString(),
+        index,
+      );
     }
 
     logger.silly('IdentitySyncWorker - sync finished');
