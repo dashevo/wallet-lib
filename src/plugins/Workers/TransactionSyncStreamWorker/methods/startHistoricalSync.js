@@ -56,12 +56,14 @@ module.exports = async function startHistoricalSync(network) {
       await startHistoricalSync.call(this, network);
 
       return;
-    } if (
+    }
+
+    if (
       e.code === GrpcErrorCodes.INVALID_ARGUMENT && e.message === GRPC_COUNT_IS_TO_BIG_ERROR_DETAILS
     ) {
       // Since there's no header sync as of the moment of writing, it's quite problematic to
       // pinpoint the exact height we're at at the moment, so we're finding it empirically
-      await this.setLastSyncedBlockHeight(lastSyncedBlockHeight - 5);
+      await this.setLastSyncedBlockHeight(lastSyncedBlockHeight + 5);
 
       this.stream = null;
       await startHistoricalSync.call(this, network);
