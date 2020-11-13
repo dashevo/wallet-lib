@@ -10,6 +10,8 @@ const GRPC_RETRY_ERRORS = [
   GrpcErrorCodes.UNKNOWN,
 ];
 
+const GRPC_COUNT_IS_TO_BIG_ERROR_DETAILS = '3 INVALID_ARGUMENT: count is too big, could not fetch more than blockchain length';
+
 /**
  *
  * @param {string} network
@@ -41,6 +43,10 @@ module.exports = async function startHistoricalSync(network) {
       if (this.stream === null && e.code === GrpcErrorCodes.CANCELLED) {
         // NOOP on self canceled state (via stop worker)
         logger.debug('TransactionSyncStreamWorker - HistoricalSync - The Worker is stopped');
+
+        // As we fully synced at this point, we're setting up last synced height to be
+        // equal to the chain tip height
+        await this.setLastSyncedBlockHeight(bestBlockHeight);
         return;
       }
 
@@ -50,6 +56,15 @@ module.exports = async function startHistoricalSync(network) {
       await startHistoricalSync.call(this, network);
 
       return;
+    } if (
+      e.code === GrpcErrorCodes.INVALID_ARGUMENT && e.message === GRPC_COUNT_IS_TO_BIG_ERROR_DETAILS
+    ) {
+      // Since there's no header sync as of the moment of writing, it's quite problematic to
+      // pinpoint the exact height we're at at the moment, so we're finding it empirically
+      await this.setLastSyncedBlockHeight(lastSyncedBlockHeight - 5);
+
+      this.stream = null;
+      await startHistoricalSync.call(this, network);
     }
 
     this.stream = null;
