@@ -58,14 +58,15 @@ module.exports = async function startHistoricalSync(network) {
       return;
     }
 
+    // This error is thrown when last synced block height is too small. To make the value
+    // of count variable lower, we need to adjust last synced height.
+    // Since there's no header sync as of the moment of writing, it's quite problematic to
+    // pinpoint the exact height we're at at the moment, so we're finding it empirically.
+    // That is a brute force approach and should be removed once header chain sync is implemented
     if (
       e.code === GrpcErrorCodes.INVALID_ARGUMENT && e.message === GRPC_COUNT_IS_TO_BIG_ERROR_DETAILS
     ) {
-      // This error is thrown when last synced block height is too small. To make the value
-      // of count variable lower, we need to adjust last synced height.
-      // Since there's no header sync as of the moment of writing, it's quite problematic to
-      // pinpoint the exact height we're at at the moment, so we're finding it empirically.
-      // That is a brute force approach and should be removed once header chain sync is implemented
+      // The line below is required to not overshot best block height
       const incrementInterval = bestBlockHeight - lastSyncedBlockHeight > 5 ? 5 : 1;
       await this.setLastSyncedBlockHeight(lastSyncedBlockHeight + incrementInterval);
 
