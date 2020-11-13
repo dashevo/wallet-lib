@@ -61,6 +61,8 @@ module.exports = async function startHistoricalSync(network) {
     if (
       e.code === GrpcErrorCodes.INVALID_ARGUMENT && e.message === GRPC_COUNT_IS_TO_BIG_ERROR_DETAILS
     ) {
+      // This error is thrown when last synced block height is too small. To make the value
+      // of count variable lower, we need to adjust last synced height.
       // Since there's no header sync as of the moment of writing, it's quite problematic to
       // pinpoint the exact height we're at at the moment, so we're finding it empirically
       await this.setLastSyncedBlockHeight(lastSyncedBlockHeight + 5);
