@@ -12,6 +12,7 @@ const {
   HDPrivateKey,
   Transaction,
   MerkleBlock,
+  InstantLock
 } = require('@dashevo/dashcore-lib')
 
 const TransactionSyncStreamWorker = require('../../../../src/plugins/Workers/TransactionSyncStreamWorker/TransactionSyncStreamWorker');
@@ -528,5 +529,107 @@ describe('TransactionSyncStreamWorker', function suite() {
 
       expect(worker.stream).to.be.null;
     });
+  });
+
+  it('should propagate instant locks', async () => {
+    const instantLock1 = InstantLock.fromObject({
+      inputs: [
+        {
+          outpointHash: '6e200d059fb567ba19e92f5c2dcd3dde522fd4e0a50af223752db16158dabb1d',
+          outpointIndex: 0,
+        },
+      ],
+      txid: transactions[4].hash,
+      signature: '8967c46529a967b3822e1ba8a173066296d02593f0f59b3a78a30a7eef9c8a120847729e62e4a32954339286b79fe7590221331cd28d576887a263f45b595d499272f656c3f5176987c976239cac16f972d796ad82931d532102a4f95eec7d80',
+    });
+    const instantLock2 = InstantLock.fromObject({
+      inputs: [
+        {
+          outpointHash: '6e200d059fb567ba19e92f5c2dcd3dde522fd4e0a50af223752db16158dabb1d',
+          outpointIndex: 0,
+        },
+      ],
+      txid: transactions[4].hash,
+      signature: '8967c46529a967b3822e1ba8a173066296d02593f0f59b3a78a30a7eef9c8a120847729e62e4a32954339286b79fe7590221331cd28d576887a263f45b595d499272f656c3f5176987c976239cac16f972d796ad82931d532102a4f95eec7d80',
+    });
+    const lastSavedBlockHeight = 40;
+    const bestBlockHeight = 42;
+    const receivedInstantLocks = [];
+
+    worker.setLastSyncedBlockHeight(lastSavedBlockHeight);
+    const transactionsSent = [];
+
+    accountMock.transport.getBestBlockHeight
+        .returns(bestBlockHeight);
+
+    worker.execute();
+
+    await wait(10);
+
+    try {
+      let transaction = new Transaction().to(addressAtIndex19, 10000);
+
+      transactionsSent.push(transaction);
+      txStreamMock.emit(TxStreamMock.EVENTS.data, new TxStreamDataResponseMock({
+        rawTransactions: [transaction.toBuffer()]
+      }));
+
+      txStreamMock.emit(txStreamMock.EVENTS.data, new TxStreamDataResponseMock({ instantSendLockMessages: [instantLock1.toBuffer()] }));
+
+      await wait(10);
+
+      merkleBlockMock.hashes[0] =  Buffer.from(transaction.hash, 'hex').reverse().toString('hex');
+      txStreamMock.emit(TxStreamMock.EVENTS.data, new TxStreamDataResponseMock({
+        rawMerkleBlock: merkleBlockMock.toBuffer()
+      }));
+
+      await wait(10);
+
+      transaction = transaction = new Transaction().to(accountMock.getAddress(10).address, 10000);
+
+      transactionsSent.push(transaction);
+      txStreamMock.emit(TxStreamMock.EVENTS.data, new TxStreamDataResponseMock({
+        rawTransactions: [transaction.toBuffer()]
+      }));
+
+      await wait(10);
+
+      txStreamMock.emit(TxStreamMock.EVENTS.end);
+    } catch (e) {
+      console.error(e);
+      txStreamMock.emit(TxStreamMock.EVENTS.error, e);
+    }
+
+    await worker.onStop();
+
+    const transactionsInStorage = Object
+        .values(storage.getStore().transactions)
+        .map((t) => t.toJSON());
+
+    const expectedTransactions = transactionsSent
+        .map((t) => t.toJSON());
+
+    const addressesInStorage = storage.store.wallets[walletId].addresses.external;
+    // We send transaction to index 19, so wallet should generate additional 20 addresses to keep the gap between
+    // the last used address
+    expect(Object.keys(addressesInStorage).length).to.be.equal(40);
+    // It should reconnect after the gap limit is reached
+    expect(accountMock.transport.subscribeToTransactionsWithProofs.callCount).to.be.equal(3);
+    // 20 external and 20 internal
+    expect(accountMock.transport.subscribeToTransactionsWithProofs.firstCall.args[0].length).to.be.equal(40);
+    expect(accountMock.transport.subscribeToTransactionsWithProofs.firstCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 0});
+    // 20 more of each type, since the last address is used, but the height is the same, since Merkle Block not received yet
+    expect(accountMock.transport.subscribeToTransactionsWithProofs.secondCall.args[0].length).to.be.equal(80);
+    expect(accountMock.transport.subscribeToTransactionsWithProofs.secondCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 0});
+    // Block received
+    expect(accountMock.transport.subscribeToTransactionsWithProofs.thirdCall.args[0].length).to.be.equal(80);
+    expect(accountMock.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 0});
+
+    expect(worker.stream).to.be.null;
+    expect(transactionsInStorage.length).to.be.equal(2);
+    expect(transactionsInStorage).to.have.deep.members(expectedTransactions);
+
+    // TODO: test that we don't propagate false positive ones
+    expect(receivedInstantLocks.length).to.be.equal(1);
   });
 });
