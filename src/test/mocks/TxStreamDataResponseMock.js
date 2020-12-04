@@ -33,7 +33,7 @@ class TxStreamDataResponseMock {
   getInstantSendLockMessages() {
     const { instantSendLockMessages } = this;
     return {
-      getTransactionsList() {
+      getMessagesList() {
         return instantSendLockMessages || [];
       },
     };

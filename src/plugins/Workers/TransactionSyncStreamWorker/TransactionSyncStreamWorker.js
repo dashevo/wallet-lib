@@ -1,5 +1,5 @@
 const {
-  Transaction, MerkleBlock,
+  Transaction, MerkleBlock, InstantLock,
 } = require('@dashevo/dashcore-lib');
 const { WALLET_TYPES } = require('../../../CONSTANTS');
 
@@ -24,6 +24,7 @@ class TransactionSyncStreamWorker extends Worker {
         'index',
         'BIP44PATH',
         'walletType',
+        'emitInstantLock',
       ],
       ...options,
     });
@@ -100,6 +101,19 @@ class TransactionSyncStreamWorker extends Worker {
       walletTransactions = transactions
         .getTransactionsList()
         .map((rawTransaction) => new Transaction(Buffer.from(rawTransaction)));
+    }
+
+    return walletTransactions;
+  }
+
+  static getInstantSendLocksFromResponse(response) {
+    let walletTransactions = [];
+    const instantSendLockMessages = response.getInstantSendLockMessages();
+
+    if (instantSendLockMessages) {
+      walletTransactions = instantSendLockMessages
+        .getMessagesList()
+        .map((instantSendLock) => new InstantLock(Buffer.from(instantSendLock)));
     }
 
     return walletTransactions;

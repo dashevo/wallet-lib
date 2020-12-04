@@ -151,6 +151,10 @@ class Account extends EventEmitter {
     this.emit(EVENTS.CREATED, { type: EVENTS.CREATED, payload: null });
   }
 
+  static getInstantLockTopicName(transactionHash) {
+    return `${EVENTS.INSTANT_LOCK}:${transactionHash}`;
+  }
+
   // It's actually Account that mutates wallet.accounts to add itself.
   // We might want to get rid of that as it can be really confusing.
   // It would gives that responsability to createAccount to create
@@ -174,6 +178,27 @@ class Account extends EventEmitter {
       if (this.state.isReady) return resolve(true);
       this.on(EVENTS.READY, () => resolve(true));
     }));
+  }
+
+  emitInstantLock(instantLock) {
+    this.emit(Account.getInstantLockTopicName(instantLock.txid), instantLock);
+  }
+
+  subscribeToTransactionInstantLock(transactionHash, callback) {
+    this.once(Account.getInstantLockTopicName(transactionHash), callback);
+  }
+
+  waitForInstantLock(transactionHash, timeout = 60000) {
+    return Promise.race([
+      new Promise((resolve) => {
+        this.subscribeToTransactionInstantLock(transactionHash, resolve);
+      }),
+      new Promise((resolve, reject) => {
+        setTimeout(() => {
+          reject(new Error(`InstantLock waiting period for transaction ${transactionHash} timed out`));
+        }, timeout);
+      }),
+    ]);
   }
 }
 
