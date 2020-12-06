@@ -505,7 +505,8 @@ describe('TransactionSyncStreamWorker', function suite() {
   it('should propagate instant locks', async () => {
     const transactions = [
       new Transaction().to(addressAtIndex19, 10000),
-      new Transaction().to(account.getAddress(10).address, 10000)
+      new Transaction().to(account.getAddress(10).address, 10000),
+      new Transaction().to(account.getAddress(11).address, 10000)
     ];
 
     const receivedInstantLocks = [];
@@ -640,5 +641,9 @@ describe('TransactionSyncStreamWorker', function suite() {
     // Test that if instant lock was already imported previously wait method will return it
     const firstISFromWait = await account.waitForInstantLock(transactions[0].hash);
     expect(firstISFromWait).to.be.deep.equal(instantLock1);
+
+    // Check that wait method throws if timeout has passed
+    await expect(account.waitForInstantLock(transactions[2].hash, 1000)).to.eventually
+        .be.rejectedWith('InstantLock waiting period for transaction 256d5b3bf6d8869f5cc882ae070af9b648fa0f512bfa2b6f07b35d55e160a16c timed out');
   });
 });
