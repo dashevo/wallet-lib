@@ -180,17 +180,37 @@ class Account extends EventEmitter {
     }));
   }
 
-  emitInstantLock(instantLock) {
+  /**
+   * Imports instant lock to an account and emits message
+   * @param {InstantLock} instantLock
+   */
+  importInstantLock(instantLock) {
+    this.storage.importInstantLock(instantLock);
     this.emit(Account.getInstantLockTopicName(instantLock.txid), instantLock);
   }
 
+  /**
+   * @param {string} transactionHash
+   * @param {function} callback
+   */
   subscribeToTransactionInstantLock(transactionHash, callback) {
     this.once(Account.getInstantLockTopicName(transactionHash), callback);
   }
 
+  /**
+   * Waits for instant lock for a transaction or throws after a timeout
+   * @param {string} transactionHash - instant lock to wait for
+   * @param {number} timeout - in milliseconds before throwing an error if the lock didn't arrive
+   * @return {Promise<InstantLock>}
+   */
   waitForInstantLock(transactionHash, timeout = 60000) {
     return Promise.race([
       new Promise((resolve) => {
+        const instantLock = this.storage.getInstantLock(transactionHash);
+        if (instantLock != null) {
+          resolve(instantLock);
+          return;
+        }
         this.subscribeToTransactionInstantLock(transactionHash, resolve);
       }),
       new Promise((resolve, reject) => {

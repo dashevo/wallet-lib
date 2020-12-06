@@ -636,5 +636,9 @@ describe('TransactionSyncStreamWorker', function suite() {
     expect(receivedInstantLocks.length).to.be.equal(2);
     expect(receivedInstantLocks[0]).to.be.deep.equal(instantLock1);
     expect(receivedInstantLocks[1]).to.be.deep.equal(instantLock2);
+
+    // Test that if instant lock was already imported previously wait method will return it
+    const firstISFromWait = await account.waitForInstantLock(transactions[0].hash);
+    expect(firstISFromWait).to.be.deep.equal(instantLock1);
   });
 });

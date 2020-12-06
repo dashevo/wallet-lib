@@ -16,6 +16,7 @@ class TransactionSyncStreamWorker extends Worker {
       dependencies: [
         'importTransactions',
         'importBlockHeader',
+        'importInstantLock',
         'storage',
         'transport',
         'walletId',
@@ -24,7 +25,6 @@ class TransactionSyncStreamWorker extends Worker {
         'index',
         'BIP44PATH',
         'walletType',
-        'emitInstantLock',
       ],
       ...options,
     });

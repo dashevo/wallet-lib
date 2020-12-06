@@ -47,7 +47,7 @@ module.exports = async function syncUpToTheGapLimit({
         /* First check if any instant locks appeared */
         const instantLocksReceived = this.constructor.getInstantSendLocksFromResponse(response);
         instantLocksReceived.forEach((isLock) => {
-          this.emitInstantLock(isLock);
+          this.importInstantLock(isLock);
         });
 
         /* Incoming transactions handling */
