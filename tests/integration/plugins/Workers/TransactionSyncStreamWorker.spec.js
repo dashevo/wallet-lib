@@ -1,6 +1,5 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-const EventEmitter = require('events');
 
 const {
   HDPrivateKey,
@@ -27,7 +26,6 @@ function wait(ms) {
 describe('TransactionSyncStreamWorker', function suite() {
   this.timeout(60000);
   let worker;
-  let mockParentEmitter;
   let storage;
   let walletId;
   let wallet;
@@ -36,24 +34,22 @@ describe('TransactionSyncStreamWorker', function suite() {
   let address;
   let addressAtIndex19;
   let testHDKey;
-  let merkleBlockBuffer;
   let merkleBlockMock;
   let transportMock;
 
   beforeEach(async function beforeEach() {
     testHDKey = "xprv9s21ZrQH143K4PgfRZPuYjYUWRZkGfEPuWTEUESMoEZLC274ntC4G49qxgZJEPgmujsmY52eVggtwZgJPrWTMXmbYgqDVySWg46XzbGXrSZ";
-    merkleBlockBuffer = Buffer.from([0,0,0,32,61,11,102,108,38,155,164,49,91,246,141,178,126,155,13,118,248,83,250,15,206,21,102,65,104,183,243,167,235,167,60,113,140,110,120,87,208,191,240,19,212,100,228,121,192,125,143,44,226,9,95,98,51,25,139,172,175,27,205,201,158,85,37,8,72,52,36,95,255,255,127,32,2,0,0,0,1,0,0,0,1,140,110,120,87,208,191,240,19,212,100,228,121,192,125,143,44,226,9,95,98,51,25,139,172,175,27,205,201,158,85,37,8,1,1]);
-    merkleBlockMock = new MerkleBlock(merkleBlockBuffer);
+    merkleBlockMock = new MerkleBlock(Buffer.from([0,0,0,32,61,11,102,108,38,155,164,49,91,246,141,178,126,155,13,118,248,83,250,15,206,21,102,65,104,183,243,167,235,167,60,113,140,110,120,87,208,191,240,19,212,100,228,121,192,125,143,44,226,9,95,98,51,25,139,172,175,27,205,201,158,85,37,8,72,52,36,95,255,255,127,32,2,0,0,0,1,0,0,0,1,140,110,120,87,208,191,240,19,212,100,228,121,192,125,143,44,226,9,95,98,51,25,139,172,175,27,205,201,158,85,37,8,1,1]));
 
     txStreamMock = new TxStreamMock();
     transportMock = new TransportMock(this.sinonSandbox, txStreamMock);
 
     testHDKey = new HDPrivateKey(testHDKey).toString();
-    mockParentEmitter = Object.create(EventEmitter.prototype);
 
     // Override default value of executeOnStart to prevent worker from starting
     worker = new TransactionSyncStreamWorker({ executeOnStart: false });
 
+    // This is a full instance of wallet with a mocked transport
     wallet = new Wallet({
       offlineMode: true,
       plugins: [worker],
@@ -66,9 +62,6 @@ describe('TransactionSyncStreamWorker', function suite() {
 
     storage = account.storage;
     walletId = Object.keys(storage.store.wallets)[0];
-
-    worker.setLastSyncedBlockHeight(1);
-    worker.parentEvents = mockParentEmitter;
 
     address = account.getAddress(0).address;
     addressAtIndex19 = account.getAddress(19).address;
