@@ -1,18 +1,15 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const EventEmitter = require('events');
-const { WALLET_TYPES } = require('../../../../src/CONSTANTS');
 
 const {
   HDPrivateKey,
   Transaction,
   MerkleBlock,
   InstantLock
-} = require('@dashevo/dashcore-lib')
+} = require('@dashevo/dashcore-lib');
 
 const TransactionSyncStreamWorker = require('../../../../src/plugins/Workers/TransactionSyncStreamWorker/TransactionSyncStreamWorker');
-const Storage = require('../../../../src/types/Storage/Storage');
-const KeyChain = require('../../../../src/types/KeyChain/KeyChain');
 
 const TxStreamDataResponseMock = require('../../../../src/test/mocks/TxStreamDataResponseMock');
 const TxStreamMock = require('../../../../src/test/mocks/TxStreamMock');
@@ -26,8 +23,6 @@ const { expect } = chai;
 function wait(ms) {
   return new Promise((res) => setTimeout(res, ms));
 }
-
-const BIP44PATH = `m/44'/1'/0'`
 
 describe('TransactionSyncStreamWorker', function suite() {
   this.timeout(60000);
