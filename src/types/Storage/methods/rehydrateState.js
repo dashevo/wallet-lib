@@ -22,7 +22,7 @@ const rehydrateState = async function rehydrateState() {
         : this.store.chains;
       const instantLocks = (this.adapter && hasProp(this.adapter, 'getItem'))
         ? (await this.adapter.getItem('instantLocks') || this.store.instantLocks)
-        : this.store.chains;
+        : this.store.instantLocks;
 
       this.store.transactions = mergeHelper(this.store.transactions, transactions);
       this.store.wallets = mergeHelper(this.store.wallets, wallets);
