@@ -7,7 +7,7 @@ class TransportMock {
     this.getBlockHeaderByHeight = sinonSandbox.stub().returns({ hash: 123 });
     this.on = sinonSandbox.stub();
     this.subscribeToBlocks = sinonSandbox.stub();
-    this.getIdentityIdsByPublicKeyHash = sinonSandbox.stub();
+    this.getIdentityIdsByPublicKeyHash = sinonSandbox.stub().returns([null]);
     this.sendTransaction = sinonSandbox.stub();
   }
 }
