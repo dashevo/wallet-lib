@@ -1,4 +1,5 @@
 const { merge } = require('lodash');
+const { InstantLock } = require('@dashevo/dashcore-lib');
 const { hasProp } = require('../../../utils');
 
 const mergeHelper = (initial = {}, additional = {}) => merge(initial, additional);
@@ -23,6 +24,14 @@ const rehydrateState = async function rehydrateState() {
       const instantLocks = (this.adapter && hasProp(this.adapter, 'getItem'))
         ? (await this.adapter.getItem('instantLocks') || this.store.instantLocks)
         : this.store.instantLocks;
+
+      // We need to keep deserialized instant locks
+      Object.keys(instantLocks).forEach((transactionHash) => {
+        const instantLock = instantLocks[transactionHash];
+        if (!(instantLock instanceof InstantLock)) {
+          instantLocks[transactionHash] = new InstantLock(instantLock);
+        }
+      });
 
       this.store.transactions = mergeHelper(this.store.transactions, transactions);
       this.store.wallets = mergeHelper(this.store.wallets, wallets);
