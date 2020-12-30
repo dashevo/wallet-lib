@@ -5,7 +5,7 @@
 
 * connect to testnet by default ([#210](https://github.com/dashevo/wallet-lib/issues/210))
 * update `dpp`, `dapi-client`, `dashcore-lib` ([#202](https://github.com/dashevo/wallet-lib/issues/202))
-* is locks subscription ([#206](https://github.com/dashevo/wallet-lib/issues/206))
+* handle instant locks ([#206](https://github.com/dashevo/wallet-lib/issues/206))
 
 
 
