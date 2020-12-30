@@ -8,6 +8,11 @@
 * is locks subscription ([#206](https://github.com/dashevo/wallet-lib/issues/206))
 
 
+### BREAKING CHANGES
+
+* wallet is now connecting to a testnet by default
+
+
 
 ## [7.16.1](https://github.com/dashevo/wallet-lib/compare/v7.16.0...v7.16.1) (2020-10-28)
 
