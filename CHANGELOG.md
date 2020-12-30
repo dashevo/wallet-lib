@@ -3,7 +3,7 @@
 
 ### Bug Fixes
 
-* broadcastStateTransition is timing out on testnet ([#214](https://github.com/dashevo/wallet-lib/issues/214)) ([a1406e6](https://github.com/dashevo/wallet-lib/commit/a1406e6a1ea30cac4eb5e869dc7d732097e8bbd9))
+* broadcastStateTransition is timing out on testnet ([#214](https://github.com/dashevo/wallet-lib/issues/214))
 
 
 
