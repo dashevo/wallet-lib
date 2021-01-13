@@ -127,8 +127,6 @@ class TransactionSyncStreamWorker extends Worker {
       skipSyncronizationBeforeHeight,
     } = (this.storage.store.syncOptions || {});
 
-    console.dir(skipSyncronizationBeforeHeight);
-
     if (skipSyncronizationBeforeHeight) {
       this.setLastSyncedBlockHeight(
         skipSyncronizationBeforeHeight,
