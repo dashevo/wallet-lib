@@ -102,12 +102,12 @@ class Wallet {
 
     this.store = this.storage.store;
 
-    if (this.debugOptions.skipSyncronizationBeforeHeight) {
-      // As it is pretty compicated to pass any of wallet options
+    if (this.debugOptions.skipSynchronizationBeforeHeight) {
+      // As it is pretty complicated to pass any of wallet options
       // to a specific plugin, using `store` as an options mediator
       // is easier.
       this.store.syncOptions = {
-        skipSyncronizationBeforeHeight: this.debugOptions.skipSyncronizationBeforeHeight,
+        skipSynchronizationBeforeHeight: this.debugOptions.skipSynchronizationBeforeHeight,
       };
     }
 

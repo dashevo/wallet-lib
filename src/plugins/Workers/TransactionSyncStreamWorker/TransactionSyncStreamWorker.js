@@ -124,12 +124,12 @@ class TransactionSyncStreamWorker extends Worker {
     // situation when plugin is injected directly
     // instead of usual injection process
     const {
-      skipSyncronizationBeforeHeight,
+      skipSynchronizationBeforeHeight,
     } = (this.storage.store.syncOptions || {});
 
-    if (skipSyncronizationBeforeHeight) {
+    if (skipSynchronizationBeforeHeight) {
       this.setLastSyncedBlockHeight(
-        skipSyncronizationBeforeHeight,
+        skipSynchronizationBeforeHeight,
       );
     }
 

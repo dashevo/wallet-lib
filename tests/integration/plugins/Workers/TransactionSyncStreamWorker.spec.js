@@ -635,19 +635,26 @@ describe('TransactionSyncStreamWorker', function suite() {
         .be.rejectedWith('InstantLock waiting period for transaction 256d5b3bf6d8869f5cc882ae070af9b648fa0f512bfa2b6f07b35d55e160a16c timed out');
   });
 
-  it('should start from the height specified in `skipSyncronizationBeforeHeight` options', async () => {
+  it('should start from the height specified in `skipSynchronizationBeforeHeight` options', async () => {
+    const bestBlockHeight = 42;
+
     wallet = new Wallet({
-      offlineMode: true,
-      plugins: [worker],
-      allowSensitiveOperations: true,
       HDPrivateKey: new HDPrivateKey(testHDKey),
       debugOptions: {
-        skipSyncronizationBeforeHeight: 20,
+        skipSynchronizationBeforeHeight: 20,
       },
     });
     wallet.transport = transportMock;
 
-    account = await wallet.getAccount();
+    [account] = await Promise.all([
+      wallet.getAccount(),
+      new Promise(resolve => {
+        setTimeout(() => {
+          txStreamMock.emit(TxStreamMock.EVENTS.end);
+          resolve();
+        }, 10)
+      })
+    ]);
 
     storage = account.storage;
     walletId = Object.keys(storage.store.wallets)[0];
@@ -656,11 +663,11 @@ describe('TransactionSyncStreamWorker', function suite() {
     addressAtIndex19 = account.getAddress(19).address;
 
     account.transport.getBestBlockHeight
-      .returns(42);
+      .returns(bestBlockHeight);
 
     const transactionsSent = [];
 
-    worker.execute();
+    //worker.execute();
 
     await wait(10);
 
@@ -683,6 +690,6 @@ describe('TransactionSyncStreamWorker', function suite() {
 
     await worker.onStop();
 
-    expect(account.transport.subscribeToTransactionsWithProofs.getCall(0).args[1]).to.be.deep.equal({ fromBlockHeight: 20, count: 0});
+    expect(account.transport.subscribeToTransactionsWithProofs.getCall(0).args[1]).to.be.deep.equal({ fromBlockHeight: 20, count: bestBlockHeight - 20 });
   });
 });
