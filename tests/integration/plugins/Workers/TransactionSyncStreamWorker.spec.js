@@ -634,4 +634,55 @@ describe('TransactionSyncStreamWorker', function suite() {
     await expect(account.waitForInstantLock(transactions[2].hash, 1000)).to.eventually
         .be.rejectedWith('InstantLock waiting period for transaction 256d5b3bf6d8869f5cc882ae070af9b648fa0f512bfa2b6f07b35d55e160a16c timed out');
   });
+
+  it('should start from the height specified in `skipSyncronizationBeforeHeight` options', async () => {
+    wallet = new Wallet({
+      offlineMode: true,
+      plugins: [worker],
+      allowSensitiveOperations: true,
+      HDPrivateKey: new HDPrivateKey(testHDKey),
+      debugOptions: {
+        skipSyncronizationBeforeHeight: 20,
+      },
+    });
+    wallet.transport = transportMock;
+
+    account = await wallet.getAccount();
+
+    storage = account.storage;
+    walletId = Object.keys(storage.store.wallets)[0];
+
+    address = account.getAddress(0).address;
+    addressAtIndex19 = account.getAddress(19).address;
+
+    account.transport.getBestBlockHeight
+      .returns(42);
+
+    const transactionsSent = [];
+
+    worker.execute();
+
+    await wait(10);
+
+    try {
+      for (let i = 0; i <= 42; i++) {
+        const transaction = new Transaction().to(address, i);
+
+        transactionsSent.push(transaction);
+        txStreamMock.emit(TxStreamMock.EVENTS.data, new TxStreamDataResponseMock({
+          rawTransactions: [transaction.toBuffer()]
+        }));
+        await wait(10);
+      }
+
+      txStreamMock.emit(TxStreamMock.EVENTS.end);
+    } catch (e) {
+      console.error(e);
+      txStreamMock.emit(TxStreamMock.EVENTS.error, e);
+    }
+
+    await worker.onStop();
+
+    expect(account.transport.subscribeToTransactionsWithProofs.getCall(0).args[1]).to.be.deep.equal({ fromBlockHeight: 20, count: 0});
+  });
 });
