@@ -656,39 +656,8 @@ describe('TransactionSyncStreamWorker', function suite() {
       })
     ]);
 
-    storage = account.storage;
-    walletId = Object.keys(storage.store.wallets)[0];
-
-    address = account.getAddress(0).address;
-    addressAtIndex19 = account.getAddress(19).address;
-
     account.transport.getBestBlockHeight
       .returns(bestBlockHeight);
-
-    const transactionsSent = [];
-
-    //worker.execute();
-
-    await wait(10);
-
-    try {
-      for (let i = 0; i <= 42; i++) {
-        const transaction = new Transaction().to(address, i);
-
-        transactionsSent.push(transaction);
-        txStreamMock.emit(TxStreamMock.EVENTS.data, new TxStreamDataResponseMock({
-          rawTransactions: [transaction.toBuffer()]
-        }));
-        await wait(10);
-      }
-
-      txStreamMock.emit(TxStreamMock.EVENTS.end);
-    } catch (e) {
-      console.error(e);
-      txStreamMock.emit(TxStreamMock.EVENTS.error, e);
-    }
-
-    await worker.onStop();
 
     expect(account.transport.subscribeToTransactionsWithProofs.getCall(0).args[1]).to.be.deep.equal({ fromBlockHeight: 20, count: bestBlockHeight - 20 });
   });
