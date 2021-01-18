@@ -1,4 +1,3 @@
-const TxStreamDataResponseMock = require('./TxStreamDataResponseMock');
 const TxStreamMock = require('./TxStreamMock');
 const TransportMock = require('./TransportMock');
 
@@ -9,15 +8,13 @@ module.exports = async function createAndAttachTransportMocksToWallet(wallet, si
   // eslint-disable-next-line no-param-reassign
   wallet.transport = transportMock;
 
-  await Promise.all([
-    wallet.getAccount(),
-    new Promise((resolve) => {
-      setTimeout(() => {
-        txStreamMock.emit(TxStreamMock.EVENTS.end);
-        resolve();
-      }, 10);
-    }),
-  ]);
+  const accountSyncPromise = wallet.getAccount();
+  // Breaking the event loop to start wallet syncing
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  // Emitting tx stream end to make wallet sync finish
+  txStreamMock.emit(TxStreamMock.EVENTS.end);
+  // Waiting for wallet to sync
+  await accountSyncPromise;
 
   return { txStreamMock, transportMock };
 };
