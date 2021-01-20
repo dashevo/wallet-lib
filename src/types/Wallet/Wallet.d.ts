@@ -59,10 +59,10 @@ export declare namespace Wallet {
         privateKey?: PrivateKey | string;
         HDPrivateKey?: HDPrivateKey | string;
         HDPublicKey?: HDPublicKey | string;
-        debugOptions?: IWalletDebugOptions;
+        unsafeOptions?: IWalletUnsafeOptions;
     }
 
-    interface IWalletDebugOptions {
-        skipSyncronizationBeforeHeight?: number;
+    interface IWalletUnsafeOptions {
+        skipSynchronizationBeforeHeight?: number;
     }
 }

@@ -637,7 +637,7 @@ describe('TransactionSyncStreamWorker', function suite() {
 
     wallet = new Wallet({
       HDPrivateKey: new HDPrivateKey(testHDKey),
-      debugOptions: {
+      unsafeOptions: {
         skipSynchronizationBeforeHeight: 20,
       },
     });
