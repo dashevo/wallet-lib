@@ -25,6 +25,7 @@ module.exports = async function injectPlugin(
     try {
       const isInit = !(typeof UnsafePlugin === 'function');
       const plugin = (isInit) ? UnsafePlugin : new UnsafePlugin();
+      plugin.on('error', (e) => self.emit('error', e));
 
       const pluginName = plugin.name.toLowerCase();
       logger.debug(`Account.injectPlugin(${pluginName}) - starting injection`);

@@ -53,7 +53,7 @@ module.exports = async function startHistoricalSync(network) {
     }
 
     this.stream = null;
-    throw e;
+    this.emit('error', e);
   }
 
   this.setLastSyncedBlockHeight(bestBlockHeight);

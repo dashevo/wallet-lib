@@ -46,6 +46,6 @@ module.exports = async function startIncomingSync() {
       return;
     }
 
-    throw e;
+    this.emit('error', e);
   }
 };
