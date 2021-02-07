@@ -18,7 +18,8 @@ module.exports = function createAccount(walletId, network, label = null) {
     this.store.wallets[walletId].accounts['0'] = {
       label,
       network,
-      blockHeight: 0, // Used to keep track of local state sync of the account
+      blockHeight: 0, // Used to keep track of local state sync of the account,
+      blockHash: null
     };
 
     return true;
