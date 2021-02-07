@@ -10,6 +10,6 @@ module.exports = function getLastSyncedBlockHeight() {
   const { blockHash } = (this.walletType === WALLET_TYPES.SINGLE_ADDRESS)
       ? accountsStore[this.index.toString()]
       : accountsStore[this.BIP44PATH.toString()];
-  
+
   return blockHash;
 };
