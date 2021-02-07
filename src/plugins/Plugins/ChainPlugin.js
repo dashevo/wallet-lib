@@ -38,10 +38,9 @@ class ChainPlugin extends StandardPlugin {
         // const { network } = self.storage.store.wallets[self.walletId];
         const { payload: block } = ev;
         this.parentEvents.emit(EVENTS.BLOCK, { type: EVENTS.BLOCK, payload: block });
-        // We do not announce BLOCKHEADER as this is done by Storage
-        await self.storage.importBlockHeader(block.header);
-
         const blockHeight = await self.transport.getBestBlockHeight();
+        // We do not announce BLOCKHEADER as this is done by Storage
+        await self.storage.importBlockHeader(block.header, blockHeight);
         this.storage.store.chains[network.toString()].blockHeight = blockHeight;
         logger.debug(`ChainPlugin - setting chain blockheight ${blockHeight}`);
       });
