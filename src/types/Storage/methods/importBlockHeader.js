@@ -13,9 +13,9 @@ const importBlockHeader = function importBlockHeader(blockHeader, height) {
 
   if (!chainStore.blockHeaders[blockHeader.hash]) {
     if (height) {
-      if (height > currentChainHeight) store.chains[network].blockHeight = height;
-      else {
-        store.chains[network].blockHeight += 1;
+      if (height > currentChainHeight) {
+        store.chains[network].blockHeight = height;
+        store.chains[network].blockHash = blockHeader.hash;
         self.announce(EVENTS.BLOCKHEIGHT_CHANGED, store.chains[network].blockHeight);
       }
     }
