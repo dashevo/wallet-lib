@@ -6,7 +6,7 @@ const { WALLET_TYPES } = require('../../../../CONSTANTS');
  * @param  {number} blockHeight
  * @return {number}
  */
-module.exports = function setLastSyncedBlockHeight(blockHeight) {
+module.exports = function setLastSyncedBlockHeight(hash) {
   const { walletId } = this;
   const accountsStore = this.storage.store.wallets[walletId].accounts;
 
@@ -14,7 +14,7 @@ module.exports = function setLastSyncedBlockHeight(blockHeight) {
       ? accountsStore[this.index.toString()]
       : accountsStore[this.BIP44PATH.toString()];
 
-  accountStore.blockHeight = blockHeight;
+  accountStore.blockHash = hash;
 
-  return accountStore.blockHeight;
+  return accountStore.blockHash;
 };

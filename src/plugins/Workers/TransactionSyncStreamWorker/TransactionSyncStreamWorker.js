@@ -128,8 +128,12 @@ class TransactionSyncStreamWorker extends Worker {
     } = (this.storage.store.syncOptions || {});
 
     if (skipSynchronizationBeforeHeight) {
+      const hash = await this.transport.client.core.getBlockHash(skipSynchronizationBeforeHeight);
       this.setLastSyncedBlockHeight(
         skipSynchronizationBeforeHeight,
+      );
+      this.setLastSyncedBlockHash(
+          hash,
       );
     }
 
@@ -167,35 +171,13 @@ class TransactionSyncStreamWorker extends Worker {
       this.stream = null;
     }
   }
-
-  setLastSyncedBlockHash(hash) {
-    const { walletId } = this;
-    const accountsStore = this.storage.store.wallets[walletId].accounts;
-
-    const accountStore = (this.walletType === WALLET_TYPES.SINGLE_ADDRESS)
-      ? accountsStore[this.index.toString()]
-      : accountsStore[this.BIP44PATH.toString()];
-
-    accountStore.blockHash = hash;
-
-    return accountStore.blockHash;
-  }
-
-  getLastSyncedBlockHash() {
-    const { walletId } = this;
-    const accountsStore = this.storage.store.wallets[walletId].accounts;
-
-    const { blockHash } = (this.walletType === WALLET_TYPES.SINGLE_ADDRESS)
-      ? accountsStore[this.index.toString()]
-      : accountsStore[this.BIP44PATH.toString()];
-
-    return blockHash;
-  }
 }
 
 TransactionSyncStreamWorker.prototype.getAddressesToSync = require('./methods/getAddressesToSync');
 TransactionSyncStreamWorker.prototype.getBestBlockHeightFromTransport = require('./methods/getBestBlockHeight');
+TransactionSyncStreamWorker.prototype.setLastSyncedBlockHash = require('./methods/setLastSyncedBlockHash');
 TransactionSyncStreamWorker.prototype.setLastSyncedBlockHeight = require('./methods/setLastSyncedBlockHeight');
+TransactionSyncStreamWorker.prototype.getLastSyncedBlockHash = require('./methods/getLastSyncedBlockHash');
 TransactionSyncStreamWorker.prototype.getLastSyncedBlockHeight = require('./methods/getLastSyncedBlockHeight');
 TransactionSyncStreamWorker.prototype.startHistoricalSync = require('./methods/startHistoricalSync');
 TransactionSyncStreamWorker.prototype.startIncomingSync = require('./methods/startIncomingSync');

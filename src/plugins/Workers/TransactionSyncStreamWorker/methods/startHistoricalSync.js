@@ -56,6 +56,9 @@ module.exports = async function startHistoricalSync(network) {
     throw e;
   }
 
+  const hash = await this.transport.client.core.getBlockHash(bestBlockHeight);
+
+  this.setLastSyncedBlockHeight(hash);
   this.setLastSyncedBlockHeight(bestBlockHeight);
 
   logger.debug(`TransactionSyncStreamWorker - HistoricalSync - Synchronized ${count} in ${+new Date() - start}ms`);
