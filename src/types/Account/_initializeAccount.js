@@ -6,13 +6,6 @@ const IdentitySyncWorker = require('../../plugins/Workers/IdentitySyncWorker');
 const EVENTS = require('../../EVENTS');
 const { WALLET_TYPES } = require('../../CONSTANTS');
 
-const {
-  PluginFailedOnStart,
-  WorkerFailedOnExecute,
-  InjectionToPluginUnallowed,
-  PluginInjectionError,
-} = require('../../errors');
-
 const ensureAddressesToGapLimit = require('../../utils/bip44/ensureAddressesToGapLimit');
 
 // eslint-disable-next-line no-underscore-dangle
