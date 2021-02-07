@@ -60,12 +60,11 @@ class ChainPlugin extends StandardPlugin {
       return false;
     }
     const { blocks } = res;
-    const { network } = this.storage.store.wallets[this.walletId];
     logger.debug('ChainPlugin - Setting up starting blockHeight', blocks);
-    this.storage.store.chains[network.toString()].blockHeight = blocks;
 
-    const bestBlock = await this.transport.getBlockHeaderByHeight(blocks);
-    await this.storage.importBlockHeader(bestBlock);
+    const height = blocks;
+    const bestBlock = await this.transport.getBlockHeaderByHeight(height);
+    await this.storage.importBlockHeader(bestBlock, height);
 
     return true;
   }
