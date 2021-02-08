@@ -1,4 +1,5 @@
 const { SAVE_STATE_SUCCESS, SAVE_STATE_FAILED } = require('../../../EVENTS');
+const logger = require('../../../logger');
 
 /**
  * Force persistence of the state to the adapter
@@ -12,6 +13,7 @@ const saveState = async function saveState() {
       await this.adapter.setItem('wallets', { ...self.store.wallets });
       await this.adapter.setItem('instantLocks', { ...self.store.instantLocks });
       this.lastSave = +new Date();
+      logger.debug('Storage: saved state.');
       this.emit(SAVE_STATE_SUCCESS, { type: SAVE_STATE_SUCCESS, payload: this.lastSave });
       return true;
     } catch (err) {
