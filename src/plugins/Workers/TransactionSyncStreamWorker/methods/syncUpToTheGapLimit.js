@@ -72,7 +72,7 @@ module.exports = async function syncUpToTheGapLimit({
         }
       })
       .on('error', (err) => {
-        logger.silly('TransactionSyncStreamWorker - end stream on error');
+        logger.silly(`TransactionSyncStreamWorker - end stream on error: ${err}`);
         reject(err);
       })
       .on('end', () => {
