@@ -16,5 +16,6 @@ module.exports = function setLastSyncedBlockHash(hash) {
 
   accountStore.blockHash = hash;
 
+  this.storage.store.lastModified = +new Date();
   return accountStore.blockHash;
 };
