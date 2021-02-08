@@ -132,7 +132,7 @@ class TransactionSyncStreamWorker extends Worker {
         skipSynchronizationBeforeHeight,
       );
       this.setLastSyncedBlockHash(
-          hash,
+        hash,
       );
     }
 

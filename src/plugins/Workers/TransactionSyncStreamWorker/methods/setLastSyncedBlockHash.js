@@ -11,8 +11,8 @@ module.exports = function setLastSyncedBlockHeight(hash) {
   const accountsStore = this.storage.store.wallets[walletId].accounts;
 
   const accountStore = (this.walletType === WALLET_TYPES.SINGLE_ADDRESS)
-      ? accountsStore[this.index.toString()]
-      : accountsStore[this.BIP44PATH.toString()];
+    ? accountsStore[this.index.toString()]
+    : accountsStore[this.BIP44PATH.toString()];
 
   accountStore.blockHash = hash;
 

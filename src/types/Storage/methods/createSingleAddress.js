@@ -19,7 +19,7 @@ module.exports = function createAccount(walletId, network, label = null) {
       label,
       network,
       blockHeight: 0, // Used to keep track of local state sync of the account,
-      blockHash: null
+      blockHash: null,
     };
 
     return true;

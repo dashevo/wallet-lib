@@ -8,8 +8,8 @@ module.exports = function getLastSyncedBlockHeight() {
   const accountsStore = this.storage.store.wallets[walletId].accounts;
 
   const { blockHash } = (this.walletType === WALLET_TYPES.SINGLE_ADDRESS)
-      ? accountsStore[this.index.toString()]
-      : accountsStore[this.BIP44PATH.toString()];
+    ? accountsStore[this.index.toString()]
+    : accountsStore[this.BIP44PATH.toString()];
 
   return blockHash;
 };
