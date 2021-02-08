@@ -1,6 +1,5 @@
 const { merge } = require('lodash');
 const { InstantLock } = require('@dashevo/dashcore-lib');
-const { hasProp } = require('../../../utils');
 const logger = require('../../../logger');
 
 const mergeHelper = (initial = {}, additional = {}) => merge(initial, additional);
