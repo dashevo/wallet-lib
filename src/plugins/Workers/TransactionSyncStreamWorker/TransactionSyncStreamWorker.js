@@ -127,14 +127,8 @@ class TransactionSyncStreamWorker extends Worker {
     } = (this.storage.store.syncOptions || {});
 
     if (skipSynchronizationBeforeHeight) {
-      const header = await this.transport.getBlockHeaderByHeight(skipSynchronizationBeforeHeight);
-      const { hash } = header;
-
       this.setLastSyncedBlockHeight(
         skipSynchronizationBeforeHeight,
-      );
-      this.setLastSyncedBlockHash(
-        hash,
       );
     }
 
