@@ -56,7 +56,8 @@ module.exports = async function startHistoricalSync(network) {
     throw e;
   }
 
-  const hash = await this.transport.client.core.getBlockHash(bestBlockHeight);
+  const header = await this.transport.getBlockHeaderByHeight(bestBlockHeight);
+  const { hash } = header;
 
   this.setLastSyncedBlockHash(hash);
   this.setLastSyncedBlockHeight(bestBlockHeight);
