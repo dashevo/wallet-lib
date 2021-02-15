@@ -76,7 +76,8 @@ class Account extends EventEmitter {
     this.label = (opts && opts.label && is.string(opts.label)) ? opts.label : null;
 
     // Forward async error events to wallet allowing catching during initial sync
-    this.on('error', (error) => wallet.emit('error', error, {
+    this.on('error', (error, errorContext) => wallet.emit('error', error, {
+      ...errorContext,
       accountIndex: this.index,
       network: this.network,
       label: this.label,

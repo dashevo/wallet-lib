@@ -65,7 +65,11 @@ class Worker extends StandardPlugin {
 
       if (this.executeOnStart) await this.execWorker();
     } catch (e) {
-      this.emit('error', e);
+      this.emit('error', e, {
+        type: 'plugin',
+        pluginType: 'worker',
+        pluginName: this.name,
+      });
     }
   }
 
@@ -100,7 +104,11 @@ class Worker extends StandardPlugin {
         payloadResult = await this.execute();
       } catch (e) {
         await this.stopWorker(e.message);
-        this.emit('error', e);
+        this.emit('error', e, {
+          type: 'plugin',
+          pluginType: 'worker',
+          pluginName: this.name,
+        });
       }
     } else {
       throw new Error(`Worker ${this.name}: Missing execute function`);

@@ -46,6 +46,10 @@ module.exports = async function startIncomingSync() {
       return;
     }
 
-    this.emit('error', e);
+    this.emit('error', e, {
+      type: 'plugin',
+      pluginType: 'worker',
+      pluginName: this.name,
+    });
   }
 };
