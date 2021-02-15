@@ -1,4 +1,5 @@
 const { Address, Transaction } = require('@dashevo/dashcore-lib');
+const { WALLET_TYPES } = require('../../../CONSTANTS');
 /**
  * Return all the utxos
  * @return {UnspentOutput[]}
@@ -7,15 +8,23 @@ function getUTXOS() {
   const utxos = [];
 
   const self = this;
-  const { walletId, network } = this;
+  const {
+    walletId, network, BIP44PATH, walletType,
+  } = this;
   const currentBlockHeight = this.store.chains[network].blockHeight;
   /* eslint-disable-next-line no-restricted-syntax */
-  for (const walletType in this.store.wallets[walletId].addresses) {
-    if (walletType && ['external', 'internal', 'misc'].includes(walletType)) {
+  for (const addressType in this.store.wallets[walletId].addresses) {
+    if (addressType && ['external', 'internal', 'misc'].includes(addressType)) {
       /* eslint-disable-next-line no-restricted-syntax */
-      for (const path in self.store.wallets[walletId].addresses[walletType]) {
+      for (const path in self.store.wallets[walletId].addresses[addressType]) {
         if (path) {
-          const address = self.store.wallets[walletId].addresses[walletType][path];
+          const address = self.store.wallets[walletId].addresses[addressType][path];
+          if (
+            [WALLET_TYPES.HDPUBLIC, WALLET_TYPES.HDWALLET].includes(walletType)
+              && !path.startsWith(BIP44PATH)) {
+            // eslint-disable-next-line no-continue
+            continue;
+          }
           /* eslint-disable-next-line no-restricted-syntax */
           for (const identifier in address.utxos) {
             if (identifier) {
