@@ -37,15 +37,28 @@ class Storage extends EventEmitter {
     this.lastModified = null;
     this.network = has(opts, 'network') ? opts.network.toString() : defaultOpts.network;
 
+    this.adapter = opts.adapter;
+
     // // Map an address to it's walletid/path/type schema (used by searchAddress for speedup)
     this.mappedAddress = {};
+
+    this.prepare();
+  }
+
+  async prepare() {
+    if (this.rehydrate) {
+      await this.rehydrateState();
+    }
+
+    if (this.autosave) {
+      this.startWorker();
+    }
   }
 }
 Storage.prototype.addNewTxToAddress = require('./methods/addNewTxToAddress');
 Storage.prototype.announce = require('./methods/announce');
 Storage.prototype.calculateDuffBalance = require('./methods/calculateDuffBalance');
 Storage.prototype.clearAll = require('./methods/clearAll');
-Storage.prototype.configure = require('./methods/configure');
 Storage.prototype.createAccount = require('./methods/createAccount');
 Storage.prototype.createSingleAddress = require('./methods/createSingleAddress');
 Storage.prototype.createWallet = require('./methods/createWallet');

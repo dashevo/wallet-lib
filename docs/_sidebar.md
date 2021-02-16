@@ -59,7 +59,6 @@
         - [`.announce()`](storage/announce.md)
         - [`.calculateDuffBalance()`](storage/calculateDuffBalance.md)
         - [`.clearAll()`](storage/clearAll.md)
-        - [`.configure()`](storage/configure.md)
         - [`.createChain()`](storage/createChain.md)
         - [`.createWallet()`](storage/createWallet.md)
         - [`.getStore()`](storage/getStore.md)

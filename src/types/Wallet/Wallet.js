@@ -24,6 +24,7 @@ const fromHDPublicKey = require('./methods/fromHDPublicKey');
 const fromHDPrivateKey = require('./methods/fromHDPrivateKey');
 const generateNewWalletId = require('./methods/generateNewWalletId');
 
+const createAdapter = require('../../adapters/createAdapter');
 const createTransportFromOptions = require('../../transport/createTransportFromOptions');
 
 /**
@@ -94,10 +95,7 @@ class Wallet {
       rehydrate: true,
       autosave: true,
       network,
-    });
-
-    this.storage.configure({
-      adapter: opts.adapter,
+      adapter: createAdapter(opts.adapter),
     });
 
     this.store = this.storage.store;
