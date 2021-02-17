@@ -1,11 +1,10 @@
-const logger = require('../logger');
-
 /**
  * @abstract
  */
 class AbstractAdapter {
-  constructor(options) {
+  constructor(adapter) {
     this.isConfig = false;
+    this.adapter = adapter;
   }
 
   config() {
