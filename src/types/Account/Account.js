@@ -30,7 +30,6 @@ function getNextUnusedAccountIndexForWallet(wallet) {
 const defaultOptions = {
   network: 'testnet',
   cacheTx: true,
-  cacheBlockHeaders: true,
   allowSensitiveOperations: false,
   plugins: [],
   injectDefaultPlugins: true,
@@ -119,9 +118,6 @@ class Account extends EventEmitter {
     this.keyChain = wallet.keyChain;
 
     this.cacheTx = (opts.cacheTx) ? opts.cacheTx : defaultOptions.cacheTx;
-    this.cacheBlockHeaders = (opts.cacheBlockHeaders)
-      ? opts.cacheBlockHeaders
-      : defaultOptions.cacheBlockHeaders;
 
     this.plugins = {
       workers: {},
@@ -254,7 +250,6 @@ Account.prototype.getWorker = require('./methods/getWorker');
 Account.prototype.hasPlugins = require('./methods/hasPlugins');
 Account.prototype.injectPlugin = require('./methods/injectPlugin');
 Account.prototype.importTransactions = require('./methods/importTransactions');
-Account.prototype.importBlockHeader = require('./methods/importBlockHeader');
 
 Account.prototype.sign = require('./methods/sign');
 

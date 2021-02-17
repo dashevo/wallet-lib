@@ -7,8 +7,8 @@ function getUTXOS() {
   const utxos = [];
 
   const self = this;
-  const { walletId, network } = this;
-  const currentBlockHeight = this.store.chains[network].blockHeight;
+  const { walletId, network, index } = this;
+  const currentBlockHeight = this.store.wallets[walletId].accounts[index].blockHeight;
   /* eslint-disable-next-line no-restricted-syntax */
   for (const walletType in this.store.wallets[walletId].addresses) {
     if (walletType && ['external', 'internal', 'misc'].includes(walletType)) {

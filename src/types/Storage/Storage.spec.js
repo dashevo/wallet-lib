@@ -47,17 +47,11 @@ describe('Storage - constructor', function suite() {
   it('should work on usage', async () => {
     const storage = new Storage();
     await storage.configure();
-    await storage.createChain(Dashcore.Networks.testnet);
 
     const defaultWalletId = 'squawk7700';
     const expectedStore1 = {
       wallets: {},
       transactions: {},
-      chains: {
-        testnet: {
-          name: 'testnet', blockHeight: -1, blockHash: null, blockHeaders: {}, mappedBlockHeaderHeights: {},
-        },
-      },
       instantLocks: {}
     };
     expect(storage.getStore()).to.deep.equal(expectedStore1);
@@ -75,11 +69,6 @@ describe('Storage - constructor', function suite() {
         },
       },
       transactions: {},
-      chains: {
-        testnet: {
-          name: 'testnet', blockHeight: -1, blockHash: null, blockHeaders: {}, mappedBlockHeaderHeights: {},
-        },
-      },
       instantLocks: {},
     };
     expect(storage.getStore()).to.deep.equal(expectedStore2);

@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const logger = require('../../logger');
 const TransactionSyncStreamWorker = require('../../plugins/Workers/TransactionSyncStreamWorker/TransactionSyncStreamWorker');
-const ChainPlugin = require('../../plugins/Plugins/ChainPlugin');
 const IdentitySyncWorker = require('../../plugins/Workers/IdentitySyncWorker');
 const EVENTS = require('../../EVENTS');
 const { WALLET_TYPES } = require('../../CONSTANTS');
@@ -44,8 +43,6 @@ async function _initializeAccount(account, userUnsafePlugins) {
           await account.getAddress('0'); // We force what is usually done by the BIP44Worker.
         }
         if (!account.offlineMode) {
-          await account.injectPlugin(ChainPlugin, true);
-
           // Transaction sync worker
           await account.injectPlugin(TransactionSyncStreamWorker, true);
 

@@ -56,7 +56,6 @@ export declare class Storage {
     importAccounts(accounts: Account|[Account], walletId: string): boolean;
     importAddress(address: AddressObj, walletId: string): boolean;
     importAddresses(addresses: [AddressObj], walletId: string): boolean;
-    importBlockHeader(blockHeader: BlockHeader, height: number): void;
     importSingleAddress(singleAddress: AddressObj, walletId: string): boolean;
     importTransaction(transaction: Transaction): void;
     importTransactions(transactions: [Transaction]): boolean;

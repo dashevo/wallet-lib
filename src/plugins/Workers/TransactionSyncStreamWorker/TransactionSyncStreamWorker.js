@@ -14,7 +14,6 @@ class TransactionSyncStreamWorker extends Worker {
       gapLimit: 10,
       dependencies: [
         'importTransactions',
-        'importBlockHeader',
         'importInstantLock',
         'storage',
         'transport',

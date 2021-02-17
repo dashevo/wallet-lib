@@ -56,7 +56,6 @@ const CONSTANTS = {
       'getTotalBalance',
       'broadcastTransaction',
       'importTransactions',
-      'importBlockHeader',
       'getAddress',
       'fetchStatus',
       'getPlugin',

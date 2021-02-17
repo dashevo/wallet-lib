@@ -11,13 +11,6 @@ async function getTransaction(txid = null) {
   const tx = await this.transport.getTransaction(txid);
   if (this.cacheTx) {
     await this.importTransactions(tx);
-    if (this.cacheBlockHeaders) {
-      const searchBlockHeader = this.storage.searchBlockHeader(tx.nLockTime);
-      if (!searchBlockHeader.found) {
-        // Trigger caching of blockheader
-        await this.getBlockHeader(tx.nLockTime);
-      }
-    }
   }
   return tx;
 }

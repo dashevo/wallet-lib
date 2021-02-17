@@ -1,10 +1,5 @@
 const logger = require('../../../../logger');
 
-function isAnyIntersection(arrayA, arrayB) {
-  const intersection = arrayA.filter((e) => arrayB.indexOf(e) > -1);
-  return intersection.length > 0;
-}
-
 /**
  *
  * @param options
@@ -73,20 +68,6 @@ module.exports = async function syncUpToTheGapLimit({
             // DO not setting null this.stream allow to know we
             // need to reset our stream (as we pass along the error)
             stream.cancel();
-          }
-        }
-
-        /* Incoming Merkle block handling */
-        const merkleBlockFromResponse = this.constructor
-          .getMerkleBlockFromStreamResponse(response);
-
-        if (merkleBlockFromResponse) {
-          // Reverse hashes, as they're little endian in the header
-          const transactionsInHeader = merkleBlockFromResponse.hashes.map((hashHex) => Buffer.from(hashHex, 'hex').reverse().toString('hex'));
-          const transactionsInWallet = Object.keys(self.storage.getStore().transactions);
-          const isTruePositive = isAnyIntersection(transactionsInHeader, transactionsInWallet);
-          if (isTruePositive) {
-            self.importBlockHeader(merkleBlockFromResponse.header);
           }
         }
       })

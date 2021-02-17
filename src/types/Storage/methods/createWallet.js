@@ -16,7 +16,6 @@ const createWallet = function createWallet(walletId = 'squawk7700', network = te
         misc: {},
       },
     };
-    this.createChain(network);
     return true;
   }
   return false;
