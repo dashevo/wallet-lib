@@ -54,7 +54,7 @@ class Storage extends EventEmitter {
       this.startWorker();
     }
 
-    this.emit(CONFIGURED, { type: CONFIGURED, payload: null })
+    this.emit(CONFIGURED, { type: CONFIGURED, payload: null });
   }
 }
 Storage.prototype.addNewTxToAddress = require('./methods/addNewTxToAddress');
