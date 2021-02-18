@@ -22,9 +22,9 @@ describe('Storage - constructor', function suite() {
     const storage = new Storage();
     let configuredEvent = false;
     storage.on(CONFIGURED, () => configuredEvent = true);
-    await storage.configure();
     expect(storage.adapter).to.exist;
-    expect(storage.adapter.constructor.name).to.equal('InMem');
+    expect(storage.adapter.constructor.name).to.equal('InMemoryAdapter');
+    await storage.prepare();
     expect(configuredEvent).to.equal(true);
     storage.stopWorker();
   });
@@ -34,10 +34,10 @@ describe('Storage - constructor', function suite() {
       this.skip('LocalForage is a valid adapter on browser')
       return;
     }
-    const expectedException1 = 'Invalid Storage Adapter : No available storage method found.';
+    const expectedException1 = 'No available storage method found.';
     const storageOpts1 = { adapter: localForage };
-    const storage = new Storage();
-    return storage.configure(storageOpts1).then(
+    const storage = new Storage(storageOpts1);
+    return storage.prepare().then(
       () => Promise.reject(new Error('Expected method to reject.')),
       (err) => expect(err).to.be.a('Error').with.property('message', expectedException1),
     ).then(() => {
@@ -46,7 +46,8 @@ describe('Storage - constructor', function suite() {
   });
   it('should work on usage', async () => {
     const storage = new Storage();
-    await storage.configure();
+    await storage.prepare();
+    await storage.createChain(Dashcore.Networks.testnet);
 
     const defaultWalletId = 'squawk7700';
     const expectedStore1 = {

@@ -35,12 +35,8 @@ describe('Wallet - class', function suite() {
     expect(Dashcore.Mnemonic(wallet2.mnemonic).toString()).to.be.equal(wallet2.mnemonic);
     expect(wallet2.mnemonic).to.be.not.equal(wallet1.mnemonic);
     expect(wallet2.network).to.be.deep.equal(Dashcore.Networks.testnet.toString());
-    wallet1.storage.on('CONFIGURED', () => {
-      wallet1.disconnect();
-    });
-    wallet2.storage.on('CONFIGURED', () => {
-      wallet2.disconnect();
-    });
+    wallet1.disconnect();
+    wallet2.disconnect();
   });
   it('should create a wallet with mnemonic', () => {
     const wallet1 = new Wallet({ mnemonic: knifeMnemonic.mnemonic, ...mocks });

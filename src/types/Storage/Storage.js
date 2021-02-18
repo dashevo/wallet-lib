@@ -1,8 +1,8 @@
 const EventEmitter = require('events');
 const { cloneDeep, has } = require('lodash');
-
+const createAdapter = require('../../adapters/createAdapter');
 const CONSTANTS = require('../../CONSTANTS');
-
+const { CONFIGURED } = require('../../EVENTS');
 const initialStore = {
   wallets: {},
   transactions: {},
@@ -37,10 +37,12 @@ class Storage extends EventEmitter {
     this.lastModified = null;
     this.network = has(opts, 'network') ? opts.network.toString() : defaultOpts.network;
 
-    this.adapter = opts.adapter;
+    this.adapter = opts.adapter || createAdapter();
 
     // // Map an address to it's walletid/path/type schema (used by searchAddress for speedup)
     this.mappedAddress = {};
+
+    this.isStopped = true;
   }
 
   async prepare() {
@@ -51,6 +53,8 @@ class Storage extends EventEmitter {
     if (this.autosave) {
       this.startWorker();
     }
+
+    this.emit(CONFIGURED, { type: CONFIGURED, payload: null })
   }
 }
 Storage.prototype.addNewTxToAddress = require('./methods/addNewTxToAddress');
