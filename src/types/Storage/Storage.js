@@ -6,7 +6,6 @@ const CONSTANTS = require('../../CONSTANTS');
 const initialStore = {
   wallets: {},
   transactions: {},
-  chains: {},
   instantLocks: {},
 };
 // eslint-disable-next-line no-underscore-dangle

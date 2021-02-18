@@ -24,7 +24,10 @@ describe('Account - createTransaction', function suite() {
       store: validStore,
       walletId: 'a3771aaf93',
       getUTXOS,
-      network: 'testnet'
+      network: 'testnet',
+      index: 0,
+      walletType: 'hdwallet',
+      BIP44PATH: "m/44'/1'/0'"
     };
 
     const mockOpts1 = {};

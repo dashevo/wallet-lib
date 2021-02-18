@@ -6,6 +6,11 @@ const { Transaction } = Dashcore;
 const mockedStoreEmpty = {
   wallets: {
     123456789: {
+      accounts:{
+        "m/44'/1'/0'":{
+          blockHeight: 0,
+        }
+      },
       addresses: {},
     },
   },
@@ -19,6 +24,11 @@ const mockedStoreEmpty = {
 const mockedStore2 = {
   wallets: {
     123456789: {
+      accounts:{
+        "m/44'/1'/0'":{
+          blockHeight: 10000,
+        }
+      },
       addresses: {
         external: {
           "m/44'/1'/0'/0/0": {
@@ -90,7 +100,10 @@ describe('Account - getUTXOS', function suite() {
       store: mockedStoreEmpty,
       getStore: mockedStoreEmpty,
       walletId: '123456789',
-      network: 'testnet'
+      network: 'testnet',
+      index: 0,
+      walletType: 'hdwallet',
+      BIP44PATH: "m/44'/1'/0'"
     });
     expect(utxos).to.be.deep.equal([]);
 
@@ -98,7 +111,10 @@ describe('Account - getUTXOS', function suite() {
       store: mockedStore2,
       getStore: mockedStore2,
       walletId: '123456789',
-      network: 'testnet'
+      network: 'testnet',
+      index: 0,
+      walletType: 'hdwallet',
+      BIP44PATH: "m/44'/1'/0'"
     });
 
     expect(utxos2).to.be.deep.equal([new Dashcore.Transaction.UnspentOutput(

@@ -186,7 +186,8 @@ describe('TransactionSyncStreamWorker', function suite() {
       expect(account.transport.subscribeToTransactionsWithProofs.secondCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 2});
       // Block received
       expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[0].length).to.be.equal(80);
-      expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 2});
+      expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 2});
+      // expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 2});
 
       expect(worker.stream).to.be.null;
       expect(transactionsInStorage.length).to.be.equal(2);
@@ -377,7 +378,8 @@ describe('TransactionSyncStreamWorker', function suite() {
       expect(account.transport.subscribeToTransactionsWithProofs.secondCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 0});
       // Block received
       expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[0].length).to.be.equal(80);
-      expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 0});
+      expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 0});
+      // expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 0});
 
       expect(worker.stream).to.be.null;
       expect(transactionsInStorage.length).to.be.equal(2);
@@ -597,7 +599,8 @@ describe('TransactionSyncStreamWorker', function suite() {
     expect(account.transport.subscribeToTransactionsWithProofs.secondCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 0});
     // Block received
     expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[0].length).to.be.equal(80);
-    expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 0});
+    // expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 0});
+    expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 0});
 
     expect(worker.stream).to.be.null;
     expect(transactionsInStorage.length).to.be.equal(2);
@@ -631,7 +634,6 @@ describe('TransactionSyncStreamWorker', function suite() {
     await expect(account.waitForInstantLock(transactions[2].hash, 1000)).to.eventually
         .be.rejectedWith('InstantLock waiting period for transaction 256d5b3bf6d8869f5cc882ae070af9b648fa0f512bfa2b6f07b35d55e160a16c timed out');
   });
-
   it('should start from the height specified in `skipSynchronizationBeforeHeight` options', async function () {
     const bestBlockHeight = 42;
 

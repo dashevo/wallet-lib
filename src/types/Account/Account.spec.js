@@ -74,11 +74,9 @@ describe('Account - class', function suite() {
   it('should forward events', function (done) {
     const mockWallet = mocks.wallet;
     const account = new Account(mockWallet, { injectDefaultPlugins: false });
-    account.init(mockWallet).then(async ()=>{
-      await account.on(EVENTS.BLOCKHEADER, ()=>{
-        done();
-      });
-    })
-
+    account.on(EVENTS.STARTED, ()=>{
+      done();
+    });
+    account.init(mockWallet);
   });
 });
