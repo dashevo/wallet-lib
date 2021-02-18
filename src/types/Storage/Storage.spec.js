@@ -47,7 +47,6 @@ describe('Storage - constructor', function suite() {
   it('should work on usage', async () => {
     const storage = new Storage();
     await storage.prepare();
-    await storage.createChain(Dashcore.Networks.testnet);
 
     const defaultWalletId = 'squawk7700';
     const expectedStore1 = {

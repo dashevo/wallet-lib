@@ -19,7 +19,7 @@ const rehydrateState = async function rehydrateState() {
       const wallets = (this.adapter && this.adapter.getItem)
         ? (await this.adapter.getItem('wallets') || this.store.wallets)
         : this.store.wallets;
-      const instantLocks = (this.adapter && hasProp(this.adapter, 'getItem'))
+      const instantLocks = (this.adapter && this.adapter.getItem)
         ? (await this.adapter.getItem('instantLocks') || this.store.instantLocks)
         : this.store.instantLocks;
 
