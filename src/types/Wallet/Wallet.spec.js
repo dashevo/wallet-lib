@@ -6,12 +6,12 @@ const fluidMnemonic = require('../../../fixtures/fluidDepth');
 const cR4t6ePrivateKey = require('../../../fixtures/cR4t6e_pk');
 const { WALLET_TYPES } = require('../../CONSTANTS');
 const { Wallet } = require('../../index');
-const inMem = require('../../adapters/InMem');
+const InMemoryAdapter = require('../../adapters/InMemoryAdapter/InMemoryAdapter');
 const fromHDPublicKey = require('./methods/fromHDPublicKey');
 const gatherSail = require('../../../fixtures/gathersail');
 
 const mocks = {
-  adapter: inMem,
+  adapter: new InMemoryAdapter(),
   offlineMode: true,
 };
 describe('Wallet - class', function suite() {

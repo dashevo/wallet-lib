@@ -10,10 +10,11 @@ describe('Adapter - InMemoryAdapter', function suite() {
   });
   it('should set an item', () => {
     const item = { item: 'item' };
-    expect(inMemoryAdapter.setItem('toto', item)).to.deep.equal(item);
+    inMemoryAdapter.setItem('foo', item);
+    expect(inMemoryAdapter.setItem('foo', item)).to.deep.equal(item);
   });
   it('should get an item', () => {
     const item = { item: 'item' };
-    expect(inMemoryAdapter.getItem('toto')).to.deep.equal(item);
+    expect(inMemoryAdapter.getItem('foo')).to.deep.equal(item);
   });
 });

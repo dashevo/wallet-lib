@@ -97,6 +97,7 @@ class Wallet {
       network,
       adapter: createAdapter(opts.adapter),
     });
+    this.storage.prepare();
 
     this.store = this.storage.store;
 

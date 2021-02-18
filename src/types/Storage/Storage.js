@@ -41,8 +41,6 @@ class Storage extends EventEmitter {
 
     // // Map an address to it's walletid/path/type schema (used by searchAddress for speedup)
     this.mappedAddress = {};
-
-    this.prepare();
   }
 
   async prepare() {

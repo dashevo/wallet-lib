@@ -2,10 +2,18 @@ const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
 const { Account, EVENTS } = require('../../index');
 const EventEmitter = require('events');
-const inMem = require('../../adapters/InMem');
-
+const InMemoryAdapter = require('../../adapters/InMemoryAdapter/InMemoryAdapter');
+const blockHeader = new Dashcore.BlockHeader.fromObject({
+  hash: '00000ac3a0c9df709260e41290d6902e5a4a073099f11fe8c1ce80aadc4bb331',
+  version: 2,
+  prevHash: '00000ce430de949c85a145b02e33ebbaed3772dc8f3d668f66edc6852c24d002',
+  merkleRoot: '663360403b5fba9cd8744c3706f9660c7d3fee4e5a9ee98ce0ad5e5ad7824c1d',
+  time: 1398712821,
+  bits: 504365040,
+  nonce: 312363
+});
 const mocks = {
-  adapter: inMem,
+  adapter: new InMemoryAdapter(),
   offlineMode: true,
 };
 

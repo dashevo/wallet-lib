@@ -12,7 +12,6 @@ const SUPPORTED_ADAPTERS = {
  * @returns {Adapter}
  */
 function createAdapter(options) {
-  console.log(options);
   if (options && options.name && options.adapter) {
     switch (options.name) {
       case SUPPORTED_ADAPTERS.NodeForage:

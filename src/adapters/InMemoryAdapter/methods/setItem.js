@@ -1,4 +1,4 @@
-module.exports = async function setItem(key, item) {
+module.exports = function setItem(key, item) {
   this.keys[key] = item;
   return item;
 };

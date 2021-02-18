@@ -1,3 +1,3 @@
-module.exports = async function getItem(key) {
+module.exports = function getItem(key) {
   return this.keys[key] || null;
 };
