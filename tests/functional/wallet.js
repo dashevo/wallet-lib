@@ -4,22 +4,32 @@ const { Wallet } = require('../../src/index');
 
 const { fundWallet } = require('../../src/utils');
 const { EVENTS } = require('../../src');
-
-const seeds = process.env.DAPI_SEED
-  .split(',');
-
+const DAPIClient = require('@dashevo/dapi-client');
+const dapiClient = new DAPIClient();
+// const seeds = process.env.DAPI_SEED
+//   .split(',');
+// const seeds = null;
 let newWallet;
 let wallet;
 let account;
 let faucetWallet;
+let skipSynchronizationBeforeHeight;
 
 describe('Wallet-lib - functional ', function suite() {
   this.timeout(700000);
 
-  before(() => {
+  before(async () => {
+    const status = await dapiClient.core.getStatus();
+    console.log({status});
+
+    const bestBlockHeight = status.blocks;
+    skipSynchronizationBeforeHeight = (bestBlockHeight>1000) ? bestBlockHeight - 1000 : 0;
     faucetWallet = new Wallet({
       transport: {
         seeds,
+      },
+      unsafeOptions:{
+        skipSynchronizationBeforeHeight
       },
       network: process.env.NETWORK,
       privateKey: process.env.FAUCET_PRIVATE_KEY
@@ -39,6 +49,9 @@ describe('Wallet-lib - functional ', function suite() {
         newWallet = new Wallet({
           transport: {
             seeds,
+          },
+          unsafeOptions:{
+            skipSynchronizationBeforeHeight
           },
           network: process.env.NETWORK,
         });
@@ -65,6 +78,9 @@ describe('Wallet-lib - functional ', function suite() {
           transport: {
             seeds,
           },
+          unsafeOptions:{
+            skipSynchronizationBeforeHeight
+          },
           network: process.env.NETWORK,
         });
 
@@ -87,6 +103,7 @@ describe('Wallet-lib - functional ', function suite() {
   describe('Account', () => {
     it('should await readiness', async () => {
       account = await wallet.getAccount();
+      console.log(account);
       await account.isReady();
       expect(account.state.isReady).to.be.deep.equal(true);
     });
@@ -138,7 +155,7 @@ describe('Wallet-lib - functional ', function suite() {
       const restoredWallet = new Wallet({
         mnemonic: wallet.mnemonic,
         transport: {
-          seeds,
+          // seeds,
         },
         network: process.env.NETWORK,
       });
