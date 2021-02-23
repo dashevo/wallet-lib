@@ -54,13 +54,15 @@ const wallet = new Wallet();
 // We can dump our initialization parameters
 const mnemonic = wallet.exportWallet();
 
-wallet.getAccount().then((account) => {
-  // At this point, account has fetch all UTXOs if they exists
-  const balance = account.getTotalBalance();
-  console.log(`Balance: ${balance}`);
-
-  // We easily can get a new address to fund
-  const { address } = account.getUnusedAddress();
+wallet
+    .getAccount()
+    .then((account) => {
+      // At this point, account has fetch all UTXOs if they exists
+      const balance = account.getTotalBalance();
+      console.log(`Balance: ${balance}`);
+    
+      // We easily can get a new address to fund
+      const { address } = account.getUnusedAddress();
 });
 ```
 
