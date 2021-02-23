@@ -1,6 +1,27 @@
 const { expect } = require('chai');
 const getAddressesToSync = require('./getAddressesToSync');
 
+const mockedStore1 = {
+  wallets: {
+    123456789: {
+      addresses: {
+        misc:{
+          '0':{
+            address: 'yizmJb63ygipuJaRgYtpWCV2erQodmaZt1',
+            balanceSat: 0,
+            fetchedLast: 0,
+            path: "0",
+            transactions: [],
+            index: 0,
+            unconfirmedBalanceSat: 0,
+            used: false,
+            utxos: {}
+          }
+        }
+      },
+    },
+  },
+}
 const mockedStore2 = {
   wallets: {
     123456789: {
@@ -53,27 +74,64 @@ const mockedStore2 = {
             }
           }
         },
+        internal:{
+          "m/44'/1'/0'/1/0": {
+            address: 'yizmJb63ygipuJaRgYtpWCV2erQodmaZt9',
+            balanceSat: 0,
+            fetchedLast: 0,
+            path: "m/44'/1'/0'/1/0",
+            transactions: [],
+            index: 0,
+            unconfirmedBalanceSat: 0,
+            used: false,
+            utxos: {}
+          }
+        },
+        misc:{
+          '0':{
+            address: 'yizmJb63ygipuJaRgYtpWCV2erQodmaZt1',
+            balanceSat: 0,
+            fetchedLast: 0,
+            path: "0",
+            transactions: [],
+            index: 0,
+            unconfirmedBalanceSat: 0,
+            used: false,
+            utxos: {}
+          }
+        }
       },
     },
   },
 };
+
+const mockSelfPrivateKeyType = {
+  storage: { getStore:()=>mockedStore1 },
+  walletId: '123456789',
+  walletType: 'single_address',
+}
 const mockSelfIndex0 = {
   storage: { getStore:()=>mockedStore2 },
   walletId: '123456789',
   walletType: 'hdwallet',
-  BIP44PATH: `m/44'/1'/0'/0/0`
+  BIP44PATH: `m/44'/1'/0'`
 }
 const mockSelfIndex1 = {
   ...mockSelfIndex0,
-  BIP44PATH: `m/44'/1'/1'/0/0`
+  BIP44PATH: `m/44'/1'/1'`
 }
+
+
 describe('TransactionSyncStreamWorker#getAddressesToSync', function suite() {
   it('should correctly fetch addresses to sync', async () => {
 
     const addressesIndex0 = getAddressesToSync.call(mockSelfIndex0 );
-    expect(addressesIndex0).to.deep.equal(['yizmJb63ygipuJaRgYtpWCV2erQodmaZt8'])
+    expect(addressesIndex0).to.deep.equal(['yizmJb63ygipuJaRgYtpWCV2erQodmaZt8', 'yizmJb63ygipuJaRgYtpWCV2erQodmaZt9'])
 
     const addressesIndex1 = getAddressesToSync.call(mockSelfIndex1 );
     expect(addressesIndex1).to.deep.equal(['yQ5TfKcj3NHM4V4K5VBgoFJj9Q4LKX13gn'])
+
+    const addressesIndex2 = getAddressesToSync.call(mockSelfPrivateKeyType );
+    expect(addressesIndex2).to.deep.equal(['yizmJb63ygipuJaRgYtpWCV2erQodmaZt1'])
   });
 });
