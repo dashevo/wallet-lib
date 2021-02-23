@@ -6,9 +6,8 @@ const { fundWallet } = require('../../src/utils');
 const { EVENTS } = require('../../src');
 const DAPIClient = require('@dashevo/dapi-client');
 const dapiClient = new DAPIClient();
-// const seeds = process.env.DAPI_SEED
-//   .split(',');
-// const seeds = null;
+const seeds = process.env.DAPI_SEED
+  .split(',');
 let newWallet;
 let wallet;
 let account;
