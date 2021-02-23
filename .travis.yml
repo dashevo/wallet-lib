@@ -18,7 +18,7 @@ services:
 addons:
   apt:
     packages:
-      - docker.io
+      - docker-ce
 
 env:
   - DOCKER_COMPOSE_VERSION=1.25.5
