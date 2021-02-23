@@ -20,7 +20,7 @@ let faucetWallet;
 let skipSynchronizationBeforeHeight;
 
 describe('Wallet-lib - functional ', function suite() {
-  this.timeout(700000);
+  this.timeout(1000000);
 
   before(async () => {
     const status = await dapiClient.core.getStatus();
