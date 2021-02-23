@@ -24,22 +24,18 @@ describe('Wallet - sweepWallet', function suite() {
     });
 
     emptyAccount = await emptyWallet.getAccount();
-    console.log(emptyAccount);
   });
 
   after(async () => {
     if (emptyWallet) {
-      console.log('Disconnect');
       await emptyWallet.disconnect();
     }
   });
 
   it('should warn on empty balance', async () => {
     await emptyAccount.isReady();
-    console.log('ISREADY');
     const exceptedException = 'Cannot sweep an empty private key (current balance: 0)';
     await expectThrowsAsync(async () => await emptyWallet.sweepWallet(), exceptedException);
-    console.log('WARN DISCONNECT');
     await emptyWallet.disconnect();
   });
   it('should warn on sweep from mnemonic', async () => {
