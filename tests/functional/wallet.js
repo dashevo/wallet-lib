@@ -19,7 +19,6 @@ describe('Wallet-lib - functional ', function suite() {
 
   before(async () => {
     const status = await dapiClient.core.getStatus();
-    console.log({status});
 
     const bestBlockHeight = status.blocks;
     skipSynchronizationBeforeHeight = (bestBlockHeight>1000) ? bestBlockHeight - 1000 : 0;
@@ -102,7 +101,6 @@ describe('Wallet-lib - functional ', function suite() {
   describe('Account', () => {
     it('should await readiness', async () => {
       account = await wallet.getAccount();
-      console.log(account);
       await account.isReady();
       expect(account.state.isReady).to.be.deep.equal(true);
     });
@@ -154,7 +152,7 @@ describe('Wallet-lib - functional ', function suite() {
       const restoredWallet = new Wallet({
         mnemonic: wallet.mnemonic,
         transport: {
-          // seeds,
+          seeds,
         },
         network: process.env.NETWORK,
       });
