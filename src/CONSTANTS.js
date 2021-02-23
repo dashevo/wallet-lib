@@ -70,11 +70,11 @@ const CONSTANTS = {
       'generateAddress',
       'getPrivateKeys',
       'injectPlugin',
-      'getIdentityHDKeyByIndex',
     ],
     UNSAFE_PROPERTIES: [
       'storage',
       'keyChain',
+      'identities',
     ],
     SAFE_PROPERTIES: [
       'offlineMode',
