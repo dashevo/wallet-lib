@@ -80,7 +80,7 @@ Insight-Client has been removed from MVP and is not working since Wallet-lib v3.
 
 ## Documentation
 
-You can see some [Examples here](/docs/usage/examples.md).
+You can see some [examples here](/docs/usage/examples.md).
 
 More extensive documentation is available at https://dashevo.github.io/wallet-lib along with additional [examples & snippets](https://dashevo.github.io/wallet-lib/#/usage/examples).
 
