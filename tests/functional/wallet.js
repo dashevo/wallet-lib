@@ -148,6 +148,7 @@ describe('Wallet-lib - functional ', function suite() {
         satoshis: Math.floor(account.getTotalBalance() / 2)
       });
 
+      console.log('New transaction satoshis amount', Math.floor(account.getTotalBalance() / 2));
       expect(newTx.constructor.name).to.equal('Transaction');
       expect(newTx.outputs.length).to.not.equal(0);
       expect(newTx.inputs.length).to.not.equal(0);
@@ -158,6 +159,9 @@ describe('Wallet-lib - functional ', function suite() {
         mnemonic: wallet.mnemonic,
         transport: {
           seeds,
+        },
+        unsafeOptions:{
+          skipSynchronizationBeforeHeight
         },
         network: process.env.NETWORK,
       });
