@@ -13,7 +13,7 @@ const TransactionSyncStreamWorker = require('../../../../src/plugins/Workers/Tra
 const TxStreamDataResponseMock = require('../../../../src/test/mocks/TxStreamDataResponseMock');
 const TxStreamMock = require('../../../../src/test/mocks/TxStreamMock');
 
-const createAndAttachTransportMocksToWallet = require('../../../../src/test/mocks/createAndAttachTransportMocksToWallet')
+const createAndAttachTransportMocksToWallet = require('../../../../src/test/mocks/createAndAttachTransportMocksToWallet');
 
 const { Wallet } = require('../../../../src');
 
@@ -186,8 +186,7 @@ describe('TransactionSyncStreamWorker', function suite() {
       expect(account.transport.subscribeToTransactionsWithProofs.secondCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 2});
       // Block received
       expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[0].length).to.be.equal(80);
-      expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 2});
-      // expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 2});
+      expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 42});
 
       expect(worker.stream).to.be.null;
       expect(transactionsInStorage.length).to.be.equal(2);
@@ -378,8 +377,7 @@ describe('TransactionSyncStreamWorker', function suite() {
       expect(account.transport.subscribeToTransactionsWithProofs.secondCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 0});
       // Block received
       expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[0].length).to.be.equal(80);
-      expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 0});
-      // expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 0});
+      expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 0});
 
       expect(worker.stream).to.be.null;
       expect(transactionsInStorage.length).to.be.equal(2);
@@ -599,8 +597,7 @@ describe('TransactionSyncStreamWorker', function suite() {
     expect(account.transport.subscribeToTransactionsWithProofs.secondCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 0});
     // Block received
     expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[0].length).to.be.equal(80);
-    // expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 0});
-    expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 0});
+    expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '5e55b2ca5472098231965e87a80b35750554ad08d5a1357800b7cd0dfa153646', count: 0});
 
     expect(worker.stream).to.be.null;
     expect(transactionsInStorage.length).to.be.equal(2);

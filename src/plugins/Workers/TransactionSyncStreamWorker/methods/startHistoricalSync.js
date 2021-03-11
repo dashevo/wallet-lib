@@ -32,6 +32,7 @@ module.exports = async function startHistoricalSync(network) {
     // If there's no blocks synced, start from height 0, otherwise from the last block hash.
     if (lastSyncedBlockHash == null) {
       options.fromBlockHeight = lastSyncedBlockHeight;
+      options.count = bestBlockHeight - lastSyncedBlockHeight;
     } else {
       options.fromBlockHash = lastSyncedBlockHash;
     }

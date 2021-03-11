@@ -45,6 +45,14 @@ module.exports = async function syncUpToTheGapLimit({
           this.importInstantLock(isLock);
         });
 
+        /* Incoming Merkle block handling */
+        const merkleBlockFromResponse = this.constructor
+          .getMerkleBlockFromStreamResponse(response);
+
+        if (merkleBlockFromResponse) {
+          self.setLastSyncedBlockHash(merkleBlockFromResponse.header.hash);
+        }
+
         /* Incoming transactions handling */
         const transactionsFromResponse = this.constructor
           .getTransactionListFromStreamResponse(response);
