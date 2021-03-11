@@ -56,12 +56,12 @@ describe('TransactionSyncStreamWorker#startHistoricalSync', function suite() {
     getLastSyncedBlockHeight.returns(lastSyncedBlockHeight);
     getLastSyncedBlockHash.returns(null);
 
-    const startSync = await startHistoricalSync.call( mockWallet, 'testnet');
+    await startHistoricalSync.call( mockWallet, 'testnet');
     expect(mockStore.wallets['f03f3fa4b5'].accounts["0"].blockHeight).to.deep.equal(458991)
     expect(mockStore.wallets['f03f3fa4b5'].accounts["0"].blockHash).to.deep.equal('cde')
     expect(startHistoricalSync.firstCall.args[0]).to.be.equal('testnet');
     expect(syncUpToTheGapLimit.firstCall.args[0]).to.be.deep.equal({
-      count:458991,
+      count:20,
       fromBlockHeight:458971,
       network:"testnet"
     });
@@ -76,7 +76,7 @@ describe('TransactionSyncStreamWorker#startHistoricalSync', function suite() {
     getLastSyncedBlockHeight.returns(42);
     getLastSyncedBlockHash.returns('abc');
 
-    const startSync = await startHistoricalSync.call( mockWallet, 'testnet');
+    await startHistoricalSync.call( mockWallet, 'testnet');
     expect(mockStore.wallets['f03f3fa4b5'].accounts["0"].blockHeight).to.deep.equal(458991)
     expect(mockStore.wallets['f03f3fa4b5'].accounts["0"].blockHash).to.deep.equal('cde')
     expect(startHistoricalSync.firstCall.args[0]).to.be.equal('testnet');
