@@ -16,10 +16,15 @@ const GRPC_RETRY_ERRORS = [
  * @return {Promise<void>}
  */
 module.exports = async function startHistoricalSync(network) {
-  const lastSyncedBlockHash = this.getLastSyncedBlockHash();
-  const bestBlockHeight = await this.getBestBlockHeightFromTransport();
+  // If we have setup a skipSynchronizationBeforeHeight, start from there
   const lastSyncedBlockHeight = await this.getLastSyncedBlockHeight();
-  const count = bestBlockHeight - lastSyncedBlockHeight || 1;
+  const lastSyncedBlockHash = this.getLastSyncedBlockHash();
+
+  const bestBlockHeight = await this.getBestBlockHeightFromTransport();
+  const header = await this.transport.getBlockHeaderByHeight(bestBlockHeight);
+  const { hash } = header;
+
+  const count = bestBlockHeight;
   const start = +new Date();
 
   try {
@@ -59,9 +64,6 @@ module.exports = async function startHistoricalSync(network) {
       pluginName: this.name,
     });
   }
-
-  const header = await this.transport.getBlockHeaderByHeight(bestBlockHeight);
-  const { hash } = header;
 
   this.setLastSyncedBlockHash(hash);
   this.setLastSyncedBlockHeight(bestBlockHeight);
