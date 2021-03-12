@@ -1,17 +1,20 @@
-const { expect } = require('chai');
+const {expect} = require('chai');
 
-const { Wallet } = require('../../src/index');
+const {Wallet} = require('../../src/index');
 
-const { fundWallet } = require('../../src/utils');
-const { EVENTS } = require('../../src');
+const {fundWallet} = require('../../src/utils');
+const {EVENTS} = require('../../src');
 const DAPIClient = require('@dashevo/dapi-client');
 
-const seeds = process.env.DAPI_SEED
-  .split(',');
+let transportOptions = null;
+if (process.env.DAPI_SEED) {
+  transportOptions = {
+    seeds: process.env.DAPI_SEED
+        .split(',')
+  }
+}
 
-const dapiClient = new DAPIClient({
-  seeds,
-});
+const dapiClient = new DAPIClient(transportOptions);
 
 let newWallet;
 let wallet;
@@ -26,12 +29,10 @@ describe('Wallet-lib - functional ', function suite() {
     const status = await dapiClient.core.getStatus();
 
     const bestBlockHeight = status.blocks;
-    skipSynchronizationBeforeHeight = (bestBlockHeight>1000) ? bestBlockHeight - 1000 : 0;
+    skipSynchronizationBeforeHeight = (bestBlockHeight > 2000) ? bestBlockHeight - 2000 : 0;
     faucetWallet = new Wallet({
-      transport: {
-        seeds,
-      },
-      unsafeOptions:{
+      transport: transportOptions,
+      unsafeOptions: {
         skipSynchronizationBeforeHeight
       },
       network: process.env.NETWORK,
@@ -50,10 +51,8 @@ describe('Wallet-lib - functional ', function suite() {
     describe('Create a new Wallet', () => {
       it('should create a new wallet with default params', () => {
         newWallet = new Wallet({
-          transport: {
-            seeds,
-          },
-          unsafeOptions:{
+          transport: transportOptions,
+          unsafeOptions: {
             skipSynchronizationBeforeHeight
           },
           network: process.env.NETWORK,
@@ -78,10 +77,8 @@ describe('Wallet-lib - functional ', function suite() {
       it('should load a wallet from mnemonic', () => {
         wallet = new Wallet({
           mnemonic: newWallet.mnemonic,
-          transport: {
-            seeds,
-          },
-          unsafeOptions:{
+          transport: transportOptions,
+          unsafeOptions: {
             skipSynchronizationBeforeHeight
           },
           network: process.env.NETWORK,
@@ -115,9 +112,9 @@ describe('Wallet-lib - functional ', function suite() {
       const amountToTopUp = 20000;
 
       await fundWallet(
-        faucetWallet,
-        wallet,
-        amountToTopUp
+          faucetWallet,
+          wallet,
+          amountToTopUp
       );
 
       const balanceAfterTopUp = account.getTotalBalance();
@@ -157,10 +154,8 @@ describe('Wallet-lib - functional ', function suite() {
     it('should be able to restore wallet to the same state with a mnemonic', async () => {
       const restoredWallet = new Wallet({
         mnemonic: wallet.mnemonic,
-        transport: {
-          seeds,
-        },
-        unsafeOptions:{
+        transport: transportOptions,
+        unsafeOptions: {
           skipSynchronizationBeforeHeight
         },
         network: process.env.NETWORK,
@@ -176,6 +171,8 @@ describe('Wallet-lib - functional ', function suite() {
       expect(Object.keys(transactions).length).to.be.equal(1);
       expect(addresses).to.be.deep.equal(expectedAddresses);
       expect(Object.keys(transactions)).to.be.deep.equal(Object.keys(expectedTransactions));
+
+      restoredWallet.disconnect();
     });
   });
 });
