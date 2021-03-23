@@ -46,19 +46,7 @@ export declare type AddressObj<T extends object = object> = T & {
 export declare type AddressInfoMap<T extends object = object> = T & {
     [pathName: string]: AddressInfo
 }
-export declare type StatusInfo<T extends object = object> = T & {
-    coreVersion: number;
-    protocolVersion: number;
-    blocks: number;
-    timeOffset: number;
-    connections: number;
-    proxy: string;
-    difficulty: number;
-    testnet: false;
-    relayFee: number;
-    errors: string;
-    network: Network
-}
+
 export declare type AddressInfo<T extends AddressObj = AddressObj> = T & {
     path: string;
     address: string;
