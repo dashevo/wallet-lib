@@ -18,6 +18,7 @@
     "test": "npm run test:unit && npm run test:integration && npm run test:functional && npm run test:browsers",
     "prepublishOnly": "npm run build"
   },
+
   "files": [
     "dist",
     "docs",
