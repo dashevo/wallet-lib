@@ -62,6 +62,13 @@ jobs:
           dashmate-branch: ${{ steps.platform-branches.outputs.dashmate-branch }}
           install-sdk-version: ${{ steps.runtime-vars.outputs.install-sdk-version }}
 
+      - name: Parametrize environment
+        run: |
+          echo "DAPI_SEED=127.0.0.1" > .env
+          echo "FAUCET_PRIVATE_KEY=${{ env.faucet-private-key }}" >> .env
+          echo "NETWORK=regtest" >> .env
+          echo "DPNS_CONTRACT_ID=${{ env.dpns-contract-id }}" >> .env
+
       - name: Check NPM package lock version is updated
         run: npm run check-package # TODO: does this exist as an action already?
 
