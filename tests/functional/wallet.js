@@ -164,7 +164,11 @@ describe('Wallet-lib - functional ', function suite() {
       expect(newTx.outputs.length).to.not.equal(0);
       expect(newTx.inputs.length).to.not.equal(0);
     });
-    it('should broadcast a transaction',  async() => {
+    it('should broadcast a transaction',  async function(){
+      if(faucetAccount.network === 'regtest'){
+        // we skip for regtest as we can't wait for block
+        this.skip();
+      }
       const txid = await account.broadcastTransaction(newTx);
       console.log(`Broadcast transaction: ${txid}`);
 
@@ -176,7 +180,7 @@ describe('Wallet-lib - functional ', function suite() {
       expect(Object.keys(account.getTransactions()).length).to.be.equal(1);
     });
 
-    it('should be able to restore wallet to the same state with a mnemonic', async () => {
+    it('should be able to restore wallet to the same state with a mnemonic', async function(){
       const restoredWallet = new Wallet({
         mnemonic: wallet.mnemonic,
         transport: {...transportOptions},
@@ -194,7 +198,12 @@ describe('Wallet-lib - functional ', function suite() {
       const addresses = restoredAccount.getAddresses();
       const transactions = restoredAccount.getTransactions();
 
-      expect(Object.keys(transactions).length).to.be.equal(1);
+      if(faucetAccount.network === 'regtest'){
+        // skipped transaction broadcast earlier
+        expect(Object.keys(transactions).length).to.be.equal(0);
+      } else{
+        expect(Object.keys(transactions).length).to.be.equal(1);
+      }
       expect(addresses).to.be.deep.equal(expectedAddresses);
       expect(Object.keys(transactions)).to.be.deep.equal(Object.keys(expectedTransactions));
 
