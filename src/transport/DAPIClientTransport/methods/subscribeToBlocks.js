@@ -12,9 +12,9 @@ module.exports = async function subscribeToBlocks(refreshBlockInterval = 30 * 10
 
   const executor = async () => {
     const chainHash = await this.getBestBlockHash();
-    console.log({ chainHash, blockHash: self.state.block && self.state.block.hash });
+
     if (!self.state.block || self.state.block.hash !== chainHash) {
-      self.state.block = await self.getBlockByHash(chainHash);
+      self.state.block = await self.getBlockByHash(await this.getBestBlockHash());
       self.announce(EVENTS.BLOCK, self.state.block);
     }
   };
@@ -35,4 +35,6 @@ module.exports = async function subscribeToBlocks(refreshBlockInterval = 30 * 10
   executors.blocks = setInterval(async () => {
     await tryExecutor();
   }, refreshBlockInterval);
+
+  await tryExecutor();
 };

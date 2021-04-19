@@ -4,6 +4,7 @@ const EVENTS = require('../../../EVENTS');
 const DAPIClientTransport = require('../DAPIClientTransport');
 
 describe('transports - DAPIClientTransport - .subscribeToBlocks', function suite() {
+  this.timeout(15000);
   let fixtures;
   let transport;
   let clientMock;
@@ -54,6 +55,6 @@ describe('transports - DAPIClientTransport - .subscribeToBlocks', function suite
       }
     });
 
-    await transport.subscribeToBlocks();
+    await transport.subscribeToBlocks(5000);
   }));
 });
