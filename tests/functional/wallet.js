@@ -31,7 +31,7 @@ describe('Wallet-lib - functional ', function suite() {
     const bestBlockHeight = status.blocks;
     skipSynchronizationBeforeHeight = (bestBlockHeight > 2000) ? bestBlockHeight - 2000 : 0;
     faucetWallet = new Wallet({
-      transport: transportOptions,
+      transport: {...transportOptions},
       unsafeOptions: {
         skipSynchronizationBeforeHeight
       },
@@ -51,7 +51,7 @@ describe('Wallet-lib - functional ', function suite() {
     describe('Create a new Wallet', () => {
       it('should create a new wallet with default params', () => {
         const walletOpts = {
-          transport: transportOptions,
+          transport: {...transportOptions},
           unsafeOptions: {
             skipSynchronizationBeforeHeight
           },
@@ -79,7 +79,7 @@ describe('Wallet-lib - functional ', function suite() {
       it('should load a wallet from mnemonic', () => {
         wallet = new Wallet({
           mnemonic: newWallet.mnemonic,
-          transport: transportOptions,
+          transport: {...transportOptions},
           unsafeOptions: {
             skipSynchronizationBeforeHeight
           },
@@ -156,7 +156,7 @@ describe('Wallet-lib - functional ', function suite() {
     it('should be able to restore wallet to the same state with a mnemonic', async () => {
       const restoredWallet = new Wallet({
         mnemonic: wallet.mnemonic,
-        transport: transportOptions,
+        transport: {...transportOptions},
         unsafeOptions: {
           skipSynchronizationBeforeHeight
         },
