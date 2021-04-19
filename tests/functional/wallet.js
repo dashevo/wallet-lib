@@ -165,7 +165,7 @@ describe('Wallet-lib - functional ', function suite() {
       expect(newTx.inputs.length).to.not.equal(0);
     });
     it('should broadcast a transaction',  async function(){
-      if(faucetAccount.network === 'regtest'){
+      if(process.env.NETWORK === 'regtest'){
         // we skip for regtest as we can't wait for block
         this.skip();
       }
@@ -190,7 +190,9 @@ describe('Wallet-lib - functional ', function suite() {
         network: process.env.NETWORK,
       });
       const restoredAccount = await restoredWallet.getAccount();
-      await waitForBlocks(restoredAccount, 2);
+      if(process.env.NETWORK !== 'regtest'){
+        await waitForBlocks(restoredAccount, 2);
+      }
 
       const expectedAddresses = account.getAddresses();
       const expectedTransactions = account.getTransactions();
