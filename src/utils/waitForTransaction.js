@@ -19,4 +19,4 @@ module.exports = async function waitForTransaction(walletAccount, id) {
 
     walletAccount.on(EVENTS.FETCHED_CONFIRMED_TRANSACTION, listener);
   }));
-}
+};

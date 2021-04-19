@@ -40,5 +40,5 @@ module.exports = {
   hasProp,
   fundWallet,
   waitForTransaction,
-  waitForBlocks
+  waitForBlocks,
 };

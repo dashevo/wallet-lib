@@ -12,8 +12,8 @@ async function fundWallet(faucetWallet, recipientWallet, amount) {
   const recipientAccount = await recipientWallet.getAccount();
 
   const faucetBalance = faucetAccount.getTotalBalance();
-  if(faucetBalance < amount){
-    const {address: faucetAddress} = faucetAccount.getAddress(0);
+  if (faucetBalance < amount) {
+    const { address: faucetAddress } = faucetAccount.getAddress(0);
     throw new Error(`Faucet ${faucetAddress} balance (${faucetBalance}) too low to perform funding of ${amount}`);
   }
 
