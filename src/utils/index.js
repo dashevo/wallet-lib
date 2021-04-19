@@ -18,6 +18,8 @@ const feeCalculation = require('./feeCalculation');
 const { hash, doubleSha256, sha256 } = require('./crypto');
 
 const fundWallet = require('./fundWallet');
+const waitForTransaction = require('./waitForTransaction');
+const waitForBlocks = require('./waitForBlocks');
 
 module.exports = {
   dashToDuffs,
@@ -37,4 +39,6 @@ module.exports = {
   sha256,
   hasProp,
   fundWallet,
+  waitForTransaction,
+  waitForBlocks
 };

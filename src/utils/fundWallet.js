@@ -1,26 +1,4 @@
-const EVENTS = require('../EVENTS');
-
-/**
- *
- * @param {Account} walletAccount
- * @param {string} id - transaction id
- * @return {Promise<string>}
- */
-function waitForTransaction(walletAccount, id) {
-  return new Promise(((resolve) => {
-    const listener = (event) => {
-      const { payload: { transaction } } = event;
-
-      if (transaction.id === id) {
-        walletAccount.removeListener(EVENTS.FETCHED_CONFIRMED_TRANSACTION, listener);
-
-        resolve(transaction.id);
-      }
-    };
-
-    walletAccount.on(EVENTS.FETCHED_CONFIRMED_TRANSACTION, listener);
-  }));
-}
+const waitForTransaction = require('./waitForTransaction');
 
 /**
  *
@@ -32,6 +10,12 @@ function waitForTransaction(walletAccount, id) {
 async function fundWallet(faucetWallet, recipientWallet, amount) {
   const faucetAccount = await faucetWallet.getAccount();
   const recipientAccount = await recipientWallet.getAccount();
+
+  const faucetBalance = faucetAccount.getTotalBalance();
+  if(faucetBalance < amount){
+    const {address: faucetAddress} = faucetAccount.getAddress(0);
+    throw new Error(`Faucet ${faucetAddress} balance (${faucetBalance}) too low to perform funding of ${amount}`);
+  }
 
   const transaction = await faucetAccount.createTransaction({
     satoshis: amount,
