@@ -26,7 +26,7 @@ let newTx;
 let skipSynchronizationBeforeHeight;
 
 describe('Wallet-lib - functional ', function suite() {
-  this.timeout(1000000);
+  this.timeout(1100000);
 
   before(async () => {
     const status = await dapiClient.core.getStatus();
@@ -186,6 +186,7 @@ describe('Wallet-lib - functional ', function suite() {
         network: process.env.NETWORK,
       });
       const restoredAccount = await restoredWallet.getAccount();
+      await waitForBlocks(restoredAccount, 2);
 
       const expectedAddresses = account.getAddresses();
       const expectedTransactions = account.getTransactions();
