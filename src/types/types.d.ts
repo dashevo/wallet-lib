@@ -80,6 +80,45 @@ export declare type WalletObj = {
     }
 }
 
+export declare type StatusInfo<T extends object = object> = T & {
+    version: {
+        protocol: number,
+        software: number,
+        agent: string,
+    },
+    time: {
+        now: number,
+        offset: number,
+        median: number,
+    },
+    status: string,
+    syncProgress: number,
+    chain: {
+        name: string,
+        headersCount: number,
+        blocksCount: number,
+        bestBlockHash: string,
+        difficulty: number,
+        chainWork: string,
+        isSynced: boolean,
+        syncProgress: number,
+    },
+    masternode: {
+        status: string,
+        proTxHash: string,
+        posePenalty: string
+        isSynced: true,
+        syncProgress: number,
+    },
+    network: {
+        peersCount: number,
+        fee: {
+            relay: number,
+            incremental: number,
+        },
+    },
+}
+
 export declare type TransactionsMap = {
     [txid: string]: Transaction
 };
