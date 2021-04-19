@@ -7,6 +7,7 @@ const {EVENTS} = require('../../src');
 const DAPIClient = require('@dashevo/dapi-client');
 
 let transportOptions = null;
+
 if (process.env.DAPI_SEED) {
   transportOptions = {
     seeds: process.env.DAPI_SEED
@@ -14,7 +15,7 @@ if (process.env.DAPI_SEED) {
   }
 }
 
-const dapiClient = new DAPIClient(transportOptions);
+const dapiClient = new DAPIClient({...transportOptions});
 
 let newWallet;
 let wallet;
@@ -27,7 +28,6 @@ describe('Wallet-lib - functional ', function suite() {
 
   before(async () => {
     const status = await dapiClient.core.getStatus();
-
     const bestBlockHeight = status.blocks;
     skipSynchronizationBeforeHeight = (bestBlockHeight > 2000) ? bestBlockHeight - 2000 : 0;
     faucetWallet = new Wallet({
@@ -50,13 +50,15 @@ describe('Wallet-lib - functional ', function suite() {
   describe('Wallet', () => {
     describe('Create a new Wallet', () => {
       it('should create a new wallet with default params', () => {
-        newWallet = new Wallet({
+        const walletOpts = {
           transport: transportOptions,
           unsafeOptions: {
             skipSynchronizationBeforeHeight
           },
           network: process.env.NETWORK,
-        });
+        }
+        console.log('Using walletOpts: ', JSON.stringify(walletOpts));
+        newWallet = new Wallet(walletOpts);
 
         expect(newWallet.walletType).to.be.equal('hdwallet');
         expect(newWallet.plugins).to.be.deep.equal({});
