@@ -200,7 +200,7 @@ describe('Wallet-lib - functional ', function suite() {
       const addresses = restoredAccount.getAddresses();
       const transactions = restoredAccount.getTransactions();
 
-      if(faucetAccount.network === 'regtest'){
+      if(process.env.NETWORK === 'regtest'){
         // skipped transaction broadcast earlier
         expect(Object.keys(transactions).length).to.be.equal(0);
       } else{
