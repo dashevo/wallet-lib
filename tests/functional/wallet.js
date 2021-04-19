@@ -2,10 +2,9 @@ const {expect} = require('chai');
 
 const {Wallet} = require('../../src/index');
 
-const {fundWallet} = require('../../src/utils');
+const {fundWallet, waitForTransaction, waitForBlocks} = require('../../src/utils');
 const {EVENTS} = require('../../src');
 const DAPIClient = require('@dashevo/dapi-client');
-
 let transportOptions = null;
 
 if (process.env.DAPI_SEED) {
@@ -21,6 +20,9 @@ let newWallet;
 let wallet;
 let account;
 let faucetWallet;
+let faucetAccount;
+let faucetAddress;
+let newTx;
 let skipSynchronizationBeforeHeight;
 
 describe('Wallet-lib - functional ', function suite() {
@@ -30,14 +32,20 @@ describe('Wallet-lib - functional ', function suite() {
     const status = await dapiClient.core.getStatus();
     const bestBlockHeight = status.blocks;
     skipSynchronizationBeforeHeight = (bestBlockHeight > 2000) ? bestBlockHeight - 2000 : 0;
-    faucetWallet = new Wallet({
+
+    const faucetOpts = {
       transport: {...transportOptions},
       unsafeOptions: {
         skipSynchronizationBeforeHeight
       },
       network: process.env.NETWORK,
       privateKey: process.env.FAUCET_PRIVATE_KEY
-    });
+    }
+    if(faucetOpts.network === 'testnet'){
+      // First faucet tx on testnet
+      faucetOpts.unsafeOptions.skipSynchronizationBeforeHeight = 460950;
+    }
+    faucetWallet = new Wallet(faucetOpts);
   });
 
   after('Disconnection', () => {
@@ -108,7 +116,6 @@ describe('Wallet-lib - functional ', function suite() {
       await account.isReady();
       expect(account.state.isReady).to.be.deep.equal(true);
     });
-
     it('populate balance with dash', async () => {
       const balanceBeforeTopUp = account.getTotalBalance();
       const amountToTopUp = 20000;
@@ -118,6 +125,10 @@ describe('Wallet-lib - functional ', function suite() {
           wallet,
           amountToTopUp
       );
+      // We know that faucetWallet has been synced after the fundWallet exec.
+      // So we use that opportunity to set our local address as getAccount require syncing.
+      faucetAccount = await faucetWallet.getAccount();
+      faucetAddress = faucetAccount.getAddress(0).address;
 
       const balanceAfterTopUp = account.getTotalBalance();
       const transactions = account.getTransactions();
@@ -142,15 +153,27 @@ describe('Wallet-lib - functional ', function suite() {
     });
 
     it('should create a transaction', () => {
-      const newTx = account.createTransaction({
-        recipient: 'ydvgJ2eVSmdKt78ZSVBJ7zarVVtdHGj3yR',
-        satoshis: Math.floor(account.getTotalBalance() / 2)
+      // Send back to faucet address
+      newTx = account.createTransaction({
+        recipient: faucetAddress,
+        satoshis: account.getTotalBalance()
       });
 
-      console.log('New transaction satoshis amount', Math.floor(account.getTotalBalance() / 2));
+      console.log(`New transaction satoshis amount ${account.getTotalBalance()} to ${faucetAddress}`);
       expect(newTx.constructor.name).to.equal('Transaction');
       expect(newTx.outputs.length).to.not.equal(0);
       expect(newTx.inputs.length).to.not.equal(0);
+    });
+    it('should broadcast a transaction',  async() => {
+      const txid = await account.broadcastTransaction(newTx);
+      console.log(`Broadcast transaction: ${txid}`);
+
+      // Waiting for two blocks as subscribe could emit a first block (the current one).
+      await waitForBlocks(faucetAccount, 2);
+      // FIXME: We can't use waitForTx as it is considered confirmed earlier than it is.
+      // await waitForTransaction(faucetAccount, txid);
+
+      expect(Object.keys(account.getTransactions()).length).to.be.equal(1);
     });
 
     it('should be able to restore wallet to the same state with a mnemonic', async () => {
