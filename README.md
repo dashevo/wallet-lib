@@ -1,7 +1,7 @@
 # Wallet Library
 
 [![NPM Version](https://img.shields.io/npm/v/@dashevo/wallet-lib)](https://www.npmjs.com/package/@dashevo/wallet-lib)
-[![Build Status](https://travis-ci.com/dashevo/wallet-lib.svg?branch=master)](https://travis-ci.com/dashevo/wallet-lib)
+[![Build Status](https://github.com/dashevo/wallet-lib/actions/workflows/test_and_release.yml/badge.svg)](https://github.com/dashevo/wallet-lib/actions/workflows/test_and_release.yml)
 [![Release Date](https://img.shields.io/github/release-date/dashevo/wallet-lib)](https://github.com/dashevo/wallet-lib/releases/latest)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen)](https://github.com/RichardLitt/standard-readme)
 
@@ -26,7 +26,7 @@ A pure and extensible JavaScript Wallet Library for Dash
 
 In order to use this library, you will need to add it to your project as a dependency.
 
-Having [NodeJS](https://nodejs.org/) installed, just type in your terminal : 
+Having [NodeJS](https://nodejs.org/) installed, just type in your terminal :
 
 ```sh
 npm install @dashevo/wallet-lib
@@ -64,7 +64,7 @@ wallet.getAccount().then((account) => {
 });
 ```
 
-Wallet will by default connects to DAPI and use either localforage (browser based device) or a InMem adapter.  
+Wallet will by default connects to DAPI and use either localforage (browser based device) or a InMem adapter.
 Account will by default be on expected BIP44 path (...0/0).
 
 ### Transports:
@@ -80,7 +80,7 @@ Insight-Client has been removed from MVP and is not working since Wallet-lib v3.
 
 ## Documentation
 
-You can see some [Examples here](/docs/usage/examples.md).
+You can see some [examples here](/docs/usage/examples.md).
 
 More extensive documentation is available at https://dashevo.github.io/wallet-lib along with additional [examples & snippets](https://dashevo.github.io/wallet-lib/#/usage/examples).
 
