@@ -29,11 +29,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
+      - name: Check NPM package lock version is updated
+        uses: dashevo/gh-action-check-package-lock@v1
+
       - name: Install NPM dependencies
         run: npm ci
-
-      - name: Check NPM package lock version is updated
-        run: npm run check-package # TODO: does this exist as an action already?
 
       - name: Run ESLinter
         run: npm run lint
@@ -50,7 +50,7 @@ jobs:
           env-file: .github/workflows/.env
 
       - name: Set compatible branches for Platform components
-        uses: dashevo/gh-action-platform-branches@master
+        uses: dashevo/gh-action-platform-branches@v1
         id: platform-branches
         with:
           override-major-version: 0
@@ -58,7 +58,7 @@ jobs:
           override-testsuite-branch: ${{ env.TEST_SUITE_BRANCH }}
 
       - name: Start Dash local network
-        uses: dashevo/gh-action-start-local-network@master
+        uses: dashevo/gh-action-start-local-network@v1
         id: start-local-network
         with:
           actions-cache-url: ${{ steps.platform-branches.outputs.cache-url }}
