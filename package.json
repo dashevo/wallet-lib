@@ -48,6 +48,7 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "node-inspect-extracted": "1.0.7",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "dotenv-safe": "^8.2.0",
