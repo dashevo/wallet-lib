@@ -1,4 +1,4 @@
-const { is } = require('../../../utils');
+const { is } = require("../../../utils");
 
 /**
  * Get a getBlockHeader from a provided block hash or block height
@@ -10,8 +10,8 @@ async function getBlockHeader(identifier) {
   if (search.found) {
     return search.result;
   }
-  const blockHeight = (is.num(identifier)) ? identifier : null;
-  const blockHeader = (is.num(identifier))
+  const blockHeight = is.num(identifier) ? identifier : null;
+  const blockHeader = is.num(identifier)
     ? await this.transport.getBlockByHeight(blockHeight)
     : await this.transport.getBlockHeaderByHash(identifier);
 

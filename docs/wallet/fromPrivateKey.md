@@ -1,19 +1,17 @@
-**Usage**: `wallet.fromPrivateKey(privateKey)`       
+**Usage**: `wallet.fromPrivateKey(privateKey)`  
 **Description**: Initialize a Wallet from a PrivateKey representation.  
-**Notes**: This is an internal method, in the future, when TC39 proposal pass, we will use the private markup.   
+**Notes**: This is an internal method, in the future, when TC39 proposal pass, we will use the private markup.
 
-Parameters: 
+Parameters:
 
-| parameters             | type                   | required       | Description                                                         |  
-|------------------------|------------------------|----------------| --------------------------------------------------------------------|
-| **PrivateKey**         | PrivateKey|String      | yes            | The PrivateKey from which you want to initialize the wallet.        |
+| parameters     | type       | required | Description |
+| -------------- | ---------- | -------- | ----------- | ------------------------------------------------------------ |
+| **PrivateKey** | PrivateKey | String   | yes         | The PrivateKey from which you want to initialize the wallet. |
 
 Returns : void (set a single address wallet).
 
-Examples : 
+Examples :
 
 ```js
-wallet.fromPrivateKey('cR4t6evwVZoCp1JsLk4wURK4UmBCZzZotNzn9T1mhBT19SH9JtNt')
+wallet.fromPrivateKey("cR4t6evwVZoCp1JsLk4wURK4UmBCZzZotNzn9T1mhBT19SH9JtNt");
 ```
-
-

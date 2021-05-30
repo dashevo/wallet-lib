@@ -1,4 +1,4 @@
-const EVENTS = require('../EVENTS');
+const EVENTS = require("../EVENTS");
 
 /**
  *
@@ -7,19 +7,24 @@ const EVENTS = require('../EVENTS');
  * @return {Promise<string>}
  */
 function waitForTransaction(walletAccount, id) {
-  return new Promise(((resolve) => {
+  return new Promise((resolve) => {
     const listener = (event) => {
-      const { payload: { transaction } } = event;
+      const {
+        payload: { transaction },
+      } = event;
 
       if (transaction.id === id) {
-        walletAccount.removeListener(EVENTS.FETCHED_CONFIRMED_TRANSACTION, listener);
+        walletAccount.removeListener(
+          EVENTS.FETCHED_CONFIRMED_TRANSACTION,
+          listener
+        );
 
         resolve(transaction.id);
       }
     };
 
     walletAccount.on(EVENTS.FETCHED_CONFIRMED_TRANSACTION, listener);
-  }));
+  });
 }
 
 /**

@@ -1,19 +1,19 @@
-# Using a plugin 
+# Using a plugin
 
 ## About plugins
 
-In order to add features and logic to the Wallet-library and be able to share independant module and request them together. 
-Wallet-lib can be passed some plugins at his instantiation. 
+In order to add features and logic to the Wallet-library and be able to share independant module and request them together.
+Wallet-lib can be passed some plugins at his instantiation.
 Plugins are particular shaped class that can perform action on your wallet.
 
-By default, three plugins are injected : BIP44Worker, SyncWorker and ChainWorker. 
+By default, three plugins are injected : BIP44Worker, SyncWorker and ChainWorker.
 
-They handle respectively with maintaining your address pool, getting you in sync with the blockchain and maintaining some knowledge about the chain (blockheight). 
+They handle respectively with maintaining your address pool, getting you in sync with the blockchain and maintaining some knowledge about the chain (blockheight).
 You can disable them by adding `injectDefaultPlugins:false` at the initialization parameter of your wallet object.
- 
+
 For more granularity, you could do it as a parameter of `getAccount(accOpts)`.
 
-## Type of plugins 
+## Type of plugins
 
 There are three different types of plugins that can be used in the wallet-library:
 
@@ -25,7 +25,7 @@ There are three different types of plugins that can be used in the wallet-librar
 In order for a plugin to have the ability to access wallet data, you have to add a dependency in the constructor.
 
 ```
-class MyPlugin extends StandardPlugin { 
+class MyPlugin extends StandardPlugin {
    constructor(){
     this.dependencies = ['walletId']
    }
@@ -37,11 +37,10 @@ class MyPlugin extends StandardPlugin {
 
 This will allow to access the walletId property; the same thing is doable with the account function.
 
-## Accessing a plugin 
-
+## Accessing a plugin
 
 ```js
-wallet.getAccount({index:0}).then((account)=>{
-        const plugin = account.getPlugin('pluginName');
-    });
+wallet.getAccount({ index: 0 }).then((account) => {
+  const plugin = account.getPlugin("pluginName");
+});
 ```

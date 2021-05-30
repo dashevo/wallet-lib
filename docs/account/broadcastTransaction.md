@@ -1,12 +1,12 @@
-**Usage**: `account.broadcastTransaction(transaction)`      
+**Usage**: `account.broadcastTransaction(transaction)`  
 **Description**: Allow to broadcast a valid **signed** transaction to the network.  
-**Notes**: Requires a signed transaction, use [`account.sign(transaction)`](/account/sign) for that.  
+**Notes**: Requires a signed transaction, use [`account.sign(transaction)`](/account/sign) for that.
 
-Parameters: 
+Parameters:
 
-| parameters             | type               | required       | Description                                                                                      |  
-|------------------------|--------------------|----------------| ------------------------------------------------------------------------------------------------ |
-| **transaction**        | Transaction/String | yes            | A valid [created transaction](/account/createTransaction) or it's hexadecimal raw representation |
+| parameters      | type               | required | Description                                                                                      |
+| --------------- | ------------------ | -------- | ------------------------------------------------------------------------------------------------ |
+| **transaction** | Transaction/String | yes      | A valid [created transaction](/account/createTransaction) or it's hexadecimal raw representation |
 
 Returns : transactionId (string).
 

@@ -1,9 +1,10 @@
-const { Transaction } = require('@dashevo/dashcore-lib');
+const { Transaction } = require("@dashevo/dashcore-lib");
 const { Output } = Transaction;
-const { InvalidDashcoreTransaction } = require('../../../errors');
-const { FETCHED_CONFIRMED_TRANSACTION } = require('../../../EVENTS');
+const { InvalidDashcoreTransaction } = require("../../../errors");
+const { FETCHED_CONFIRMED_TRANSACTION } = require("../../../EVENTS");
 
-const parseStringifiedTransaction = (stringified) => new Transaction(stringified);
+const parseStringifiedTransaction = (stringified) =>
+  new Transaction(stringified);
 /**
  * This method is used to import a transaction in Store.
  * @param {Transaction/String} transaction - A valid Transaction
@@ -14,7 +15,11 @@ const importTransaction = function importTransaction(transaction) {
     try {
       // eslint-disable-next-line no-param-reassign
       transaction = parseStringifiedTransaction(transaction);
-      if (!transaction.hash || !transaction.inputs.length || !transaction.outputs.length) {
+      if (
+        !transaction.hash ||
+        !transaction.inputs.length ||
+        !transaction.outputs.length
+      ) {
         throw new InvalidDashcoreTransaction(transaction);
       }
     } catch (e) {
@@ -37,7 +42,7 @@ const importTransaction = function importTransaction(transaction) {
   }
 
   [...inputs, ...outputs].forEach((element) => {
-    const isOutput = (element instanceof Output);
+    const isOutput = element instanceof Output;
     if (isOutput) outputIndex += 1;
 
     if (element.script) {
@@ -61,7 +66,7 @@ const importTransaction = function importTransaction(transaction) {
 
         if (!isOutput) {
           const vin = element;
-          const utxoKey = `${vin.prevTxId.toString('hex')}-${vin.outputIndex}`;
+          const utxoKey = `${vin.prevTxId.toString("hex")}-${vin.outputIndex}`;
           if (addressObject.utxos[utxoKey]) {
             const previousOutput = addressObject.utxos[utxoKey];
             addressObject.balanceSat -= previousOutput.satoshis;

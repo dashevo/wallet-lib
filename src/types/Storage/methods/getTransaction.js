@@ -1,4 +1,4 @@
-const { TransactionNotInStore } = require('../../../errors');
+const { TransactionNotInStore } = require("../../../errors");
 
 /**
  * Get a specific transaxtion by it's transaction id

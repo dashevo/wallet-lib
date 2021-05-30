@@ -1,7 +1,8 @@
-const _ = require('lodash');
-const EventEmitter = require('events');
-const { InjectionToPluginUnallowed } = require('../errors');
-const { SAFE_FUNCTIONS, SAFE_PROPERTIES } = require('../CONSTANTS').INJECTION_LISTS;
+const _ = require("lodash");
+const EventEmitter = require("events");
+const { InjectionToPluginUnallowed } = require("../errors");
+const { SAFE_FUNCTIONS, SAFE_PROPERTIES } =
+  require("../CONSTANTS").INJECTION_LISTS;
 
 const defaultOpts = {
   executeOnStart: false,
@@ -10,11 +11,11 @@ const defaultOpts = {
 class StandardPlugin extends EventEmitter {
   constructor(opts = {}) {
     super();
-    this.pluginType = _.has(opts, 'type') ? opts.type : 'Standard';
-    this.name = _.has(opts, 'name') ? opts.name : 'UnnamedPlugin';
-    this.dependencies = _.has(opts, 'dependencies') ? opts.dependencies : [];
+    this.pluginType = _.has(opts, "type") ? opts.type : "Standard";
+    this.name = _.has(opts, "name") ? opts.name : "UnnamedPlugin";
+    this.dependencies = _.has(opts, "dependencies") ? opts.dependencies : [];
 
-    this.executeOnStart = _.has(opts, 'executeOnStart')
+    this.executeOnStart = _.has(opts, "executeOnStart")
       ? opts.executeOnStart
       : defaultOpts.executeOnStart;
 
@@ -36,9 +37,9 @@ class StandardPlugin extends EventEmitter {
       const eventType = `PLUGIN/${this.name.toUpperCase()}/STARTED`;
       self.parentEvents.emit(eventType, { type: eventType, payload: null });
     } catch (e) {
-      this.emit('error', e, {
-        type: 'plugin',
-        pluginType: 'plugin',
+      this.emit("error", e, {
+        type: "plugin",
+        pluginType: "plugin",
         pluginName: this.name,
       });
     }
@@ -49,22 +50,22 @@ class StandardPlugin extends EventEmitter {
     if (SAFE_FUNCTIONS.includes(name) || SAFE_PROPERTIES.includes(name)) {
       this[name] = obj;
     } else if (PLUGINS_NAME_LIST.includes(name)) {
-      this.emit('error', new Error('Inter-plugin support yet to come'), {
-        type: 'plugin',
-        pluginType: 'plugin',
+      this.emit("error", new Error("Inter-plugin support yet to come"), {
+        type: "plugin",
+        pluginType: "plugin",
         pluginName: this.name,
       });
     } else if (allowSensitiveOperations === true) {
       this[name] = obj;
-    } else if (name === 'parentEvents') {
+    } else if (name === "parentEvents") {
       // Called by injectPlugin to setup the parentEvents on/emit fn.
       // console.log(obj)
       // this.parentEvents = {on:obj.on, emit:obj.emit};
       this.parentEvents = obj;
     } else {
-      this.emit('error', new InjectionToPluginUnallowed(name), {
-        type: 'plugin',
-        pluginType: 'plugin',
+      this.emit("error", new InjectionToPluginUnallowed(name), {
+        type: "plugin",
+        pluginType: "plugin",
         pluginName: this.name,
       });
     }

@@ -1,9 +1,7 @@
-const {
-  BloomFilter, Address,
-} = require('@dashevo/dashcore-lib');
-const logger = require('../../../logger');
+const { BloomFilter, Address } = require("@dashevo/dashcore-lib");
+const logger = require("../../../logger");
 
-const { BLOOM_FALSE_POSITIVE_RATE } = require('../../../CONSTANTS');
+const { BLOOM_FALSE_POSITIVE_RATE } = require("../../../CONSTANTS");
 
 /**
  * From a given addressList will create and submit a bloomfilter to DAPI
@@ -18,12 +16,15 @@ const { BLOOM_FALSE_POSITIVE_RATE } = require('../../../CONSTANTS');
 
 module.exports = async function subscribeToTransactionWithProofs(
   addressList,
-  opts = { fromBlockHeight: 1, count: 0 },
+  opts = { fromBlockHeight: 1, count: 0 }
 ) {
   const { client } = this;
   logger.silly(`DAPIClient.subscribeToTransactionWithProofs[${addressList}]`);
 
-  const bloomfilter = BloomFilter.create(addressList.length, BLOOM_FALSE_POSITIVE_RATE);
+  const bloomfilter = BloomFilter.create(
+    addressList.length,
+    BLOOM_FALSE_POSITIVE_RATE
+  );
 
   addressList.forEach((address) => {
     const addressModel = new Address(address);
@@ -31,7 +32,7 @@ module.exports = async function subscribeToTransactionWithProofs(
   });
 
   if (opts.fromBlockHeight == null && opts.fromBlockHash == null) {
-    throw new Error('fromBlockHeight or fromBlockHash needs to be specified');
+    throw new Error("fromBlockHeight or fromBlockHash needs to be specified");
   }
 
   if (opts.fromBlockHeight === 0) {

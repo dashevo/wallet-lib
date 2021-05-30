@@ -1,4 +1,4 @@
-const WalletLibError = require('./WalletLibError');
+const WalletLibError = require("./WalletLibError");
 
 class UnknownPlugin extends WalletLibError {
   constructor(pluginName) {

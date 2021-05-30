@@ -1,4 +1,4 @@
-const IdentityReplaceError = require('../../../errors/IndentityIdReplaceError');
+const IdentityReplaceError = require("../../../errors/IndentityIdReplaceError");
 
 /**
  *
@@ -15,7 +15,9 @@ function insertIdentityAtIndex(walletId, identityId, identityIndex) {
   const existingId = this.getIdentityIdByIndex(walletId, identityIndex);
 
   if (Boolean(existingId) && existingId !== identityId) {
-    throw new IdentityReplaceError(`Trying to replace identity at index ${identityIndex}`);
+    throw new IdentityReplaceError(
+      `Trying to replace identity at index ${identityIndex}`
+    );
   }
 
   this.store.wallets[walletId].identityIds[identityIndex] = identityId;

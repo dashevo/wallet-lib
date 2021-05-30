@@ -1,4 +1,4 @@
-const sortAndVerifyUTXOS = require('./sortAndVerifyUTXOS');
+const sortAndVerifyUTXOS = require("./sortAndVerifyUTXOS");
 
 module.exports = {
   sortAndVerifyUTXOS,

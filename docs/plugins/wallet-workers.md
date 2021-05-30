@@ -1,12 +1,12 @@
 # Wallet workers
 
-In order to perform it's duty of being in-sync with the network and to always keep a pre-generated set of unused addresses, wallet-lib uses internally two workers : 
+In order to perform it's duty of being in-sync with the network and to always keep a pre-generated set of unused addresses, wallet-lib uses internally two workers :
+
 - Sync Worker : Used to keep in sync with the network (utxo, received transactions,...)
 - Chain Worker : Used to keep track of the current chain (best block height,...)
 - BIP44 Worker : Used to always have a set of 20 unused addresses as per BIP44.
 
 Theses default workers can be deactivated by adding the options `injectDefaultPlugins` to `false` while initializing your Wallet instance.
-
 
 ## Start a worker
 

@@ -5,14 +5,14 @@
  * @return {boolean}
  */
 const importAccounts = function importAccounts(accounts, walletId) {
-  if (!walletId) throw new Error('Expected walletId to import addresses');
+  if (!walletId) throw new Error("Expected walletId to import addresses");
   if (!this.searchWallet(walletId).found) {
     this.createWallet(walletId);
   }
   const accList = this.store.wallets[walletId].accounts;
 
   const type = accounts.constructor.name;
-  if (type === 'Object') {
+  if (type === "Object") {
     if (accounts.path) {
       if (!accList[accounts.path]) {
         accList[accounts.path] = accounts;
@@ -30,11 +30,11 @@ const importAccounts = function importAccounts(accounts, walletId) {
         }
       });
     }
-  } else if (type === 'Array') {
+  } else if (type === "Array") {
     accounts.forEach((account) => {
       importAccounts.call(this, account, walletId);
     });
-  } else if (type === 'Account') {
+  } else if (type === "Account") {
     const accObj = {
       label: accounts.label,
       path: accounts.BIP44PATH,
@@ -42,7 +42,7 @@ const importAccounts = function importAccounts(accounts, walletId) {
     };
     return importAccounts.call(this, accObj, walletId);
   } else {
-    throw new Error('Invalid account. Cannot import.');
+    throw new Error("Invalid account. Cannot import.");
   }
   return true;
 };

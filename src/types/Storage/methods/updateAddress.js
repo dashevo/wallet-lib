@@ -1,32 +1,35 @@
-const { cloneDeep, xor } = require('lodash');
-const { InvalidAddressObject, TransactionNotInStore } = require('../../../errors');
-const { is } = require('../../../utils');
-const EVENTS = require('../../../EVENTS');
+const { cloneDeep, xor } = require("lodash");
+const {
+  InvalidAddressObject,
+  TransactionNotInStore,
+} = require("../../../errors");
+const { is } = require("../../../utils");
+const EVENTS = require("../../../EVENTS");
 
 /**
-* Update a specific address information in the store
-* @param {AddressObj} addressObj
-* @param {string} walletId
-* @return {boolean}
-*/
+ * Update a specific address information in the store
+ * @param {AddressObj} addressObj
+ * @param {string} walletId
+ * @return {boolean}
+ */
 const updateAddress = function updateAddress(addressObj, walletId) {
-  if (!walletId) throw new Error('Expected walletId to update an address');
+  if (!walletId) throw new Error("Expected walletId to update an address");
   if (!is.addressObj(addressObj)) throw new InvalidAddressObject(addressObj);
   const { path } = addressObj;
-  if (!path) throw new Error('Expected path to update an address');
-  const accountIndex = parseInt(path.split('/')[3], 10);
+  if (!path) throw new Error("Expected path to update an address");
+  const accountIndex = parseInt(path.split("/")[3], 10);
 
-  const typeInt = path.split('/')[4];
+  const typeInt = path.split("/")[4];
   let type;
   switch (typeInt) {
-    case '0':
-      type = 'external';
+    case "0":
+      type = "external";
       break;
-    case '1':
-      type = 'internal';
+    case "1":
+      type = "internal";
       break;
     default:
-      type = 'misc';
+      type = "misc";
   }
   const walletStore = this.store.wallets[walletId];
   const addressesStore = walletStore.addresses;
@@ -48,12 +51,13 @@ const updateAddress = function updateAddress(addressObj, walletId) {
   if (newObjectUtxosKeys.length > 0) {
     // we compare the diff between the two utxos sets
 
-    const previousUTXOS = (previousObject !== undefined) ? previousObject.utxos : [];
+    const previousUTXOS =
+      previousObject !== undefined ? previousObject.utxos : [];
 
     const newUtxos = xor(newObjectUtxosKeys, Object.keys(previousUTXOS));
     // Then we verify the outputs
     newUtxos.forEach((utxoKey) => {
-      const [txid, outputIndex] = utxoKey.split('-');
+      const [txid, outputIndex] = utxoKey.split("-");
       const utxo = utxos[utxoKey];
       utxo.txId = txid;
       utxo.outputIndex = parseInt(outputIndex, 10);
@@ -73,43 +77,51 @@ const updateAddress = function updateAddress(addressObj, walletId) {
   addressesStore[type][path] = newObject;
   if (previousObject === undefined) {
     if (newObject.balanceSat > 0) {
-      this.announce(
-        EVENTS.CONFIRMED_BALANCE_CHANGED,
-        {
-          delta: newObject.balanceSat,
-          currentValue: this.calculateDuffBalance(walletId, accountIndex, 'confirmed') || newObject.unconfirmedBalanceSat,
-          // currentValue: newObject.balanceSat,
-        },
-      );
+      this.announce(EVENTS.CONFIRMED_BALANCE_CHANGED, {
+        delta: newObject.balanceSat,
+        currentValue:
+          this.calculateDuffBalance(walletId, accountIndex, "confirmed") ||
+          newObject.unconfirmedBalanceSat,
+        // currentValue: newObject.balanceSat,
+      });
     }
     if (newObject.unconfirmedBalanceSat > 0) {
-      this.announce(
-        EVENTS.UNCONFIRMED_BALANCE_CHANGED,
-        {
-          delta: newObject.unconfirmedBalanceSat,
-          // currentValue: newObject.unconfirmedBalanceSat,
-          currentValue: this.calculateDuffBalance(walletId, accountIndex, 'unconfirmed'),
-        },
-      );
+      this.announce(EVENTS.UNCONFIRMED_BALANCE_CHANGED, {
+        delta: newObject.unconfirmedBalanceSat,
+        // currentValue: newObject.unconfirmedBalanceSat,
+        currentValue: this.calculateDuffBalance(
+          walletId,
+          accountIndex,
+          "unconfirmed"
+        ),
+      });
     }
   } else {
     if (previousObject.balanceSat !== newObject.balanceSat) {
-      this.announce(
-        EVENTS.CONFIRMED_BALANCE_CHANGED,
-        {
-          delta: newObject.balanceSat - previousObject.balanceSat,
-          // currentValue: newObject.balanceSat,
-          currentValue: this.calculateDuffBalance(walletId, accountIndex, 'confirmed'),
-        },
-      );
+      this.announce(EVENTS.CONFIRMED_BALANCE_CHANGED, {
+        delta: newObject.balanceSat - previousObject.balanceSat,
+        // currentValue: newObject.balanceSat,
+        currentValue: this.calculateDuffBalance(
+          walletId,
+          accountIndex,
+          "confirmed"
+        ),
+      });
     }
-    if (previousObject.unconfirmedBalanceSat !== newObject.unconfirmedBalanceSat) {
-      this.announce(EVENTS.UNCONFIRMED_BALANCE_CHANGED,
-        {
-          delta: newObject.unconfirmedBalanceSat - previousObject.unconfirmedBalanceSat,
-          // currentValue: newObject.unconfirmedBalanceSat,
-          currentValue: this.calculateDuffBalance(walletId, accountIndex, 'unconfirmed'),
-        });
+    if (
+      previousObject.unconfirmedBalanceSat !== newObject.unconfirmedBalanceSat
+    ) {
+      this.announce(EVENTS.UNCONFIRMED_BALANCE_CHANGED, {
+        delta:
+          newObject.unconfirmedBalanceSat -
+          previousObject.unconfirmedBalanceSat,
+        // currentValue: newObject.unconfirmedBalanceSat,
+        currentValue: this.calculateDuffBalance(
+          walletId,
+          accountIndex,
+          "unconfirmed"
+        ),
+      });
     }
   }
 

@@ -1,14 +1,14 @@
-const { expect } = require('chai');
-const getAccount = require('./getAccount');
-const { WALLET_TYPES } = require('../../../CONSTANTS');
-const expectThrowsAsync = require('../../../utils/expectThrowsAsync');
+const { expect } = require("chai");
+const getAccount = require("./getAccount");
+const { WALLET_TYPES } = require("../../../CONSTANTS");
+const expectThrowsAsync = require("../../../utils/expectThrowsAsync");
 
-const exceptedException1 = 'getAccount expected index integer to be a property of accountOptions';
+const exceptedException1 =
+  "getAccount expected index integer to be a property of accountOptions";
 
-
-describe('Wallet - getAccount', function suite() {
+describe("Wallet - getAccount", function suite() {
   this.timeout(10000);
-  it('should warn on trying to pass arg as number', () => {
+  it("should warn on trying to pass arg as number", () => {
     let timesCreateAccountCalled = 0;
     let timesAttachEventsCalled = 0;
     const mockOpts = {
@@ -20,16 +20,19 @@ describe('Wallet - getAccount', function suite() {
         return {
           index: opts.index,
           storage: {
-            attachEvents: () => timesAttachEventsCalled += 1,
+            attachEvents: () => (timesAttachEventsCalled += 1),
           },
         };
       },
     };
-    expectThrowsAsync(async () => await getAccount.call(mockOpts, 0),exceptedException1);
+    expectThrowsAsync(
+      async () => await getAccount.call(mockOpts, 0),
+      exceptedException1
+    );
     expect(timesCreateAccountCalled).to.equal(0);
     expect(timesAttachEventsCalled).to.equal(0);
   });
-  it('should create an account when not existing and get it back', async () => {
+  it("should create an account when not existing and get it back", async () => {
     let timesCreateAccountCalled = 0;
     const mockOpts1 = {
       accounts: [],

@@ -1,10 +1,9 @@
-**Usage**: `storage.stopWorker()`      
-**Description**: When the storage worker is running (interval), will clear it stopping further interval to be executed.    
+**Usage**: `storage.stopWorker()`  
+**Description**: When the storage worker is running (interval), will clear it stopping further interval to be executed.
 
-Parameters: 
+Parameters:
 
-| parameters             | type              | required       | Description                                               |  
-|------------------------|-------------------|----------------| ----------------------------------------------------------|
+| parameters | type | required | Description |
+| ---------- | ---- | -------- | ----------- |
 
 Returns : Boolean.
-

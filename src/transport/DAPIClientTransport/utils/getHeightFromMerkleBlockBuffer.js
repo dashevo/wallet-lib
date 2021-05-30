@@ -1,11 +1,9 @@
-const {
-  MerkleBlock,
-} = require('@dashevo/dashcore-lib');
+const { MerkleBlock } = require("@dashevo/dashcore-lib");
 
 const getHeightFromMerkleBlockBuffer = async (client, merkleBlockBuffer) => {
   // FIXME: MerkleBlock do not accept hex.
   const merkleBlock = new MerkleBlock(Buffer.from(merkleBlockBuffer));
-  const prevHash = merkleBlock.header.prevHash.reverse().toString('hex');
+  const prevHash = merkleBlock.header.prevHash.reverse().toString("hex");
 
   const prevBlock = await client.getBlockByHash(prevHash);
   try {

@@ -1,4 +1,4 @@
-const _ = require('lodash');
+const _ = require("lodash");
 /**
  * To any Plugins (StandardPlugins, Worker,...) will lookup in account for it's presence.
  *
@@ -16,7 +16,7 @@ module.exports = function hasPlugins(searchedPlugins = []) {
   const { plugins } = this;
   _.each(searchedPlugins, (searchedPlugin) => {
     const result = {};
-    _.each(['workers', 'standard'], (pluginTypeName) => {
+    _.each(["workers", "standard"], (pluginTypeName) => {
       const pluginType = plugins[pluginTypeName];
       _.each(pluginType, (plugin) => {
         if (searchedPlugin.name === plugin.constructor.name) {

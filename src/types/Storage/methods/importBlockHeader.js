@@ -1,4 +1,4 @@
-const EVENTS = require('../../../EVENTS');
+const EVENTS = require("../../../EVENTS");
 /**
  * This method is used to import a blockheader in Store.
  * @param {BlockHeader} blockHeader - A Blockheader
@@ -13,10 +13,14 @@ const importBlockHeader = function importBlockHeader(blockHeader, height) {
 
   if (!chainStore.blockHeaders[blockHeader.hash]) {
     if (height) {
-      if (height > currentChainHeight) store.chains[network].blockHeight = height;
+      if (height > currentChainHeight)
+        store.chains[network].blockHeight = height;
       else {
         store.chains[network].blockHeight += 1;
-        self.announce(EVENTS.BLOCKHEIGHT_CHANGED, store.chains[network].blockHeight);
+        self.announce(
+          EVENTS.BLOCKHEIGHT_CHANGED,
+          store.chains[network].blockHeight
+        );
       }
     }
     const blockHeight = height || currentChainHeight;

@@ -1,16 +1,14 @@
-const { PrivateKey, Networks } = require('@dashevo/dashcore-lib');
+const { PrivateKey, Networks } = require("@dashevo/dashcore-lib");
 
-const EventEmitter = require('events');
-const _ = require('lodash');
-const Storage = require('../Storage/Storage');
-const {
-  generateNewMnemonic,
-} = require('../../utils');
+const EventEmitter = require("events");
+const _ = require("lodash");
+const Storage = require("../Storage/Storage");
+const { generateNewMnemonic } = require("../../utils");
 
 const defaultOptions = {
   debug: false,
   offlineMode: false,
-  network: 'testnet',
+  network: "testnet",
   plugins: [],
   passphrase: null,
   injectDefaultPlugins: true,
@@ -18,14 +16,14 @@ const defaultOptions = {
   unsafeOptions: {},
 };
 
-const fromMnemonic = require('./methods/fromMnemonic');
-const fromPrivateKey = require('./methods/fromPrivateKey');
-const fromSeed = require('./methods/fromSeed');
-const fromHDPublicKey = require('./methods/fromHDPublicKey');
-const fromHDPrivateKey = require('./methods/fromHDPrivateKey');
-const generateNewWalletId = require('./methods/generateNewWalletId');
+const fromMnemonic = require("./methods/fromMnemonic");
+const fromPrivateKey = require("./methods/fromPrivateKey");
+const fromSeed = require("./methods/fromSeed");
+const fromHDPublicKey = require("./methods/fromHDPublicKey");
+const fromHDPrivateKey = require("./methods/fromHDPrivateKey");
+const generateNewWalletId = require("./methods/generateNewWalletId");
 
-const createTransportFromOptions = require('../../transport/createTransportFromOptions');
+const createTransportFromOptions = require("../../transport/createTransportFromOptions");
 
 /**
  * Instantiate a basic Wallet object,
@@ -56,15 +54,27 @@ class Wallet extends EventEmitter {
       generateNewWalletId,
     });
 
-    this.passphrase = _.has(opts, 'passphrase') ? opts.passphrase : defaultOptions.passphrase;
-    this.offlineMode = _.has(opts, 'offlineMode') ? opts.offlineMode : defaultOptions.offlineMode;
-    this.debug = _.has(opts, 'debug') ? opts.debug : defaultOptions.debug;
-    this.allowSensitiveOperations = _.has(opts, 'allowSensitiveOperations') ? opts.allowSensitiveOperations : defaultOptions.allowSensitiveOperations;
-    this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
-    this.unsafeOptions = _.has(opts, 'unsafeOptions') ? opts.unsafeOptions : defaultOptions.unsafeOptions;
+    this.passphrase = _.has(opts, "passphrase")
+      ? opts.passphrase
+      : defaultOptions.passphrase;
+    this.offlineMode = _.has(opts, "offlineMode")
+      ? opts.offlineMode
+      : defaultOptions.offlineMode;
+    this.debug = _.has(opts, "debug") ? opts.debug : defaultOptions.debug;
+    this.allowSensitiveOperations = _.has(opts, "allowSensitiveOperations")
+      ? opts.allowSensitiveOperations
+      : defaultOptions.allowSensitiveOperations;
+    this.injectDefaultPlugins = _.has(opts, "injectDefaultPlugins")
+      ? opts.injectDefaultPlugins
+      : defaultOptions.injectDefaultPlugins;
+    this.unsafeOptions = _.has(opts, "unsafeOptions")
+      ? opts.unsafeOptions
+      : defaultOptions.unsafeOptions;
 
     // Validate network
-    const networkName = _.has(opts, 'network') ? opts.network.toString() : defaultOptions.network;
+    const networkName = _.has(opts, "network")
+      ? opts.network.toString()
+      : defaultOptions.network;
     const network = Networks.get(networkName);
 
     if (!network) {
@@ -73,17 +83,21 @@ class Wallet extends EventEmitter {
 
     this.network = network.toString();
 
-    if ('mnemonic' in opts) {
-      this.fromMnemonic((opts.mnemonic === null) ? generateNewMnemonic() : opts.mnemonic);
-    } else if ('seed' in opts) {
+    if ("mnemonic" in opts) {
+      this.fromMnemonic(
+        opts.mnemonic === null ? generateNewMnemonic() : opts.mnemonic
+      );
+    } else if ("seed" in opts) {
       this.fromSeed(opts.seed);
-    } else if ('HDPrivateKey' in opts) {
+    } else if ("HDPrivateKey" in opts) {
       this.fromHDPrivateKey(opts.HDPrivateKey);
-    } else if ('privateKey' in opts) {
-      this.fromPrivateKey((opts.privateKey === null)
-        ? new PrivateKey(network).toString()
-        : opts.privateKey);
-    } else if ('HDPublicKey' in opts) {
+    } else if ("privateKey" in opts) {
+      this.fromPrivateKey(
+        opts.privateKey === null
+          ? new PrivateKey(network).toString()
+          : opts.privateKey
+      );
+    } else if ("HDPublicKey" in opts) {
       this.fromHDPublicKey(opts.HDPublicKey);
     } else {
       this.fromMnemonic(generateNewMnemonic());
@@ -109,14 +123,15 @@ class Wallet extends EventEmitter {
       // to a specific plugin, using `store` as an options mediator
       // is easier.
       this.store.syncOptions = {
-        skipSynchronizationBeforeHeight: this.unsafeOptions.skipSynchronizationBeforeHeight,
+        skipSynchronizationBeforeHeight:
+          this.unsafeOptions.skipSynchronizationBeforeHeight,
       };
     }
 
     const plugins = opts.plugins || defaultOptions.plugins;
     this.plugins = {};
     // eslint-disable-next-line no-return-assign
-    plugins.map((item) => this.plugins[item.name] = item);
+    plugins.map((item) => (this.plugins[item.name] = item));
 
     // Handle import of cache
     if (opts.cache) {
@@ -149,17 +164,17 @@ class Wallet extends EventEmitter {
 
     // Suppressed global require to avoid cyclic dependencies
     // eslint-disable-next-line global-require
-    const Identities = require('../Identities/Identities');
+    const Identities = require("../Identities/Identities");
     this.identities = new Identities(this);
     this.savedBackup = false; // TODO: When true, we delete mnemonic from internals
   }
 }
 
-Wallet.prototype.createAccount = require('./methods/createAccount');
-Wallet.prototype.disconnect = require('./methods/disconnect');
-Wallet.prototype.getAccount = require('./methods/getAccount');
+Wallet.prototype.createAccount = require("./methods/createAccount");
+Wallet.prototype.disconnect = require("./methods/disconnect");
+Wallet.prototype.getAccount = require("./methods/getAccount");
 Wallet.prototype.generateNewWalletId = generateNewWalletId;
-Wallet.prototype.exportWallet = require('./methods/exportWallet');
-Wallet.prototype.sweepWallet = require('./methods/sweepWallet');
+Wallet.prototype.exportWallet = require("./methods/exportWallet");
+Wallet.prototype.sweepWallet = require("./methods/sweepWallet");
 
 module.exports = Wallet;

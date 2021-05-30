@@ -1,11 +1,11 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-const { expect } = require('chai');
+const { expect } = require("chai");
 
 const expectThrowsAsync = async (method, errorMessage) => {
   let error = null;
   try {
     const res = await method();
-    expect(res).to.be.an('Error');
+    expect(res).to.be.an("Error");
     if (errorMessage) {
       if (res.message) {
         error = res;
@@ -14,7 +14,7 @@ const expectThrowsAsync = async (method, errorMessage) => {
   } catch (err) {
     error = err;
   }
-  expect(error).to.be.an('Error');
+  expect(error).to.be.an("Error");
   if (errorMessage) {
     expect(error.message).to.equal(errorMessage);
   }

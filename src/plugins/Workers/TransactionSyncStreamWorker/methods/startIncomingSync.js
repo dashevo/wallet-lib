@@ -1,6 +1,6 @@
-const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
+const GrpcErrorCodes = require("@dashevo/grpc-common/lib/server/error/GrpcErrorCodes");
 
-const logger = require('../../../../logger');
+const logger = require("../../../../logger");
 
 const GRPC_RETRY_ERRORS = [
   GrpcErrorCodes.DEADLINE_EXCEEDED,
@@ -30,14 +30,18 @@ module.exports = async function startIncomingSync() {
     // In both cases, the stream needs to be restarted, unless syncIncomingTransactions is
     // set to false, which is signalling the worker not to restart stream.
     if (this.syncIncomingTransactions) {
-      logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHash}`);
+      logger.debug(
+        `TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHash}`
+      );
       await startIncomingSync.call(this);
     }
   } catch (e) {
     this.stream = null;
 
     if (GRPC_RETRY_ERRORS.includes(e.code)) {
-      logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHash}`);
+      logger.debug(
+        `TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHash}`
+      );
 
       if (this.syncIncomingTransactions) {
         await startIncomingSync.call(this);
@@ -46,9 +50,9 @@ module.exports = async function startIncomingSync() {
       return;
     }
 
-    this.emit('error', e, {
-      type: 'plugin',
-      pluginType: 'worker',
+    this.emit("error", e, {
+      type: "plugin",
+      pluginType: "worker",
       pluginName: this.name,
     });
   }

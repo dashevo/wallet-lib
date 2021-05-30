@@ -1,4 +1,4 @@
-const WalletLibError = require('./WalletLibError');
+const WalletLibError = require("./WalletLibError");
 
 class InvalidAddress extends WalletLibError {
   constructor(address) {

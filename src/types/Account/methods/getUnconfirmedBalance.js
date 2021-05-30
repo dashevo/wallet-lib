@@ -1,4 +1,4 @@
-const { duffsToDash } = require('../../../utils');
+const { duffsToDash } = require("../../../utils");
 
 /**
  * Return the total balance of unconfirmed utxo
@@ -6,13 +6,15 @@ const { duffsToDash } = require('../../../utils');
  * @return {number} Balance in dash
  */
 function getUnconfirmedBalance(displayDuffs = true) {
-  const {
-    walletId, storage,
-  } = this;
+  const { walletId, storage } = this;
   const accountIndex = this.index;
 
-  const totalSat = storage.calculateDuffBalance(walletId, accountIndex, 'unconfirmed');
-  return (displayDuffs) ? totalSat : duffsToDash(totalSat);
+  const totalSat = storage.calculateDuffBalance(
+    walletId,
+    accountIndex,
+    "unconfirmed"
+  );
+  return displayDuffs ? totalSat : duffsToDash(totalSat);
 }
 
 module.exports = getUnconfirmedBalance;

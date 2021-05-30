@@ -1,4 +1,4 @@
-const WalletLibError = require('./WalletLibError');
+const WalletLibError = require("./WalletLibError");
 
 class TransactionNotInStore extends WalletLibError {
   constructor(txid) {

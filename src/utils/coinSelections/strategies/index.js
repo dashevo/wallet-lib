@@ -1,5 +1,5 @@
-const simpleAscendingAccumulator = require('./simpleAscendingAccumulator');
-const simpleDescendingAccumulator = require('./simpleDescendingAccumulator');
+const simpleAscendingAccumulator = require("./simpleAscendingAccumulator");
+const simpleDescendingAccumulator = require("./simpleDescendingAccumulator");
 
 const STRATEGIES = {
   simpleDescendingAccumulator,

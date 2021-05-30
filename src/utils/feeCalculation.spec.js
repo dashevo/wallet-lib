@@ -1,22 +1,22 @@
-const { expect } = require('chai');
-const feeCalculation = require('./feeCalculation');
+const { expect } = require("chai");
+const feeCalculation = require("./feeCalculation");
 
-describe('Utils - feeCalculation', function suite() {
+describe("Utils - feeCalculation", function suite() {
   this.timeout(10000);
-  it('should get feeRate for an instantSend transaction', () => {
-    const result = feeCalculation('instantSend');
+  it("should get feeRate for an instantSend transaction", () => {
+    const result = feeCalculation("instantSend");
     const expectedResult = {
-      type: 'perInputs',
+      type: "perInputs",
       value: 10000,
     };
     expect(result).to.deep.equal(expectedResult);
   });
-  it('should get feeRate for an classic transaction', () => {
-    const result1 = feeCalculation('standard');
+  it("should get feeRate for an classic transaction", () => {
+    const result1 = feeCalculation("standard");
     const result2 = feeCalculation();
 
     const expectedResult = {
-      type: 'perBytes',
+      type: "perBytes",
       value: 1000,
     };
     expect(result1).to.deep.equal(expectedResult);

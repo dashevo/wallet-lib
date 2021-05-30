@@ -1,4 +1,4 @@
-const { cloneDeep } = require('lodash');
+const { cloneDeep } = require("lodash");
 /**
  * Return the content of the store
  * @return {Storage.store}

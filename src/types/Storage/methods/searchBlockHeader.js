@@ -1,4 +1,4 @@
-const { is } = require('../../../utils');
+const { is } = require("../../../utils");
 /**
  * Search a specific blockheader in the store
  * @param {string|number} identifier - block hash or height
@@ -11,10 +11,10 @@ const searchBlockHeader = function searchBlockHeader(identifier) {
     found: false,
   };
   const chainStore = store.chains[this.network.toString()];
-  const blockheader = (is.num(identifier)
-  // eslint-disable-next-line no-underscore-dangle
-    ? chainStore.blockHeaders[chainStore.mappedBlockHeaderHeights[identifier]]
-    : chainStore.blockHeaders[identifier]);
+  const blockheader = is.num(identifier)
+    ? // eslint-disable-next-line no-underscore-dangle
+      chainStore.blockHeaders[chainStore.mappedBlockHeaderHeights[identifier]]
+    : chainStore.blockHeaders[identifier];
 
   if (blockheader) {
     search.found = true;

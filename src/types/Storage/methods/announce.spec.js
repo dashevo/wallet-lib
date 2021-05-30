@@ -1,6 +1,6 @@
-const { expect } = require('chai');
-const announce = require('./announce');
+const { expect } = require("chai");
+const announce = require("./announce");
 
-describe('Storage - announce', () => {
-  describe.skip('TODO test');
+describe("Storage - announce", () => {
+  describe.skip("TODO test");
 });

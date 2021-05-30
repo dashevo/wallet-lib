@@ -1,8 +1,8 @@
-const DAPIClient = require('@dashevo/dapi-client');
+const DAPIClient = require("@dashevo/dapi-client");
 
-const _ = require('lodash');
+const _ = require("lodash");
 
-const DAPIClientTransport = require('./DAPIClientTransport/DAPIClientTransport');
+const DAPIClientTransport = require("./DAPIClientTransport/DAPIClientTransport");
 
 /**
  *

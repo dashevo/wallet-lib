@@ -1,11 +1,9 @@
-**Usage**: `storage.getStore()`    
-**Description**: Used to get the whole store.   
+**Usage**: `storage.getStore()`  
+**Description**: Used to get the whole store.
 
-Parameters: 
+Parameters:
 
-| parameters             | type              | required       | Description                                                             |  
-|------------------------|-------------------|----------------| ------------------------------------------------------------------------|
+| parameters | type | required | Description |
+| ---------- | ---- | -------- | ----------- |
 
-
-Returns: Full store data     
-
+Returns: Full store data

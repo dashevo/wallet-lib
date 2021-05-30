@@ -1,5 +1,5 @@
-const _ = require('lodash');
-const { dashToDuffs, duffsToDash } = require('../../../utils');
+const _ = require("lodash");
+const { dashToDuffs, duffsToDash } = require("../../../utils");
 
 // Will filter out transaction that are not concerning us
 // (which can happen in the case of multiple account in store)
@@ -13,7 +13,9 @@ const getFilteredTransactions = async function getFilteredTransactions() {
    * In order to support this feature, it would require us to have the whole raw block set
    * in order to find a tx in a block.
    */
-  return new Error('Removed feature - unable to calculate time between transactions');
+  return new Error(
+    "Removed feature - unable to calculate time between transactions"
+  );
   /*
   const txids = [];
   const txs = [];
@@ -80,7 +82,7 @@ const getFilteredTransactions = async function getFilteredTransactions() {
    */
 };
 
-const sortByTimeDesc = (a, b) => (b.time - a.time);
+const sortByTimeDesc = (a, b) => b.time - a.time;
 
 const considerValue = (list, address, valueSat) => {
   let found = false;
@@ -108,41 +110,52 @@ async function getTransactionHistory() {
   const accountIndex = this.index;
   const store = this.storage.getStore();
 
-  const txs = await getFilteredTransactions(this.storage, walletId, accountIndex);
+  const txs = await getFilteredTransactions(
+    this.storage,
+    walletId,
+    accountIndex
+  );
 
   const { addresses } = store.wallets[walletId];
-  const isHDWallet = !((Object.keys(addresses.misc).length > Object.keys(addresses.external)));
+  const isHDWallet = !(
+    Object.keys(addresses.misc).length > Object.keys(addresses.external)
+  );
 
   const predicate = (addr) => ({ address: addr.address });
   // eslint-disable-next-line consistent-return
   const filterInAccountPredicate = (addr) => {
-    if ((isHDWallet && parseInt(addr.path.split('/')[3], 10) === accountIndex)) {
+    if (isHDWallet && parseInt(addr.path.split("/")[3], 10) === accountIndex) {
       return addr;
     }
   };
   // eslint-disable-next-line consistent-return
   const filterOutAccountPredicate = (addr) => {
-    if ((isHDWallet && parseInt(addr.path.split('/')[3], 10) !== accountIndex)) {
+    if (isHDWallet && parseInt(addr.path.split("/")[3], 10) !== accountIndex) {
       return addr;
     }
   };
-  const changeAddresses = (isHDWallet)
+  const changeAddresses = isHDWallet
     ? _.map(_.filter(addresses.internal, filterInAccountPredicate), predicate)
     : _.map(addresses.misc, predicate);
   const changeAddressList = changeAddresses.map((addr) => addr.address, []);
 
-  const externalAddresses = (isHDWallet)
+  const externalAddresses = isHDWallet
     ? _.map(_.filter(addresses.external, filterInAccountPredicate), predicate)
     : _.filter(addresses.misc, predicate);
-  const externalAddressesList = externalAddresses.map((addr) => addr.address, []);
+  const externalAddressesList = externalAddresses.map(
+    (addr) => addr.address,
+    []
+  );
 
   const mergedAddresses = { ...addresses.external, ...addresses.internal };
 
-  const otherAccountAddresses = (isHDWallet)
+  const otherAccountAddresses = isHDWallet
     ? _.map(_.filter(mergedAddresses, filterOutAccountPredicate), predicate)
     : [];
-  const otherAccountAddressesList = otherAccountAddresses
-    .map((addr) => addr.address, []);
+  const otherAccountAddressesList = otherAccountAddresses.map(
+    (addr) => addr.address,
+    []
+  );
 
   const determinateTransactionMetaData = (tx) => {
     const from = [];
@@ -164,9 +177,9 @@ async function getTransactionHistory() {
     };
 
     const determineType = (isChange, isExternal, isOtherAccount) => {
-      if (isExternal) return 'external';
-      if (isChange) return 'change';
-      return (isOtherAccount) ? 'otherAccount' : 'unknown';
+      if (isExternal) return "external";
+      if (isChange) return "change";
+      return isOtherAccount ? "otherAccount" : "unknown";
     };
 
     _.each(tx.vout, (vout) => {
@@ -210,78 +223,84 @@ async function getTransactionHistory() {
     const nbOfOtherAccountVout = Object.keys(meta.vout.otherAccount).length;
 
     let type;
-    if (nbOfOtherAccountVin > 0 && nbOfChangeVin + nbOfExternalVin + nbOfUnknwonVin === 0) {
+    if (
+      nbOfOtherAccountVin > 0 &&
+      nbOfChangeVin + nbOfExternalVin + nbOfUnknwonVin === 0
+    ) {
       // When this account is recipient of an inbetween account movement
-      type = 'moved_account';
+      type = "moved_account";
 
       _.each(meta.vout.external, (el) => {
-        considerValue(to, el.address, (parseFloat(el.valueSat)));
+        considerValue(to, el.address, parseFloat(el.valueSat));
       });
 
       _.each(meta.vin.otherAccount, (el) => {
-        considerValue(from, el.address, (parseFloat(el.valueSat)));
+        considerValue(from, el.address, parseFloat(el.valueSat));
       });
     } else if (nbOfOtherAccountVout > 0 || nbOfOtherAccountVin > 0) {
       // When the account is sender of an inbetween account movement
-      type = 'moved_account';
+      type = "moved_account";
 
       if (nbOfOtherAccountVout > 0) {
         _.each(meta.vout.otherAccount, (el) => {
-          considerValue(to, el.address, (parseFloat(el.valueSat)));
+          considerValue(to, el.address, parseFloat(el.valueSat));
         });
       }
       if (nbOfOtherAccountVin > 0) {
         _.each(meta.vout.otherAccount, (el) => {
-          considerValue(to, el.address, (parseFloat(el.valueSat)));
+          considerValue(to, el.address, parseFloat(el.valueSat));
         });
       }
 
-      _.each([meta.vin.external, meta.vin.change, meta.vin.otherAccount], (metaType) => {
-        _.each(metaType, (el) => {
-          considerValue(from, el.address, (parseFloat(el.valueSat)));
-        });
-      });
+      _.each(
+        [meta.vin.external, meta.vin.change, meta.vin.otherAccount],
+        (metaType) => {
+          _.each(metaType, (el) => {
+            considerValue(from, el.address, parseFloat(el.valueSat));
+          });
+        }
+      );
     } else if (nbOfExternalVin + nbOfChangeVin === 0) {
       // When we don't know any of the vin address then we received some
-      type = 'receive';
+      type = "receive";
 
       _.each(meta.vout.external, (el) => {
-        considerValue(to, el.address, (parseFloat(el.valueSat)));
+        considerValue(to, el.address, parseFloat(el.valueSat));
       });
       _.each(meta.vin.unknown, (el) => {
-        considerValue(from, el.address, (parseFloat(el.valueSat)));
+        considerValue(from, el.address, parseFloat(el.valueSat));
       });
       _.each(meta.vin.otherAccount, (el) => {
-        considerValue(from, el.address, (parseFloat(el.valueSat)));
+        considerValue(from, el.address, parseFloat(el.valueSat));
       });
     } else if (nbOfUnknwonVout === 0) {
       // If it's nothing above, and we don't have any unknown output, then it's internal move
-      type = 'moved';
+      type = "moved";
 
       if (nbOfExternalVout > 0) {
         _.each(meta.vout.external, (el) => {
-          considerValue(to, el.address, (parseFloat(el.valueSat)));
+          considerValue(to, el.address, parseFloat(el.valueSat));
         });
       }
       _.each([meta.vin.external, meta.vin.change], (metaType) => {
         _.each(metaType, (el) => {
-          considerValue(from, el.address, (parseFloat(el.valueSat)));
+          considerValue(from, el.address, parseFloat(el.valueSat));
         });
       });
     } else {
-      type = 'sent';
+      type = "sent";
       _.each(meta.vout.unknown, (el) => {
-        considerValue(to, el.address, (parseFloat(el.valueSat)));
+        considerValue(to, el.address, parseFloat(el.valueSat));
       });
       _.each([meta.vin.external, meta.vin.change], (metaType) => {
         _.each(metaType, (el) => {
-          considerValue(from, el.address, (parseFloat(el.valueSat)));
+          considerValue(from, el.address, parseFloat(el.valueSat));
         });
       });
       // As for a single wallet this will be a duplicate
-      if (type === 'hdwallet') {
+      if (type === "hdwallet") {
         _.each(meta.vin.change, (el) => {
-          considerValue(from, el.address, (parseFloat(el.valueSat)));
+          considerValue(from, el.address, parseFloat(el.valueSat));
         });
       }
     }

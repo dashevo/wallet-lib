@@ -1,7 +1,10 @@
-const WalletLibError = require('./WalletLibError');
+const WalletLibError = require("./WalletLibError");
 
 class InvalidDashcoreTransaction extends WalletLibError {
-  constructor(tx, reason = 'A Dashcore Transaction object or valid rawTransaction is required') {
+  constructor(
+    tx,
+    reason = "A Dashcore Transaction object or valid rawTransaction is required"
+  ) {
     super(`${reason}: ${tx.toString()}`);
   }
 }

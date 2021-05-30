@@ -1,4 +1,4 @@
-const cbor = require('cbor');
+const cbor = require("cbor");
 
 /**
  * Allow to decode an input

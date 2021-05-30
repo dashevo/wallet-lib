@@ -1,24 +1,24 @@
-const { varIntSizeBytesFromLength } = require('./varInt');
+const { varIntSizeBytesFromLength } = require("./varInt");
 const {
   dashToDuffs,
   duffsToDash,
   getBytesOf,
   hasProp,
   hasMethod,
-} = require('./utils');
+} = require("./utils");
 const {
   generateNewMnemonic,
   mnemonicToHDPrivateKey,
   mnemonicToWalletId,
   seedToHDPrivateKey,
   mnemonicToSeed,
-} = require('./mnemonic');
-const is = require('./is');
-const coinSelection = require('./coinSelection');
-const feeCalculation = require('./feeCalculation');
-const { hash, doubleSha256, sha256 } = require('./crypto');
+} = require("./mnemonic");
+const is = require("./is");
+const coinSelection = require("./coinSelection");
+const feeCalculation = require("./feeCalculation");
+const { hash, doubleSha256, sha256 } = require("./crypto");
 
-const fundWallet = require('./fundWallet');
+const fundWallet = require("./fundWallet");
 
 module.exports = {
   dashToDuffs,

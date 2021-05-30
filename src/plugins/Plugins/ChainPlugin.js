@@ -1,6 +1,6 @@
-const logger = require('../../logger');
-const { StandardPlugin } = require('..');
-const EVENTS = require('../../EVENTS');
+const logger = require("../../logger");
+const { StandardPlugin } = require("..");
+const EVENTS = require("../../EVENTS");
 
 const defaultOpts = {
   firstExecutionRequired: true,
@@ -10,15 +10,10 @@ const defaultOpts = {
 class ChainPlugin extends StandardPlugin {
   constructor(opts = {}) {
     const params = {
-      name: 'ChainPlugin',
+      name: "ChainPlugin",
       executeOnStart: defaultOpts.executeOnStart,
       firstExecutionRequired: defaultOpts.firstExecutionRequired,
-      dependencies: [
-        'storage',
-        'transport',
-        'fetchStatus',
-        'walletId',
-      ],
+      dependencies: ["storage", "transport", "fetchStatus", "walletId"],
     };
     super(Object.assign(params, opts));
     this.isSubscribedToBlocks = false;
@@ -37,7 +32,10 @@ class ChainPlugin extends StandardPlugin {
       self.transport.on(EVENTS.BLOCK, async (ev) => {
         // const { network } = self.storage.store.wallets[self.walletId];
         const { payload: block } = ev;
-        this.parentEvents.emit(EVENTS.BLOCK, { type: EVENTS.BLOCK, payload: block });
+        this.parentEvents.emit(EVENTS.BLOCK, {
+          type: EVENTS.BLOCK,
+          payload: block,
+        });
         // We do not announce BLOCKHEADER as this is done by Storage
         await self.storage.importBlockHeader(block.header);
 
@@ -61,11 +59,13 @@ class ChainPlugin extends StandardPlugin {
       return false;
     }
 
-    const { chain: { blocksCount: blocks } } = res;
+    const {
+      chain: { blocksCount: blocks },
+    } = res;
 
     const { network } = this.storage.store.wallets[this.walletId];
 
-    logger.debug('ChainPlugin - Setting up starting blockHeight', blocks);
+    logger.debug("ChainPlugin - Setting up starting blockHeight", blocks);
 
     this.storage.store.chains[network.toString()].blockHeight = blocks;
 

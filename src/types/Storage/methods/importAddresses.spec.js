@@ -1,7 +1,6 @@
-const { expect } = require('chai');
-const importAddresses = require('./importAddresses');
+const { expect } = require("chai");
+const importAddresses = require("./importAddresses");
 
-describe('Storage - importAddresses', () => {
-  it('should import an array of addresses', () => {
-  });
+describe("Storage - importAddresses", () => {
+  it("should import an array of addresses", () => {});
 });

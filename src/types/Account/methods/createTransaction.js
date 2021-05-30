@@ -1,11 +1,15 @@
 /* eslint-disable no-underscore-dangle */
-const _ = require('lodash');
+const _ = require("lodash");
 const {
-  Transaction, PrivateKey, HDPrivateKey, crypto, Script,
-} = require('@dashevo/dashcore-lib');
-const { CreateTransactionError } = require('../../../errors');
-const { dashToDuffs, coinSelection, is } = require('../../../utils');
-const _loadStrategy = require('../_loadStrategy');
+  Transaction,
+  PrivateKey,
+  HDPrivateKey,
+  crypto,
+  Script,
+} = require("@dashevo/dashcore-lib");
+const { CreateTransactionError } = require("../../../errors");
+const { dashToDuffs, coinSelection, is } = require("../../../utils");
+const _loadStrategy = require("../_loadStrategy");
 
 const parseUtxos = (utxos) => {
   // We do not allow mixmatch types (output, object together) utxo list
@@ -34,11 +38,15 @@ function createTransaction(opts = {}) {
 
   let outputs = [];
 
-  if (_.has(opts, 'recipients')) {
-    if (!is.arr(opts.recipients)) throw new Error('Expected recipients to be an array of recipient');
+  if (_.has(opts, "recipients")) {
+    if (!is.arr(opts.recipients))
+      throw new Error("Expected recipients to be an array of recipient");
     _.each(opts.recipients, (recipient) => {
-      if (_.has(recipient, 'recipient') && _.has(recipient, 'satoshis')) {
-        outputs.push({ address: recipient.recipient, satoshis: recipient.satoshis });
+      if (_.has(recipient, "recipient") && _.has(recipient, "satoshis")) {
+        outputs.push({
+          address: recipient.recipient,
+          satoshis: recipient.satoshis,
+        });
       } else {
         throw new Error(`Invalid recipient provided ${recipient}`);
       }
@@ -46,29 +54,38 @@ function createTransaction(opts = {}) {
   } else {
     // FIXME : Remove amount support in next release.
     if (!opts || (!opts.amount && !opts.satoshis)) {
-      throw new Error('An amount in dash or in satoshis is expected to create a transaction');
+      throw new Error(
+        "An amount in dash or in satoshis is expected to create a transaction"
+      );
     }
-    const satoshis = (opts.amount && !opts.satoshis) ? dashToDuffs(opts.amount) : opts.satoshis;
+    const satoshis =
+      opts.amount && !opts.satoshis ? dashToDuffs(opts.amount) : opts.satoshis;
     if (!opts || !opts.recipient) {
-      throw new Error('A recipient is expected to create a transaction');
+      throw new Error("A recipient is expected to create a transaction");
     }
     outputs = [{ address: opts.recipient, satoshis }];
   }
 
-  const deductFee = _.has(opts, 'deductFee')
-    ? opts.deductFee
-    : true;
+  const deductFee = _.has(opts, "deductFee") ? opts.deductFee : true;
 
-  const strategy = _.has(opts, 'strategy')
+  const strategy = _.has(opts, "strategy")
     ? _loadStrategy(opts.strategy)
     : this.strategy;
 
-  const utxosList = _.has(opts, 'utxos') ? parseUtxos(opts.utxos) : this.getUTXOS();
+  const utxosList = _.has(opts, "utxos")
+    ? parseUtxos(opts.utxos)
+    : this.getUTXOS();
 
-  const feeCategory = (opts.isInstantSend) ? 'instant' : 'normal';
+  const feeCategory = opts.isInstantSend ? "instant" : "normal";
   let selection;
   try {
-    selection = coinSelection(utxosList, outputs, deductFee, feeCategory, strategy);
+    selection = coinSelection(
+      utxosList,
+      outputs,
+      deductFee,
+      feeCategory,
+      strategy
+    );
   } catch (e) {
     throw new CreateTransactionError(e);
   }
@@ -88,22 +105,23 @@ function createTransaction(opts = {}) {
   // and determine the finalFees
   // eslint-disable-next-line no-underscore-dangle
   const preChangeSize = tx._estimateSize();
-  const changeAddress = _.has(opts, 'change') ? opts.change : this.getUnusedAddress('internal').address;
+  const changeAddress = _.has(opts, "change")
+    ? opts.change
+    : this.getUnusedAddress("internal").address;
   tx.change(changeAddress);
   // eslint-disable-next-line no-underscore-dangle
   const deltaChangeSize = tx._estimateSize() - preChangeSize;
-  const finalFees = Math.ceil(estimatedFee + ((deltaChangeSize * estimatedFee) / preChangeSize));
+  const finalFees = Math.ceil(
+    estimatedFee + (deltaChangeSize * estimatedFee) / preChangeSize
+  );
 
   tx.fee(finalFees);
   const addressList = selectedUTXOs.map((el) => {
     if (el.address) return el.address.toString();
-    return Script
-      .fromHex(el.script)
-      .toAddress(this.getNetwork())
-      .toString();
+    return Script.fromHex(el.script).toAddress(this.getNetwork()).toString();
   });
 
-  const privateKeys = _.has(opts, 'privateKeys')
+  const privateKeys = _.has(opts, "privateKeys")
     ? opts.privateKeys
     : this.getPrivateKeys(addressList);
   const transformedPrivateKeys = [];
@@ -120,7 +138,7 @@ function createTransaction(opts = {}) {
     const signedTx = this.keyChain.sign(
       tx,
       transformedPrivateKeys,
-      crypto.Signature.SIGHASH_ALL,
+      crypto.Signature.SIGHASH_ALL
     );
     return signedTx;
   } catch (e) {

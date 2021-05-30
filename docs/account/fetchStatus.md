@@ -1,9 +1,9 @@
-**Usage**: `account.fetchStatus()`    
+**Usage**: `account.fetchStatus()`  
 **Description**: Allow to retrieve status of the current chain (blockheight).
 
-Parameters:   
+Parameters:
 
-| parameters        | type   | required       | Description                                          |  
-|-------------------|--------|----------------| -----------------------------------------------------|
+| parameters | type | required | Description |
+| ---------- | ---- | -------- | ----------- |
 
 Returns : status object

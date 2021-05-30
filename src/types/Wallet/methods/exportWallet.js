@@ -1,14 +1,17 @@
-const { WALLET_TYPES } = require('../../../CONSTANTS');
+const { WALLET_TYPES } = require("../../../CONSTANTS");
 
 function exportMnemonic(mnemonic) {
-  if (!mnemonic) throw new Error('Wallet was not initiated with a mnemonic, can\'t export it');
+  if (!mnemonic)
+    throw new Error(
+      "Wallet was not initiated with a mnemonic, can't export it"
+    );
   return mnemonic.toString();
 }
 
-function exportSingleAddressWallet(_outputType = 'privateKey') {
+function exportSingleAddressWallet(_outputType = "privateKey") {
   switch (_outputType) {
-    case 'privateKey':
-      if (!this.privateKey) throw new Error('No PrivateKey to export');
+    case "privateKey":
+      if (!this.privateKey) throw new Error("No PrivateKey to export");
       return this.privateKey;
     default:
       throw new Error(`Tried to export to invalid output : ${_outputType}`);
@@ -20,25 +23,28 @@ function exportHDWallet(_outputType) {
     case undefined:
       // We did not define any output, so we try first mnemonic, or HDPrivateKey
       try {
-        return exportHDWallet.call(this, 'mnemonic');
+        return exportHDWallet.call(this, "mnemonic");
       } catch (e) {
-        return exportHDWallet.call(this, 'HDPrivateKey');
+        return exportHDWallet.call(this, "HDPrivateKey");
       }
-    case 'mnemonic':
-      if (!this.mnemonic) throw new Error('Wallet was not initiated with a mnemonic, can\'t export it.');
+    case "mnemonic":
+      if (!this.mnemonic)
+        throw new Error(
+          "Wallet was not initiated with a mnemonic, can't export it."
+        );
       return exportMnemonic(this.mnemonic);
-    case 'HDPrivateKey':
-      if (!this.HDPrivateKey) throw new Error('No PrivateKey to export');
+    case "HDPrivateKey":
+      if (!this.HDPrivateKey) throw new Error("No PrivateKey to export");
       return this.HDPrivateKey.toString();
     default:
       throw new Error(`Tried to export to invalid output : ${_outputType}`);
   }
 }
 
-function exportHDPublicWallet(_outputType = 'HDPublicKey') {
+function exportHDPublicWallet(_outputType = "HDPublicKey") {
   switch (_outputType) {
-    case 'HDPublicKey':
-      if (!this.HDPublicKey) throw new Error('No publicKey to export');
+    case "HDPublicKey":
+      if (!this.HDPublicKey) throw new Error("No publicKey to export");
       return this.HDPublicKey.toString();
     default:
       throw new Error(`Tried to export to invalid output : ${_outputType}`);
@@ -64,6 +70,6 @@ module.exports = function exportWallet(outputType) {
     case WALLET_TYPES.HDWALLET:
       return exportHDWallet.call(this, outputType);
     default:
-      throw new Error('Trying to export from an unknown wallet type');
+      throw new Error("Trying to export from an unknown wallet type");
   }
 };

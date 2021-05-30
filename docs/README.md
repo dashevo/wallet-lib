@@ -7,14 +7,14 @@
 
 A pure and extensible JavaScript Wallet Library for Dash
 
-### What it is 
+### What it is
 
 Wallet-lib provides all the wallet features needed for node and browser usage.
-From being able to display an account balance, to paying to another address, passing by the need to automate back-end task related to a cold-storage.  
+From being able to display an account balance, to paying to another address, passing by the need to automate back-end task related to a cold-storage.
 
 Wallet-lib allows you to easily work with Wallets/Accounts for HDWallets, or from just a single private key.  
 It also allows you to monitor public keys and HDPubKey.  
-You might also wish to create your own set of plugins or your own coin selection logic.  
+You might also wish to create your own set of plugins or your own coin selection logic.
 
 ### Install
 
@@ -22,7 +22,7 @@ You might also wish to create your own set of plugins or your own coin selection
 
 In order to use this library in Node, you will need to add it to your project as a dependency.
 
-Having [NodeJS](https://nodejs.org/) installed, just type in your terminal : 
+Having [NodeJS](https://nodejs.org/) installed, just type in your terminal :
 
 ```sh
 npm install @dashevo/wallet-lib
@@ -30,7 +30,7 @@ npm install @dashevo/wallet-lib
 
 ### CDN Standalone
 
-For browser usage, you can also directly rely on unpkg :  
+For browser usage, you can also directly rely on unpkg :
 
 ```
 <script src="https://unpkg.com/@dashevo/wallet-lib"></script>
@@ -41,7 +41,7 @@ For browser usage, you can also directly rely on unpkg :
 In your file, where you want to execute it :
 
 ```js
-const { Wallet, EVENTS } = require('@dashevo/wallet-lib');
+const { Wallet, EVENTS } = require("@dashevo/wallet-lib");
 
 const wallet = new Wallet();
 
@@ -61,4 +61,3 @@ wallet.getAccount().then((account) => {
 ## Licence
 
 [MIT](https://github.com/dashevo/wallet-lib/blob/master/LICENCE.md) © Dash Core Group, Inc.
-

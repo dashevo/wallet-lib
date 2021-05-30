@@ -1,6 +1,6 @@
 /* eslint-disable no-continue, no-restricted-syntax */
-const { Address, Transaction } = require('@dashevo/dashcore-lib');
-const { WALLET_TYPES } = require('../../../CONSTANTS');
+const { Address, Transaction } = require("@dashevo/dashcore-lib");
+const { WALLET_TYPES } = require("../../../CONSTANTS");
 
 /**
  * Return all the utxos
@@ -8,20 +8,20 @@ const { WALLET_TYPES } = require('../../../CONSTANTS');
  */
 function getUTXOS() {
   const self = this;
-  const {
-    walletId,
-    network,
-    BIP44PATH,
-    walletType,
-  } = this;
+  const { walletId, network, BIP44PATH, walletType } = this;
 
   const utxos = [];
-  const isHDWallet = [WALLET_TYPES.HDPUBLIC, WALLET_TYPES.HDWALLET].includes(walletType);
+  const isHDWallet = [WALLET_TYPES.HDPUBLIC, WALLET_TYPES.HDWALLET].includes(
+    walletType
+  );
 
   const currentBlockHeight = this.store.chains[network].blockHeight;
 
   for (const addressType in this.store.wallets[walletId].addresses) {
-    if (!addressType || !['external', 'internal', 'misc'].includes(addressType)) {
+    if (
+      !addressType ||
+      !["external", "internal", "misc"].includes(addressType)
+    ) {
       continue;
     }
     for (const path in self.store.wallets[walletId].addresses[addressType]) {
@@ -32,7 +32,7 @@ function getUTXOS() {
 
       for (const identifier in address.utxos) {
         if (!identifier) continue;
-        const [txid, outputIndex] = identifier.split('-');
+        const [txid, outputIndex] = identifier.split("-");
         const transaction = new Transaction(this.store.transactions[txid]);
 
         if (transaction.isCoinbase()) {
@@ -50,15 +50,15 @@ function getUTXOS() {
             continue;
           }
         }
-        utxos.push(new Transaction.UnspentOutput(
-          {
+        utxos.push(
+          new Transaction.UnspentOutput({
             txId: txid,
             vout: parseInt(outputIndex, 10),
             script: address.utxos[identifier].script,
             satoshis: address.utxos[identifier].satoshis,
             address: new Address(address.address, network),
-          },
-        ));
+          })
+        );
       }
     }
   }

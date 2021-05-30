@@ -1,11 +1,11 @@
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 function hash(alg, data) {
   return crypto.createHash(alg).update(data).digest();
 }
 
 function sha256(data) {
-  return hash('sha256', data);
+  return hash("sha256", data);
 }
 
 function doubleSha256(data) {

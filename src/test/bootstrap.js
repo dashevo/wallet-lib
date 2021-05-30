@@ -1,9 +1,9 @@
-const path = require('path');
-const dotenvSafe = require('dotenv-safe');
-const sinon = require('sinon');
+const path = require("path");
+const dotenvSafe = require("dotenv-safe");
+const sinon = require("sinon");
 
 dotenvSafe.config({
-  path: path.resolve(__dirname, '..', '..', '.env'),
+  path: path.resolve(__dirname, "..", "..", ".env"),
 });
 
 beforeEach(function beforeEach() {

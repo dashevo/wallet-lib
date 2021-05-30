@@ -1,8 +1,8 @@
-const WalletLibError = require('./WalletLibError');
+const WalletLibError = require("./WalletLibError");
 
 class InvalidUTXO extends WalletLibError {
   constructor() {
-    const message = 'Invalid UnspentOutput provided.';
+    const message = "Invalid UnspentOutput provided.";
     super(message);
   }
 }

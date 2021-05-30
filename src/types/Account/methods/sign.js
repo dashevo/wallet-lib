@@ -1,4 +1,4 @@
-const { PrivateKey, HDPrivateKey } = require('@dashevo/dashcore-lib');
+const { PrivateKey, HDPrivateKey } = require("@dashevo/dashcore-lib");
 /**
  * To any object passed (Transaction, ST,..), will try to sign the message given passed keys.
  * @param {Transaction} object - The object to sign
@@ -14,8 +14,10 @@ module.exports = function sign(object, privateKeys = [], sigType) {
     // We seek private key based on inputs
     object.inputs.forEach((input) => {
       if (input.script) {
-        // eslint-disable-next-line no-underscore-dangle
-        const addr = input.script.toAddress(network) || input.output._script.toAddress(network);
+        const addr =
+          input.script.toAddress(network) ||
+          // eslint-disable-next-line no-underscore-dangle
+          input.output._script.toAddress(network);
         addressList.push(addr.toString());
       }
     });

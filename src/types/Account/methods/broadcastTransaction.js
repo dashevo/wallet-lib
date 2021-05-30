@@ -1,33 +1,42 @@
-const Dashcore = require('@dashevo/dashcore-lib');
-const { is } = require('../../../utils');
+const Dashcore = require("@dashevo/dashcore-lib");
+const { is } = require("../../../utils");
 const {
   ValidTransportLayerRequired,
   InvalidRawTransaction,
   InvalidDashcoreTransaction,
-} = require('../../../errors');
+} = require("../../../errors");
 
 function impactAffectedInputs({ inputs }) {
-  const {
-    storage, walletId,
-  } = this;
+  const { storage, walletId } = this;
 
   // We iterate out input to substract their balance.
   inputs.forEach((input) => {
-    const potentiallySelectedAddresses = storage.searchAddressesWithTx(input.prevTxId);
+    const potentiallySelectedAddresses = storage.searchAddressesWithTx(
+      input.prevTxId
+    );
     // Fixme : If you want this check, you will need to modify fixtures of our tests.
     // if (!potentiallySelectedAddresses.found) {
     //   throw new Error('Input is not part of that Wallet.');
     // }
-    potentiallySelectedAddresses.results.forEach((potentiallySelectedAddress) => {
-      const { type, path } = potentiallySelectedAddress;
-      if (potentiallySelectedAddress.utxos[`${input.prevTxId}-${input.outputIndex}`]) {
-        const inputUTXO = potentiallySelectedAddress.utxos[`${input.prevTxId}-${input.outputIndex}`];
-        const address = storage.store.wallets[walletId].addresses[type][path];
-        // Todo: This modify the balance of an address, we need a std method to do that instead.
-        address.balanceSat -= inputUTXO.satoshis;
-        delete address.utxos[`${input.prevTxId}-${input.outputIndex}`];
+    potentiallySelectedAddresses.results.forEach(
+      (potentiallySelectedAddress) => {
+        const { type, path } = potentiallySelectedAddress;
+        if (
+          potentiallySelectedAddress.utxos[
+            `${input.prevTxId}-${input.outputIndex}`
+          ]
+        ) {
+          const inputUTXO =
+            potentiallySelectedAddress.utxos[
+              `${input.prevTxId}-${input.outputIndex}`
+            ];
+          const address = storage.store.wallets[walletId].addresses[type][path];
+          // Todo: This modify the balance of an address, we need a std method to do that instead.
+          address.balanceSat -= inputUTXO.satoshis;
+          delete address.utxos[`${input.prevTxId}-${input.outputIndex}`];
+        }
       }
-    });
+    );
   });
 
   return true;
@@ -39,7 +48,7 @@ function impactAffectedInputs({ inputs }) {
  * @return {Promise<transactionId>}
  */
 async function broadcastTransaction(transaction) {
-  if (!this.transport) throw new ValidTransportLayerRequired('broadcast');
+  if (!this.transport) throw new ValidTransportLayerRequired("broadcast");
 
   // We still support having in rawtransaction, if this is the case
   // we first need to reform our object
@@ -54,7 +63,7 @@ async function broadcastTransaction(transaction) {
   }
 
   if (!transaction.isFullySigned()) {
-    throw new Error('Transaction not signed.');
+    throw new Error("Transaction not signed.");
   }
   const txid = await this.transport.sendTransaction(transaction.toString());
   // We now need to impact/update our affected inputs

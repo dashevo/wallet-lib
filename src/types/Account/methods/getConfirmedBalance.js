@@ -1,4 +1,4 @@
-const { duffsToDash } = require('../../../utils');
+const { duffsToDash } = require("../../../utils");
 
 /**
  * Return the confirmed balance of an account.
@@ -6,12 +6,14 @@ const { duffsToDash } = require('../../../utils');
  * @return {number} Balance in dash
  */
 function getConfirmedBalance(displayDuffs = true) {
-  const {
-    walletId, storage,
-  } = this;
+  const { walletId, storage } = this;
   const accountIndex = this.index;
-  const totalSat = storage.calculateDuffBalance(walletId, accountIndex, 'confirmed');
-  return (displayDuffs) ? totalSat : duffsToDash(totalSat);
+  const totalSat = storage.calculateDuffBalance(
+    walletId,
+    accountIndex,
+    "confirmed"
+  );
+  return displayDuffs ? totalSat : duffsToDash(totalSat);
 }
 
 module.exports = getConfirmedBalance;

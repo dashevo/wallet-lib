@@ -17,7 +17,9 @@ const searchAddress = function searchAddress(address, forceLoop = false) {
     existingWallets.forEach((walletId) => {
       const existingTypes = Object.keys(store.wallets[walletId].addresses);
       existingTypes.forEach((type) => {
-        const existingPaths = Object.keys(store.wallets[walletId].addresses[type]);
+        const existingPaths = Object.keys(
+          store.wallets[walletId].addresses[type]
+        );
         existingPaths.forEach((path) => {
           const el = store.wallets[walletId].addresses[type][path];
           if (el.address === search.address) {

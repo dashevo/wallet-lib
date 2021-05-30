@@ -1,40 +1,44 @@
-const _ = require('lodash');
-const logger = require('../../logger');
-const TransactionSyncStreamWorker = require('../../plugins/Workers/TransactionSyncStreamWorker/TransactionSyncStreamWorker');
-const ChainPlugin = require('../../plugins/Plugins/ChainPlugin');
-const IdentitySyncWorker = require('../../plugins/Workers/IdentitySyncWorker');
-const EVENTS = require('../../EVENTS');
-const { WALLET_TYPES } = require('../../CONSTANTS');
+const _ = require("lodash");
+const logger = require("../../logger");
+const TransactionSyncStreamWorker = require("../../plugins/Workers/TransactionSyncStreamWorker/TransactionSyncStreamWorker");
+const ChainPlugin = require("../../plugins/Plugins/ChainPlugin");
+const IdentitySyncWorker = require("../../plugins/Workers/IdentitySyncWorker");
+const EVENTS = require("../../EVENTS");
+const { WALLET_TYPES } = require("../../CONSTANTS");
 
-const ensureAddressesToGapLimit = require('../../utils/bip44/ensureAddressesToGapLimit');
+const ensureAddressesToGapLimit = require("../../utils/bip44/ensureAddressesToGapLimit");
 
 // eslint-disable-next-line no-underscore-dangle
 async function _initializeAccount(account, userUnsafePlugins) {
   const self = account;
   // We run faster in offlineMode to speed up the process when less happens.
-  const readinessIntervalTime = (account.offlineMode) ? 50 : 200;
+  const readinessIntervalTime = account.offlineMode ? 50 : 200;
   // TODO: perform rejection with a timeout
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
       if (account.injectDefaultPlugins) {
-      // TODO: Should check in other accounts if a similar is setup already
-      // TODO: We want to sort them by dependencies and deal with the await this way
-      // await parent if child has it in dependency
-      // if not, then is it marked as requiring a first exec
-      // if yes add to watcher list.
+        // TODO: Should check in other accounts if a similar is setup already
+        // TODO: We want to sort them by dependencies and deal with the await this way
+        // await parent if child has it in dependency
+        // if not, then is it marked as requiring a first exec
+        // if yes add to watcher list.
 
-        if ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(account.walletType)) {
+        if (
+          [WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(
+            account.walletType
+          )
+        ) {
           ensureAddressesToGapLimit(
             account.store.wallets[account.walletId],
             account.walletType,
             account.index,
-            account.getAddress.bind(account),
+            account.getAddress.bind(account)
           );
         }
 
         if (account.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
-          await account.getAddress('0'); // We force what is usually done by the BIP44Worker.
+          await account.getAddress("0"); // We force what is usually done by the BIP44Worker.
         }
         if (!account.offlineMode) {
           await account.injectPlugin(ChainPlugin, true);
@@ -62,8 +66,15 @@ async function _initializeAccount(account, userUnsafePlugins) {
       };
       const sendInitialized = () => {
         if (!self.state.isInitialized) {
-          self.emit(EVENTS.INITIALIZED, { type: EVENTS.INITIALIZED, payload: null });
-          logger.debug(`Initialized with ${Object.keys(account.plugins.watchers).length} plugins`);
+          self.emit(EVENTS.INITIALIZED, {
+            type: EVENTS.INITIALIZED,
+            payload: null,
+          });
+          logger.debug(
+            `Initialized with ${
+              Object.keys(account.plugins.watchers).length
+            } plugins`
+          );
           self.state.isInitialized = true;
         }
       };
@@ -74,14 +85,20 @@ async function _initializeAccount(account, userUnsafePlugins) {
         let readyPlugins = 0;
         watchedPlugins.forEach((pluginName) => {
           if (account.plugins.watchers[pluginName].ready === true) {
-            logger.debug(`Initializing - ${readyPlugins}/${watchedPlugins.length} plugins`);
+            logger.debug(
+              `Initializing - ${readyPlugins}/${watchedPlugins.length} plugins`
+            );
             readyPlugins += 1;
-            logger.debug(`Initialized ${pluginName} - ${readyPlugins}/${watchedPlugins.length} plugins`);
+            logger.debug(
+              `Initialized ${pluginName} - ${readyPlugins}/${watchedPlugins.length} plugins`
+            );
           }
         });
-        logger.debug(`Initializing - ${readyPlugins}/${watchedPlugins.length} plugins`);
+        logger.debug(
+          `Initializing - ${readyPlugins}/${watchedPlugins.length} plugins`
+        );
         if (readyPlugins === watchedPlugins.length) {
-        // At this stage, our worker are initialized
+          // At this stage, our worker are initialized
           sendInitialized();
 
           // If both of the plugins are present
@@ -100,12 +117,16 @@ async function _initializeAccount(account, userUnsafePlugins) {
             return resolve(true);
           }
 
-          if ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(account.walletType)) {
+          if (
+            [WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(
+              account.walletType
+            )
+          ) {
             ensureAddressesToGapLimit(
               account.store.wallets[account.walletId],
               account.walletType,
               account.index,
-              account.getAddress.bind(account),
+              account.getAddress.bind(account)
             );
           }
 

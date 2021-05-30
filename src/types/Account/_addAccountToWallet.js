@@ -7,7 +7,8 @@
 const _addAccountToWallet = function addAccountToWallet(account, wallet) {
   const { accounts } = wallet;
 
-  const existAlready = accounts.filter((el) => el.index === wallet.index).length > 0;
+  const existAlready =
+    accounts.filter((el) => el.index === wallet.index).length > 0;
   if (!existAlready) {
     wallet.accounts.push(account);
   }

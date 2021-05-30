@@ -1,13 +1,13 @@
-const { expect } = require('chai');
-const createChain = require('./createChain');
+const { expect } = require("chai");
+const createChain = require("./createChain");
 
-describe('Storage - createChain', function suite() {
+describe("Storage - createChain", function suite() {
   this.timeout(10000);
-  it('should create a chain', () => {
+  it("should create a chain", () => {
     const self = {
       store: { chains: {} },
     };
-    const testnet = 'testnet';
+    const testnet = "testnet";
 
     createChain.call(self, testnet);
 
@@ -15,7 +15,10 @@ describe('Storage - createChain', function suite() {
       store: {
         chains: {
           testnet: {
-            name: 'testnet', blockHeight: -1, blockHeaders: {}, mappedBlockHeaderHeights: {},
+            name: "testnet",
+            blockHeight: -1,
+            blockHeaders: {},
+            mappedBlockHeaderHeights: {},
           },
         },
       },

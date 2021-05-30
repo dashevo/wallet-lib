@@ -1,7 +1,7 @@
-const EventEmitter = require('events');
+const EventEmitter = require("events");
 
-const EVENTS = require('../EVENTS');
-const logger = require('../logger');
+const EVENTS = require("../EVENTS");
+const logger = require("../logger");
 
 /**
  * @abstract
@@ -38,7 +38,11 @@ class AbstractTransport extends EventEmitter {
         break;
       default:
         this.emit(eventName, { type: eventName, payload: args });
-        logger.warn('Transporter - Not implemented, announce of ', eventName, args);
+        logger.warn(
+          "Transporter - Not implemented, announce of ",
+          eventName,
+          args
+        );
     }
   }
 

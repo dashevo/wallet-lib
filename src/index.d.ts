@@ -11,13 +11,13 @@ import utils from "./utils";
 import plugins from "./plugins";
 
 export {
-    Account,
-    Wallet,
-    KeyChain,
-    Identities,
-    EVENTS,
-    CONSTANTS,
-    utils,
-    plugins,
+  Account,
+  Wallet,
+  KeyChain,
+  Identities,
+  EVENTS,
+  CONSTANTS,
+  utils,
+  plugins,
 };
-declare module '@dashevo/wallet-lib';
+declare module "@dashevo/wallet-lib";

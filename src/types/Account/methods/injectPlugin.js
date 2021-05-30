@@ -1,10 +1,11 @@
-const _ = require('lodash');
+const _ = require("lodash");
 const {
   InjectionErrorCannotInject,
-  InjectionErrorCannotInjectUnknownDependency: InjectionErrorCannotInjectUnknownDep,
-} = require('../../../errors');
-const { is } = require('../../../utils');
-const logger = require('../../../logger');
+  InjectionErrorCannotInjectUnknownDependency:
+    InjectionErrorCannotInjectUnknownDep,
+} = require("../../../errors");
+const { is } = require("../../../utils");
+const logger = require("../../../logger");
 /**
  * Will try to inject a given plugin. If needed, it will construct the object first (new).
  * @param {Plugin} UnsafePlugin - Either a child object, or it's parent class to inject
@@ -15,7 +16,7 @@ const logger = require('../../../logger');
 module.exports = async function injectPlugin(
   UnsafePlugin,
   allowSensitiveOperations = false,
-  awaitOnInjection = true,
+  awaitOnInjection = true
 ) {
   // TODO : Only called internally, it might be worth to remove public access to it.
   // For now, it helps us on debugging
@@ -23,23 +24,32 @@ module.exports = async function injectPlugin(
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
-      const isInit = !(typeof UnsafePlugin === 'function');
-      const plugin = (isInit) ? UnsafePlugin : new UnsafePlugin();
-      plugin.on('error', (e, errContext) => self.emit('error', e, errContext));
+      const isInit = !(typeof UnsafePlugin === "function");
+      const plugin = isInit ? UnsafePlugin : new UnsafePlugin();
+      plugin.on("error", (e, errContext) => self.emit("error", e, errContext));
 
       const pluginName = plugin.name.toLowerCase();
       logger.debug(`Account.injectPlugin(${pluginName}) - starting injection`);
-      if (_.isEmpty(plugin)) reject(new InjectionErrorCannotInject(pluginName, 'Empty plugin'));
+      if (_.isEmpty(plugin))
+        reject(new InjectionErrorCannotInject(pluginName, "Empty plugin"));
 
       // All plugins will require the event object
       const { pluginType } = plugin;
 
       const {
-        on, emit,
-        _conf, _maxListeners, _on, _events, _all, _newListener, _removeListener, listenerTree,
+        on,
+        emit,
+        _conf,
+        _maxListeners,
+        _on,
+        _events,
+        _all,
+        _newListener,
+        _removeListener,
+        listenerTree,
       } = self;
 
-      plugin.inject('parentEvents', {
+      plugin.inject("parentEvents", {
         on,
         emit,
         _conf,
@@ -56,22 +66,42 @@ module.exports = async function injectPlugin(
       // Check for dependencies
       const deps = plugin.dependencies || [];
 
-      const injectedPlugins = Object.keys(this.plugins.standard).map((key) => key.toLowerCase());
+      const injectedPlugins = Object.keys(this.plugins.standard).map((key) =>
+        key.toLowerCase()
+      );
       deps.forEach((dependencyName) => {
         if (_.has(self, dependencyName)) {
-          plugin.inject(dependencyName, self[dependencyName], allowSensitiveOperations);
-        } else if (typeof self[dependencyName] === 'function') {
-          plugin.inject(dependencyName, self[dependencyName].bind(self), allowSensitiveOperations);
+          plugin.inject(
+            dependencyName,
+            self[dependencyName],
+            allowSensitiveOperations
+          );
+        } else if (typeof self[dependencyName] === "function") {
+          plugin.inject(
+            dependencyName,
+            self[dependencyName].bind(self),
+            allowSensitiveOperations
+          );
         } else {
           const loweredDependencyName = dependencyName.toLowerCase();
           if (injectedPlugins.includes(loweredDependencyName)) {
-            plugin.inject(dependencyName, this.plugins.standard[loweredDependencyName], true);
-          } else reject(new InjectionErrorCannotInjectUnknownDep(pluginName, dependencyName));
+            plugin.inject(
+              dependencyName,
+              this.plugins.standard[loweredDependencyName],
+              true
+            );
+          } else
+            reject(
+              new InjectionErrorCannotInjectUnknownDep(
+                pluginName,
+                dependencyName
+              )
+            );
         }
       });
 
       switch (pluginType) {
-        case 'Worker':
+        case "Worker":
           self.plugins.workers[pluginName] = plugin;
           if (plugin.executeOnStart === true) {
             if (plugin.firstExecutionRequired === true) {
@@ -82,22 +112,30 @@ module.exports = async function injectPlugin(
               self.plugins.watchers[pluginName] = watcher;
 
               // eslint-disable-next-line no-return-assign,no-param-reassign
-              const startWatcher = (_watcher) => _watcher.started = true;
+              const startWatcher = (_watcher) => (_watcher.started = true);
               // eslint-disable-next-line no-return-assign,no-param-reassign
-              const setReadyWatch = (_watcher) => _watcher.ready = true;
+              const setReadyWatch = (_watcher) => (_watcher.ready = true);
 
-              const onStartedEvent = () => startWatcher(watcher)
-                  && logger.silly(`WORKER/${pluginName.toUpperCase()}/STARTED`);
-              const onExecuteEvent = () => setReadyWatch(watcher)
-                  && logger.silly(`WORKER/${pluginName.toUpperCase()}/EXECUTED`);
+              const onStartedEvent = () =>
+                startWatcher(watcher) &&
+                logger.silly(`WORKER/${pluginName.toUpperCase()}/STARTED`);
+              const onExecuteEvent = () =>
+                setReadyWatch(watcher) &&
+                logger.silly(`WORKER/${pluginName.toUpperCase()}/EXECUTED`);
 
-              self.on(`WORKER/${pluginName.toUpperCase()}/STARTED`, onStartedEvent);
-              self.on(`WORKER/${pluginName.toUpperCase()}/EXECUTED`, onExecuteEvent);
+              self.on(
+                `WORKER/${pluginName.toUpperCase()}/STARTED`,
+                onStartedEvent
+              );
+              self.on(
+                `WORKER/${pluginName.toUpperCase()}/EXECUTED`,
+                onExecuteEvent
+              );
             }
             await plugin.startWorker();
           }
           break;
-        case 'Standard':
+        case "Standard":
           if (plugin.executeOnStart === true) {
             if (plugin.firstExecutionRequired === true) {
               const watcher = {
@@ -105,11 +143,18 @@ module.exports = async function injectPlugin(
                 started: false,
               };
               self.plugins.watchers[pluginName] = watcher;
-              // eslint-disable-next-line no-return-assign,no-param-reassign,max-len
-              const startWatcher = (_watcher) => { _watcher.started = true; _watcher.ready = true; };
+              const startWatcher = (_watcher) => {
+                // eslint-disable-next-line no-return-assign,no-param-reassign,max-len
+                _watcher.started = true;
+                // eslint-disable-next-line no-return-assign,no-param-reassign,max-len
+                _watcher.ready = true;
+              };
 
               const onStartedEvent = () => startWatcher(watcher);
-              self.on(`PLUGIN/${pluginName.toUpperCase()}/STARTED`, onStartedEvent);
+              self.on(
+                `PLUGIN/${pluginName.toUpperCase()}/STARTED`,
+                onStartedEvent
+              );
             }
           }
           self.plugins.standard[pluginName] = plugin;
@@ -124,7 +169,9 @@ module.exports = async function injectPlugin(
         else plugin.onInjected();
       }
 
-      logger.debug(`Account.injectPlugin(${pluginName}) - successfully injected`);
+      logger.debug(
+        `Account.injectPlugin(${pluginName}) - successfully injected`
+      );
       return resolve(plugin);
     } catch (e) {
       return reject(e);

@@ -1,6 +1,6 @@
-const _ = require('lodash');
-const logger = require('../logger');
-const StandardPlugin = require('./StandardPlugin');
+const _ = require("lodash");
+const logger = require("../logger");
+const StandardPlugin = require("./StandardPlugin");
 
 // eslint-disable-next-line no-underscore-dangle
 const _defaultOpts = {
@@ -13,24 +13,24 @@ const _defaultOpts = {
 class Worker extends StandardPlugin {
   constructor(opts = JSON.parse(JSON.stringify(_defaultOpts))) {
     const defaultOpts = JSON.parse(JSON.stringify(_defaultOpts));
-    super({ type: 'Worker', ...opts });
+    super({ type: "Worker", ...opts });
     this.worker = null;
     this.workerPass = 0;
     this.isWorkerRunning = false;
 
-    this.firstExecutionRequired = _.has(opts, 'firstExecutionRequired')
+    this.firstExecutionRequired = _.has(opts, "firstExecutionRequired")
       ? opts.firstExecutionRequired
       : defaultOpts.firstExecutionRequired;
 
-    this.executeOnStart = _.has(opts, 'executeOnStart')
+    this.executeOnStart = _.has(opts, "executeOnStart")
       ? opts.executeOnStart
       : defaultOpts.executeOnStart;
 
-    this.workerIntervalTime = _.has(opts, 'workerIntervalTime')
+    this.workerIntervalTime = _.has(opts, "workerIntervalTime")
       ? opts.workerIntervalTime
       : defaultOpts.workerIntervalTime;
 
-    this.workerMaxPass = (opts.workerMaxPass)
+    this.workerMaxPass = opts.workerMaxPass
       ? opts.workerMaxPass
       : defaultOpts.workerMaxPass;
 
@@ -45,12 +45,18 @@ class Worker extends StandardPlugin {
     const self = this;
     const eventTypeStarting = `WORKER/${this.name.toUpperCase()}/STARTING`;
     logger.debug(JSON.stringify({ eventTypeStarting, result: payloadResult }));
-    this.parentEvents.emit(eventTypeStarting, { type: eventTypeStarting, payload: payloadResult });
+    this.parentEvents.emit(eventTypeStarting, {
+      type: eventTypeStarting,
+      payload: payloadResult,
+    });
     try {
       if (this.worker) await this.stopWorker();
 
       if (this.workerIntervalTime > 0) {
-        this.worker = setInterval(this.execWorker.bind(self), this.workerIntervalTime);
+        this.worker = setInterval(
+          this.execWorker.bind(self),
+          this.workerIntervalTime
+        );
       }
 
       if (this.executeOnStart === true) {
@@ -60,14 +66,17 @@ class Worker extends StandardPlugin {
       }
       const eventTypeStarted = `WORKER/${this.name.toUpperCase()}/STARTED`;
       logger.debug(JSON.stringify({ eventTypeStarted, result: payloadResult }));
-      this.parentEvents.emit(eventTypeStarted, { type: eventTypeStarted, payload: payloadResult });
+      this.parentEvents.emit(eventTypeStarted, {
+        type: eventTypeStarted,
+        payload: payloadResult,
+      });
       this.state.started = true;
 
       if (this.executeOnStart) await this.execWorker();
     } catch (e) {
-      this.emit('error', e, {
-        type: 'plugin',
-        pluginType: 'worker',
+      this.emit("error", e, {
+        type: "plugin",
+        pluginType: "worker",
         pluginName: this.name,
       });
     }
@@ -85,7 +94,10 @@ class Worker extends StandardPlugin {
     }
     this.state.started = false;
     logger.debug(JSON.stringify({ eventType, result: payloadResult }));
-    this.parentEvents.emit(eventType, { type: eventType, payload: payloadResult });
+    this.parentEvents.emit(eventType, {
+      type: eventType,
+      payload: payloadResult,
+    });
   }
 
   async execWorker() {
@@ -104,9 +116,9 @@ class Worker extends StandardPlugin {
         payloadResult = await this.execute();
       } catch (e) {
         await this.stopWorker(e.message);
-        this.emit('error', e, {
-          type: 'plugin',
-          pluginType: 'worker',
+        this.emit("error", e, {
+          type: "plugin",
+          pluginType: "worker",
           pluginName: this.name,
         });
       }
@@ -119,7 +131,10 @@ class Worker extends StandardPlugin {
     if (!this.state.ready) this.state.ready = true;
     const eventType = `WORKER/${this.name.toUpperCase()}/EXECUTED`;
     logger.debug(JSON.stringify({ eventType, result: payloadResult }));
-    this.parentEvents.emit(eventType, { type: eventType, payload: payloadResult });
+    this.parentEvents.emit(eventType, {
+      type: eventType,
+      payload: payloadResult,
+    });
     return true;
   }
 }

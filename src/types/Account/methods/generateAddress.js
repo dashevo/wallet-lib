@@ -1,13 +1,14 @@
-const EVENTS = require('../../../EVENTS');
-const { WALLET_TYPES } = require('../../../CONSTANTS');
-const { is } = require('../../../utils');
+const EVENTS = require("../../../EVENTS");
+const { WALLET_TYPES } = require("../../../CONSTANTS");
+const { is } = require("../../../utils");
 /**
  * Generate an address from a path and import it to the store
  * @param {string} path
  * @return {AddressObj} Address information
  * */
 function generateAddress(path) {
-  if (is.undefOrNull(path)) throw new Error('Expected path to generate an address');
+  if (is.undefOrNull(path))
+    throw new Error("Expected path to generate an address");
   let index = 0;
   let privateKey;
 
@@ -16,11 +17,11 @@ function generateAddress(path) {
   switch (this.walletType) {
     case WALLET_TYPES.HDWALLET:
       // eslint-disable-next-line prefer-destructuring
-      index = parseInt(path.toString().split('/')[5], 10);
+      index = parseInt(path.toString().split("/")[5], 10);
       privateKey = this.keyChain.getKeyForPath(path);
       break;
     case WALLET_TYPES.HDPUBLIC:
-      index = parseInt(path.toString().split('/')[5], 10);
+      index = parseInt(path.toString().split("/")[5], 10);
       privateKey = this.keyChain.getKeyForChild(index);
       break;
     case WALLET_TYPES.SINGLE_ADDRESS:
@@ -43,7 +44,10 @@ function generateAddress(path) {
   };
 
   this.storage.importAddresses(addressData, this.walletId);
-  this.emit(EVENTS.GENERATED_ADDRESS, { type: EVENTS.GENERATED_ADDRESS, payload: addressData });
+  this.emit(EVENTS.GENERATED_ADDRESS, {
+    type: EVENTS.GENERATED_ADDRESS,
+    payload: addressData,
+  });
   return addressData;
 }
 module.exports = generateAddress;

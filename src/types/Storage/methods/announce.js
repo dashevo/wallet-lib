@@ -1,5 +1,5 @@
-const logger = require('../../../logger');
-const EVENTS = require('../../../EVENTS');
+const logger = require("../../../logger");
+const EVENTS = require("../../../EVENTS");
 
 /**
  * Used to announce some events.
@@ -20,7 +20,7 @@ const announce = function announce(type, el) {
       break;
     default:
       this.emit(type, { type, payload: el });
-      logger.warn('Storage - Not implemented, announce of ', type, el);
+      logger.warn("Storage - Not implemented, announce of ", type, el);
   }
   return true;
 };

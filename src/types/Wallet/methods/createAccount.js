@@ -1,4 +1,4 @@
-const { WALLET_TYPES } = require('../../../CONSTANTS');
+const { WALLET_TYPES } = require("../../../CONSTANTS");
 /**
  * Will derivate to a new account.
  * @param {object} accountOpts - options to pass, will autopopulate some
@@ -11,15 +11,19 @@ async function createAccount(accountOpts) {
    *   disable eslint global require for next line
    */
   // eslint-disable-next-line global-require
-  const Account = require('../../Account/Account');
+  const Account = require("../../Account/Account");
 
-  const {
-    injectDefaultPlugins, debug, plugins, allowSensitiveOperations,
-  } = this;
+  const { injectDefaultPlugins, debug, plugins, allowSensitiveOperations } =
+    this;
   const baseOpts = {
-    injectDefaultPlugins, debug, allowSensitiveOperations, plugins,
+    injectDefaultPlugins,
+    debug,
+    allowSensitiveOperations,
+    plugins,
   };
-  if (this.walletType === WALLET_TYPES.SINGLE_ADDRESS) { baseOpts.privateKey = this.privateKey; }
+  if (this.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
+    baseOpts.privateKey = this.privateKey;
+  }
   const opts = Object.assign(baseOpts, accountOpts);
 
   const account = new Account(this, opts);

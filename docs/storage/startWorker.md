@@ -1,11 +1,10 @@
-**Usage**: `storage.startWorker()`      
+**Usage**: `storage.startWorker()`  
 **Description**: Allow to start the storage worker (uses interval), will save the state when needed.  
-**Notes**: Use `storage.stopWorker()` to stop.    
+**Notes**: Use `storage.stopWorker()` to stop.
 
-Parameters: 
+Parameters:
 
-| parameters             | type              | required       | Description                                               |  
-|------------------------|-------------------|----------------| ----------------------------------------------------------|
+| parameters | type | required | Description |
+| ---------- | ---- | -------- | ----------- |
 
 Returns : void.
-

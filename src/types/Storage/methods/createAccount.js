@@ -1,4 +1,4 @@
-const { hasProp } = require('../../../utils');
+const { hasProp } = require("../../../utils");
 
 /**
  * Create a new account into a wallet

@@ -1,6 +1,6 @@
-const logger = require('../../../logger');
-const { WALLET_TYPES } = require('../../../CONSTANTS');
-const ensureAddressesToGapLimit = require('../../../utils/bip44/ensureAddressesToGapLimit');
+const logger = require("../../../logger");
+const { WALLET_TYPES } = require("../../../CONSTANTS");
+const ensureAddressesToGapLimit = require("../../../utils/bip44/ensureAddressesToGapLimit");
 
 /**
  * Import transactions and always keep a number of unused addresses up to gap
@@ -9,14 +9,7 @@ const ensureAddressesToGapLimit = require('../../../utils/bip44/ensureAddressesT
  * @returns {Promise<number>}
  */
 module.exports = async function importTransactions(transactions) {
-  const {
-    walletType,
-    walletId,
-    index,
-    store,
-    storage,
-    getAddress,
-  } = this;
+  const { walletType, walletId, index, store, storage, getAddress } = this;
 
   const localWalletStore = store.wallets[walletId];
 
@@ -29,7 +22,7 @@ module.exports = async function importTransactions(transactions) {
       localWalletStore,
       walletType,
       index,
-      getAddress.bind(this),
+      getAddress.bind(this)
     );
   }
 

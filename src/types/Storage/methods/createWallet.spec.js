@@ -1,22 +1,22 @@
-const { expect } = require('chai');
-const Dashcore = require('@dashevo/dashcore-lib');
-const createWallet = require('./createWallet');
-const createChain = require('./createChain');
+const { expect } = require("chai");
+const Dashcore = require("@dashevo/dashcore-lib");
+const createWallet = require("./createWallet");
+const createChain = require("./createChain");
 
-describe('Storage - createWallet', function suite() {
+describe("Storage - createWallet", function suite() {
   this.timeout(10000);
-  it('should create a wallet', () => {
+  it("should create a wallet", () => {
     const self = {
       store: { wallets: {}, chains: {} },
       createChain,
     };
-    const walletid = '123ae';
+    const walletid = "123ae";
 
     createWallet.call(self, walletid);
 
     const expected = {
       wallets: {
-        '123ae': {
+        "123ae": {
           accounts: {},
           network: Dashcore.Networks.testnet.toString(),
           mnemonic: null,
@@ -27,13 +27,16 @@ describe('Storage - createWallet', function suite() {
       },
       chains: {
         testnet: {
-          name: 'testnet', blockHeight: -1, blockHeaders: {}, mappedBlockHeaderHeights: {},
+          name: "testnet",
+          blockHeight: -1,
+          blockHeaders: {},
+          mappedBlockHeaderHeights: {},
         },
       },
     };
     expect(self.store).to.be.deep.equal(expected);
   });
-  it('should create a wallet without any walletId', () => {
+  it("should create a wallet without any walletId", () => {
     const self = {
       store: { wallets: {}, chains: {} },
       createChain,
@@ -54,7 +57,10 @@ describe('Storage - createWallet', function suite() {
       },
       chains: {
         testnet: {
-          name: 'testnet', blockHeight: -1, blockHeaders: {}, mappedBlockHeaderHeights: {},
+          name: "testnet",
+          blockHeight: -1,
+          blockHeaders: {},
+          mappedBlockHeaderHeights: {},
         },
       },
     };

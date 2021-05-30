@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const { Worker } = require('../../src/plugins');
+const { Worker } = require("../../src/plugins");
 
 class HelloWorldWorker extends Worker {
   constructor() {
@@ -13,7 +13,7 @@ class HelloWorldWorker extends Worker {
 
   // eslint-disable-next-line class-methods-use-this
   execute() {
-    console.log('HELLO WORLD');
+    console.log("HELLO WORLD");
   }
 }
 module.exports = HelloWorldWorker;

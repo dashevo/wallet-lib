@@ -6,7 +6,7 @@
 function forceRefreshAccount() {
   const store = this.storage.getStore();
   const addressStore = store.wallets[this.walletId].addresses;
-  ['internal', 'external', 'misc'].forEach((type) => {
+  ["internal", "external", "misc"].forEach((type) => {
     Object.keys(addressStore[type]).forEach((path) => {
       addressStore[type][path].fetchedLast = 0;
     });

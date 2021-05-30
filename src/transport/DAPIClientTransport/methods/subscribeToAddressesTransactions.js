@@ -1,5 +1,5 @@
-const EVENTS = require('../../../EVENTS');
-const logger = require('../../../logger');
+const EVENTS = require("../../../EVENTS");
+const logger = require("../../../logger");
 // Artifact from previous optimisation made in SyncWorker plugin
 // Kept for reminder when Bloomfilters
 
@@ -26,7 +26,7 @@ async function executor(forcedAddressList = null) {
     fetchedUtxos[address] = [];
   });
 
-  const utxos = (await self.getUTXO(addressList));
+  const utxos = await self.getUTXO(addressList);
 
   utxos.forEach((utxo) => {
     const { address, txid, outputIndex } = utxo;
@@ -39,18 +39,26 @@ async function executor(forcedAddressList = null) {
     }
   });
   addressList.forEach((address) => {
-    self.announce(EVENTS.FETCHED_ADDRESS, { address, utxos: fetchedUtxos[address] });
+    self.announce(EVENTS.FETCHED_ADDRESS, {
+      address,
+      utxos: fetchedUtxos[address],
+    });
   });
 }
 
 function startExecutor() {
   const self = this;
-  logger.silly('DAPIClientTransport.subscribeToAddressesTransactions.startExecutor');
+  logger.silly(
+    "DAPIClientTransport.subscribeToAddressesTransactions.startExecutor"
+  );
   this.state.executors.addresses = setInterval(() => {
     try {
       executor.call(self);
     } catch (e) {
-      logger.error('DAPIClientTransport.subscribeToAddressesTransactions.executor failed', e);
+      logger.error(
+        "DAPIClientTransport.subscribeToAddressesTransactions.executor failed",
+        e
+      );
       throw e;
     }
   }, fastFetchThreshold);
@@ -59,7 +67,8 @@ function startExecutor() {
 module.exports = async function subscribeToAddressesTransactions(addressList) {
   logger.silly(`DAPIClient.subscribeToAddressesTransactions[${addressList}]`);
 
-  if (!Array.isArray(addressList)) throw new Error('Expected array of addresses');
+  if (!Array.isArray(addressList))
+    throw new Error("Expected array of addresses");
   const { executors, subscriptions, addressesTransactionsMap } = this.state;
 
   addressList.forEach((address) => {
@@ -75,7 +84,10 @@ module.exports = async function subscribeToAddressesTransactions(addressList) {
     try {
       startExecutor.call(this);
     } catch (e) {
-      logger.error('DAPIClientTransport.subscribeToAddressesTransactions.startingExecutor failed', e);
+      logger.error(
+        "DAPIClientTransport.subscribeToAddressesTransactions.startingExecutor failed",
+        e
+      );
       throw e;
     }
   }

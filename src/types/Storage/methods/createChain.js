@@ -1,4 +1,4 @@
-const { hasProp } = require('../../../utils');
+const { hasProp } = require("../../../utils");
 
 /**
  * Create when does not yet exist a chain in the store

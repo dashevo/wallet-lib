@@ -1,30 +1,48 @@
 /* eslint-disable no-console */
-const logger = require('../src/logger');
-const { Wallet, EVENTS } = require('../src');
+const logger = require("../src/logger");
+const { Wallet, EVENTS } = require("../src");
 
 const wallet = new Wallet({
-  mnemonic: 'protect cave garden achieve hand vacant clarify atom finish outer waste sword',
-  network: 'testnet',
+  mnemonic:
+    "protect cave garden achieve hand vacant clarify atom finish outer waste sword",
+  network: "testnet",
 });
 
 wallet
   .getAccount()
   .then(async (account) => {
-    logger.info('Balance Confirmed', await account.getConfirmedBalance(false));
-    logger.info('Balance Unconfirmed', await account.getUnconfirmedBalance(false));
-    logger.info('New Address', await account.getUnusedAddress().address);
+    logger.info("Balance Confirmed", await account.getConfirmedBalance(false));
+    logger.info(
+      "Balance Unconfirmed",
+      await account.getUnconfirmedBalance(false)
+    );
+    logger.info("New Address", await account.getUnusedAddress().address);
 
-    const transaction = account.createTransaction({ satoshis: 1000, recipient: 'ycyFFyWCPSWbXLZBeYppJqgvBF7bnu8BWQ' });
+    const transaction = account.createTransaction({
+      satoshis: 1000,
+      recipient: "ycyFFyWCPSWbXLZBeYppJqgvBF7bnu8BWQ",
+    });
     const transactionID = await account.broadcastTransaction(transaction);
 
     logger.info(`Transaction ${transactionID} broadcast`);
 
-    account.on(EVENTS.GENERATED_ADDRESS, () => logger.info('GENERATED_ADDRESS'));
-    account.on(EVENTS.CONFIRMED_BALANCE_CHANGED, (info) => logger.info('CONFIRMED_BALANCE_CHANGED', info));
-    account.on(EVENTS.UNCONFIRMED_BALANCE_CHANGED, (info) => logger.info('UNCONFIRMED_BALANCE_CHANGED', info));
-    account.on(EVENTS.BLOCKHEIGHT_CHANGED, (info) => logger.info('BLOCKHEIGHT_CHANGED:', info));
-    account.on(EVENTS.PREFETCHED, () => logger.info('PREFETCHED', EVENTS.PREFETCHED));
+    account.on(EVENTS.GENERATED_ADDRESS, () =>
+      logger.info("GENERATED_ADDRESS")
+    );
+    account.on(EVENTS.CONFIRMED_BALANCE_CHANGED, (info) =>
+      logger.info("CONFIRMED_BALANCE_CHANGED", info)
+    );
+    account.on(EVENTS.UNCONFIRMED_BALANCE_CHANGED, (info) =>
+      logger.info("UNCONFIRMED_BALANCE_CHANGED", info)
+    );
+    account.on(EVENTS.BLOCKHEIGHT_CHANGED, (info) =>
+      logger.info("BLOCKHEIGHT_CHANGED:", info)
+    );
+    account.on(EVENTS.PREFETCHED, () =>
+      logger.info("PREFETCHED", EVENTS.PREFETCHED)
+    );
     account.on(EVENTS.DISCOVERY_STARTED, () => logger.info(EVENTS.PREFETCHED));
-  }).catch((e) => {
-    console.log('Failed with error', e);
+  })
+  .catch((e) => {
+    console.log("Failed with error", e);
   });

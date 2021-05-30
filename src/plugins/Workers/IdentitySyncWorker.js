@@ -1,7 +1,7 @@
-const Identifier = require('@dashevo/dpp/lib/Identifier');
-const Worker = require('../Worker');
+const Identifier = require("@dashevo/dpp/lib/Identifier");
+const Worker = require("../Worker");
 
-const logger = require('../../logger');
+const logger = require("../../logger");
 
 /**
  * @property {number} gapLimit
@@ -9,17 +9,12 @@ const logger = require('../../logger');
 class IdentitySyncWorker extends Worker {
   constructor(options) {
     super({
-      name: 'IdentitySyncWorker',
+      name: "IdentitySyncWorker",
       executeOnStart: true,
       firstExecutionRequired: true,
       workerIntervalTime: 60 * 1000,
       gapLimit: 10,
-      dependencies: [
-        'storage',
-        'transport',
-        'walletId',
-        'identities',
-      ],
+      dependencies: ["storage", "transport", "walletId", "identities"],
       ...options,
     });
   }
@@ -37,7 +32,7 @@ class IdentitySyncWorker extends Worker {
       unusedIndices.push(index);
     });
 
-    logger.silly('IdentitySyncWorker - sync start');
+    logger.silly("IdentitySyncWorker - sync start");
 
     let gapCount = 0;
     let unusedIndex;
@@ -64,7 +59,9 @@ class IdentitySyncWorker extends Worker {
       const publicKey = privateKey.toPublicKey();
 
       // eslint-disable-next-line no-await-in-loop
-      const [fetchedId] = await this.transport.getIdentityIdsByPublicKeyHash([publicKey.hash]);
+      const [fetchedId] = await this.transport.getIdentityIdsByPublicKeyHash([
+        publicKey.hash,
+      ]);
 
       // if identity id is not preset then increment gap count
       // and stop sync if gap limit is reached
@@ -74,7 +71,7 @@ class IdentitySyncWorker extends Worker {
         logger.silly(`IdentitySyncWorker - gap at index ${index}`);
 
         if (gapCount >= this.gapLimit) {
-          logger.silly('IdentitySyncWorker - gap limit is reached');
+          logger.silly("IdentitySyncWorker - gap limit is reached");
 
           break;
         }
@@ -87,7 +84,9 @@ class IdentitySyncWorker extends Worker {
       // this method will loop forever.
       // This check prevents this from happening
       if (!Buffer.isBuffer(fetchedId)) {
-        throw new Error(`Expected identity id to be a Buffer or null, got ${fetchedId}`);
+        throw new Error(
+          `Expected identity id to be a Buffer or null, got ${fetchedId}`
+        );
       }
 
       // reset gap counter if we got an identity
@@ -100,11 +99,11 @@ class IdentitySyncWorker extends Worker {
       await this.storage.insertIdentityIdAtIndex(
         this.walletId,
         Identifier.from(fetchedId).toString(),
-        index,
+        index
       );
     }
 
-    logger.silly('IdentitySyncWorker - sync finished');
+    logger.silly("IdentitySyncWorker - sync finished");
   }
 }
 

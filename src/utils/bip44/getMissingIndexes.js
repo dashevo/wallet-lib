@@ -1,4 +1,4 @@
-const is = require('../is');
+const is = require("../is");
 
 module.exports = function getMissingIndexes(paths, fromOrigin = true) {
   if (!is.arr(paths)) return false;
@@ -6,7 +6,7 @@ module.exports = function getMissingIndexes(paths, fromOrigin = true) {
   let sortedIndexes = [];
 
   paths.forEach((path) => {
-    const splitedPath = path.split('/');
+    const splitedPath = path.split("/");
     const index = parseInt(splitedPath[5], 10);
     sortedIndexes.push(index);
   });

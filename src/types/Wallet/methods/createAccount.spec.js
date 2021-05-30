@@ -1,9 +1,9 @@
-const { expect } = require('chai');
-const createAccount = require('./createAccount');
-const { WALLET_TYPES } = require('../../../CONSTANTS');
+const { expect } = require("chai");
+const createAccount = require("./createAccount");
+const { WALLET_TYPES } = require("../../../CONSTANTS");
 
-const exceptedException1 = 'getAccount expected index integer to be a property of accountOptions';
-
+const exceptedException1 =
+  "getAccount expected index integer to be a property of accountOptions";
 
 // describe('Wallet - getAccount', () => {
 //   it('should warn on trying to pass arg as number', () => {

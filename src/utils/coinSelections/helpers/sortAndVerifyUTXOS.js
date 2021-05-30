@@ -7,12 +7,12 @@ const sort = {
       let result;
       params.reverse().forEach((param) => {
         const key = param.property;
-        const { direction } = (param.direction === 'ascending') ? 1 : -1;
+        const { direction } = param.direction === "ascending" ? 1 : -1;
 
-        if ((a[key] < b[key])) {
+        if (a[key] < b[key]) {
           result = -1;
         } else {
-          result = (a[key] > b[key]) ? 1 : 0;
+          result = a[key] > b[key] ? 1 : 0;
         }
         return result * direction;
       });

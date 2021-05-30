@@ -1,5 +1,5 @@
-const { WALLET_TYPES } = require('../../../CONSTANTS');
-const logger = require('../../../logger');
+const { WALLET_TYPES } = require("../../../CONSTANTS");
+const logger = require("../../../logger");
 /**
  * This will sweep any paper wallet with remaining UTXOS to another Wallet created
  * via a random new mnemonic or via passed one.
@@ -16,7 +16,9 @@ async function sweepWallet(opts = {}) {
   // eslint-disable-next-line no-async-promise-executor,consistent-return
   return new Promise(async (resolve, reject) => {
     if (self.walletType !== WALLET_TYPES.SINGLE_ADDRESS) {
-      return reject(new Error('Can only sweep wallet initialized from privateKey'));
+      return reject(
+        new Error("Can only sweep wallet initialized from privateKey")
+      );
     }
 
     const account = await self.getAccount({ index: 0 });
@@ -24,7 +26,11 @@ async function sweepWallet(opts = {}) {
 
     const balance = await account.getTotalBalance();
     if (balance <= 0) {
-      return reject(new Error(`Cannot sweep an empty private key (current balance: ${balance})`));
+      return reject(
+        new Error(
+          `Cannot sweep an empty private key (current balance: ${balance})`
+        )
+      );
     }
 
     let newWallet;
@@ -37,7 +43,9 @@ async function sweepWallet(opts = {}) {
 
       newWallet = new self.constructor(walletOpts);
 
-      const recipient = newWallet.getAccount({ index: 0 }).getUnusedAddress().address;
+      const recipient = newWallet
+        .getAccount({ index: 0 })
+        .getUnusedAddress().address;
 
       const tx = account.createTransaction({
         satoshis: balance,
@@ -46,7 +54,11 @@ async function sweepWallet(opts = {}) {
 
       const txid = await account.broadcastTransaction(tx);
 
-      logger.info(`SweepWallet: ${balance} of ${account.getAddress().address} to ${recipient} transfered. Txid :${txid}`);
+      logger.info(
+        `SweepWallet: ${balance} of ${
+          account.getAddress().address
+        } to ${recipient} transfered. Txid :${txid}`
+      );
 
       return resolve(newWallet);
     } catch (err) {

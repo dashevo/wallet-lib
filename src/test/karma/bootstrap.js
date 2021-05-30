@@ -1,6 +1,6 @@
-const { expect, use } = require('chai');
-const sinon = require('sinon');
-const chaiAsPromised = require('chai-as-promised');
+const { expect, use } = require("chai");
+const sinon = require("sinon");
+const chaiAsPromised = require("chai-as-promised");
 
 use(chaiAsPromised);
 

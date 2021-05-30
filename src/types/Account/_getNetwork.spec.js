@@ -1,6 +1,4 @@
-const { expect } = require('chai');
-const Dashcore = require('@dashevo/dashcore-lib');
+const { expect } = require("chai");
+const Dashcore = require("@dashevo/dashcore-lib");
 
-
-describe('Account - getNetwork', () => {
-});
+describe("Account - getNetwork", () => {});

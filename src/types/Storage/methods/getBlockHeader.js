@@ -1,4 +1,4 @@
-const { BlockHeaderNotInStore } = require('../../../errors');
+const { BlockHeaderNotInStore } = require("../../../errors");
 
 /**
  * @param identifier - block hash or height

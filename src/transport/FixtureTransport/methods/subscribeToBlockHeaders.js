@@ -1,4 +1,4 @@
-const EVENTS = require('../../../EVENTS');
+const EVENTS = require("../../../EVENTS");
 
 module.exports = async function subscribeToBlockHeaders() {
   const self = this;
@@ -12,6 +12,6 @@ module.exports = async function subscribeToBlockHeaders() {
     }
   };
   await executor();
-  const refreshBlockInterval = 10 * 1000;// Every 10s
+  const refreshBlockInterval = 10 * 1000; // Every 10s
   executors.blockHeaders = setInterval(() => executor(), refreshBlockInterval);
 };

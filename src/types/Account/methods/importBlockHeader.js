@@ -1,5 +1,5 @@
-const logger = require('../../../logger');
-const { WALLET_TYPES } = require('../../../CONSTANTS');
+const logger = require("../../../logger");
+const { WALLET_TYPES } = require("../../../CONSTANTS");
 /**
  * Import transactions and always keep a number of unused addresses up to gap
  *
@@ -14,12 +14,13 @@ module.exports = async function importBlockHeader(blockHeader) {
   // We do however have the knowledge of previous block hash by
   // knowing the following blockHeight blockheader's prevHash value
   // const previousHash = blockHeader.prevHash.reverse().toString('hex');
-  const {
-    walletId, BIP44PATH, index, store, storage, walletType,
-  } = this;
+  const { walletId, BIP44PATH, index, store, storage, walletType } = this;
 
   const localWalletStore = store.wallets[walletId];
-  const localAccountStore = ([WALLET_TYPES.HDPUBLIC, WALLET_TYPES.HDWALLET].includes(walletType))
+  const localAccountStore = [
+    WALLET_TYPES.HDPUBLIC,
+    WALLET_TYPES.HDWALLET,
+  ].includes(walletType)
     ? localWalletStore.accounts[BIP44PATH.toString()]
     : localWalletStore.accounts[index.toString()];
 

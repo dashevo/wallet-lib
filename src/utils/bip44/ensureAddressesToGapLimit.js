@@ -1,9 +1,9 @@
-const logger = require('../../logger');
-const { BIP44_ADDRESS_GAP, WALLET_TYPES } = require('../../CONSTANTS');
-const is = require('../is');
+const logger = require("../../logger");
+const { BIP44_ADDRESS_GAP, WALLET_TYPES } = require("../../CONSTANTS");
+const is = require("../is");
 
-const getMissingIndexes = require('./getMissingIndexes');
-const isContiguousPath = require('./isContiguousPath');
+const getMissingIndexes = require("./getMissingIndexes");
+const isContiguousPath = require("./isContiguousPath");
 
 /**
  * This method ensures there will always be enough local addresses up to gap limit as per BIP44
@@ -13,7 +13,12 @@ const isContiguousPath = require('./isContiguousPath');
  * @param getAddress
  * @return {number}
  */
-function ensureAccountAddressesToGapLimit(walletStore, walletType, accountIndex, getAddress) {
+function ensureAccountAddressesToGapLimit(
+  walletStore,
+  walletType,
+  accountIndex,
+  getAddress
+) {
   let generated = 0;
 
   const externalAddresses = walletStore.addresses.external;
@@ -27,16 +32,16 @@ function ensureAccountAddressesToGapLimit(walletStore, walletType, accountIndex,
   // Gets missing addresses and adds them to the storage
   // Please note that getAddress adds new addresses to storage, which it probably shouldn't
   missingIndexes.forEach((index) => {
-    getAddress(index, 'external');
+    getAddress(index, "external");
     if (walletType === WALLET_TYPES.HDWALLET) {
-      getAddress(index, 'internal');
+      getAddress(index, "internal");
     }
   });
 
-  const sortByIndex = (a, b) => parseInt(a.split('/')[5], 10) - parseInt(b.split('/')[5], 10);
-  externalAddressesPaths = Object
-    .keys(externalAddresses)
-    .filter((el) => parseInt(el.split('/')[3], 10) === accountIndex)
+  const sortByIndex = (a, b) =>
+    parseInt(a.split("/")[5], 10) - parseInt(b.split("/")[5], 10);
+  externalAddressesPaths = Object.keys(externalAddresses)
+    .filter((el) => parseInt(el.split("/")[3], 10) === accountIndex)
     .sort(sortByIndex);
 
   let lastUsedIndex = 0;
@@ -47,7 +52,7 @@ function ensureAccountAddressesToGapLimit(walletStore, walletType, accountIndex,
     const address = externalAddresses[path];
 
     if (!isContiguousPath(path, prevPath)) {
-      throw new Error('Addresses are expected to be contiguous');
+      throw new Error("Addresses are expected to be contiguous");
     }
 
     if (address.used) {
@@ -59,26 +64,30 @@ function ensureAccountAddressesToGapLimit(walletStore, walletType, accountIndex,
   });
 
   const gapBetweenLastUsedAndLastGenerated = lastGeneratedIndex - lastUsedIndex;
-  const addressToGenerate = BIP44_ADDRESS_GAP - gapBetweenLastUsedAndLastGenerated;
+  const addressToGenerate =
+    BIP44_ADDRESS_GAP - gapBetweenLastUsedAndLastGenerated;
 
   if (addressToGenerate > 0) {
-    const lastElemPath = externalAddressesPaths[externalAddressesPaths.length - 1];
+    const lastElemPath =
+      externalAddressesPaths[externalAddressesPaths.length - 1];
     const lastElem = externalAddresses[lastElemPath];
 
-    const startingIndex = (is.def(lastElem)) ? lastElem.index + 1 : 0;
+    const startingIndex = is.def(lastElem) ? lastElem.index + 1 : 0;
     const lastIndex = addressToGenerate + startingIndex - 1;
 
     if (lastIndex > startingIndex) {
       for (let i = startingIndex; i <= lastIndex; i += 1) {
-        getAddress(i, 'external');
+        getAddress(i, "external");
         generated += 1;
         if (walletType === WALLET_TYPES.HDWALLET) {
-          getAddress(i, 'internal');
+          getAddress(i, "internal");
         }
       }
     }
   }
-  logger.silly(`BIP44 - ensured addresses to gap limit - generated: ${generated}`);
+  logger.silly(
+    `BIP44 - ensured addresses to gap limit - generated: ${generated}`
+  );
 
   return generated;
 }

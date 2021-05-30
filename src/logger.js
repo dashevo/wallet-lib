@@ -1,7 +1,7 @@
-const util = require('util');
-const winston = require('winston');
+const util = require("util");
+const winston = require("winston");
 
-const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
+const LOG_LEVEL = process.env.LOG_LEVEL || "info";
 
 // Log levels:
 //   error    0
@@ -18,7 +18,7 @@ const logger = winston.createLogger({
       format: winston.format.combine(
         {
           transform: (info) => {
-            const args = info[Symbol.for('splat')];
+            const args = info[Symbol.for("splat")];
             const result = { ...info };
             if (args) {
               result.message = util.format(info.message, ...args);
@@ -27,9 +27,7 @@ const logger = winston.createLogger({
           },
         },
         winston.format.colorize(),
-        winston.format.printf(({
-          level, message,
-        }) => `${level}: ${message}`),
+        winston.format.printf(({ level, message }) => `${level}: ${message}`)
       ),
     }),
   ],

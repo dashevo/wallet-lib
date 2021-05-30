@@ -1,7 +1,10 @@
-const TxStreamMock = require('./TxStreamMock');
-const TransportMock = require('./TransportMock');
+const TxStreamMock = require("./TxStreamMock");
+const TransportMock = require("./TransportMock");
 
-module.exports = async function createAndAttachTransportMocksToWallet(wallet, sinon) {
+module.exports = async function createAndAttachTransportMocksToWallet(
+  wallet,
+  sinon
+) {
   const txStreamMock = new TxStreamMock();
   const transportMock = new TransportMock(sinon, txStreamMock);
 

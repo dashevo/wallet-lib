@@ -1,4 +1,4 @@
-const EventEmitter = require('events');
+const EventEmitter = require("events");
 
 class TxStreamMock extends EventEmitter {
   cancel() {
@@ -8,16 +8,16 @@ class TxStreamMock extends EventEmitter {
   }
 
   end() {
-    this.emit('end');
+    this.emit("end");
     this.removeAllListeners();
   }
 }
 
 TxStreamMock.EVENTS = {
-  cancel: 'cancel',
-  data: 'data',
-  end: 'end',
-  error: 'error',
+  cancel: "cancel",
+  data: "data",
+  end: "end",
+  error: "error",
 };
 
 module.exports = TxStreamMock;

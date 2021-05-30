@@ -1,11 +1,10 @@
-**Usage**: async `storage.saveState()`     
-**Description**: Used to force persistence of the state to the adapter    
-**Notes**: Three items are set (`adapter.setItem`) : transactions, wallets and chains data.   
+**Usage**: async `storage.saveState()`  
+**Description**: Used to force persistence of the state to the adapter  
+**Notes**: Three items are set (`adapter.setItem`) : transactions, wallets and chains data.
 
-Parameters: 
+Parameters:
 
-| parameters             | type              | required       | Description                                                            |  
-|------------------------|-------------------|----------------| -----------------------------------------------------------------------|
-
+| parameters | type | required | Description |
+| ---------- | ---- | -------- | ----------- |
 
 Returns : Boolean

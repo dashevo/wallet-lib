@@ -1,6 +1,6 @@
-const { Transaction } = require('@dashevo/dashcore-lib');
-const { is } = require('../../../utils');
-const logger = require('../../../logger');
+const { Transaction } = require("@dashevo/dashcore-lib");
+const { is } = require("../../../utils");
+const logger = require("../../../logger");
 
 module.exports = async function getTransaction(txid) {
   logger.silly(`DAPIClient.getTransaction[${txid}]`);

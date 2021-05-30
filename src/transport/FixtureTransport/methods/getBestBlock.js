@@ -1,6 +1,6 @@
-const logger = require('../../../logger');
+const logger = require("../../../logger");
 
 module.exports = async function getBestBlock() {
-  logger.silly('FakeNet.getBestBlock');
+  logger.silly("FakeNet.getBestBlock");
   return this.getBlockByHash(await this.getBestBlockHash());
 };

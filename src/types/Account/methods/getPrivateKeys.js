@@ -8,13 +8,17 @@ function getPrivateKeys(addressList) {
   let privKeys = [];
   if (addressList.constructor.name === Object.name) {
     addresses = [addressList];
-  } else { addresses = addressList; }
+  } else {
+    addresses = addressList;
+  }
 
   const { walletId } = this;
   const self = this;
   const subwallets = Object.keys(this.store.wallets[walletId].addresses);
   subwallets.forEach((subwallet) => {
-    const paths = Object.keys(self.store.wallets[walletId].addresses[subwallet]);
+    const paths = Object.keys(
+      self.store.wallets[walletId].addresses[subwallet]
+    );
     paths.forEach((path) => {
       const address = self.store.wallets[walletId].addresses[subwallet][path];
       if (addresses.includes(address.address)) {

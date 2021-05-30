@@ -1,30 +1,32 @@
 const {
-  Transaction, MerkleBlock, InstantLock,
-} = require('@dashevo/dashcore-lib');
-const { WALLET_TYPES } = require('../../../CONSTANTS');
+  Transaction,
+  MerkleBlock,
+  InstantLock,
+} = require("@dashevo/dashcore-lib");
+const { WALLET_TYPES } = require("../../../CONSTANTS");
 
-const Worker = require('../../Worker');
+const Worker = require("../../Worker");
 
 class TransactionSyncStreamWorker extends Worker {
   constructor(options) {
     super({
-      name: 'TransactionSyncStreamWorker',
+      name: "TransactionSyncStreamWorker",
       executeOnStart: true,
       firstExecutionRequired: true,
       workerIntervalTime: 0,
       gapLimit: 10,
       dependencies: [
-        'importTransactions',
-        'importBlockHeader',
-        'importInstantLock',
-        'storage',
-        'transport',
-        'walletId',
-        'getAddress',
-        'network',
-        'index',
-        'BIP44PATH',
-        'walletType',
+        "importTransactions",
+        "importBlockHeader",
+        "importInstantLock",
+        "storage",
+        "transport",
+        "walletId",
+        "getAddress",
+        "network",
+        "index",
+        "BIP44PATH",
+        "walletType",
       ],
       ...options,
     });
@@ -113,7 +115,9 @@ class TransactionSyncStreamWorker extends Worker {
     if (instantSendLockMessages) {
       walletTransactions = instantSendLockMessages
         .getMessagesList()
-        .map((instantSendLock) => new InstantLock(Buffer.from(instantSendLock)));
+        .map(
+          (instantSendLock) => new InstantLock(Buffer.from(instantSendLock))
+        );
     }
 
     return walletTransactions;
@@ -123,14 +127,11 @@ class TransactionSyncStreamWorker extends Worker {
     // Using sync options here to avoid
     // situation when plugin is injected directly
     // instead of usual injection process
-    const {
-      skipSynchronizationBeforeHeight,
-    } = (this.storage.store.syncOptions || {});
+    const { skipSynchronizationBeforeHeight } =
+      this.storage.store.syncOptions || {};
 
     if (skipSynchronizationBeforeHeight) {
-      this.setLastSyncedBlockHeight(
-        skipSynchronizationBeforeHeight,
-      );
+      this.setLastSyncedBlockHeight(skipSynchronizationBeforeHeight);
     }
 
     // We first need to sync up initial historical transactions
@@ -172,9 +173,10 @@ class TransactionSyncStreamWorker extends Worker {
     const { walletId } = this;
     const accountsStore = this.storage.store.wallets[walletId].accounts;
 
-    const accountStore = (this.walletType === WALLET_TYPES.SINGLE_ADDRESS)
-      ? accountsStore[this.index.toString()]
-      : accountsStore[this.BIP44PATH.toString()];
+    const accountStore =
+      this.walletType === WALLET_TYPES.SINGLE_ADDRESS
+        ? accountsStore[this.index.toString()]
+        : accountsStore[this.BIP44PATH.toString()];
 
     accountStore.blockHash = hash;
 
@@ -185,20 +187,21 @@ class TransactionSyncStreamWorker extends Worker {
     const { walletId } = this;
     const accountsStore = this.storage.store.wallets[walletId].accounts;
 
-    const { blockHash } = (this.walletType === WALLET_TYPES.SINGLE_ADDRESS)
-      ? accountsStore[this.index.toString()]
-      : accountsStore[this.BIP44PATH.toString()];
+    const { blockHash } =
+      this.walletType === WALLET_TYPES.SINGLE_ADDRESS
+        ? accountsStore[this.index.toString()]
+        : accountsStore[this.BIP44PATH.toString()];
 
     return blockHash;
   }
 }
 
-TransactionSyncStreamWorker.prototype.getAddressesToSync = require('./methods/getAddressesToSync');
-TransactionSyncStreamWorker.prototype.getBestBlockHeightFromTransport = require('./methods/getBestBlockHeight');
-TransactionSyncStreamWorker.prototype.setLastSyncedBlockHeight = require('./methods/setLastSyncedBlockHeight');
-TransactionSyncStreamWorker.prototype.getLastSyncedBlockHeight = require('./methods/getLastSyncedBlockHeight');
-TransactionSyncStreamWorker.prototype.startHistoricalSync = require('./methods/startHistoricalSync');
-TransactionSyncStreamWorker.prototype.startIncomingSync = require('./methods/startIncomingSync');
-TransactionSyncStreamWorker.prototype.syncUpToTheGapLimit = require('./methods/syncUpToTheGapLimit');
+TransactionSyncStreamWorker.prototype.getAddressesToSync = require("./methods/getAddressesToSync");
+TransactionSyncStreamWorker.prototype.getBestBlockHeightFromTransport = require("./methods/getBestBlockHeight");
+TransactionSyncStreamWorker.prototype.setLastSyncedBlockHeight = require("./methods/setLastSyncedBlockHeight");
+TransactionSyncStreamWorker.prototype.getLastSyncedBlockHeight = require("./methods/getLastSyncedBlockHeight");
+TransactionSyncStreamWorker.prototype.startHistoricalSync = require("./methods/startHistoricalSync");
+TransactionSyncStreamWorker.prototype.startIncomingSync = require("./methods/startIncomingSync");
+TransactionSyncStreamWorker.prototype.syncUpToTheGapLimit = require("./methods/syncUpToTheGapLimit");
 
 module.exports = TransactionSyncStreamWorker;

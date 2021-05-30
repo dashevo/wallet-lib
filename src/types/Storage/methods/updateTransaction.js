@@ -5,7 +5,7 @@
  * @return {boolean}
  */
 const updateTransaction = function updateTransaction(transaction) {
-  if (!transaction) throw new Error('Expected a transaction to update');
+  if (!transaction) throw new Error("Expected a transaction to update");
 
   const transactionStore = this.store.transactions;
   const storeTx = transactionStore[transaction.hash];

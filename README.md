@@ -8,13 +8,13 @@
 A pure and extensible JavaScript Wallet Library for Dash
 
 ## Table of Contents
+
 - [Install](#install)
 - [Usage](#usage)
 - [Documentation](#documentation)
 - [Maintainers](#maintainers)
 - [Contributing](#contributing)
 - [License](#license)
-
 
 ## Background
 
@@ -47,7 +47,7 @@ const wallet = new Wallet({adapter: localforage});
 In your file, where you want to execute it :
 
 ```js
-const { Wallet, EVENTS } = require('@dashevo/wallet-lib');
+const { Wallet, EVENTS } = require("@dashevo/wallet-lib");
 
 const wallet = new Wallet();
 

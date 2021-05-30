@@ -1,10 +1,11 @@
-const _ = require('lodash');
-const { is } = require('../../utils');
-const { InvalidStrategy, UnknownStrategy } = require('../../errors');
-const buildInStrategies = require('../../utils/coinSelections/strategies');
+const _ = require("lodash");
+const { is } = require("../../utils");
+const { InvalidStrategy, UnknownStrategy } = require("../../errors");
+const buildInStrategies = require("../../utils/coinSelections/strategies");
 
 const fromString = function fromString(strategyName) {
-  if (!_.has(buildInStrategies, strategyName)) return new UnknownStrategy(`Unknown strategy ${strategyName}`);
+  if (!_.has(buildInStrategies, strategyName))
+    return new UnknownStrategy(`Unknown strategy ${strategyName}`);
   return buildInStrategies[strategyName];
 };
 const fromFunction = function fromFunction(arg) {

@@ -1,10 +1,10 @@
-const { expect } = require('chai');
-const addNewTxToAddress = require('./addNewTxToAddress');
+const { expect } = require("chai");
+const addNewTxToAddress = require("./addNewTxToAddress");
 
 // FIXME : We only use this method in one specific case : From the SyncWorker when receiving from the WSock from insight
 // THerefore we might want to remove our dependency on this method ?
-describe('Storage - addNewTxToAddress', () => {
-  it('should add a new transaction to an address in store', () => {
+describe("Storage - addNewTxToAddress", () => {
+  it("should add a new transaction to an address in store", () => {
     // const self = {
     //   store: {
     //     wallets: {

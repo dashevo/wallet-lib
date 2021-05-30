@@ -1,1 +1,1 @@
-module.exports = require('./coinSelections/index');
+module.exports = require("./coinSelections/index");

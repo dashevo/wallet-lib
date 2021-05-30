@@ -1,4 +1,4 @@
-const { hasProp } = require('../../../utils');
+const { hasProp } = require("../../../utils");
 
 /**
  * Create a new account into a wallet
@@ -14,8 +14,8 @@ module.exports = function createAccount(walletId, network, label = null) {
     }
   }
 
-  if (!hasProp(this.store.wallets[walletId].accounts, '0')) {
-    this.store.wallets[walletId].accounts['0'] = {
+  if (!hasProp(this.store.wallets[walletId].accounts, "0")) {
+    this.store.wallets[walletId].accounts["0"] = {
       label,
       network,
       blockHeight: 0, // Used to keep track of local state sync of the account

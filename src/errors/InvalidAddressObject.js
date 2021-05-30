@@ -1,5 +1,5 @@
-const is = require('../utils/is');
-const WalletLibError = require('./WalletLibError');
+const is = require("../utils/is");
+const WalletLibError = require("./WalletLibError");
 
 class InvalidAddressObject extends WalletLibError {
   constructor(addressObject) {
@@ -12,8 +12,8 @@ class InvalidAddressObject extends WalletLibError {
     const evaluateAddressObjectError = (addrObj) => {
       const addressErrors = [];
       const expectedProps = [
-        ['path', 'string'],
-        ['address', 'addressObject'],
+        ["path", "string"],
+        ["address", "addressObject"],
       ];
       const handledTypeVerification = Object.keys(is);
       expectedProps.forEach((prop) => {

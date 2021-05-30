@@ -1,5 +1,5 @@
-const blocksData = require('./data/blocks/blocks');
-const AbstractTransport = require('../AbstractTransport');
+const blocksData = require("./data/blocks/blocks");
+const AbstractTransport = require("../AbstractTransport");
 
 const bestBlockDataHeight = 21546;
 
@@ -18,11 +18,11 @@ class FixtureTransport extends AbstractTransport {
 
     this.relayFee = 0.00001;
     this.difficulty = 0.00171976818884149;
-    this.network = 'testnet';
+    this.network = "testnet";
   }
 
   setHeight(height) {
-    if (!height) throw new Error('Height needed');
+    if (!height) throw new Error("Height needed");
     this.height = height;
 
     if (!blocksData.heights[this.height]) {
@@ -50,24 +50,24 @@ class FixtureTransport extends AbstractTransport {
   // eslint-disable-next-line class-methods-use-this
   getMnemonicList() {
     return [
-      'nerve iron scrap chronic error wild glue sound range hurdle alter dwarf',
+      "nerve iron scrap chronic error wild glue sound range hurdle alter dwarf",
     ];
   }
 }
 
-FixtureTransport.prototype.getBestBlock = require('./methods/getBestBlock');
-FixtureTransport.prototype.getBestBlockHash = require('./methods/getBestBlockHash');
-FixtureTransport.prototype.getBestBlockHeader = require('./methods/getBestBlockHeader');
-FixtureTransport.prototype.getBestBlockHeight = require('./methods/getBestBlockHeight');
-FixtureTransport.prototype.getBlockByHash = require('./methods/getBlockByHash');
-FixtureTransport.prototype.getBlockByHeight = require('./methods/getBlockByHeight');
-FixtureTransport.prototype.getBlockHeaderByHash = require('./methods/getBlockHeaderByHash');
-FixtureTransport.prototype.getBlockHeaderByHeight = require('./methods/getBlockHeaderByHeight');
-FixtureTransport.prototype.getStatus = require('./methods/getStatus');
-FixtureTransport.prototype.getTransaction = require('./methods/getTransaction');
-FixtureTransport.prototype.sendTransaction = require('./methods/sendTransaction');
-FixtureTransport.prototype.subscribeToAddressesTransactions = require('./methods/subscribeToAddressesTransactions');
-FixtureTransport.prototype.subscribeToBlockHeaders = require('./methods/subscribeToBlockHeaders');
-FixtureTransport.prototype.subscribeToBlocks = require('./methods/subscribeToBlocks');
+FixtureTransport.prototype.getBestBlock = require("./methods/getBestBlock");
+FixtureTransport.prototype.getBestBlockHash = require("./methods/getBestBlockHash");
+FixtureTransport.prototype.getBestBlockHeader = require("./methods/getBestBlockHeader");
+FixtureTransport.prototype.getBestBlockHeight = require("./methods/getBestBlockHeight");
+FixtureTransport.prototype.getBlockByHash = require("./methods/getBlockByHash");
+FixtureTransport.prototype.getBlockByHeight = require("./methods/getBlockByHeight");
+FixtureTransport.prototype.getBlockHeaderByHash = require("./methods/getBlockHeaderByHash");
+FixtureTransport.prototype.getBlockHeaderByHeight = require("./methods/getBlockHeaderByHeight");
+FixtureTransport.prototype.getStatus = require("./methods/getStatus");
+FixtureTransport.prototype.getTransaction = require("./methods/getTransaction");
+FixtureTransport.prototype.sendTransaction = require("./methods/sendTransaction");
+FixtureTransport.prototype.subscribeToAddressesTransactions = require("./methods/subscribeToAddressesTransactions");
+FixtureTransport.prototype.subscribeToBlockHeaders = require("./methods/subscribeToBlockHeaders");
+FixtureTransport.prototype.subscribeToBlocks = require("./methods/subscribeToBlocks");
 
 module.exports = FixtureTransport;

@@ -3,7 +3,7 @@
  * @param index - {Number}
  * @return {HDPrivateKey | HDPublicKey}
  */
-function getKeyForChild(index = 0, type = 'HDPrivateKey') {
+function getKeyForChild(index = 0, type = "HDPrivateKey") {
   return this.generateKeyForChild(index, type);
 }
 

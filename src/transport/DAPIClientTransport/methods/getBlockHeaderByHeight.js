@@ -1,4 +1,4 @@
-const logger = require('../../../logger');
+const logger = require("../../../logger");
 
 module.exports = async function getBlockHeaderByHeight(blockHeight) {
   logger.silly(`DAPIClient.getBlockHeaderByHeight[${blockHeight}]`);

@@ -1,15 +1,15 @@
-const { Script, Address } = require('@dashevo/dashcore-lib');
-const { DUFFS_PER_DASH } = require('../CONSTANTS');
+const { Script, Address } = require("@dashevo/dashcore-lib");
+const { DUFFS_PER_DASH } = require("../CONSTANTS");
 
 function dashToDuffs(dash) {
   if (dash === undefined || dash.constructor.name !== Number.name) {
-    throw new Error('Can only convert a number');
+    throw new Error("Can only convert a number");
   }
   return parseInt((dash * DUFFS_PER_DASH).toFixed(0), 10);
 }
 function duffsToDash(duffs) {
   if (duffs === undefined || duffs.constructor.name !== Number.name) {
-    throw new Error('Can only convert a number');
+    throw new Error("Can only convert a number");
   }
   return duffs / DUFFS_PER_DASH;
 }
@@ -29,7 +29,7 @@ function hasProp(obj, prop) {
  * @return {boolean}
  */
 function hasMethod(obj, methodName) {
-  return typeof obj[methodName] === 'function';
+  return typeof obj[methodName] === "function";
 }
 
 function getBytesOf(elem, type) {
@@ -37,11 +37,11 @@ function getBytesOf(elem, type) {
   let SCRIPT_BYTES = 0;
 
   switch (type) {
-    case 'utxo':
+    case "utxo":
       BASE_BYTES = 32 + 4 + 1 + 4;
-      SCRIPT_BYTES = Buffer.from(elem.script, 'hex').length;
+      SCRIPT_BYTES = Buffer.from(elem.script, "hex").length;
       return BASE_BYTES + SCRIPT_BYTES;
-    case 'output':
+    case "output":
       BASE_BYTES = 8 + 1;
       SCRIPT_BYTES = Script(new Address(elem.address)).toBuffer().length;
       return BASE_BYTES + SCRIPT_BYTES;
@@ -50,5 +50,9 @@ function getBytesOf(elem, type) {
   }
 }
 module.exports = {
-  dashToDuffs, duffsToDash, getBytesOf, hasProp, hasMethod,
+  dashToDuffs,
+  duffsToDash,
+  getBytesOf,
+  hasProp,
+  hasMethod,
 };

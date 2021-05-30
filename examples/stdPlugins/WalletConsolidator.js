@@ -1,5 +1,5 @@
-const { StandardPlugin } = require('../../src/plugins/index');
-const logger = require('../../src/logger');
+const { StandardPlugin } = require("../../src/plugins/index");
+const logger = require("../../src/logger");
 
 class WalletConsolidator extends StandardPlugin {
   constructor() {
@@ -10,20 +10,23 @@ class WalletConsolidator extends StandardPlugin {
       executeOnStart: false,
       // Methods and function that we would want to use
       dependencies: [
-        'getUTXOS',
-        'getUnusedAddress',
-        'getConfirmedBalance',
-        'createTransactionFromUTXOS',
-        'broadcastTransaction',
+        "getUTXOS",
+        "getUnusedAddress",
+        "getConfirmedBalance",
+        "createTransactionFromUTXOS",
+        "broadcastTransaction",
       ],
     });
   }
 
-  consolidateWallet(address = this.getUnusedAddress().address, utxos = this.getUTXOS()) {
+  consolidateWallet(
+    address = this.getUnusedAddress().address,
+    utxos = this.getUTXOS()
+  ) {
     return {
       prepareTransaction: () => {
         if (!utxos || utxos.length === 0) {
-          throw new Error('There is nothing to consolidate');
+          throw new Error("There is nothing to consolidate");
         }
         const opts = {
           utxos,
@@ -34,7 +37,7 @@ class WalletConsolidator extends StandardPlugin {
         return {
           toString: () => rawtx,
           broadcast: async () => {
-            logger.info('TRIED TO BROADCAST', rawtx);
+            logger.info("TRIED TO BROADCAST", rawtx);
             return rawtx;
             // return self.broadcastTransaction(rawtx);
           },
