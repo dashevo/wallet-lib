@@ -56,10 +56,13 @@ async function broadcastTransaction(transaction) {
   if (!transaction.isFullySigned()) {
     throw new Error('Transaction not signed.');
   }
-  const txid = await this.transport.sendTransaction(transaction.toString());
+
+  const serializedTransaction = transaction.toString();
+  const txid = await this.transport.sendTransaction(serializedTransaction);
   // We now need to impact/update our affected inputs
   // so we clear them out from UTXOset.
-  const { inputs } = new Dashcore.Transaction(transaction).toObject();
+  const { inputs } = transaction.toObject();
+
   impactAffectedInputs.call(this, {
     inputs,
   });
