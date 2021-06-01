@@ -62,10 +62,10 @@ async function broadcastTransaction(transaction) {
 
   try {
     const serializedTransaction = transaction.toString();
-    txid = await this.transport.sendTransaction(serializedTransaction);
     // We now need to impact/update our affected inputs
     // so we clear them out from UTXOset.
     ({ inputs } = transaction.toObject());
+    txid = await this.transport.sendTransaction(serializedTransaction);
   } catch (e) {
     console.error(e);
   }
