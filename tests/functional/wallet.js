@@ -5,12 +5,6 @@ const { Wallet } = require('../../src/index');
 const { fundWallet } = require('../../src/utils');
 const { EVENTS } = require('../../src');
 
-function wait(timeout) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, timeout);
-  });
-}
-
 const seeds = process.env.DAPI_SEED
   .split(',');
 
@@ -146,7 +140,7 @@ describe('Wallet-lib - functional ', function suite() {
         transport: {
           seeds,
         },
-        network: process.env.NETWORK,
+        network: wallet.network,
       });
       const restoredAccount = await restoredWallet.getAccount();
 
@@ -159,9 +153,6 @@ describe('Wallet-lib - functional ', function suite() {
 
       const addresses = restoredAccount.getAddresses();
       const transactions = restoredAccount.getTransactions();
-
-      // TODO: DIRTY HACK TO SUBVERT DAPI BLIND WINDOW! REMOVE ME PLEASE!
-      await wait(60000);
 
       expect(Object.keys(transactions).length).to.be.equal(1);
       expect(addresses).to.be.deep.equal(expectedAddresses);
