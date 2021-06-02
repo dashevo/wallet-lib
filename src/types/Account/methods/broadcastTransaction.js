@@ -57,19 +57,13 @@ async function broadcastTransaction(transaction) {
     throw new Error('Transaction not signed.');
   }
 
-  let txid;
-  let inputs;
+  const { inputs } = transaction.toObject();
+  const serializedTransaction = transaction.toString();
 
-  try {
-    const serializedTransaction = transaction.toString();
-    // We now need to impact/update our affected inputs
-    // so we clear them out from UTXOset.
-    ({ inputs } = transaction.toObject());
-    txid = await this.transport.sendTransaction(serializedTransaction);
-  } catch (e) {
-    console.error(e);
-  }
+  const txid = await this.transport.sendTransaction(serializedTransaction);
 
+  // We now need to impact/update our affected inputs
+  // so we clear them out from UTXOset.
   impactAffectedInputs.call(this, {
     inputs,
   });
