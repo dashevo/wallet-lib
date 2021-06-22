@@ -36,6 +36,7 @@ const defaultOptions = {
   injectDefaultPlugins: true,
   debug: false,
   strategy: simpleDescendingAccumulator,
+  waitForInstantLockTimeout: 120000,
 };
 
 /* eslint-disable no-underscore-dangle */
@@ -64,6 +65,8 @@ class Account extends EventEmitter {
     this.allowSensitiveOperations = _.has(opts, 'allowSensitiveOperations') ? opts.allowSensitiveOperations : defaultOptions.allowSensitiveOperations;
     this.debug = _.has(opts, 'debug') ? opts.debug : defaultOptions.debug;
     // if (this.debug) process.env.LOG_LEVEL = 'debug';
+
+    this.waitForInstantLockTimeout = _.has(opts, 'waitForInstantLockTimeout') ? opts.waitForInstantLockTimeout : defaultOptions.waitForInstantLockTimeout;
 
     this.walletType = wallet.walletType;
     this.offlineMode = wallet.offlineMode;
@@ -213,7 +216,7 @@ class Account extends EventEmitter {
    * @param {number} timeout - in milliseconds before throwing an error if the lock didn't arrive
    * @return {Promise<InstantLock>}
    */
-  waitForInstantLock(transactionHash, timeout = 120000) {
+  waitForInstantLock(transactionHash, timeout = this.waitForInstantLockTimeout) {
     return Promise.race([
       new Promise((resolve) => {
         const instantLock = this.storage.getInstantLock(transactionHash);

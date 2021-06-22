@@ -94,6 +94,7 @@ export declare namespace Account {
             transactions?:TransactionsMap,
             addresses?:WalletObj["addresses"]
         }
+        waitForInstantLockTimeout?: number;
     }
 
     interface createTransactionOptions {
