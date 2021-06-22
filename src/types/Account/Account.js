@@ -213,7 +213,7 @@ class Account extends EventEmitter {
    * @param {number} timeout - in milliseconds before throwing an error if the lock didn't arrive
    * @return {Promise<InstantLock>}
    */
-  waitForInstantLock(transactionHash, timeout = 60000) {
+  waitForInstantLock(transactionHash, timeout = 120000) {
     return Promise.race([
       new Promise((resolve) => {
         const instantLock = this.storage.getInstantLock(transactionHash);
