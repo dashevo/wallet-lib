@@ -6,6 +6,10 @@ const { mnemonicToHDPrivateKey } = require('../../utils/mnemonic');
 let keychain;
 const mnemonic = 'during develop before curtain hazard rare job language become verb message travel';
 const pk = '4226d5e2fe8cbfe6f5beb7adf5a5b08b310f6c4a67fc27826779073be6f5699e';
+
+const expectedRootDIP15AccountKey_0 = 'tprv8hRzmheQujhJN5XP2dj955nAFCKeEoSifJRWuutdbwWRtusdDQ426jbp75EqErUSuTxmPyxYmP1TpcF5qdxGhXLNXRLMGsRLG6NFCv1WnaQ';
+const expectedRootDIP15AccountKey_1 = 'tprv8hRzmheQujhJQyCtFTuUFHxB3Ag5VLB994zhH4CfxbA41cq73HT2mpYq5M33V54oJyn6g514saxxVJB886G55eYX56J6D6x87UNNT6iQHkR';
+const expectedKeyForChild_0 = 'tprv8d4podc2Tg459CH2bwLHXj3vdJFBT2rdsk5Nr1djH7hzHdt5LRdvN6QyFwMiDy7ffRdik7fEVRKKgsHB4F18sh8xF6jFXpKq4sUgGBoSbKw';
 describe('Keychain', function suite() {
   this.timeout(10000);
   it('should create a keychain', () => {
@@ -32,6 +36,12 @@ describe('Keychain', function suite() {
     const pk2 = keychain.getKeyForPath('m/44\'/1\'');
     expect(pk2.toString()).to.equal(hardenedPk.toString());
   });
+  it('should get DIP15 account path', function () {
+    const rootDIP15AccountKey_0 = keychain.getHardenedDIP15AccountKey(0);
+    expect(rootDIP15AccountKey_0.toString()).to.deep.equal(expectedRootDIP15AccountKey_0);
+    const rootDIP15AccountKey_1 = keychain.getHardenedDIP15AccountKey(1);
+    expect(rootDIP15AccountKey_1.toString()).to.deep.equal(expectedRootDIP15AccountKey_1);
+  });
   it('should derive from hardened feature path', () => {
     const hardenedPk = keychain.getHardenedBIP44Path();
     const derivedPk = hardenedPk.deriveChild(0, true).deriveChild(0).deriveChild(0);
@@ -41,7 +51,7 @@ describe('Keychain', function suite() {
   it('should generate key for child', () => {
     const keychain2 = new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(mnemonic, 'testnet') });
     const keyForChild = keychain2.generateKeyForChild(0);
-    expect(keyForChild.toString()).to.equal('tprv8d4podc2Tg459CH2bwLHXj3vdJFBT2rdsk5Nr1djH7hzHdt5LRdvN6QyFwMiDy7ffRdik7fEVRKKgsHB4F18sh8xF6jFXpKq4sUgGBoSbKw');
+    expect(keyForChild.toString()).to.equal(expectedKeyForChild_0);
   });
 
   it('should sign', () => {
