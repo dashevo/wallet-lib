@@ -23,7 +23,7 @@ export declare class KeyChain {
 
     getHardenedBIP44Path(type?: HDKeyTypesParam): HDKeyTypes;
     getHardenedDIP9FeaturePath(type?: HDKeyTypesParam): HDKeyTypes;
-
+    getHardenedDIP15AccountKey(index?: number, type?: HDKeyTypesParam): HDKeyTypes;
     getKeyForChild(index: number, type?: HDKeyTypesParam): HDKeyTypes;
     getKeyForPath(path: string, type?: HDKeyTypesParam): HDKeyTypes;
     getPrivateKey(): PrivateKey;
