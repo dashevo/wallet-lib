@@ -13,7 +13,7 @@ class StandardPlugin extends EventEmitter {
     this.pluginType = _.has(opts, 'type') ? opts.type : 'Standard';
     this.name = _.has(opts, 'name') ? opts.name : 'UnnamedPlugin';
     this.dependencies = _.has(opts, 'dependencies') ? opts.dependencies : [];
-
+    this.pluginDependencies = _.has(opts, 'pluginDependencies') ? opts.pluginDependencies : [];
     this.executeOnStart = _.has(opts, 'executeOnStart')
       ? opts.executeOnStart
       : defaultOpts.executeOnStart;

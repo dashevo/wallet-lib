@@ -31,11 +31,12 @@ async function _initializeAccount(account, userUnsafePlugins) {
             account.index,
             account.getAddress.bind(account),
           );
+        } else if (account.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
+          await account.getAddress('0'); // We force what is usually done by the BIP44Worker.
+        } else {
+          throw new Error(`InitializateAccount failed - Unexpected walletType: ${account.walletType}`);
         }
 
-        if (account.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
-          await account.getAddress('0'); // We force what is usually done by the BIP44Worker.
-        }
         if (!account.offlineMode) {
           await account.injectPlugin(ChainPlugin, true);
 
