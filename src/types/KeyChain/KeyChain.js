@@ -36,7 +36,6 @@ KeyChain.prototype.generateKeyForChild = require('./methods/generateKeyForChild'
 KeyChain.prototype.generateKeyForPath = require('./methods/generateKeyForPath');
 KeyChain.prototype.getHardenedBIP44Path = require('./methods/getHardenedBIP44Path');
 KeyChain.prototype.getHardenedDIP9FeaturePath = require('./methods/getHardenedDIP9FeaturePath');
-KeyChain.prototype.getHardenedDIP15AccountKey = require('./methods/getHardenedDIP15AccountKey');
 KeyChain.prototype.getKeyForChild = require('./methods/getKeyForChild');
 KeyChain.prototype.getKeyForPath = require('./methods/getKeyForPath');
 KeyChain.prototype.getPrivateKey = require('./methods/getPrivateKey');
