@@ -47,7 +47,7 @@ class IdentitySyncWorker extends Worker {
 
       // check unused indices in the middle of list first
       if (unusedIndex) {
-        // if we go through unused indices and thay are not
+        // if we go through unused indices and they are not
         // sequential we need to reset gap count
         if (unusedIndex !== index + 1) {
           gapCount = 0;
@@ -64,7 +64,8 @@ class IdentitySyncWorker extends Worker {
       const publicKey = privateKey.toPublicKey();
 
       // eslint-disable-next-line no-await-in-loop
-      const [fetchedId] = await this.transport.getIdentityIdsByPublicKeyHash([publicKey.hash]);
+      const response = await this.transport.getIdentityIdsByPublicKeyHash([publicKey.hash]);
+      const [fetchedId] = response.getIdentityIds();
 
       // if identity id is not preset then increment gap count
       // and stop sync if gap limit is reached

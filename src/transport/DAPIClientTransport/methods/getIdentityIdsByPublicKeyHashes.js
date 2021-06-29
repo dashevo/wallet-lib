@@ -2,7 +2,7 @@ const logger = require('../../../logger');
 
 /**
  * @param {Buffer[]} publicKeyHashes
- * @return {Promise<*|string>}
+ * @return {Promise<GetIdentityIdsByPublicKeyHashesResponse>}
  */
 module.exports = async function getIdentityIdsByPublicKeyHashes(publicKeyHashes) {
   logger.silly('DAPIClientTransport.getIdentityIdsByPublicKeyHashes');

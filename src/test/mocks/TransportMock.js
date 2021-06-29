@@ -1,4 +1,10 @@
+const GetIdentityIdsByPublicKeyHashesResponse = require('@dashevo/dapi-client/lib/methods/platform/getIdentityIdsByPublicKeyHashes/GetIdentityIdsByPublicKeyHashesResponse');
 const getStatus = require('../../transport/FixtureTransport/methods/getStatus');
+
+const metadata = {
+  height: 10,
+  coreChainLockedHeight: 42,
+};
 
 class TransportMock {
   constructor(sinonSandbox, transactionStreamMock) {
@@ -9,7 +15,9 @@ class TransportMock {
     this.getBlockHeaderByHeight = sinonSandbox.stub().returns({ hash: 123 });
     this.on = sinonSandbox.stub();
     this.subscribeToBlocks = sinonSandbox.stub();
-    this.getIdentityIdsByPublicKeyHash = sinonSandbox.stub().returns([null]);
+    this.getIdentityIdsByPublicKeyHash = sinonSandbox.stub().returns(
+      new GetIdentityIdsByPublicKeyHashesResponse(metadata, [null]),
+    );
     this.sendTransaction = sinonSandbox.stub();
     this.getStatus = sinonSandbox.stub().resolves(getStatus());
   }
