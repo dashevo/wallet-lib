@@ -1,5 +1,5 @@
 import {Block, BlockHeader, Transaction} from "@dashevo/dashcore-lib";
-const GetIdentityIdsByPublicKeyHashesResponse = require('@dashevo/dapi-client/lib/methods/platform/getIdentityIdsByPublicKeyHashes/GetIdentityIdsByPublicKeyHashesResponse');
+import GetIdentityIdsByPublicKeyHashesResponse from '@dashevo/dapi-client/lib/methods/platform/getIdentityIdsByPublicKeyHashes/GetIdentityIdsByPublicKeyHashesResponse';
 
 export declare interface Transport {
     announce(eventName, args)
