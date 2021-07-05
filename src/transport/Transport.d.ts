@@ -1,5 +1,4 @@
 import {Block, BlockHeader, Transaction} from "@dashevo/dashcore-lib";
-import GetIdentityIdsByPublicKeyHashesResponse from '@dashevo/dapi-client/lib/methods/platform/getIdentityIdsByPublicKeyHashes/GetIdentityIdsByPublicKeyHashesResponse';
 
 export declare interface Transport {
     announce(eventName, args)
@@ -22,7 +21,7 @@ export declare interface Transport {
 
     getBlockHeaderByHeight(height): Promise<BlockHeader>
 
-    getIdentityIdsByPublicKeyHash(publicKeyHashes: Buffer[]): Promise<GetIdentityIdsByPublicKeyHashesResponse>
+    getIdentityIdsByPublicKeyHash(publicKeyHashes: Buffer[]): Promise<Buffer[]>
 
     getStatus(): Promise<object>
 
