@@ -1,10 +1,4 @@
-const GetIdentityIdsByPublicKeyHashesResponse = require('@dashevo/dapi-client/lib/methods/platform/getIdentityIdsByPublicKeyHashes/GetIdentityIdsByPublicKeyHashesResponse');
 const getStatus = require('../../transport/FixtureTransport/methods/getStatus');
-
-const metadata = {
-  height: 10,
-  coreChainLockedHeight: 42,
-};
 
 class TransportMock {
   constructor(sinonSandbox, transactionStreamMock) {
