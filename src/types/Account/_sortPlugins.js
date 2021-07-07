@@ -9,10 +9,21 @@ const initPlugin = (UnsafePlugin) => {
   return (isInit) ? UnsafePlugin : new UnsafePlugin();
 };
 
-const sortUserPlugins = (defaultSortedPlugins, userUnsafePlugins) => {
+/**
+ * Sort user defined plugins using the injectionOrder properties before or after when specified.
+ *
+ * Except if specified using before property, all system plugins (TxSyncStream, IdentitySync...)
+ * will be sorted on top.
+ *
+ * @param defaultSortedPlugins
+ * @param userUnsafePlugins
+ * @returns {*[]}
+ */
+const sortUserPlugins = (defaultSortedPlugins, userUnsafePlugins, allowSensitiveOperations) => {
   const sortedPlugins = [];
   const initializedSortedPlugins = [];
 
+  // We start by ensuring all default plugins get loaded and initialized on top
   each(defaultSortedPlugins, (defaultPluginParams) => {
     sortedPlugins.push(defaultPluginParams);
 
@@ -21,41 +32,79 @@ const sortUserPlugins = (defaultSortedPlugins, userUnsafePlugins) => {
     initializedSortedPlugins.push(plugin);
   });
 
+  // Iterate accross all user defined plugins
   each(userUnsafePlugins, (UnsafePlugin) => {
     const plugin = initPlugin(UnsafePlugin);
 
-    const { pluginDependencies } = plugin;
-    const hasPluginDependencies = !!(pluginDependencies && pluginDependencies.length);
+    const {
+      awaitOnInjection,
+      injectionOrder: {
+        before: injectBefore,
+        after: injectAfter,
+      },
+    } = plugin;
 
-    let lastDependencyIndex = -1;
+    const hasAfterDependencies = !!(injectAfter && injectAfter.length);
+    const hasBeforeDependencies = !!(injectBefore && injectBefore.length);
+    const hasPluginDependencies = (hasAfterDependencies || hasBeforeDependencies);
+
+    let injectionIndex = initializedSortedPlugins.length;
+
     if (hasPluginDependencies) {
-      each(pluginDependencies, (pluginDependencyName) => {
-        const pluginDependencyIndex = findIndex(initializedSortedPlugins, ['name', pluginDependencyName]);
-        if (lastDependencyIndex < pluginDependencyIndex) {
-          lastDependencyIndex = pluginDependencyIndex;
-        }
-        if (pluginDependencyIndex === -1) {
-          // This will throw if user has defined the plugin but we didn't processed it yet.
-          // We could process that by delaying and retry after that,
-          // complexity of such would exist in case of cross-dependency
-          // For now we just implement the naive way to handle dependency, but adding a TODO here.
-          // Let's note : We will still want to throw after retrying if we still fail
-          // to sort the concerned plugin (to avoid looping forever and ever)
-          throw new Error(`Plugin ${plugin.name} has missing dependency ${pluginDependencyName}`);
-        }
-      });
+      let injectionBeforeIndex = -1;
+      let injectionAfterIndex = -1;
+
+      if (hasBeforeDependencies) {
+        each(injectBefore, (pluginDependencyName) => {
+          const beforePluginIndex = findIndex(initializedSortedPlugins, ['name', pluginDependencyName]);
+          // TODO: we could have an handling that would postpone trying to insert the dependencies
+          // ensuring the case where we try to rely and sort based on user specified dependencies
+          // For now, require user to sort them when specifying the plugins.
+          if (beforePluginIndex === -1) throw new Error(`Dependency ${pluginDependencyName} not found`);
+          if (injectionBeforeIndex === -1 || injectionIndex > beforePluginIndex) {
+            injectionBeforeIndex = beforePluginIndex;
+          }
+        });
+      }
+
+      if (hasAfterDependencies) {
+        each(injectAfter, (pluginDependencyName) => {
+          const afterPluginIndex = findIndex(initializedSortedPlugins, ['name', pluginDependencyName]);
+          if (afterPluginIndex === -1) throw new Error(`Dependency ${pluginDependencyName} not found`);
+          if (injectionAfterIndex === -1 || injectionAfterIndex < afterPluginIndex) {
+            injectionAfterIndex = afterPluginIndex + 1;
+          }
+        });
+      }
+
+      if (
+        injectionBeforeIndex !== -1
+          && injectionAfterIndex !== -1
+          && injectionAfterIndex > injectionBeforeIndex
+      ) {
+        throw new Error(`Conflicting dependency order for ${plugin.name}`);
+      }
+
+      if (
+        injectionBeforeIndex !== -1
+          || injectionAfterIndex !== -1
+      ) {
+        injectionIndex = (injectionBeforeIndex !== -1)
+          ? injectionBeforeIndex
+          : injectionAfterIndex;
+      }
     }
 
     // We insert both initialized and uninitialized plugins as we gonna need to read property.
     initializedSortedPlugins.splice(
-      (lastDependencyIndex >= 0) ? lastDependencyIndex + 1 : initializedSortedPlugins.length,
+      injectionIndex,
       0,
       plugin,
     );
     sortedPlugins.splice(
-      (lastDependencyIndex >= 0) ? lastDependencyIndex + 1 : initializedSortedPlugins.length,
+      injectionIndex,
       0,
-      [UnsafePlugin, true],
+      [UnsafePlugin, allowSensitiveOperations, awaitOnInjection],
     );
   });
   each(initializedSortedPlugins, (initializedSortedPlugin, i) => {
@@ -63,20 +112,27 @@ const sortUserPlugins = (defaultSortedPlugins, userUnsafePlugins) => {
   });
   return sortedPlugins;
 };
+
+/**
+ * Sort plugins defined by users based on the before and after properties
+ * @param account
+ * @param userUnsafePlugins
+ * @returns {*[]}
+ */
 const sortPlugins = (account, userUnsafePlugins) => {
   const plugins = [];
 
   // eslint-disable-next-line no-async-promise-executor
   if (account.injectDefaultPlugins) {
     if (!account.offlineMode) {
-      plugins.push([ChainPlugin, true]);
-      plugins.push([TransactionSyncStreamWorker, true]);
+      plugins.push([ChainPlugin, true, true]);
+      plugins.push([TransactionSyncStreamWorker, true, true]);
 
       if (account.walletType === WALLET_TYPES.HDWALLET) {
-        plugins.push([IdentitySyncWorker, true]);
+        plugins.push([IdentitySyncWorker, true, true]);
       }
     }
   }
-  return sortUserPlugins(plugins, userUnsafePlugins);
+  return sortUserPlugins(plugins, userUnsafePlugins, account.allowSensitiveOperations);
 };
 module.exports = sortPlugins;

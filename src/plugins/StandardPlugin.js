@@ -13,7 +13,8 @@ class StandardPlugin extends EventEmitter {
     this.pluginType = _.has(opts, 'type') ? opts.type : 'Standard';
     this.name = _.has(opts, 'name') ? opts.name : 'UnnamedPlugin';
     this.dependencies = _.has(opts, 'dependencies') ? opts.dependencies : [];
-    this.pluginDependencies = _.has(opts, 'pluginDependencies') ? opts.pluginDependencies : [];
+    this.injectionOrder = _.has(opts, 'injectionOrder') ? opts.injectionOrder : { before: [], after: [] };
+    this.awaitOnInjection = _.has(opts, 'awaitOnInjection') ? opts.awaitOnInjection : false;
     this.executeOnStart = _.has(opts, 'executeOnStart')
       ? opts.executeOnStart
       : defaultOpts.executeOnStart;
