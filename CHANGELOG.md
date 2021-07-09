@@ -3,13 +3,12 @@
 
 ### Features
 
-* add `waitForInstantLockTimeout` Account Option ([#270](https://github.com/dashevo/wallet-lib/issues/270))
+* add `waitForInstantLockTimeout` Wallet Option ([#270](https://github.com/dashevo/wallet-lib/issues/270))
 
 
 ### Bug Fixes
 
 * `waitForInstantLock` timeouts stuck in event loop ([#272](https://github.com/dashevo/wallet-lib/issues/272))
-* connection within dashmate local network ([#263](https://github.com/dashevo/wallet-lib/issues/263))
 
 
 
