@@ -1,4 +1,3 @@
-const { each } = require('lodash');
 const sortPlugins = require('./_sortPlugins');
 
 const preparePlugins = function (account, userUnsafePlugins) {
@@ -6,10 +5,12 @@ const preparePlugins = function (account, userUnsafePlugins) {
   return new Promise(async (resolve, reject) => {
     try {
       const sortedPlugins = sortPlugins(account, userUnsafePlugins);
-      each(sortedPlugins, async (pluginArgs) => {
-        const [plugin, allowSensitiveOperation, awaitOnInjection] = pluginArgs;
+      // eslint-disable-next-line no-restricted-syntax
+      for (const [plugin, allowSensitiveOperation, awaitOnInjection] of sortedPlugins) {
+        // eslint-disable-next-line no-await-in-loop
         await account.injectPlugin(plugin, allowSensitiveOperation, awaitOnInjection);
-      });
+      }
+      resolve(sortedPlugins);
     } catch (e) {
       reject(e);
     }
