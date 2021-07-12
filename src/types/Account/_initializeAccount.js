@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const logger = require('../../logger');
 const EVENTS = require('../../EVENTS');
 const { WALLET_TYPES } = require('../../CONSTANTS');
