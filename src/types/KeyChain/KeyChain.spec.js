@@ -46,19 +46,23 @@ describe('Keychain', function suite() {
     const rootDIP15AccountKey_1 = keychain.getHardenedDIP15AccountKey(1);
     expect(rootDIP15AccountKey_1.toString()).to.deep.equal(expectedRootDIP15AccountKey_1);
   });
-  it('should get DIP15 extended private key', function () {
+  it('should get DIP15 extended key', function () {
     const userUniqueId = '0x555d3854c910b7dee436869c4724bed2fe0784e198b8a39f02bbb49d8ebcfc3a';
     const contactUniqueId = '0xa137439f36d04a15474ff7423e4b904a14373fafb37a41db74c84f1dbb5c89b5';
 
     //  m/9'/5'/15'/0'/0x555d3854c910b7dee436869c4724bed2fe0784e198b8a39f02bbb49d8ebcfc3a'/0xa137439f36d04a15474ff7423e4b904a14373fafb37a41db74c84f1dbb5c89b5'/0
-    const DIP15ExtKey_0 = keychain2.getDIP15ExtendedPrivateKey(userUniqueId, contactUniqueId, 0, 0);
-    expect(DIP15ExtKey_0.privateKey.toString()).to.equal('fac40790776d171ee1db90899b5eb2df2f7d2aaf35ad56f07ffb8ed2c57f8e60')
-    expect(DIP15ExtKey_0.publicKey.toString()).to.equal('038030c88ab0106e1f4af3b939db2bafc56f892554106f08da1ce1f9ef10f807bd')
+    const DIP15ExtPubKey_0 = keychain2.getDIP15ExtendedKey(userUniqueId, contactUniqueId, 0, 0, type='HDPublicKey');
+    expect(DIP15ExtPubKey_0.toString()).to.equal('xpub6LTkTQFSb8KMgMSz4B6sMZLpkQAY6wSTDprDkHDmLwWLpnjxazuxZn13FrSLKUafitsxuaaffM5a49P6aswhpppWUuYW6eFnwBXshR2W2eY');
+    expect(DIP15ExtPubKey_0.publicKey.toString()).to.equal('038030c88ab0106e1f4af3b939db2bafc56f892554106f08da1ce1f9ef10f807bd')
 
+    const DIP15ExtPrivKey_0 = keychain2.getDIP15ExtendedKey(userUniqueId, contactUniqueId, 0, 0);
+    expect(DIP15ExtPrivKey_0.toString()).to.equal('xprvA7UQ3tiYkkm4TsNWx9ZrzRQ6CNL3hUibrbvcwtp9nbyMwzQp3Tbi1ygZQaPoigDhCf8XUjMmGK2NbnB2kLXPYg99Lp6e3iki318sdWcFN3q');
+    expect(DIP15ExtPrivKey_0.privateKey.toString()).to.equal('fac40790776d171ee1db90899b5eb2df2f7d2aaf35ad56f07ffb8ed2c57f8e60')
+    expect(DIP15ExtPrivKey_0.publicKey.toString()).to.equal('038030c88ab0106e1f4af3b939db2bafc56f892554106f08da1ce1f9ef10f807bd')
 
     const userAhash = "0xa11ce14f698b32e9bb306dba7bbbee831263dcf658abeebb39930460ead117e5";
     const userBhash = "0xb0b052ff075c5ca3c16c3e20e9ac8223834475cc1324ab07889cb24ce6a62793";
-    const DIP15ExtKey_1 = keychain.getDIP15ExtendedPrivateKey(userAhash, userBhash, 0, 0);
+    const DIP15ExtKey_1 = keychain.getDIP15ExtendedKey(userAhash, userBhash, 0, 0);
     expect(DIP15ExtKey_1.privateKey.toString()).to.equal('60581b6dca8244d3fb3cfe619b5a22277e5423b01e5285f356981f247e0f4a60')
     expect(DIP15ExtKey_1.publicKey.toString()).to.equal('03deaac00f721151307fbc7bf80d7b8afab98c1f026d67e5f56b21e2013f551ce6')
 
