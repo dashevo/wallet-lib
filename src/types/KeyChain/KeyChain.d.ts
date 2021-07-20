@@ -21,6 +21,7 @@ export declare class KeyChain {
     generateKeyForChild(index: number, type?: HDKeyTypesParam): HDPrivateKey|HDPublicKey;
     generateKeyForPath(path: string, type?: HDKeyTypesParam): HDPrivateKey|HDPublicKey;
 
+    getDIP15ExtendedKey(userUniqueId: string, contactUniqueId: string, index?: number = 0, accountIndex?: number = 0, type?: HDKeyTypesParam = HDKeyTypesParam.HDPrivateKey)
     getHardenedBIP44Path(type?: HDKeyTypesParam): HDKeyTypes;
     getHardenedDIP9FeaturePath(type?: HDKeyTypesParam): HDKeyTypes;
     getHardenedDIP15AccountKey(index?: number, type?: HDKeyTypesParam): HDKeyTypes;
