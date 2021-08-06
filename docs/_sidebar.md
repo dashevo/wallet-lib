@@ -49,7 +49,7 @@
         - [`.generateKeyForChild()`](keychain/generateKeyForChild.md)
         - [`.generateKeyForPath()`](keychain/generateKeyForPath.md)
         - [`.getHardenedBIP44HDKey()`](keychain/getHardenedBIP44HDKey.md)
-        - [`.getHardenedDIP9FeaturePath()`](keychain/getHardenedDIP9FeaturePath.md)
+        - [`.getHardenedDIP9FeatureHDKey()`](keychain/getHardenedDIP9FeatureHDKey.md)
         - [`.getKeyForChild()`](keychain/getKeyForChild.md)
         - [`.getKeyForPath()`](keychain/getKeyForPath.md)
         - [`.getPrivateKey()`](keychain/getPrivateKey.md)

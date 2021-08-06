@@ -1,5 +1,5 @@
-**Usage**: `keychain.getHardenedDIP9FeaturePath(type)`    
-**Description**: Return a safier root path to derivate from
+**Usage**: `keychain.getHardenedDIP9FeatureHDKey(type)`    
+**Description**: Return a safier root key to derivate from
 
 Parameters: 
 
@@ -12,7 +12,7 @@ Returns : HDPrivateKey (of path: `m/9'/1'` on testnet or `m/9'/5'` on livenet)
 Example: 
 ```js
 
-const hdPrivateKey = keychain.getHardenedDIP9FeaturePath();
+const hdPrivateKey = keychain.getHardenedDIP9FeatureHDKey();
 const { privateKey } = hdPrivateKey;
 
 ```
