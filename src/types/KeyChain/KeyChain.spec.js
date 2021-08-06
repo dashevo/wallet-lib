@@ -28,12 +28,12 @@ describe('Keychain', function suite() {
     expect(address).to.equal('yNfUebksUc5HoSfg8gv98ruC3jUNJUM8pT');
   });
   it('should get hardened feature path', () => {
-    const hardenedPk = keychain.getHardenedBIP44Path();
+    const hardenedPk = keychain.getHardenedBIP44HDKey();
     const pk2 = keychain.getKeyForPath('m/44\'/1\'');
     expect(pk2.toString()).to.equal(hardenedPk.toString());
   });
   it('should derive from hardened feature path', () => {
-    const hardenedPk = keychain.getHardenedBIP44Path();
+    const hardenedPk = keychain.getHardenedBIP44HDKey();
     const derivedPk = hardenedPk.deriveChild(0, true).deriveChild(0).deriveChild(0);
     const address = new Dashcore.Address(derivedPk.publicKey.toAddress()).toString();
     expect(address).to.equal('yNfUebksUc5HoSfg8gv98ruC3jUNJUM8pT');

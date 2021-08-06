@@ -48,7 +48,7 @@
         - [`new KeyChain()`](keychain/KeyChain.md)
         - [`.generateKeyForChild()`](keychain/generateKeyForChild.md)
         - [`.generateKeyForPath()`](keychain/generateKeyForPath.md)
-        - [`.getHardenedBIP44Path()`](keychain/getHardenedBIP44Path.md)
+        - [`.getHardenedBIP44HDKey()`](keychain/getHardenedBIP44HDKey.md)
         - [`.getHardenedDIP9FeaturePath()`](keychain/getHardenedDIP9FeaturePath.md)
         - [`.getKeyForChild()`](keychain/getKeyForChild.md)
         - [`.getKeyForPath()`](keychain/getKeyForPath.md)
