@@ -122,6 +122,26 @@ describe('Wallet - class', function suite() {
       wallet1.disconnect();
     });
   });
+  it('should create a wallet with PublicKey', () => {
+    const publicKey = new Dashcore.PrivateKey(cR4t6ePrivateKey.privateKey).toPublicKey();
+    expect(publicKey.toString()).to.equal('03353b4deb77923b026278d116e2007d6f97a058e42d35f1fd39efd5314705f844');
+    const wallet1 = new Wallet({ publicKey: publicKey.toString(), network: 'testnet', ...mocks });
+    expect(wallet1.walletType).to.be.equal(WALLET_TYPES.SINGLE_ADDRESS);
+    expect(wallet1.mnemonic).to.be.equal(null);
+
+    expect(wallet1.plugins).to.be.deep.equal({});
+    expect(wallet1.accounts).to.be.deep.equal([]);
+    expect(wallet1.network).to.be.deep.equal(Dashcore.Networks.testnet.toString());
+    expect(wallet1.keyChain.type).to.be.deep.equal('privateKey');
+    expect(wallet1.passphrase).to.be.deep.equal(null);
+    expect(wallet1.allowSensitiveOperations).to.be.deep.equal(false);
+    expect(wallet1.injectDefaultPlugins).to.be.deep.equal(true);
+    expect(wallet1.walletId).to.be.equal(cR4t6ePrivateKey.walletIdTestnet);
+
+    wallet1.storage.on('CONFIGURED', () => {
+      wallet1.disconnect();
+    });
+  });
   it('should have an offline Mode', () => {
     const wallet = new Wallet({
       offlineMode: true, privateKey: cR4t6ePrivateKey.privateKey, network: 'testnet', ...mocks,

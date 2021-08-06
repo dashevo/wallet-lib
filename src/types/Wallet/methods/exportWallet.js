@@ -5,6 +5,26 @@ function exportMnemonic(mnemonic) {
   return mnemonic.toString();
 }
 
+function exportPublicKeyWallet(_outputType = 'publicKey') {
+  switch (_outputType) {
+    case 'publicKey':
+      if (!this.publicKey) throw new Error('No PublicKey to export');
+      return this.publicKey;
+    default:
+      throw new Error(`Tried to export to invalid output : ${_outputType}`);
+  }
+}
+
+function exportAddressWallet(_outputType = 'address') {
+  switch (_outputType) {
+    case 'address':
+      if (!this.address) throw new Error('No Address to export');
+      return this.address;
+    default:
+      throw new Error(`Tried to export to invalid output : ${_outputType}`);
+  }
+}
+
 function exportSingleAddressWallet(_outputType = 'privateKey') {
   switch (_outputType) {
     case 'privateKey':
@@ -50,15 +70,22 @@ function exportHDPublicWallet(_outputType = 'HDPublicKey') {
  * The default output differs from the wallet type.
  * For an HDWallet, it will be it's mnemonic.
  * For an HDPublic wallet (watch), it's will be that HDPubKey.
- * If initiated from a single private (single address), we output that privKey.
+ * If initiated from a private key, we output that key, similarly
+ * if initiated from a public key.
+ * On the case it's initiated from an address, we output it.
  *
  * @param outputType - Allow to overwrite the default output type
  * @return {Mnemonic|HDPrivateKey}
  */
 module.exports = function exportWallet(outputType) {
   switch (this.walletType) {
+    case WALLET_TYPES.PRIVATEKEY:
     case WALLET_TYPES.SINGLE_ADDRESS:
       return exportSingleAddressWallet.call(this, outputType);
+    case WALLET_TYPES.ADDRESS:
+      return exportAddressWallet.call(this, outputType);
+    case WALLET_TYPES.PUBLICKEY:
+      return exportPublicKeyWallet.call(this, outputType);
     case WALLET_TYPES.HDPUBLIC:
       return exportHDPublicWallet.call(this, outputType);
     case WALLET_TYPES.HDWALLET:
