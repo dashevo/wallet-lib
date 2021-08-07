@@ -1,7 +1,7 @@
 /**
  * Search a specific txid's metadata in the store
  * @param {string} hash
- * @return {TransactionSearchResult}
+ * @return {TransactionMetadataSearchResult}
  */
 const searchTransactionMetadata = function searchTransactionMetadata(hash) {
   const search = {
