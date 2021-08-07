@@ -21,7 +21,6 @@ const importTransactions = function importTransactions(transactions) {
     });
   } else if (type === 'Array') {
     transactions.forEach((transactionData) => {
-      if (tx.constructor.name === 'Array') {
       if (transactionData.constructor.name === 'Array') {
         self.importTransaction(transactionData[0], transactionData[1]);
       } else {
