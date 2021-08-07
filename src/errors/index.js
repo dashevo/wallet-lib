@@ -52,6 +52,7 @@ module.exports = {
   WorkerFailedOnExecute,
   StorageUnableToAddTransaction,
   TransactionNotInStore,
+  TransactionMetadataNotInStore,
   UnknownPlugin,
   UnknownWorker,
   ValidTransportLayerRequired,

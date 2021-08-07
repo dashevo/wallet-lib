@@ -391,6 +391,14 @@ describe('Storage - importTransaction', function suite() {
     const expectedTransaction = new Transaction(transactionFixtures.valid.testnet["1a74dc225b3336c4edb1f94c9ec2ed88fd0ef136866fda26f8a734924407b4d6"]);
     expect(mockedSelf.store.transactions['1a74dc225b3336c4edb1f94c9ec2ed88fd0ef136866fda26f8a734924407b4d6'].toString()).to.equal(expectedTransaction.toString());
 
+    expect(mockedSelf.store.transactionsMetadata).to.exist;
+    expect(mockedSelf.store.transactionsMetadata['1a74dc225b3336c4edb1f94c9ec2ed88fd0ef136866fda26f8a734924407b4d6']).to.deep.equal({
+      blockHash: '0000007a84abfe1d2b4201f4844bb1e59f24daf965c928281589269f281abc01',
+      height: 551438,
+      instantLocked: true,
+      chainLocked: true
+    })
+
     expect(mockedSelf.mappedTransactionsHeight).to.exist;
     const expectedMetadata = transactionFixtures.valid.testnet.metadata["1a74dc225b3336c4edb1f94c9ec2ed88fd0ef136866fda26f8a734924407b4d6"];
     expectedMetadata.hash = '1a74dc225b3336c4edb1f94c9ec2ed88fd0ef136866fda26f8a734924407b4d6';
