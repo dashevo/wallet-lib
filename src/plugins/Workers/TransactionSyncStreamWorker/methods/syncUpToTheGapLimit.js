@@ -41,6 +41,7 @@ module.exports = async function syncUpToTheGapLimit({
   self.stream = stream;
   let reachedGapLimit = false;
 
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     stream
       .on('data', async (response) => {
