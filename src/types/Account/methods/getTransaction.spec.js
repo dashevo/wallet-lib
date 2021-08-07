@@ -21,7 +21,7 @@ describe('Account - getTransaction', function suite() {
       index: 0,
       storage: storageHDW,
       transport: {
-        getTransaction: () => fetchTransactionInfoCalledNb += 1,
+        getTransaction: () => {fetchTransactionInfoCalledNb += 1; return null},
       },
     };
   });
@@ -33,7 +33,7 @@ describe('Account - getTransaction', function suite() {
     expect(fetchTransactionInfoCalledNb).to.equal(0);
     const tx = await getTransaction.call(mockedWallet, '92151f239013c961db15bc91d904404d2ae0520929969b59b69b17493569d0d5');
     expect(fetchTransactionInfoCalledNb).to.equal(1);
-    expect(tx).to.equal(1);
+    expect(tx).to.equal(null);
   });
 });
 
