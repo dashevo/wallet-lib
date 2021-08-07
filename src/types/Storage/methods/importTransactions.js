@@ -20,11 +20,12 @@ const importTransactions = function importTransactions(transactions) {
       self.importTransaction(transaction);
     });
   } else if (type === 'Array') {
-    transactions.forEach((tx) => {
+    transactions.forEach((transactionData) => {
       if (tx.constructor.name === 'Array') {
-        self.importTransaction(tx[0], tx[1]);
+      if (transactionData.constructor.name === 'Array') {
+        self.importTransaction(transactionData[0], transactionData[1]);
       } else {
-        self.importTransaction(tx);
+        self.importTransaction(transactionData);
       }
     });
   } else {
