@@ -25,7 +25,7 @@ async function getTransaction(txid = null) {
     chainLocked,
   };
   if (this.cacheTx) {
-    await this.importTransactions([transaction, metadata]);
+    await this.importTransactions([[transaction, metadata]]);
     if (this.cacheBlockHeaders) {
       const searchBlockHeader = this.storage.searchBlockHeader(height);
       if (!searchBlockHeader.found) {
