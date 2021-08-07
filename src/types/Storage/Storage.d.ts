@@ -10,6 +10,7 @@ import { BlockHeader } from "@dashevo/dashcore-lib";
 import { Account } from "../..";
 import { Transaction } from "@dashevo/dashcore-lib/typings/transaction/Transaction";
 
+
 export declare namespace Storage {
     interface IStorageOptions {
         rehydrate?: boolean;

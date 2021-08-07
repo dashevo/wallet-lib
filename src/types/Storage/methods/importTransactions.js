@@ -2,7 +2,7 @@ const { Transaction } = require('@dashevo/dashcore-lib');
 
 /**
  * Import an array of transactions or a transaction object to the store
- * @param {[Transaction]|Transaction} transactions
+ * @param {[[Transaction, TransactionMetaData]][Transaction]|Transaction} transactions
  * @return {number}
  * */
 const importTransactions = function importTransactions(transactions) {
@@ -21,7 +21,11 @@ const importTransactions = function importTransactions(transactions) {
     });
   } else if (type === 'Array') {
     transactions.forEach((tx) => {
-      self.importTransaction(tx);
+      if (tx.constructor.name === 'Array') {
+        self.importTransaction(tx[0], tx[1]);
+      } else {
+        self.importTransaction(tx);
+      }
     });
   } else {
     throw new Error('Invalid transaction. Cannot import.');

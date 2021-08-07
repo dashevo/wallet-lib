@@ -53,6 +53,7 @@ describe('Storage - constructor', function suite() {
     const expectedStore1 = {
       wallets: {},
       transactions: {},
+      transactionsMetadata:{},
       chains: {
         testnet: {
           name: 'testnet', blockHeight: -1, blockHeaders: {}, mappedBlockHeaderHeights: {},

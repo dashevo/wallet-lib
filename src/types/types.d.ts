@@ -1,5 +1,11 @@
 import {Account} from "./Account/Account";
 
+export declare type TransactionMetaData<T extends object = object> = T & {
+    blockHash: string,
+    height: number,
+    instantLocked: boolean,
+    chainLocked: boolean
+}
 export declare type transactionId<T extends string = string> = T;
 export declare type Mnemonic<T extends object = object> = T & {
     toString(): string;
