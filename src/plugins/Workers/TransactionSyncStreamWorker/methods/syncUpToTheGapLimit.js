@@ -66,6 +66,9 @@ module.exports = async function syncUpToTheGapLimit({
             const transactionHash = transaction._getHash().reverse().toString('hex');
             // eslint-disable-next-line no-await-in-loop
             const getTransactionResponse = await this.transport.getTransaction(transactionHash);
+            // eslint-disable-next-line no-await-in-loop
+            const getBlockHeaderResponse = await this.transport.getBlockHeaderByHash(getTransactionResponse.blockHash);
+            this.importBlockHeader(getBlockHeaderResponse);
             const metadata = {
               blockHash: getTransactionResponse.blockHash,
               height: getTransactionResponse.height,
