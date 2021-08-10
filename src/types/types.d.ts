@@ -30,6 +30,25 @@ export declare type TransactionWithMetaData<T extends object = object> = T & {
     metadata: TransactionMetaData
 }
 
+export declare type TransactionHistoryType = "received"|"sent";
+export declare type TransactionHistory<T extends object = object> = T & {
+    // fees: number,
+    from: [{
+        address: string,
+        satoshis: number,
+    }],
+    time: number,
+    to: [{
+        address: string,
+        satoshis: number
+    }],
+    type: TransactionHistoryType
+    txId: string,
+    blockHash: string
+}
+
+export declare type TransactionsHistory = [TransactionHistory]|[];
+
 export declare type TransactionsWithMetaData = [TransactionWithMetaData];
 
 export declare type RawTransaction = string;

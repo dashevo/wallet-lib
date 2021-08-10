@@ -26,7 +26,6 @@ function categorizeTransactions(transactionsWithMetadata, accountStore, accountI
 
   each(transactionsWithMetadata, (transactionWithMetadata) => {
     const [transaction, metadata] = transactionWithMetadata;
-    console.log([transaction, metadata]);
     each(transaction.vout, (vout) => {
 
     });

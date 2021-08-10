@@ -88,6 +88,11 @@ const CONSTANTS = {
       'network',
     ],
   },
+  TRANSACTION_HISTORY_TYPES: {
+    RECEIVED: 'received',
+    SENT: 'sent',
+    INTERNAL: 'internal',
+  },
   STORAGE: {
     autosaveIntervalTime: 10 * 1000,
   },

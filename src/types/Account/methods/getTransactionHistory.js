@@ -1,5 +1,6 @@
 const { each } = require('lodash');
 const _ = require('lodash');
+const { TRANSACTION_HISTORY_TYPES } = require('../../../CONSTANTS');
 const {
   filterTransactions,
   categorizeTransactions,
@@ -11,7 +12,7 @@ const sortByHeightDescending = (a, b) => (b.height - a.height);
 
 /**
  * Get all the transaction history already formated
- * @return {Promise<any[]>}
+ * @return {Promise<TransactionsHistory>}
  */
 async function getTransactionHistory() {
   const transactionHistory = [];
@@ -57,7 +58,32 @@ async function getTransactionHistory() {
     // To get time of block, let's find the blockheader.
     const blockHeader = blockHeaders[blockHash];
     const { time } = blockHeader;
-    transactionHistory.push({ time, ...categorizedTransaction });
+
+    // Would require knowing the vout of this vin to determinate inputAmount.
+    // const { inputs, outputs } = categorizedTransaction.transaction;
+    // const inputAmount = 0;
+    // const outputAmount = outputs.reduce((acc, output) => (acc + output.satoshis), 0);
+    // const transactionFee = (transaction.isCoinbase() ? 0 : inputAmount - outputAmount);
+    const normalizedTransactionHistory = {
+      // fees: transactionFee,
+      from: [{
+        address: null,
+        satoshis: null,
+      }],
+      to: [{
+        address: null,
+        satoshis: null,
+      }],
+      // received, sent...
+      type: TRANSACTION_HISTORY_TYPES.SENT,
+      time,
+      txId: categorizedTransaction.transaction.hash,
+      blockHash: categorizedTransaction.blockHash,
+      isChainLocked: categorizedTransaction.isChainLocked,
+      isInstantLocked: categorizedTransaction.isInstantLocked,
+    };
+
+    transactionHistory.push(normalizedTransactionHistory);
   });
   // Sort by decreasing time.
   return transactionHistory.sort(sortbyTimeDescending);
