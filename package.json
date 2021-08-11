@@ -37,7 +37,7 @@
   },
   "homepage": "https://github.com/dashevo/wallet-lib#readme",
   "dependencies": {
-    "@dashevo/dapi-client": "github:dashevo/dapi-client#get-consensun-params",
+    "@dashevo/dapi-client": "~0.21.0-dev.4",
     "@dashevo/dashcore-lib": "~0.19.25",
     "@dashevo/dpp": "~0.20.1",
     "@dashevo/grpc-common": "~0.3.4",
