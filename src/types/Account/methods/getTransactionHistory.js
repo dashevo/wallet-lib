@@ -5,6 +5,7 @@ const {
   filterTransactions,
   categorizeTransactions,
   extendTransactionsWithMetadata,
+  // calculateTransactionFees,
 } = require('../../../utils');
 
 const sortbyTimeDescending = (a, b) => (b.time - a.time);
@@ -49,19 +50,23 @@ async function getTransactionHistory() {
   const categorizedTransactions = categorizeTransactions(
     filteredTransactionsWithMetadata,
     accountStore,
+    accountIndex,
+    walletType,
+    network,
   );
 
   const sortedCategorizedTransactions = categorizedTransactions.sort(sortByHeightDescending);
 
   each(sortedCategorizedTransactions, (categorizedTransaction) => {
-    const { blockHash } = categorizedTransaction;
+    const { blockHash, from, to } = categorizedTransaction;
     // To get time of block, let's find the blockheader.
     const blockHeader = blockHeaders[blockHash];
     const { time } = blockHeader;
 
+    const normalizedTransactionHistory = {
     // Would require knowing the vout of this vin to determinate inputAmount.
-    // const { inputs, outputs } = categorizedTransaction.transaction;
-    // const inputAmount = 0;
+      // This information could be fetched, but the necessity vs the cost is questionable.
+      // fees: calculateTransactionFees(categorizedTransaction.transaction),
     // const outputAmount = outputs.reduce((acc, output) => (acc + output.satoshis), 0);
     // const transactionFee = (transaction.isCoinbase() ? 0 : inputAmount - outputAmount);
     const normalizedTransactionHistory = {

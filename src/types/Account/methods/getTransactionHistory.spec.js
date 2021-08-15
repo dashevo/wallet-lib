@@ -1,4 +1,6 @@
 const { expect } = require('chai');
+const { WALLET_TYPES } = require('../../../CONSTANTS');
+const getTransactions = require('./getTransactions');
 const getTransactionHistory = require('./getTransactionHistory');
 const searchTransaction = require('../../Storage/methods/searchTransaction');
 const getTransaction = require('../../Storage/methods/getTransaction');
@@ -9,11 +11,31 @@ const mockedStoreHDWallet = require('../../../../fixtures/duringdevelop-fullstor
 const mockedStoreSingleAddress = require('../../../../fixtures/da07-fullstore-snapshot-1548533266');
 
 describe('Account - getTransactionHistory', () => {
-  console.error('We require tx association with height/hash to build this.');
-  return;
   it('should return an empty array on no transaction history', async () => {
+    const storageHDW = {
+      store: mockedStoreHDWallet,
+      getStore: () => mockedStoreHDWallet,
+      mappedAddress: {},
+    };
+    const walletIdHDW = Object.keys(mockedStoreHDWallet.wallets)[0];
+    const selfHDW = {
+      walletId: walletIdHDW,
+      walletType: WALLET_TYPES.HDWALLET,
+      index: 0,
+      storage: storageHDW,
+    };
+    selfHDW.storage.searchTransaction = searchTransaction.bind(storageHDW);
+    selfHDW.storage.searchAddress = searchAddress.bind(storageHDW);
+    selfHDW.storage.getBlockHeader = getBlockHeader.bind(storageHDW);
+    selfHDW.storage.searchBlockHeader = searchBlockHeader.bind(storageHDW);
+    selfHDW.getTransaction = getTransaction.bind(selfHDW);
+    selfHDW.getTransactions = getTransactions.bind(selfHDW);
+    const txHistoryHDW = await getTransactionHistory.call(selfHDW);
+    const expectedTxHistoryHDW = [];
+    expect(txHistoryHDW).to.be.deep.equal(expectedTxHistoryHDW);
 
   });
+  return;
   it('should return a valid transaction history for HDWallet', async () => {
     const storageHDW = {
       store: mockedStoreHDWallet,
