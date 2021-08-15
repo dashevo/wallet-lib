@@ -1,0 +1,38 @@
+const { map, filter } = require('lodash');
+const { WALLET_TYPES } = require('../CONSTANTS');
+
+function classifyAddresses(addressStore, accountIndex, walletType) {
+  const { external, internal, misc } = addressStore;
+
+  // This will filter addresses to return only the one that are directly one the account manage.
+  // TODO: Coputational improvement can be made by having accountIndex
+  //  member of the address info format and thus comparing only 2 numbers
+  const filterPathByAccount = (address) => (parseInt(address.path.split('/')[3], 10) === accountIndex);
+  const addressMappingPredicate = (addressInfo) => (addressInfo.address);
+
+  if (!walletType === WALLET_TYPES.HDWALLET) throw new Error('NOT IMPLEMENTED');
+  // IMPLEMENTS MISC handling and identities...
+
+  const externalAddressList = (walletType === WALLET_TYPES.HDWALLET)
+    ? map(filter(external, filterPathByAccount), addressMappingPredicate)
+    : [];
+
+  const internalAddressList = (walletType === WALLET_TYPES.HDWALLET)
+    ? map(filter(internal, filterPathByAccount), addressMappingPredicate)
+    : [];
+
+  const otherAccountAddressList = (walletType === WALLET_TYPES.HDWALLET)
+    ? map(filter(
+      { ...external, ...internal },
+      !filterPathByAccount,
+    ),
+    addressMappingPredicate)
+    : [];
+
+  return {
+    externalAddressList,
+    internalAddressList,
+    otherAccountAddressList,
+  };
+}
+module.exports = classifyAddresses;

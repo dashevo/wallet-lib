@@ -1,0 +1,480 @@
+const { expect } = require('chai');
+const { WALLET_TYPES } = require('../CONSTANTS');
+const classifyAddresses = require('./classifyAddresses');
+
+describe('Utils - classifyAddresses', function suite() {
+  it('should correctly classify address for HDWallet', function () {
+    const walletType = WALLET_TYPES.HDWALLET;
+    const accountIndex = 0;
+    // const tx = new Transaction('020000000142bb40d403a55a70e1601f8f34ef42c7fa1171dfd9477648a2b02e414f4f9488000000006a47304402206c0a1f90457439095660682dccc3f39cdd0dfeb2b573e2454ccace219e6cb87502204ce55165e01f51a0fb92e98a248dba55957c9441953d0a546977ecfdc9e75ac601210200669c7e5dd728b676c2c1163ddcfa88e7cd4f01d12f01188b6b32c399c008ccfeffffff024011f307000000001976a9149b41890df761a9b6e1fb8588e3e1c13390be914488ac900f4e26000000001976a914b7240ea2d7287d73ad41c05a48af34d4ed071da188ac0d6a0800');
+    const accountStore = {
+      accounts: {
+        "m/44'/1'/0'": {
+          label: null,
+          path: "m/44'/1'/0'",
+          network: 'testnet',
+          blockHeight: 554643,
+          blockHash: '0000007a84abfe1d2b4201f4844bb1e59f24daf965c928281589269f281abc01'
+        }
+      },
+      network: 'testnet',
+      mnemonic: null,
+      type: null,
+      identityIds: [],
+      addresses: {
+        external:{
+          "m/44'/1'/0'/0/0": {
+            path: "m/44'/1'/0'/0/0",
+            index: 0,
+            address: 'yd1ohc12LgCYp56CDuckTEHwoa6LbPghMd',
+            transactions: ["1a74dc225b3336c4edb1f94c9ec2ed88fd0ef136866fda26f8a734924407b4d6"],
+            balanceSat: 642650000,
+            unconfirmedBalanceSat: 0,
+            utxos: {
+              "1a74dc225b3336c4edb1f94c9ec2ed88fd0ef136866fda26f8a734924407b4d6-1" : {}
+            },
+            fetchedLast: 0,
+            used: true
+          },
+        "m/44'/1'/0'/0/1": {
+          path: "m/44'/1'/0'/0/1",
+          index: 1,
+          address: 'yMX3ycrLVF2k6YxWQbMoYgs39aeTfY4wrB',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/2": {
+          path: "m/44'/1'/0'/0/2",
+          index: 2,
+          address: 'ydJGUUmNxdmvyskoZXqtJRqWyqsaFPitGQ',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/3": {
+          path: "m/44'/1'/0'/0/3",
+          index: 3,
+          address: 'yhugNjDRVJUL7PK9MqQP9M6M1HJm8zuWJL',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/4": {
+          path: "m/44'/1'/0'/0/4",
+          index: 4,
+          address: 'ySgckdRYxpa7Uda8yUNRqjYeuusqLy3AY3',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/5": {
+          path: "m/44'/1'/0'/0/5",
+          index: 5,
+          address: 'yS4DeSU3MTBisgL6p8PDRzSxTPN2PUt3vE',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/6": {
+          path: "m/44'/1'/0'/0/6",
+          index: 6,
+          address: 'yRZef5UGotGgLMaLYTzhvfknogqMRBkUiX',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/7": {
+          path: "m/44'/1'/0'/0/7",
+          index: 7,
+          address: 'yTUw2bGzi9rYs41XH1dxbRqiJoDtwuUcv2',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/8": {
+          path: "m/44'/1'/0'/0/8",
+          index: 8,
+          address: 'yNQHAGhNP7UbhxnkZH4muP2oKkuayGEuwX',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/9": {
+          path: "m/44'/1'/0'/0/9",
+          index: 9,
+          address: 'yPPDLBDjHctWpMxLiMTJXLngcYPke7YNaY',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/10": {
+          path: "m/44'/1'/0'/0/10",
+          index: 10,
+          address: 'ya2vVJAJdZN2We7MYiSjGf9wkdWF6A1RLr',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/11": {
+          path: "m/44'/1'/0'/0/11",
+          index: 11,
+          address: 'ya5k2YMjfyfxZoidq4UdQ65jYUXvtVomEv',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/12": {
+          path: "m/44'/1'/0'/0/12",
+          index: 12,
+          address: 'yhXZja3Apyp9S32zEVsPqLssNJZLrczxJC',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/13": {
+          path: "m/44'/1'/0'/0/13",
+          index: 13,
+          address: 'yhWqJXsp25aZNQHEprebQrqPoANj6A13Aa',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/14": {
+          path: "m/44'/1'/0'/0/14",
+          index: 14,
+          address: 'yjV3sKAGsuJHDGyf6HDMNuLfMgGp5pBxRy',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/15": {
+          path: "m/44'/1'/0'/0/15",
+          index: 15,
+          address: 'yjPeTiRatdvotxUuPFEPDJc2aF774uMB9J',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/16": {
+          path: "m/44'/1'/0'/0/16",
+          index: 16,
+          address: 'yRrhuVw6Vd3NzgYrfqb1oTvdhyxzDT9PGz',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/17": {
+          path: "m/44'/1'/0'/0/17",
+          index: 17,
+          address: 'yYpL5JJLVGfJXPE15ZMQzNvUGkD4JY6ETF',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/18": {
+          path: "m/44'/1'/0'/0/18",
+          index: 18,
+          address: 'ygcW1365Hs2LSLY5LXnkJAUB94pS4HouNu',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/0/19": {
+          path: "m/44'/1'/0'/0/19",
+          index: 19,
+          address: 'yW8RA7zTUz14sNiGjvFQaNupugwwmE1aQi',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        }
+      },
+      internal: {
+        "m/44'/1'/0'/1/0": {
+          path: "m/44'/1'/0'/1/0",
+          index: 0,
+          address: 'yaLhoAZ4iex2zKmfvS9rvEmxXmRiPrjHdD',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/1": {
+          path: "m/44'/1'/0'/1/1",
+          index: 1,
+          address: 'yTcjWB7v7opDzpfYKpFdFEtEvSKFsh3bW3',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/2": {
+          path: "m/44'/1'/0'/1/2",
+          index: 2,
+          address: 'yiDVYtUZ2mKV4teSJzKBArqY4BRsZoFLYs',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/3": {
+          path: "m/44'/1'/0'/1/3",
+          index: 3,
+          address: 'ya7Me5KMoSz5x4GGZ1pJGrJjC3yMkDDWDa',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/4": {
+          path: "m/44'/1'/0'/1/4",
+          index: 4,
+          address: 'yXwS8mRrrxF3pt1GfG7yGKNpPnD6pdwX3a',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/5": {
+          path: "m/44'/1'/0'/1/5",
+          index: 5,
+          address: 'yXd4eqycSaJRhRZxXT3iK5H34af4TV5REE',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/6": {
+          path: "m/44'/1'/0'/1/6",
+          index: 6,
+          address: 'yWaDfpToRxHc3qtcd8P1agW4Fvj1ueWgwH',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/7": {
+          path: "m/44'/1'/0'/1/7",
+          index: 7,
+          address: 'yPYdu2jDrD3Bai83AdvHTYwpAgAkzMaCcM',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/8": {
+          path: "m/44'/1'/0'/1/8",
+          index: 8,
+          address: 'yMEkuZ67vZ6kUgDHVVDSTzwU3GbHoTFwqR',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/9": {
+          path: "m/44'/1'/0'/1/9",
+          index: 9,
+          address: 'yYSSMwkEqU4hNF2z5kbVBTDYtgt8dQQYd7',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/10": {
+          path: "m/44'/1'/0'/1/10",
+          index: 10,
+          address: 'yfzAa63gQ6arpyBzuqQtZmSnU8HLnJnEan',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/11": {
+          path: "m/44'/1'/0'/1/11",
+          index: 11,
+          address: 'ySjTorgG6VVfPiY7TJ2tdU2hkohfFAtzJf',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/12": {
+          path: "m/44'/1'/0'/1/12",
+          index: 12,
+          address: 'yMUJsy5HEiQTeDgqxY2zBGEeTCDr4g5V8c',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/13": {
+          path: "m/44'/1'/0'/1/13",
+          index: 13,
+          address: 'yWDkvzhKk7BKEU6Ybz1Kyarejzt8zhSqxy',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/14": {
+          path: "m/44'/1'/0'/1/14",
+          index: 14,
+          address: 'yTJQE4vYXRdEcPt3nADF36S6FKLkLRG2Ty',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/15": {
+          path: "m/44'/1'/0'/1/15",
+          index: 15,
+          address: 'yTjku3TMxJN3uiiSHYB2tQ4wp1rJJ92M2A',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/16": {
+          path: "m/44'/1'/0'/1/16",
+          index: 16,
+          address: 'yZ8JgZrpuEr1srdcgLgTAsomtMBgSYwTrW',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/17": {
+          path: "m/44'/1'/0'/1/17",
+          index: 17,
+          address: 'yUG2YZrss5JfZrN4AG4RKkkbfYyd4H6TSx',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/18": {
+          path: "m/44'/1'/0'/1/18",
+          index: 18,
+          address: 'yiLMqyvjBV3CqkCL8H44bRSUBap7tPCmvo',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        },
+        "m/44'/1'/0'/1/19": {
+          path: "m/44'/1'/0'/1/19",
+          index: 19,
+          address: 'yfrCYcuD7ezYnpNAmbPMjrTETjipsNGsEe',
+          transactions: [],
+          balanceSat: 0,
+          unconfirmedBalanceSat: 0,
+          utxos: {},
+          fetchedLast: 0,
+          used: false
+        }
+      },
+      misc: {}
+    }
+
+
+  };
+
+    const res = classifyAddresses(accountStore.addresses, accountIndex, walletType);
+    console.log({res});
+  });
+});

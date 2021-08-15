@@ -1,40 +1,68 @@
-const _ = require('lodash');
 const { each } = require('lodash');
+const classifyAddresses = require('./classifyAddresses');
 
-function categorizeTransactions(transactionsWithMetadata, accountStore, accountIndex, isHDWallet) {
-  const accountAddresses = accountStore.addresses;
+function categorizeTransactions(transactionsWithMetadata, accountStore, accountIndex, walletType, network = 'testnet') {
   const categorizedTransactions = [];
-  const predicate = (addr) => ({ address: addr.address });
-
-  const filterInAccountPredicate = (addr) => !!(isHDWallet && parseInt(addr.path.split('/')[3], 10) === accountIndex);
-  const filterOutAccountPredicate = (addr) => !!(isHDWallet && parseInt(addr.path.split('/')[3], 10) !== accountIndex);
-  const changeAddresses = (isHDWallet)
-    ? _.map(_.filter(accountAddresses.internal, filterInAccountPredicate), predicate)
-    : _.map(accountAddresses.misc, predicate);
-  const changeAddressList = changeAddresses.map((addr) => addr.address, []);
-
-  const externalAddresses = (isHDWallet)
-    ? _.map(_.filter(accountAddresses.external, filterInAccountPredicate), predicate)
-    : _.filter(accountAddresses.misc, predicate);
-  const externalAddressesList = externalAddresses.map((addr) => addr.address, []);
-  const mergedAddresses = { ...accountAddresses.external, ...accountAddresses.internal };
-  const otherAccountAddresses = (isHDWallet)
-    ? _.map(_.filter(mergedAddresses, filterOutAccountPredicate), predicate)
-    : [];
-  const otherAccountAddressesList = otherAccountAddresses
-    .map((addr) => addr.address, []);
+  console.log({ accountIndex, accountStore, walletType });
+  const {
+    externalAddressList,
+    internalAddressList,
+    otherAccountAddressList,
+  } = classifyAddresses(accountStore.addresses, accountIndex, walletType);
 
   each(transactionsWithMetadata, (transactionWithMetadata) => {
     const [transaction, metadata] = transactionWithMetadata;
-    each(transaction.vout, (vout) => {
+    const from = [];
+    const to = [];
+    let type = 'unknown';
+    // For each vout, we will look at matching known addresses
+    console.log('tx', transaction);
+    each(transaction.outputs, (vout) => {
+      const { satoshis, script } = vout;
+      const address = script.toAddress(network).toString();
+      if (address) {
+        console.log(internalAddressList, address);
+        console.log(externalAddressList, address);
+        console.log(otherAccountAddressList, address);
+        const isChange = internalAddressList.includes(address);
+        const isExternal = externalAddressList.includes(address);
+        const isOtherAccount = otherAccountAddressList.includes(address);
 
+        if (isExternal || isChange) type = 'received';
+        else if (isOtherAccount) type = 'transfer';
+        else type = 'sent';
+        to.push({
+          address,
+          satoshis,
+        });
+        // console.log(`vOut:${address}-Sat: ${satoshis} - isChange: ${isChange} - isExternal: ${isExternal} - isOtherAccount: ${isOtherAccount}`);
+      }
     });
-    each(transaction.vin, (vin) => {
-
+    // For each vin, we will look at matching known addresses
+    // In order to know the value in, we would require fetching tx for output of vin info
+    each(transaction.inputs, (vin) => {
+      const { script } = vin;
+      const address = script.toAddress(network).toString();
+      if (address) {
+        console.log(internalAddressList, address);
+        console.log(externalAddressList, address);
+        console.log(otherAccountAddressList, address);
+        const isChange = internalAddressList.includes(address);
+        const isExternal = externalAddressList.includes(address);
+        const isOtherAccount = otherAccountAddressList.includes(address);
+        console.log(`vIn:${address} - isChange: ${isChange} - isExternal: ${isExternal} - isOtherAccount: ${isOtherAccount}`);
+        from.push({
+          address,
+        });
+        if (isOtherAccount) type = 'transfer';
+        if (isExternal || isChange) type = 'sent';
+      }
     });
     const categorizedTransaction = {
+      from,
+      to,
       transaction,
-      type: 'unknown',
+      type,
       blockHash: metadata.blockHash,
       height: metadata.height,
       isInstantLocked: metadata.instantLocked,
