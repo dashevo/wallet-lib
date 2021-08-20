@@ -91,7 +91,9 @@ const CONSTANTS = {
   TRANSACTION_HISTORY_TYPES: {
     RECEIVED: 'received',
     SENT: 'sent',
-    INTERNAL: 'internal',
+    ADDRESS_TRANSFER: 'address_transfer',
+    ACCOUNT_TRANSFER: 'account_transfer',
+    UNKNOWN: 'unknown',
   },
   STORAGE: {
     autosaveIntervalTime: 10 * 1000,

@@ -1,6 +1,4 @@
 const { each } = require('lodash');
-const _ = require('lodash');
-const { TRANSACTION_HISTORY_TYPES } = require('../../../CONSTANTS');
 const {
   filterTransactions,
   categorizeTransactions,
@@ -25,6 +23,7 @@ async function getTransactionHistory() {
     storage,
     network,
   } = this;
+
   const transactions = this.getTransactions();
   const store = storage.getStore();
 
@@ -58,34 +57,35 @@ async function getTransactionHistory() {
   const sortedCategorizedTransactions = categorizedTransactions.sort(sortByHeightDescending);
 
   each(sortedCategorizedTransactions, (categorizedTransaction) => {
-    const { blockHash, from, to } = categorizedTransaction;
+    const {
+      transaction,
+      from,
+      to,
+      type,
+      isChainLocked,
+      isInstantLocked,
+    } = categorizedTransaction;
+
+    const blockHash = categorizedTransaction.blockHash !== '' ? categorizedTransaction.blockHash : null;
+
     // To get time of block, let's find the blockheader.
     const blockHeader = blockHeaders[blockHash];
-    const { time } = blockHeader;
+
+    // If it's unconfirmed, we won't have a blockHeader nor it's time.
+    const time = blockHeader ? blockHeader.time : -1;
 
     const normalizedTransactionHistory = {
-    // Would require knowing the vout of this vin to determinate inputAmount.
+      // Would require knowing the vout of this vin to determinate inputAmount.
       // This information could be fetched, but the necessity vs the cost is questionable.
       // fees: calculateTransactionFees(categorizedTransaction.transaction),
-    // const outputAmount = outputs.reduce((acc, output) => (acc + output.satoshis), 0);
-    // const transactionFee = (transaction.isCoinbase() ? 0 : inputAmount - outputAmount);
-    const normalizedTransactionHistory = {
-      // fees: transactionFee,
-      from: [{
-        address: null,
-        satoshis: null,
-      }],
-      to: [{
-        address: null,
-        satoshis: null,
-      }],
-      // received, sent...
-      type: TRANSACTION_HISTORY_TYPES.SENT,
+      from,
+      to,
+      type,
       time,
-      txId: categorizedTransaction.transaction.hash,
-      blockHash: categorizedTransaction.blockHash,
-      isChainLocked: categorizedTransaction.isChainLocked,
-      isInstantLocked: categorizedTransaction.isInstantLocked,
+      txId: transaction.hash,
+      blockHash,
+      isChainLocked,
+      isInstantLocked,
     };
 
     transactionHistory.push(normalizedTransactionHistory);
