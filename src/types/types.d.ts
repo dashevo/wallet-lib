@@ -30,7 +30,12 @@ export declare type TransactionWithMetaData<T extends object = object> = T & {
     metadata: TransactionMetaData
 }
 
-export declare type TransactionHistoryType = "received"|"sent";
+export declare type TransactionHistoryType = "received"
+    | "sent"
+    | "address_transfer"
+    | "account_transfer"
+    | "unknown"
+
 export declare type TransactionHistory<T extends object = object> = T & {
     // fees: number,
     from: [{
