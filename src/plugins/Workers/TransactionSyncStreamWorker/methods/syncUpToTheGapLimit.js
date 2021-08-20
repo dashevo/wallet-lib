@@ -67,12 +67,17 @@ module.exports = async function syncUpToTheGapLimit({
             // eslint-disable-next-line no-await-in-loop
             const getTransactionResponse = await this.transport.getTransaction(transactionHash);
 
-            // eslint-disable-next-line no-await-in-loop
-            const getBlockHeaderResponse = await this
-              .transport
-              .getBlockHeaderByHash(getTransactionResponse.blockHash);
+            if(!getTransactionResponse.blockHash){
+              // We should set-up a retry of fetching the tx and it's blockhash
+            }
+            if (getTransactionResponse.blockHash) {
+              // eslint-disable-next-line no-await-in-loop
+              const getBlockHeaderResponse = await this
+                .transport
+                .getBlockHeaderByHash(getTransactionResponse.blockHash);
 
-            this.importBlockHeader(getBlockHeaderResponse);
+              this.importBlockHeader(getBlockHeaderResponse);
+            }
 
             const metadata = {
               blockHash: getTransactionResponse.blockHash,
