@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const { Networks } = require('@dashevo/dashcore-lib')
 const {
   generateNewMnemonic,
   seedToHDPrivateKey,

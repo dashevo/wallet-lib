@@ -5,6 +5,6 @@
  * @return {boolean}
  */
 function hasMethod(obj, methodName) {
-  return typeof obj[methodName] === 'function';
+  return !!obj && typeof obj[methodName] === 'function';
 }
 module.exports = hasMethod;

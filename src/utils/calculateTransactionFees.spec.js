@@ -1,5 +1,4 @@
 const { expect } = require('chai');
-const { WALLET_TYPES } = require('../CONSTANTS');
 const calculateTransactionFees = require('./calculateTransactionFees');
 
 describe('Utils - calculateTransactionFees', function suite() {

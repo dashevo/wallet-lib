@@ -1,8 +1,9 @@
+const { Mnemonic, Networks, Address } = require('@dashevo/dashcore-lib');
 const { expect } = require('chai');
-const { hasProp, is, generateNewMnemonic} = require("./index");
+const { is, generateNewMnemonic} = require("./index");
 const figureBridgeFixture = require("../../fixtures/figurebridge");
 
-describe('Utils - hasProp', function suite() {
+describe('Utils - is', function suite() {
   it('should have is.num handle numbers', () => {
     expect(is.num(100)).to.be.equals(true);
   });
