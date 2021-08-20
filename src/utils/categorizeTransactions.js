@@ -1,9 +1,35 @@
 const { each } = require('lodash');
 const classifyAddresses = require('./classifyAddresses');
+const { TRANSACTION_HISTORY_TYPES } = require('../CONSTANTS');
+
+const determineType = (inputsDetection, outputsDetection) => {
+  let type = TRANSACTION_HISTORY_TYPES.UNKNOWN;
+  if (inputsDetection.hasExternalAddress) {
+    type = TRANSACTION_HISTORY_TYPES.RECEIVED;
+  }
+  if (outputsDetection.hasExternalAddress) {
+    type = TRANSACTION_HISTORY_TYPES.RECEIVED;
+  }
+  if (
+    !outputsDetection.hasExternalAddress
+      && (inputsDetection.hasChangeAddress || inputsDetection.hasExternalAddress)
+  ) {
+    type = TRANSACTION_HISTORY_TYPES.SENT;
+  }
+  if (inputsDetection.hasExternalAddress && outputsDetection.hasExternalAddress) {
+    type = TRANSACTION_HISTORY_TYPES.ADDRESS_TRANSFER;
+  } else if (
+    (inputsDetection.hasExternalAddress && outputsDetection.hasOtherAccountAddress)
+      || (inputsDetection.hasOtherAccountAddress && outputsDetection.hasExternalAddress)
+  ) {
+    type = TRANSACTION_HISTORY_TYPES.ACCOUNT_TRANSFER;
+  }
+  return type;
+};
 
 function categorizeTransactions(transactionsWithMetadata, accountStore, accountIndex, walletType, network = 'testnet') {
   const categorizedTransactions = [];
-  console.log({ accountIndex, accountStore, walletType });
+
   const {
     externalAddressList,
     internalAddressList,
@@ -14,28 +40,28 @@ function categorizeTransactions(transactionsWithMetadata, accountStore, accountI
     const [transaction, metadata] = transactionWithMetadata;
     const from = [];
     const to = [];
-    let type = 'unknown';
+
+    let outputsHasChangeAddress = false;
+    let outputsHasExternalAddress = false;
+    let outputsHasOtherAccountAddress = false;
+
+    let inputsHasChangeAddress = false;
+    let inputsHasExternalAddress = false;
+    let inputsHasOtherAccountAddress = false;
+
     // For each vout, we will look at matching known addresses
-    console.log('tx', transaction);
+    // console.log('tx', transaction);
     each(transaction.outputs, (vout) => {
       const { satoshis, script } = vout;
       const address = script.toAddress(network).toString();
       if (address) {
-        console.log(internalAddressList, address);
-        console.log(externalAddressList, address);
-        console.log(otherAccountAddressList, address);
-        const isChange = internalAddressList.includes(address);
-        const isExternal = externalAddressList.includes(address);
-        const isOtherAccount = otherAccountAddressList.includes(address);
-
-        if (isExternal || isChange) type = 'received';
-        else if (isOtherAccount) type = 'transfer';
-        else type = 'sent';
+        if (internalAddressList.includes(address)) outputsHasChangeAddress = true;
+        if (externalAddressList.includes(address)) outputsHasExternalAddress = true;
+        if (otherAccountAddressList.includes(address)) outputsHasOtherAccountAddress = true;
         to.push({
           address,
           satoshis,
         });
-        // console.log(`vOut:${address}-Sat: ${satoshis} - isChange: ${isChange} - isExternal: ${isExternal} - isOtherAccount: ${isOtherAccount}`);
       }
     });
     // For each vin, we will look at matching known addresses
@@ -44,20 +70,25 @@ function categorizeTransactions(transactionsWithMetadata, accountStore, accountI
       const { script } = vin;
       const address = script.toAddress(network).toString();
       if (address) {
-        console.log(internalAddressList, address);
-        console.log(externalAddressList, address);
-        console.log(otherAccountAddressList, address);
-        const isChange = internalAddressList.includes(address);
-        const isExternal = externalAddressList.includes(address);
-        const isOtherAccount = otherAccountAddressList.includes(address);
-        console.log(`vIn:${address} - isChange: ${isChange} - isExternal: ${isExternal} - isOtherAccount: ${isOtherAccount}`);
+        if (internalAddressList.includes(address)) inputsHasChangeAddress = true;
+        if (externalAddressList.includes(address)) inputsHasExternalAddress = true;
+        if (otherAccountAddressList.includes(address)) inputsHasOtherAccountAddress = true;
         from.push({
           address,
         });
-        if (isOtherAccount) type = 'transfer';
-        if (isExternal || isChange) type = 'sent';
       }
     });
+
+    const type = determineType({
+      hasChangeAddress: inputsHasChangeAddress,
+      hasExternalAddress: inputsHasExternalAddress,
+      hasOtherAccountAddress: inputsHasOtherAccountAddress,
+    }, {
+      hasChangeAddress: outputsHasChangeAddress,
+      hasExternalAddress: outputsHasExternalAddress,
+      hasOtherAccountAddress: outputsHasOtherAccountAddress,
+    });
+
     const categorizedTransaction = {
       from,
       to,
@@ -73,4 +104,5 @@ function categorizeTransactions(transactionsWithMetadata, accountStore, accountI
 
   return categorizedTransactions;
 }
+
 module.exports = categorizeTransactions;
