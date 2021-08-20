@@ -1,4 +1,4 @@
-const { map, filter } = require('lodash');
+const { map, filter, difference } = require('lodash');
 const { WALLET_TYPES } = require('../CONSTANTS');
 
 function classifyAddresses(addressStore, accountIndex, walletType) {
@@ -22,11 +22,10 @@ function classifyAddresses(addressStore, accountIndex, walletType) {
     : [];
 
   const otherAccountAddressList = (walletType === WALLET_TYPES.HDWALLET)
-    ? map(filter(
-      { ...external, ...internal },
-      !filterPathByAccount,
-    ),
-    addressMappingPredicate)
+    ? difference(
+      [...map(external, addressMappingPredicate), ...map(internal, addressMappingPredicate)],
+      [...externalAddressList, ...internalAddressList],
+    )
     : [];
 
   return {

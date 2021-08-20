@@ -474,7 +474,54 @@ describe('Utils - classifyAddresses', function suite() {
 
   };
 
-    const res = classifyAddresses(accountStore.addresses, accountIndex, walletType);
-    console.log({res});
+    const result = classifyAddresses(accountStore.addresses, accountIndex, walletType);
+    const expectedResult = {
+      externalAddressList: [
+        'yd1ohc12LgCYp56CDuckTEHwoa6LbPghMd',
+        'yMX3ycrLVF2k6YxWQbMoYgs39aeTfY4wrB',
+        'ydJGUUmNxdmvyskoZXqtJRqWyqsaFPitGQ',
+        'yhugNjDRVJUL7PK9MqQP9M6M1HJm8zuWJL',
+        'ySgckdRYxpa7Uda8yUNRqjYeuusqLy3AY3',
+        'yS4DeSU3MTBisgL6p8PDRzSxTPN2PUt3vE',
+        'yRZef5UGotGgLMaLYTzhvfknogqMRBkUiX',
+        'yTUw2bGzi9rYs41XH1dxbRqiJoDtwuUcv2',
+        'yNQHAGhNP7UbhxnkZH4muP2oKkuayGEuwX',
+        'yPPDLBDjHctWpMxLiMTJXLngcYPke7YNaY',
+        'ya2vVJAJdZN2We7MYiSjGf9wkdWF6A1RLr',
+        'ya5k2YMjfyfxZoidq4UdQ65jYUXvtVomEv',
+        'yhXZja3Apyp9S32zEVsPqLssNJZLrczxJC',
+        'yhWqJXsp25aZNQHEprebQrqPoANj6A13Aa',
+        'yjV3sKAGsuJHDGyf6HDMNuLfMgGp5pBxRy',
+        'yjPeTiRatdvotxUuPFEPDJc2aF774uMB9J',
+        'yRrhuVw6Vd3NzgYrfqb1oTvdhyxzDT9PGz',
+        'yYpL5JJLVGfJXPE15ZMQzNvUGkD4JY6ETF',
+        'ygcW1365Hs2LSLY5LXnkJAUB94pS4HouNu',
+        'yW8RA7zTUz14sNiGjvFQaNupugwwmE1aQi'
+      ],
+      internalAddressList: [
+        'yaLhoAZ4iex2zKmfvS9rvEmxXmRiPrjHdD',
+        'yTcjWB7v7opDzpfYKpFdFEtEvSKFsh3bW3',
+        'yiDVYtUZ2mKV4teSJzKBArqY4BRsZoFLYs',
+        'ya7Me5KMoSz5x4GGZ1pJGrJjC3yMkDDWDa',
+        'yXwS8mRrrxF3pt1GfG7yGKNpPnD6pdwX3a',
+        'yXd4eqycSaJRhRZxXT3iK5H34af4TV5REE',
+        'yWaDfpToRxHc3qtcd8P1agW4Fvj1ueWgwH',
+        'yPYdu2jDrD3Bai83AdvHTYwpAgAkzMaCcM',
+        'yMEkuZ67vZ6kUgDHVVDSTzwU3GbHoTFwqR',
+        'yYSSMwkEqU4hNF2z5kbVBTDYtgt8dQQYd7',
+        'yfzAa63gQ6arpyBzuqQtZmSnU8HLnJnEan',
+        'ySjTorgG6VVfPiY7TJ2tdU2hkohfFAtzJf',
+        'yMUJsy5HEiQTeDgqxY2zBGEeTCDr4g5V8c',
+        'yWDkvzhKk7BKEU6Ybz1Kyarejzt8zhSqxy',
+        'yTJQE4vYXRdEcPt3nADF36S6FKLkLRG2Ty',
+        'yTjku3TMxJN3uiiSHYB2tQ4wp1rJJ92M2A',
+        'yZ8JgZrpuEr1srdcgLgTAsomtMBgSYwTrW',
+        'yUG2YZrss5JfZrN4AG4RKkkbfYyd4H6TSx',
+        'yiLMqyvjBV3CqkCL8H44bRSUBap7tPCmvo',
+        'yfrCYcuD7ezYnpNAmbPMjrTETjipsNGsEe'
+      ],
+      otherAccountAddressList: []
+    };
+    expect(result).to.deep.equal(expectedResult);
   });
 });

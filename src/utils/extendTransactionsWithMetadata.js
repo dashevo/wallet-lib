@@ -1,6 +1,6 @@
 const { each } = require('lodash');
 
-const extendTransactionsWithMetada = (transactions, transactionsMetadata) => {
+const extendTransactionsWithMetadata = (transactions, transactionsMetadata) => {
   const transactionsWithMetadata = [];
   each(transactions, (transaction) => {
     const { hash } = transaction;
@@ -10,4 +10,4 @@ const extendTransactionsWithMetada = (transactions, transactionsMetadata) => {
   });
   return transactionsWithMetadata;
 };
-module.exports = extendTransactionsWithMetada;
+module.exports = extendTransactionsWithMetadata;
