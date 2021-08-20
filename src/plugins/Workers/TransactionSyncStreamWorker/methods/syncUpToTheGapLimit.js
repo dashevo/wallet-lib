@@ -67,8 +67,8 @@ module.exports = async function syncUpToTheGapLimit({
             // eslint-disable-next-line no-await-in-loop
             const getTransactionResponse = await this.transport.getTransaction(transactionHash);
 
-            if(!getTransactionResponse.blockHash){
-              // We should set-up a retry of fetching the tx and it's blockhash
+            if (!getTransactionResponse.blockHash) {
+              // TODO: We should set-up a retry of fetching the tx and it's blockhash
             }
             if (getTransactionResponse.blockHash) {
               // eslint-disable-next-line no-await-in-loop

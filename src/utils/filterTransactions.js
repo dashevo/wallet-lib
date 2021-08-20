@@ -40,7 +40,11 @@ function filterTransactions(accountStore, walletType, accountIndex, transactions
 
   // Misc addresses can be publicKey/privateKey main addresses if !isHDWallet
   each(misc, (miscAddress) => {
-    console.log({ miscAddress });
+    miscAddress.transactions.forEach((txid) => {
+      if (!filteredTransactionsId.includes(txid)) {
+        filteredTransactionsId.push(txid);
+      }
+    });
   });
 
   uniq(filteredTransactionsId).forEach((transactionId) => {
