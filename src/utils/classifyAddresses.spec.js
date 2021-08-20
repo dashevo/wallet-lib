@@ -6,7 +6,6 @@ describe('Utils - classifyAddresses', function suite() {
   it('should correctly classify address for HDWallet', function () {
     const walletType = WALLET_TYPES.HDWALLET;
     const accountIndex = 0;
-    // const tx = new Transaction('020000000142bb40d403a55a70e1601f8f34ef42c7fa1171dfd9477648a2b02e414f4f9488000000006a47304402206c0a1f90457439095660682dccc3f39cdd0dfeb2b573e2454ccace219e6cb87502204ce55165e01f51a0fb92e98a248dba55957c9441953d0a546977ecfdc9e75ac601210200669c7e5dd728b676c2c1163ddcfa88e7cd4f01d12f01188b6b32c399c008ccfeffffff024011f307000000001976a9149b41890df761a9b6e1fb8588e3e1c13390be914488ac900f4e26000000001976a914b7240ea2d7287d73ad41c05a48af34d4ed071da188ac0d6a0800');
     const accountStore = {
       accounts: {
         "m/44'/1'/0'": {
