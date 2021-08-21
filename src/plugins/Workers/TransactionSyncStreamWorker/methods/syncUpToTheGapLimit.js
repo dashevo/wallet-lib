@@ -1,5 +1,5 @@
 const logger = require('../../../../logger');
-const sleep = require("../../../../utils/sleep");
+const sleep = require('../../../../utils/sleep');
 
 function isAnyIntersection(arrayA, arrayB) {
   const intersection = arrayA.filter((e) => arrayB.indexOf(e) > -1);
@@ -42,7 +42,7 @@ module.exports = async function syncUpToTheGapLimit({
   self.stream = stream;
   let reachedGapLimit = false;
 
-  let pendingRequest = {};
+  const pendingRequest = {};
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     stream
@@ -75,15 +75,15 @@ module.exports = async function syncUpToTheGapLimit({
               // TODO: We should set-up a retry of fetching the tx and it's blockhash
             }
             if (getTransactionResponse.blockHash) {
-
-              pendingRequest[getTransactionResponse.blockHash] = {isProcessing: true};
+              pendingRequest[getTransactionResponse.blockHash] = { isProcessing: true };
               // eslint-disable-next-line no-await-in-loop
               const getBlockHeaderResponse = await this
                 .transport
                 .getBlockHeaderByHash(getTransactionResponse.blockHash);
 
+              // eslint-disable-next-line no-await-in-loop
               await this.importBlockHeader(getBlockHeaderResponse);
-              delete pendingRequest[getTransactionResponse.blockHash]
+              delete pendingRequest[getTransactionResponse.blockHash];
             }
 
             const metadata = {
@@ -138,18 +138,17 @@ module.exports = async function syncUpToTheGapLimit({
           logger.silly('TransactionSyncStreamWorker - end stream on request');
           self.stream = null;
           resolve(reachedGapLimit);
-        }
+        };
 
         const tryEndStream = async () => {
-          if(Object.keys(pendingRequest).length !== 0){
+          if (Object.keys(pendingRequest).length !== 0) {
             await sleep(200);
             return tryEndStream();
           }
-          endStream();
+          return endStream();
         };
 
         tryEndStream();
-
       });
   });
 };

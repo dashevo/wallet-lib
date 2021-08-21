@@ -2,8 +2,9 @@ const { each } = require('lodash');
 const classifyAddresses = require('./classifyAddresses');
 const { TRANSACTION_HISTORY_TYPES } = require('../CONSTANTS');
 
-// TODO: On a private key based wallet, as change and external is similar, we actually cannot differentiate
-// correctly from an address_transfer and a sent transaction where our own address is a change...
+// TODO: On a private key based wallet, as change and external is similar,
+//  we actually cannot differentiate correctly from an address_transfer
+//  and a sent transaction where our own address is a change...
 const determineType = (inputsDetection, outputsDetection) => {
   let type = TRANSACTION_HISTORY_TYPES.UNKNOWN;
   if (inputsDetection.hasExternalAddress) {
