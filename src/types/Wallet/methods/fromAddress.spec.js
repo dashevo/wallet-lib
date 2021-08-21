@@ -15,7 +15,7 @@ describe('Wallet - fromAddress', function suite() {
   it('should set wallet from address', () => {
     const self1 = {};
     fromAddress.call(self1, cR4t6ePublicKey.toAddress());
-    expect(self1.walletType).to.equal(WALLET_TYPES.SINGLE_ADDRESS);
+    expect(self1.walletType).to.equal(WALLET_TYPES.ADDRESS);
     expect(self1.mnemonic).to.equal(null);
     expect(self1.address).to.equal(cR4t6ePublicKey.toAddress().toString());
     expect(self1.keyChain.type).to.equal('address');
@@ -24,7 +24,7 @@ describe('Wallet - fromAddress', function suite() {
 
     const self2 = {};
     fromAddress.call(self2, cR4t6ePublicKey.toAddress().toString());
-    expect(self2.walletType).to.equal(WALLET_TYPES.SINGLE_ADDRESS);
+    expect(self2.walletType).to.equal(WALLET_TYPES.ADDRESS);
     expect(self2.mnemonic).to.equal(null);
     expect(self2.address).to.equal(cR4t6ePublicKey.toAddress().toString());
     expect(self2.keyChain.type).to.equal('address');

@@ -15,7 +15,7 @@ describe('Wallet - fromPublicKey', function suite() {
   it('should set wallet from public Key', () => {
     const self1 = {};
     fromPublicKey.call(self1, cR4t6ePublicKey.toString());
-    expect(self1.walletType).to.equal(WALLET_TYPES.SINGLE_ADDRESS);
+    expect(self1.walletType).to.equal(WALLET_TYPES.PUBLICKEY);
     expect(self1.mnemonic).to.equal(null);
     expect(self1.publicKey).to.equal(cR4t6ePublicKey.toString());
     expect(self1.keyChain.type).to.equal('publicKey');
@@ -24,7 +24,7 @@ describe('Wallet - fromPublicKey', function suite() {
 
     const self2 = {};
     fromPublicKey.call(self2, cR4t6ePublicKey.toString());
-    expect(self2.walletType).to.equal(WALLET_TYPES.SINGLE_ADDRESS);
+    expect(self2.walletType).to.equal(WALLET_TYPES.PUBLICKEY);
     expect(self2.mnemonic).to.equal(null);
     expect(self2.publicKey).to.equal(cR4t6ePublicKey.toString());
     expect(self2.keyChain.type).to.equal('publicKey');

@@ -17,7 +17,7 @@ module.exports = function generateNewWalletId() {
       if (!this.publicKey) throw new Error(`${errorMessageBase} : No publicKey found`);
       this.walletId = mnemonicToWalletId(this.publicKey);
       break;
-    // TODO: DEPRECATE USAGE OF SINGLE_ADDRESS
+    // TODO: DEPRECATE USAGE OF SINGLE_ADDRESS in favor or PRIVATEKEY
     case WALLET_TYPES.PRIVATEKEY:
     case WALLET_TYPES.SINGLE_ADDRESS:
       if (!this.privateKey) throw new Error(`${errorMessageBase} : No privateKey found`);
