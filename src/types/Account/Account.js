@@ -132,6 +132,8 @@ class Account extends EventEmitter {
           this.label,
         );
         break;
+      default:
+        throw new Error('Invalid wallet type');
     }
 
     this.keyChain = wallet.keyChain;
