@@ -42,7 +42,6 @@ module.exports = async function syncUpToTheGapLimit({
   self.stream = stream;
   let reachedGapLimit = false;
 
-  const pendingRequest = {};
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     stream
@@ -67,7 +66,7 @@ module.exports = async function syncUpToTheGapLimit({
             // eslint-disable-next-line no-underscore-dangle
             const transactionHash = transaction._getHash().reverse().toString('hex');
 
-            pendingRequest[transactionHash] = { isProcessing: true };
+            self.pendingRequest[transactionHash] = { isProcessing: true, type: 'transaction' };
             // eslint-disable-next-line no-await-in-loop
             const getTransactionResponse = await this.transport.getTransaction(transactionHash);
 
@@ -75,15 +74,14 @@ module.exports = async function syncUpToTheGapLimit({
               // TODO: We should set-up a retry of fetching the tx and it's blockhash
             }
             if (getTransactionResponse.blockHash) {
-              pendingRequest[getTransactionResponse.blockHash] = { isProcessing: true };
+              self.pendingRequest[getTransactionResponse.blockHash.toString('hex')] = { isProcessing: true, type: 'blockheader' };
               // eslint-disable-next-line no-await-in-loop
               const getBlockHeaderResponse = await this
                 .transport
                 .getBlockHeaderByHash(getTransactionResponse.blockHash);
-
               // eslint-disable-next-line no-await-in-loop
               await this.importBlockHeader(getBlockHeaderResponse);
-              delete pendingRequest[getTransactionResponse.blockHash];
+              delete self.pendingRequest[getTransactionResponse.blockHash.toString('hex')];
             }
 
             const metadata = {
@@ -93,7 +91,7 @@ module.exports = async function syncUpToTheGapLimit({
               chainLocked: getTransactionResponse.chainLocked,
             };
             transactionsWithMetadata.push([getTransactionResponse.transaction, metadata]);
-            delete pendingRequest[transactionHash];
+            delete self.pendingRequest[transactionHash];
           }
 
           const addressesGeneratedCount = await self
@@ -141,7 +139,7 @@ module.exports = async function syncUpToTheGapLimit({
         };
 
         const tryEndStream = async () => {
-          if (Object.keys(pendingRequest).length !== 0) {
+          if (Object.keys(self.pendingRequest).length !== 0) {
             await sleep(200);
             return tryEndStream();
           }

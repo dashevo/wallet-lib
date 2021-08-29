@@ -2,6 +2,7 @@ const {
   Transaction, MerkleBlock, InstantLock,
 } = require('@dashevo/dashcore-lib');
 const { WALLET_TYPES } = require('../../../CONSTANTS');
+const sleep = require('../../../utils/sleep');
 
 const Worker = require('../../Worker');
 
@@ -32,6 +33,7 @@ class TransactionSyncStreamWorker extends Worker {
     this.syncIncomingTransactions = false;
     this.stream = null;
     this.incomingSyncPromise = null;
+    this.pendingRequest = {};
   }
 
   /**
@@ -153,6 +155,10 @@ class TransactionSyncStreamWorker extends Worker {
   }
 
   async onStop() {
+    if (Object.keys(this.pendingRequest).length !== 0) {
+      await sleep(200);
+      return this.onStop();
+    }
     this.syncIncomingTransactions = false;
 
     if (this.stream) {
@@ -166,6 +172,7 @@ class TransactionSyncStreamWorker extends Worker {
       // reconnect to the stream.
       this.stream = null;
     }
+    return true;
   }
 
   setLastSyncedBlockHash(hash) {
