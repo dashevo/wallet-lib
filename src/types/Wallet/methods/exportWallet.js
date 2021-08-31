@@ -9,7 +9,7 @@ function exportPublicKeyWallet(_outputType = 'publicKey') {
   switch (_outputType) {
     case 'publicKey':
       if (!this.publicKey) throw new Error('No PublicKey to export');
-      return this.publicKey;
+      return this.publicKey.toString();
     default:
       throw new Error(`Tried to export to invalid output : ${_outputType}`);
   }
@@ -19,7 +19,7 @@ function exportAddressWallet(_outputType = 'address') {
   switch (_outputType) {
     case 'address':
       if (!this.address) throw new Error('No Address to export');
-      return this.address;
+      return this.address.toString();
     default:
       throw new Error(`Tried to export to invalid output : ${_outputType}`);
   }
@@ -29,7 +29,7 @@ function exportSingleAddressWallet(_outputType = 'privateKey') {
   switch (_outputType) {
     case 'privateKey':
       if (!this.privateKey) throw new Error('No PrivateKey to export');
-      return this.privateKey;
+      return this.privateKey.toString();
     default:
       throw new Error(`Tried to export to invalid output : ${_outputType}`);
   }

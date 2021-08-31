@@ -141,6 +141,23 @@ describe('Wallet - class', function suite() {
     wallet1.storage.on('CONFIGURED', () => {
       wallet1.disconnect();
     });
+
+    const wallet2 = new Wallet({ publicKey, network: 'testnet', ...mocks });
+    expect(wallet2.walletType).to.be.equal(WALLET_TYPES.PUBLICKEY);
+    expect(wallet2.mnemonic).to.be.equal(null);
+
+    expect(wallet2.plugins).to.be.deep.equal({});
+    expect(wallet2.accounts).to.be.deep.equal([]);
+    expect(wallet2.network).to.be.deep.equal(Dashcore.Networks.testnet.toString());
+    expect(wallet2.keyChain.type).to.be.deep.equal('publicKey');
+    expect(wallet2.passphrase).to.be.deep.equal(null);
+    expect(wallet2.allowSensitiveOperations).to.be.deep.equal(false);
+    expect(wallet2.injectDefaultPlugins).to.be.deep.equal(true);
+    expect(wallet2.walletId).to.be.equal('9f1f6f37f7');
+
+    wallet2.storage.on('CONFIGURED', () => {
+      wallet2.disconnect();
+    });
   });
   it('should have an offline Mode', () => {
     const wallet = new Wallet({
