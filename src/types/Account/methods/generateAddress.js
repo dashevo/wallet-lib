@@ -19,7 +19,7 @@ function generateAddress(path) {
       address = this.keyChain.address;
       break;
     case WALLET_TYPES.PUBLICKEY:
-      address = new PublicKey(this.keyChain.publicKey).toAddress(network).toString();
+      address = new PublicKey(this.keyChain.publicKey.toString()).toAddress(network).toString();
       break;
     case WALLET_TYPES.HDWALLET:
       // eslint-disable-next-line prefer-destructuring

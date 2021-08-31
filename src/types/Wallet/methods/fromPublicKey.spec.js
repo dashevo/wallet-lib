@@ -19,7 +19,7 @@ describe('Wallet - fromPublicKey', function suite() {
     expect(self1.mnemonic).to.equal(null);
     expect(self1.publicKey).to.equal(cR4t6ePublicKey);
     expect(self1.keyChain.type).to.equal('publicKey');
-    expect(self1.keyChain.publicKey).to.equal(cR4t6ePublicKey.toString());
+    expect(self1.keyChain.publicKey).to.equal(cR4t6ePublicKey);
     expect(self1.keyChain.keys).to.deep.equal({});
 
     const self2 = {};
