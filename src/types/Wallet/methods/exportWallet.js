@@ -5,38 +5,38 @@ function exportMnemonic(mnemonic) {
   return mnemonic.toString();
 }
 
-function exportPublicKeyWallet(_outputType = 'publicKey') {
-  switch (_outputType) {
+function exportPublicKeyWallet(outputType = 'publicKey') {
+  switch (outputType) {
     case 'publicKey':
       if (!this.publicKey) throw new Error('No PublicKey to export');
       return this.publicKey.toString();
     default:
-      throw new Error(`Tried to export to invalid output : ${_outputType}`);
+      throw new Error(`Tried to export to invalid output : ${outputType}`);
   }
 }
 
-function exportAddressWallet(_outputType = 'address') {
-  switch (_outputType) {
+function exportAddressWallet(outputType = 'address') {
+  switch (outputType) {
     case 'address':
       if (!this.address) throw new Error('No Address to export');
       return this.address.toString();
     default:
-      throw new Error(`Tried to export to invalid output : ${_outputType}`);
+      throw new Error(`Tried to export to invalid output : ${outputType}`);
   }
 }
 
-function exportSingleAddressWallet(_outputType = 'privateKey') {
-  switch (_outputType) {
+function exportSingleAddressWallet(outputType = 'privateKey') {
+  switch (outputType) {
     case 'privateKey':
       if (!this.privateKey) throw new Error('No PrivateKey to export');
       return this.privateKey.toString();
     default:
-      throw new Error(`Tried to export to invalid output : ${_outputType}`);
+      throw new Error(`Tried to export to invalid output : ${outputType}`);
   }
 }
 
-function exportHDWallet(_outputType) {
-  switch (_outputType) {
+function exportHDWallet(outputType) {
+  switch (outputType) {
     case undefined:
       // We did not define any output, so we try first mnemonic, or HDPrivateKey
       try {
@@ -51,17 +51,17 @@ function exportHDWallet(_outputType) {
       if (!this.HDPrivateKey) throw new Error('No PrivateKey to export');
       return this.HDPrivateKey.toString();
     default:
-      throw new Error(`Tried to export to invalid output : ${_outputType}`);
+      throw new Error(`Tried to export to invalid output : ${outputType}`);
   }
 }
 
-function exportHDPublicWallet(_outputType = 'HDPublicKey') {
-  switch (_outputType) {
+function exportHDPublicWallet(outputType = 'HDPublicKey') {
+  switch (outputType) {
     case 'HDPublicKey':
       if (!this.HDPublicKey) throw new Error('No publicKey to export');
       return this.HDPublicKey.toString();
     default:
-      throw new Error(`Tried to export to invalid output : ${_outputType}`);
+      throw new Error(`Tried to export to invalid output : ${outputType}`);
   }
 }
 
