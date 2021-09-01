@@ -1,6 +1,5 @@
 const logger = require('../../../../logger');
 const EVENTS = require('../../../../EVENTS');
-const { DELAYED_TRANSACTION_CHECK_INTERVAL } = require('../../../../CONSTANTS');
 
 async function handleTransactionFromStream(transaction) {
   const self = this;
@@ -18,16 +17,12 @@ async function handleTransactionFromStream(transaction) {
     this.delayedRequests[transactionHash] = { isDelayed: true, type: 'transaction' };
 
     return new Promise((resolve) => {
-      self.parentEvents
-        .on(
-          EVENTS.BLOCKHEIGHT_CHANGED,
-          () => {
-            setTimeout(
-              resolve(self.handleTransactionFromStream(transaction)),
-              DELAYED_TRANSACTION_CHECK_INTERVAL,
-            );
-          },
-        );
+      self.parentEvents.once(
+        EVENTS.BLOCKHEIGHT_CHANGED,
+        () => {
+          resolve(self.handleTransactionFromStream(transaction));
+        },
+      );
     });
   }
 

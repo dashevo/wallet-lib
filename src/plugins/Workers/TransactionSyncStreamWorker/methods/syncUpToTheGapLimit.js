@@ -67,7 +67,7 @@ module.exports = async function syncUpToTheGapLimit({
             const promise = new Promise((resolveHandleTransactionPromise) => {
               self.handleTransactionFromStream(transaction)
                 .then(({
-                 transactionResponse,
+                  transactionResponse,
                   metadata,
                 }) => {
                   transactionsWithMetadata.push([transactionResponse.transaction, metadata]);
