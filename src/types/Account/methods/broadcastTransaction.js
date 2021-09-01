@@ -40,6 +40,7 @@ function impactAffectedInputs({ inputs }) {
  * @return {Promise<transactionId>}
  */
 async function broadcastTransaction(transaction, forceBroadcast = false) {
+  const { chains } = this.storage.getStore();
   if (!this.transport) throw new ValidTransportLayerRequired('broadcast');
 
   // We still support having in rawtransaction, if this is the case
@@ -59,6 +60,15 @@ async function broadcastTransaction(transaction, forceBroadcast = false) {
   }
 
   const { inputs } = transaction.toObject();
+  const { minRelay: minRelayFeeRate } = chains[this.network.toString()].fees;
+
+  // eslint-disable-next-line no-underscore-dangle
+  const estimateKbSize = transaction._estimateSize() / 1000;
+  const minRelayFee = estimateKbSize * minRelayFeeRate;
+
+  if (minRelayFee > transaction.getFee() && !forceBroadcast) {
+    throw new Error(`Expected minimum fee for transaction ${minRelayFee}. Current: ${transaction.getFee()}`);
+  }
   const serializedTransaction = transaction.toString();
 
   const txid = await this.transport.sendTransaction(serializedTransaction);
