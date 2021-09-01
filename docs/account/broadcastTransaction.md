@@ -7,6 +7,7 @@ Parameters:
 | parameters             | type               | required       | Description                                                                                      |  
 |------------------------|--------------------|----------------| ------------------------------------------------------------------------------------------------ |
 | **transaction**        | Transaction/String | yes            | A valid [created transaction](/account/createTransaction) or it's hexadecimal raw representation |
+| **forceBroadcast**     | Boolean            | no[=false]     | When set to true, and min relay fee is not met, will still try to broadcast a transaction        |
 
 Returns : transactionId (string).
 
