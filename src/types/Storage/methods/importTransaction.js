@@ -35,7 +35,7 @@ const importTransaction = function importTransaction(transaction, transactionMet
   transactions[transaction.hash] = transaction;
   if (transactionMetadata) {
     const { height } = transactionMetadata;
-    if (Number.isInteger(height)) {
+    if (Number.isInteger(height) && height !== 0) {
       transactionsMetadata[transaction.hash] = transactionMetadata;
       const mappedTransactionObject = { hash: transaction.hash, ...transactionMetadata };
 
