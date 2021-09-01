@@ -69,7 +69,10 @@ class ChainPlugin extends StandardPlugin {
     logger.debug('ChainPlugin - Setting up starting blockHeight', blocks);
 
     this.storage.store.chains[network.toString()].blockHeight = blocks;
-    this.storage.store.chains[network.toString()].fees.minRelay = dashToDuffs(relay);
+
+    if (relay) {
+      this.storage.store.chains[network.toString()].fees.minRelay = dashToDuffs(relay);
+    }
 
     const bestBlock = await this.transport.getBlockHeaderByHeight(blocks);
     await this.storage.importBlockHeader(bestBlock);
