@@ -63,8 +63,7 @@ module.exports = async function syncUpToTheGapLimit({
           // As we require height information, we fetch transaction using client.
           // eslint-disable-next-line no-restricted-syntax
           for (const transaction of walletTransactions.transactions) {
-            // eslint-disable-next-line no-underscore-dangle
-            const transactionHash = transaction._getHash().reverse().toString('hex');
+            const transactionHash = transaction.hash;
 
             self.pendingRequest[transactionHash] = { isProcessing: true, type: 'transaction' };
             // eslint-disable-next-line no-await-in-loop
