@@ -53,8 +53,7 @@ function categorizeTransactions(transactionsWithMetadata, accountStore, accountI
     let inputsHasOtherAccountAddress = false;
 
     // For each vout, we will look at matching known addresses
-    // console.log('tx', transaction);
-    each(transaction.outputs, (vout) => {
+    transaction.outputs.forEach((vout) => {
       const { satoshis, script } = vout;
       const address = script.toAddress(network).toString();
       if (address) {
@@ -69,7 +68,7 @@ function categorizeTransactions(transactionsWithMetadata, accountStore, accountI
     });
     // For each vin, we will look at matching known addresses
     // In order to know the value in, we would require fetching tx for output of vin info
-    each(transaction.inputs, (vin) => {
+    transaction.inputs.forEach((vin) => {
       const { script } = vin;
       const address = script.toAddress(network).toString();
       if (address) {
