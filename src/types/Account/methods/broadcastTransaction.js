@@ -67,7 +67,7 @@ async function broadcastTransaction(transaction, options = {}) {
   const estimateKbSize = transaction._estimateSize() / 1000;
   const minRelayFee = Math.ceil(estimateKbSize * minRelayFeeRate);
 
-  if (minRelayFee > transaction.getFee() && !options.skipFeeValiation) {
+  if (minRelayFee > transaction.getFee() && !options.skipFeeValidation) {
     throw new Error(`Expected minimum fee for transaction ${minRelayFee}. Current: ${transaction.getFee()}`);
   }
   const serializedTransaction = transaction.toString();
