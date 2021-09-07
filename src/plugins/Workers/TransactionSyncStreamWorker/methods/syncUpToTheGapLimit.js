@@ -59,25 +59,14 @@ module.exports = async function syncUpToTheGapLimit({
           .filterWalletTransactions(transactionsFromResponse, addresses, network);
 
         if (walletTransactions.transactions.length) {
-          const transactionsWithMetadata = [];
-          const awaitingPromises = [];
           // As we require height information, we fetch transaction using client.
-          // eslint-disable-next-line no-restricted-syntax
-          for (const transaction of walletTransactions.transactions) {
-            const promise = new Promise((resolveHandleTransactionPromise) => {
-              self.handleTransactionFromStream(transaction)
-                .then(({
-                  transactionResponse,
-                  metadata,
-                }) => {
-                  transactionsWithMetadata.push([transactionResponse.transaction, metadata]);
-                  resolveHandleTransactionPromise(true);
-                });
-            });
-            awaitingPromises.push(promise);
-          }
+          const awaitingPromises = walletTransactions.transactions
+            .map((transaction) => self.handleTransactionFromStream(transaction).then(({
+              transactionResponse,
+              metadata,
+            }) => [transactionResponse.transaction, metadata]));
 
-          await Promise.all(awaitingPromises);
+          const transactionsWithMetadata = await Promise.all(awaitingPromises);
 
           const addressesGeneratedCount = await self
             .importTransactions(transactionsWithMetadata);

@@ -6,13 +6,15 @@ async function handleTransactionFromStream(transaction) {
   // As we require height information, we fetch transaction using client.
   // eslint-disable-next-line no-restricted-syntax
   // eslint-disable-next-line no-underscore-dangle
-  const transactionHash = transaction._getHash().reverse().toString('hex');
+  const transactionHash = transaction.hash;
 
   this.pendingRequest[transactionHash] = { isProcessing: true, type: 'transaction' };
   // eslint-disable-next-line no-await-in-loop
   const getTransactionResponse = await this.transport.getTransaction(transactionHash);
 
   if (!getTransactionResponse.blockHash) {
+    // at this point, transaction is not yet mined, therefore we gonna retry on next block to
+    // fetch this tx and subsequently its blockhash for blockheader fetching.
     logger.silly(`TransactionSyncStreamWorker - Unconfirmed transaction ${transactionHash}: delayed.`);
     this.delayedRequests[transactionHash] = { isDelayed: true, type: 'transaction' };
 
