@@ -36,10 +36,10 @@ function impactAffectedInputs({ inputs }) {
 /**
  * Broadcast a Transaction to the transport layer
  * @param {Transaction|RawTransaction} transaction - A txobject or it's hexadecimal representation
- * @param {isBoolean=false} forceBroadcast - Allow to force broadcast on error.
+ * @param {Boolean} options.skipFeeValidation - Allow to skip fee validation
  * @return {Promise<transactionId>}
  */
-async function broadcastTransaction(transaction, forceBroadcast = false) {
+async function broadcastTransaction(transaction, options = {}) {
   const { network, storage } = this;
   const { chains } = storage.getStore();
   if (!this.transport) throw new ValidTransportLayerRequired('broadcast');
@@ -67,7 +67,7 @@ async function broadcastTransaction(transaction, forceBroadcast = false) {
   const estimateKbSize = transaction._estimateSize() / 1000;
   const minRelayFee = Math.ceil(estimateKbSize * minRelayFeeRate);
 
-  if (minRelayFee > transaction.getFee() && !forceBroadcast) {
+  if (minRelayFee > transaction.getFee() && !options.skipFeeValiation) {
     throw new Error(`Expected minimum fee for transaction ${minRelayFee}. Current: ${transaction.getFee()}`);
   }
   const serializedTransaction = transaction.toString();
