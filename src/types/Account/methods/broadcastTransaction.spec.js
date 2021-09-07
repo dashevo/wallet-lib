@@ -162,7 +162,7 @@ describe('Account - broadcastTransaction', function suite() {
     tx.fee(0);
 
     return broadcastTransaction
-        .call(self, tx, true)
+        .call(self, tx, {skipFeeValidation: true})
         .then(
             () => expect(sendCalled).to.equal(1) && expect(searchCalled).to.equal(1),
         );
