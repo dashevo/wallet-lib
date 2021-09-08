@@ -36,7 +36,8 @@ function impactAffectedInputs({ inputs }) {
 /**
  * Broadcast a Transaction to the transport layer
  * @param {Transaction|RawTransaction} transaction - A txobject or it's hexadecimal representation
- * @param {Boolean} options.skipFeeValidation - Allow to skip fee validation
+ * @param {Object} [options]
+ * @param {Boolean} [options.skipFeeValidation=false] - Allow to skip fee validation
  * @return {Promise<transactionId>}
  */
 async function broadcastTransaction(transaction, options = {}) {
