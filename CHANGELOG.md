@@ -1,3 +1,26 @@
+## [7.20.1](https://github.com/dashevo/wallet-lib/compare/v7.20.0...v7.20.1) (2021-07-28)
+
+
+### Bug Fixes
+
+* `InvalidResponse` error when connecting to older networks with newer client ([#284](https://github.com/dashevo/wallet-lib/issues/284))
+
+
+
+# [7.20.0](https://github.com/dashevo/wallet-lib/compare/v7.19.2...v7.20.0) (2021-07-09)
+
+
+### Features
+
+* add `waitForInstantLockTimeout` Wallet Option ([#270](https://github.com/dashevo/wallet-lib/issues/270))
+
+
+### Bug Fixes
+
+* `waitForInstantLock` timeouts stuck in event loop ([#272](https://github.com/dashevo/wallet-lib/issues/272))
+
+
+
 ## [7.19.2](https://github.com/dashevo/wallet-lib/compare/v7.19.1...v7.19.2) (2021-05-28)
 
 
