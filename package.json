@@ -37,9 +37,9 @@
   },
   "homepage": "https://github.com/dashevo/wallet-lib#readme",
   "dependencies": {
-    "@dashevo/dapi-client": "~0.21.0-dev.6",
+    "@dashevo/dapi-client": "github:dashevo/js-dapi-client#error-codes",
     "@dashevo/dashcore-lib": "~0.19.25",
-    "@dashevo/dpp": "^0.21.0-dev.3",
+    "@dashevo/dpp": "^0.21.0-dev.4",
     "@dashevo/grpc-common": "~0.4.0",
     "cbor": "^7.0.5",
     "crypto-js": "^4.0.0",
@@ -58,7 +58,7 @@
     "karma": "^5.0.9",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^3.1.0",
-    "karma-mocha": "^2.0.1",
+    "karma-mocha": "^2.0.1",ch
     "karma-mocha-reporter": "^2.2.5",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^4.0.2",
