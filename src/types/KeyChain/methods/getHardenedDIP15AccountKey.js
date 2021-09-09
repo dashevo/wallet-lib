@@ -5,7 +5,7 @@
  * @return {HDPrivateKey|HDPublicKey}
  */
 function getHardenedDIP15AccountKey(accountIndex = 0, type = 'HDPrivateKey') {
-  const hardenedFeatureRootKey = this.getHardenedDIP9FeatureKey(type);
+  const hardenedFeatureRootKey = this.getHardenedDIP9FeatureHDKey(type);
 
   // Feature is set to 15' for all DashPay Incoming Funds derivation paths (see DIP15).
   const featureKey = hardenedFeatureRootKey.deriveChild(15, true);
