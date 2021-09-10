@@ -1,5 +1,5 @@
-const { expect } = require('chai');
-const { WALLET_TYPES } = require('../../CONSTANTS');
+const {expect} = require('chai');
+const {WALLET_TYPES} = require('../../CONSTANTS');
 const sortPlugins = require('./_sortPlugins');
 
 const TransactionSyncStreamWorker = require('../../plugins/Workers/TransactionSyncStreamWorker/TransactionSyncStreamWorker');
@@ -15,6 +15,7 @@ class dummyWorker extends Worker {
     });
   }
 }
+
 class withoutPluginDependenciesWorker extends Worker {
   constructor() {
     super({
@@ -22,6 +23,7 @@ class withoutPluginDependenciesWorker extends Worker {
     });
   }
 }
+
 const userDefinedWithoutPluginDependenciesPlugins = {
   "dummyWorker": dummyWorker,
   "withoutPluginDependenciesWorker": withoutPluginDependenciesWorker
@@ -39,6 +41,7 @@ class withSinglePluginDependenciesWorker extends Worker {
     });
   }
 }
+
 const userDefinedWithSinglePluginDependenciesPlugins1 = {
   "dummyWorker": dummyWorker,
   "withSinglePluginDependenciesWorker": withSinglePluginDependenciesWorker
@@ -56,10 +59,12 @@ class withSingleInjectBeforePluginDependenciesWorker extends Worker {
     });
   }
 }
+
 const userDefinedWithSingleInjectBeforePluginDependenciesPlugins1 = {
   "dummyWorker": dummyWorker,
   "withSingleInjectBeforePluginDependenciesWorker": withSingleInjectBeforePluginDependenciesWorker
 };
+
 class withSinglePluginAndSingleInjectBeforeDependenciesWorker extends Worker {
   constructor() {
     super({
@@ -75,6 +80,7 @@ class withSinglePluginAndSingleInjectBeforeDependenciesWorker extends Worker {
     });
   }
 }
+
 const userDefinedWithSinglePluginAndSingleInjectBeforeDependenciesWorker = {
   "dummyWorker": dummyWorker,
   "withSinglePluginAndSingleInjectBeforeDependenciesWorker": withSinglePluginAndSingleInjectBeforeDependenciesWorker
@@ -111,7 +117,7 @@ class userDefinedConflictingDependenciesWorker extends Worker {
       name: 'userDefinedConflictingDependenciesWorker',
       injectionOrder: {
         before: [
-            'ChainPlugin'
+          'ChainPlugin'
         ],
         after: [
           'TransactionSyncStreamWorker',
@@ -150,9 +156,9 @@ const userDefinedComplexPluginDependenciesPlugins = {
 }
 
 
-
 const baseAccount = {
-  walletType: WALLET_TYPES.HDWALLET
+  walletType: WALLET_TYPES.HDWALLET,
+  allowSensitiveOperations: false
 }
 const accountOnlineWithDefaultPlugins = {
   ...baseAccount,
@@ -174,102 +180,101 @@ const accountOfflineWithoutDefaultPlugins = {
 };
 
 
-
-
 describe('Account - _sortPlugins', () => {
   describe('system plugins sorting', async function () {
     it('should be able to correctly sort default plugins', async function () {
-      const sortedPluginsOnlineWithDefault = await sortPlugins(accountOnlineWithDefaultPlugins);
+      const sortedPluginsOnlineWithDefault = sortPlugins(accountOnlineWithDefaultPlugins);
+
       expect(sortedPluginsOnlineWithDefault).to.deep.equal([
-        [ChainPlugin, true],
-        [TransactionSyncStreamWorker, true],
-        [IdentitySyncWorker, true],
+        [ChainPlugin, true, true],
+        [TransactionSyncStreamWorker, true, true],
+        [IdentitySyncWorker, true, true],
       ])
-      const sortedPluginsOnlineWithoutDefault = await sortPlugins(accountOnlineWithoutDefaultPlugins);
+
+      const sortedPluginsOnlineWithoutDefault = sortPlugins(accountOnlineWithoutDefaultPlugins);
       expect(sortedPluginsOnlineWithoutDefault).to.deep.equal([]);
 
-      const sortedPluginsOfflineWithDefault = await sortPlugins(accountOfflineWithDefaultPlugins);
+      const sortedPluginsOfflineWithDefault = sortPlugins(accountOfflineWithDefaultPlugins);
       expect(sortedPluginsOfflineWithDefault).to.deep.equal([])
 
-      const sortedPluginsOfflineWithoutDefault = await sortPlugins(accountOfflineWithoutDefaultPlugins);
+      const sortedPluginsOfflineWithoutDefault = sortPlugins(accountOfflineWithoutDefaultPlugins);
       expect(sortedPluginsOfflineWithoutDefault).to.deep.equal([])
     });
   });
   describe('user plugins sorting', async function () {
     it('should handle userDefinedWithoutPluginDependenciesPlugins', async function () {
-      const sortedPlugins = await sortPlugins(accountOnlineWithDefaultPlugins, userDefinedWithoutPluginDependenciesPlugins);
+      const sortedPlugins = sortPlugins(accountOnlineWithDefaultPlugins, userDefinedWithoutPluginDependenciesPlugins);
       expect(sortedPlugins).to.deep.equal([
-        [ChainPlugin, true],
-        [TransactionSyncStreamWorker, true],
-        [IdentitySyncWorker, true],
-        [dummyWorker, true],
-        [withoutPluginDependenciesWorker, true],
+        [ChainPlugin, true, true],
+        [TransactionSyncStreamWorker, true,true],
+        [IdentitySyncWorker, true,true],
+        [dummyWorker, false, false],
+        [withoutPluginDependenciesWorker, false,false],
       ]);
     });
-
     it('should handle userDefinedWithSinglePluginDependenciesPlugins1', async function () {
-      const sortedPlugins = await sortPlugins(accountOnlineWithDefaultPlugins, userDefinedWithSinglePluginDependenciesPlugins1);
+      const sortedPlugins =  sortPlugins(accountOnlineWithDefaultPlugins, userDefinedWithSinglePluginDependenciesPlugins1);
       expect(sortedPlugins).to.deep.equal([
-        [ChainPlugin, true],
-        [TransactionSyncStreamWorker, true],
-        [IdentitySyncWorker, true],
-        [withSinglePluginDependenciesWorker, true],
-        [dummyWorker, true],
+        [ChainPlugin, true, true],
+        [TransactionSyncStreamWorker, true, true],
+        [IdentitySyncWorker, true, true],
+        [withSinglePluginDependenciesWorker, false, false],
+        [dummyWorker, false, false],
       ])
     });
     it('should handle userDefinedWithSinglePluginDependenciesPlugins1', async function () {
-      const sortedPlugins = await sortPlugins(accountOnlineWithDefaultPlugins, userDefinedWithSingleInjectBeforePluginDependenciesPlugins1);
+      const sortedPlugins =  sortPlugins(accountOnlineWithDefaultPlugins, userDefinedWithSingleInjectBeforePluginDependenciesPlugins1);
       expect(sortedPlugins).to.deep.equal([
-        [ChainPlugin, true],
-        [TransactionSyncStreamWorker, true],
-        [withSingleInjectBeforePluginDependenciesWorker, true],
-        [IdentitySyncWorker, true],
-        [dummyWorker, true],
+        [ChainPlugin, true, true],
+        [TransactionSyncStreamWorker, true, true],
+        [withSingleInjectBeforePluginDependenciesWorker, false, false],
+        [IdentitySyncWorker, true, true],
+        [dummyWorker, false, false],
       ])
     });
 
     it('should handle userDefinedWithSinglePluginDependenciesPlugins2', async function () {
-      const sortedPlugins = await sortPlugins(accountOnlineWithDefaultPlugins, userDefinedWithSinglePluginDependenciesPlugins2);
+      const sortedPlugins =  sortPlugins(accountOnlineWithDefaultPlugins, userDefinedWithSinglePluginDependenciesPlugins2);
       expect(sortedPlugins).to.deep.equal([
-        [ChainPlugin, true],
-        [withSinglePluginDependenciesWorker2 , true],
-        [TransactionSyncStreamWorker, true],
-        [IdentitySyncWorker, true],
-        [dummyWorker, true],
+        [ChainPlugin, true, true],
+        [withSinglePluginDependenciesWorker2, false, false],
+        [TransactionSyncStreamWorker, true, true],
+        [IdentitySyncWorker, true, true],
+        [dummyWorker, false, false],
       ])
     });
 
     it('should handle withSinglePluginAndSingleInjectBeforeDependenciesWorker', function () {
       const sortedPlugins = sortPlugins(accountOnlineWithDefaultPlugins, userDefinedWithSinglePluginAndSingleInjectBeforeDependenciesWorker);
       expect(sortedPlugins).to.deep.equal([
-        [ChainPlugin, true],
-        [withSinglePluginAndSingleInjectBeforeDependenciesWorker , true],
-        [TransactionSyncStreamWorker, true],
-        [IdentitySyncWorker, true],
-        [dummyWorker, true],
+        [ChainPlugin, true, true],
+        [withSinglePluginAndSingleInjectBeforeDependenciesWorker, false, false],
+        [TransactionSyncStreamWorker, true, true],
+        [IdentitySyncWorker, true, true],
+        [dummyWorker, false, false],
       ])
     });
 
     it('should handle userDefinedWithMultiplePluginDependenciesPlugins', async function () {
-      const sortedPlugins = await sortPlugins(accountOnlineWithDefaultPlugins, userDefinedWithMultiplePluginDependenciesPlugins);
+      const sortedPlugins = sortPlugins(accountOnlineWithDefaultPlugins, userDefinedWithMultiplePluginDependenciesPlugins);
       expect(sortedPlugins).to.deep.equal([
-        [ChainPlugin, true],
-        [withSinglePluginDependenciesWorker2 , true],
-        [TransactionSyncStreamWorker, true],
-        [IdentitySyncWorker, true],
-        [withSinglePluginDependenciesWorker , true],
-        [dummyWorker, true],
+        [ChainPlugin, true, true],
+        [withSinglePluginDependenciesWorker2, false, false],
+        [TransactionSyncStreamWorker, true, true],
+        [IdentitySyncWorker, true, true],
+        [withSinglePluginDependenciesWorker, false, false],
+        [dummyWorker, false, false],
       ]);
     });
     it('should handle userDefinedConflictingDependencies', function () {
-      expect(()=> sortPlugins(accountOnlineWithDefaultPlugins, userDefinedConflictingDependencies))
+      expect(() => sortPlugins(accountOnlineWithDefaultPlugins, userDefinedConflictingDependencies))
           .to
           .throw('Conflicting dependency order for userDefinedConflictingDependenciesWorker');
     });
     it('should handle userDefinedComplexPluginDependenciesPlugins', async function () {
       // TODO: User specified wrongly sorted plugins with deps is not yet handled.
       // rejecting with error for now.
-      expect(()=> sortPlugins(accountOnlineWithDefaultPlugins, userDefinedComplexPluginDependenciesPlugins))
+      expect(() => sortPlugins(accountOnlineWithDefaultPlugins, userDefinedComplexPluginDependenciesPlugins))
           .to
           .throw('Dependency withSinglePluginDependenciesWorker not found');
       // const sortedPlugins = await sortPlugins(accountOnlineWithDefaultPlugins, userDefinedComplexPluginDependenciesPlugins);
