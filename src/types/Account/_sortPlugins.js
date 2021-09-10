@@ -79,7 +79,6 @@ const sortUserPlugins = (defaultSortedPlugins, userUnsafePlugins, allowSensitive
         });
       }
 
-
       if (
         injectionBeforeIndex !== -1
           && injectionAfterIndex !== -1
