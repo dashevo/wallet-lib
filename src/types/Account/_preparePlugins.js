@@ -1,6 +1,6 @@
 const sortPlugins = require('./_sortPlugins');
 
-const preparePlugins = function (account, userUnsafePlugins) {
+const preparePlugins = function preparePlugins(account, userUnsafePlugins) {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
