@@ -24,7 +24,7 @@ const sortUserPlugins = (defaultSortedPlugins, userUnsafePlugins, allowSensitive
   const initializedSortedPlugins = [];
 
   // We start by ensuring all default plugins get loaded and initialized on top
-  each(defaultSortedPlugins, (defaultPluginParams) => {
+  defaultSortedPlugins.forEach((defaultPluginParams) => {
     sortedPlugins.push(defaultPluginParams);
 
     // We also need to initialize them so we actually as we gonna need to read some properties.
@@ -62,7 +62,9 @@ const sortUserPlugins = (defaultSortedPlugins, userUnsafePlugins, allowSensitive
           // For now, require user to sort them when specifying the plugins.
           if (beforePluginIndex === -1) throw new Error(`Dependency ${pluginDependencyName} not found`);
           if (injectionBeforeIndex === -1 || injectionIndex > beforePluginIndex) {
-            injectionBeforeIndex = beforePluginIndex;
+            injectionBeforeIndex = (injectionBeforeIndex === -1 || injectBefore > beforePluginIndex)
+              ? beforePluginIndex
+              : injectionBeforeIndex;
           }
         });
       }
@@ -76,6 +78,7 @@ const sortUserPlugins = (defaultSortedPlugins, userUnsafePlugins, allowSensitive
           }
         });
       }
+
 
       if (
         injectionBeforeIndex !== -1
@@ -107,7 +110,7 @@ const sortUserPlugins = (defaultSortedPlugins, userUnsafePlugins, allowSensitive
       [UnsafePlugin, allowSensitiveOperations, awaitOnInjection],
     );
   });
-  each(initializedSortedPlugins, (initializedSortedPlugin, i) => {
+  initializedSortedPlugins.forEach((initializedSortedPlugin, i) => {
     delete initializedSortedPlugins[i];
   });
   return sortedPlugins;

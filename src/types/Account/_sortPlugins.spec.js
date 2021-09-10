@@ -148,6 +148,12 @@ class pluginWithMultiplePluginDependencies extends Worker {
   }
 }
 
+const userDefinedSimpleDependencyPluginDependenciesPlugins = {
+  "dummyWorker": dummyWorker,
+  "withSinglePluginDependenciesWorker": withSinglePluginDependenciesWorker,
+  "pluginWithMultiplePluginDependencies": pluginWithMultiplePluginDependencies,
+}
+// Order is wrong here, which we also need to test
 const userDefinedComplexPluginDependenciesPlugins = {
   "dummyWorker": dummyWorker,
   "pluginWithMultiplePluginDependencies": pluginWithMultiplePluginDependencies,
@@ -271,6 +277,19 @@ describe('Account - _sortPlugins', () => {
           .to
           .throw('Conflicting dependency order for userDefinedConflictingDependenciesWorker');
     });
+    it('should handle userDefinedSimpleDependencyPluginDependenciesPlugins', async function () {
+      const sortedPlugins = sortPlugins(accountOnlineWithDefaultPlugins, userDefinedSimpleDependencyPluginDependenciesPlugins);
+
+      expect(sortedPlugins).to.deep.equal([
+        [ChainPlugin, true, true],
+        [pluginWithMultiplePluginDependencies, false, false],
+        [TransactionSyncStreamWorker, true, true],
+        [IdentitySyncWorker, true, true],
+        [withSinglePluginDependenciesWorker, false, false],
+        [dummyWorker, false, false],
+      ])
+    });
+
     it('should handle userDefinedComplexPluginDependenciesPlugins', async function () {
       // TODO: User specified wrongly sorted plugins with deps is not yet handled.
       // rejecting with error for now.
