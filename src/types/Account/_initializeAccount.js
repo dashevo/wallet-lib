@@ -14,12 +14,6 @@ async function _initializeAccount(account, userUnsafePlugins) {
   return new Promise(async (resolve, reject) => {
     try {
       if (account.injectDefaultPlugins) {
-      // TODO: Should check in other accounts if a similar is setup already
-      // TODO: We want to sort them by dependencies and deal with the await this way
-      // await parent if child has it in dependency
-      // if not, then is it marked as requiring a first exec
-      // if yes add to watcher list.
-
         if ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(account.walletType)) {
           ensureAddressesToGapLimit(
             account.store.wallets[account.walletId],
@@ -29,17 +23,6 @@ async function _initializeAccount(account, userUnsafePlugins) {
           );
         } else {
           await account.getAddress('0'); // We force what is usually done by the BIP44Worker.
-        }
-
-        if (!account.offlineMode) {
-          await account.injectPlugin(ChainPlugin, true);
-
-          // Transaction sync worker
-          await account.injectPlugin(TransactionSyncStreamWorker, true);
-
-          if (account.walletType === WALLET_TYPES.HDWALLET) {
-            await account.injectPlugin(IdentitySyncWorker, true);
-          }
         }
       }
 
