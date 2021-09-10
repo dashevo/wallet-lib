@@ -40,6 +40,10 @@ const CONSTANTS = {
   },
   UNCONFIRMED_TRANSACTION_STATUS_CODE: -1,
   WALLET_TYPES: {
+    ADDRESS: 'address',
+    PUBLICKEY: 'publicKey',
+    PRIVATEKEY: 'privateKey',
+    // TODO: DEPRECATE.
     SINGLE_ADDRESS: 'single_address',
     HDWALLET: 'hdwallet',
     HDPUBLIC: 'hdpublic',
@@ -87,6 +91,13 @@ const CONSTANTS = {
       'strategy',
       'network',
     ],
+  },
+  TRANSACTION_HISTORY_TYPES: {
+    RECEIVED: 'received',
+    SENT: 'sent',
+    ADDRESS_TRANSFER: 'address_transfer',
+    ACCOUNT_TRANSFER: 'account_transfer',
+    UNKNOWN: 'unknown',
   },
   STORAGE: {
     autosaveIntervalTime: 10 * 1000,

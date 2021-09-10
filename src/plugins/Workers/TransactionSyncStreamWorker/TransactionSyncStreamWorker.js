@@ -2,6 +2,7 @@ const {
   Transaction, MerkleBlock, InstantLock,
 } = require('@dashevo/dashcore-lib');
 const { WALLET_TYPES } = require('../../../CONSTANTS');
+const sleep = require('../../../utils/sleep');
 
 const Worker = require('../../Worker');
 
@@ -33,6 +34,7 @@ class TransactionSyncStreamWorker extends Worker {
     this.syncIncomingTransactions = false;
     this.stream = null;
     this.incomingSyncPromise = null;
+    this.pendingRequest = {};
   }
 
   /**
@@ -154,6 +156,14 @@ class TransactionSyncStreamWorker extends Worker {
   }
 
   async onStop() {
+    // Sync, will require transaction and their blockHeader to be fetched before resolving.
+    // As await onStop() is a way to wait for execution before continuing,
+    // this ensure onStop will properly let the plugin to warn about all
+    // completion of pending request.
+    if (Object.keys(this.pendingRequest).length !== 0) {
+      await sleep(200);
+      return this.onStop();
+    }
     this.syncIncomingTransactions = false;
 
     if (this.stream) {
@@ -167,15 +177,16 @@ class TransactionSyncStreamWorker extends Worker {
       // reconnect to the stream.
       this.stream = null;
     }
+    return true;
   }
 
   setLastSyncedBlockHash(hash) {
     const { walletId } = this;
     const accountsStore = this.storage.store.wallets[walletId].accounts;
 
-    const accountStore = (this.walletType === WALLET_TYPES.SINGLE_ADDRESS)
-      ? accountsStore[this.index.toString()]
-      : accountsStore[this.BIP44PATH.toString()];
+    const accountStore = ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(this.walletType))
+      ? accountsStore[this.BIP44PATH.toString()]
+      : accountsStore[this.index.toString()];
 
     accountStore.blockHash = hash;
 
@@ -186,9 +197,9 @@ class TransactionSyncStreamWorker extends Worker {
     const { walletId } = this;
     const accountsStore = this.storage.store.wallets[walletId].accounts;
 
-    const { blockHash } = (this.walletType === WALLET_TYPES.SINGLE_ADDRESS)
-      ? accountsStore[this.index.toString()]
-      : accountsStore[this.BIP44PATH.toString()];
+    const { blockHash } = ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(this.walletType))
+      ? accountsStore[this.BIP44PATH.toString()]
+      : accountsStore[this.index.toString()];
 
     return blockHash;
   }

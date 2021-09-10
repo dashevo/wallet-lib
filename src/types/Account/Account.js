@@ -4,7 +4,7 @@ const logger = require('../../logger');
 const { WALLET_TYPES } = require('../../CONSTANTS');
 const { is } = require('../../utils');
 const EVENTS = require('../../EVENTS');
-const Wallet = require('../Wallet/Wallet.js');
+const Wallet = require('../Wallet/Wallet');
 const { simpleDescendingAccumulator } = require('../../utils/coinSelections/strategies');
 
 function getNextUnusedAccountIndexForWallet(wallet) {
@@ -112,20 +112,28 @@ class Account extends EventEmitter {
         super.emit(...args);
       };
     }
-    if ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(this.walletType)) {
-      this.storage.createAccount(
-        this.walletId,
-        this.BIP44PATH,
-        this.network,
-        this.label,
-      );
-    }
-    if (this.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
-      this.storage.createSingleAddress(
-        this.walletId,
-        this.network,
-        this.label,
-      );
+    switch (this.walletType) {
+      case WALLET_TYPES.HDWALLET:
+      case WALLET_TYPES.HDPUBLIC:
+        this.storage.createAccount(
+          this.walletId,
+          this.BIP44PATH,
+          this.network,
+          this.label,
+        );
+        break;
+      case WALLET_TYPES.PRIVATEKEY:
+      case WALLET_TYPES.PUBLICKEY:
+      case WALLET_TYPES.ADDRESS:
+      case WALLET_TYPES.SINGLE_ADDRESS:
+        this.storage.createSingleAddress(
+          this.walletId,
+          this.network,
+          this.label,
+        );
+        break;
+      default:
+        throw new Error(`Invalid wallet type ${this.walletType}`);
     }
 
     this.keyChain = wallet.keyChain;
@@ -216,17 +224,24 @@ class Account extends EventEmitter {
    * @return {Promise<InstantLock>}
    */
   waitForInstantLock(transactionHash, timeout = this.waitForInstantLockTimeout) {
+    let rejectTimeout;
+
     return Promise.race([
       new Promise((resolve) => {
         const instantLock = this.storage.getInstantLock(transactionHash);
         if (instantLock != null) {
+          clearTimeout(rejectTimeout);
           resolve(instantLock);
           return;
         }
-        this.subscribeToTransactionInstantLock(transactionHash, resolve);
+
+        this.subscribeToTransactionInstantLock(transactionHash, (instantLockData) => {
+          clearTimeout(rejectTimeout);
+          resolve(instantLockData);
+        });
       }),
       new Promise((resolve, reject) => {
-        setTimeout(() => {
+        rejectTimeout = setTimeout(() => {
           reject(new Error(`InstantLock waiting period for transaction ${transactionHash} timed out`));
         }, timeout);
       }),

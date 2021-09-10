@@ -9,7 +9,7 @@ const pk = '4226d5e2fe8cbfe6f5beb7adf5a5b08b310f6c4a67fc27826779073be6f5699e';
 describe('Keychain', function suite() {
   this.timeout(10000);
   it('should create a keychain', () => {
-    const expectedException1 = 'Expect privateKey, HDPublicKey or HDPrivateKey';
+    const expectedException1 = 'Expect privateKey, publicKey, HDPublicKey, HDPrivateKey or Address';
     expect(() => new KeyChain()).to.throw(expectedException1);
     expect(() => new KeyChain(mnemonic)).to.throw(expectedException1);
 
@@ -27,22 +27,27 @@ describe('Keychain', function suite() {
     const address = new Dashcore.Address(pk2.publicKey.toAddress()).toString();
     expect(address).to.equal('yNfUebksUc5HoSfg8gv98ruC3jUNJUM8pT');
   });
-  it('should get hardened feature path', () => {
-    const hardenedPk = keychain.getHardenedBIP44Path();
-    const pk2 = keychain.getKeyForPath('m/44\'/1\'');
-    expect(pk2.toString()).to.equal(hardenedPk.toString());
-  });
   it('should derive from hardened feature path', () => {
-    const hardenedPk = keychain.getHardenedBIP44Path();
-    const derivedPk = hardenedPk.deriveChild(0, true).deriveChild(0).deriveChild(0);
+    const hardenedHDKey = keychain.getHardenedBIP44HDKey();
+    const pk2 = keychain.getKeyForPath(`m/44'/1'`);
+    expect(pk2.toString()).to.equal(hardenedHDKey.toString());
+    expect(hardenedHDKey.toString()).to.deep.equal('tprv8dtrJNytYHRiZY585hmHGbguS6VjGpK49puSB7oXZjLHcQfrAzQkF4ZCxM2DkEbyY85J4EYcZ8EjT5ZCU8ozB727TDdodbfXet5GkGau2RQ');
+    const derivedPk = hardenedHDKey.deriveChild(0, true).deriveChild(0).deriveChild(0);
     const address = new Dashcore.Address(derivedPk.publicKey.toAddress()).toString();
     expect(address).to.equal('yNfUebksUc5HoSfg8gv98ruC3jUNJUM8pT');
+  });
+  it('should get hardened DIP9FeatureHDKey', function () {
+    const hardenedHDKey = keychain.getHardenedDIP9FeatureHDKey();
+    const pk2 = keychain.getKeyForPath(`m/9'/1'`);
+    expect(pk2.toString()).to.equal(hardenedHDKey.toString());
+    expect(hardenedHDKey.toString()).to.deep.equal('tprv8fBJjWoGgCpGRCbyzE9RUA59rmoN1RUijhLnXGL4VHnLxvSe523yVg4GrGzbR6TyXtdynAEh5z8UX55EXt2Cb3xjvrsx2PgTY9BHxzFVkWn');
   });
   it('should generate key for child', () => {
     const keychain2 = new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(mnemonic, 'testnet') });
     const keyForChild = keychain2.generateKeyForChild(0);
     expect(keyForChild.toString()).to.equal('tprv8d4podc2Tg459CH2bwLHXj3vdJFBT2rdsk5Nr1djH7hzHdt5LRdvN6QyFwMiDy7ffRdik7fEVRKKgsHB4F18sh8xF6jFXpKq4sUgGBoSbKw');
   });
+
 
   it('should sign', () => {
 
