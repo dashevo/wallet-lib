@@ -73,7 +73,7 @@ const sortUserPlugins = (defaultSortedPlugins, userUnsafePlugins, allowSensitive
         each(injectAfter, (pluginDependencyName) => {
           const afterPluginIndex = findIndex(initializedSortedPlugins, ['name', pluginDependencyName]);
           if (afterPluginIndex === -1) throw new Error(`Dependency ${pluginDependencyName} not found`);
-          if (injectionAfterIndex === -1 || injectionAfterIndex < afterPluginIndex) {
+          if (injectionAfterIndex === -1 || injectionAfterIndex < afterPluginIndex + 1) {
             injectionAfterIndex = afterPluginIndex + 1;
           }
         });
