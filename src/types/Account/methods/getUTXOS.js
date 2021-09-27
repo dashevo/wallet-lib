@@ -4,6 +4,8 @@ const { WALLET_TYPES, COINBASE_MATURITY } = require('../../../CONSTANTS');
 
 /**
  * Return all the utxos
+ * @param {getUTXOSOptions} options - Options object
+ * @param {Number} [options.coinbaseMaturity] - Allow to override coinbase maturity
  * @return {UnspentOutput[]}
  */
 function getUTXOS(options = {
