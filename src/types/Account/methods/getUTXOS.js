@@ -48,12 +48,18 @@ function getUTXOS(options = {
           if (!transaction.isSpecialTransaction()) {
             continue;
           }
+
+          const transactionHeight = (this.store.transactionsMetadata[txid])
+            ? this.store.transactionsMetadata[txid].height
+            : transaction.extraPayload.height;
+
           // We check maturity is at least 100 blocks.
           // another way is to just read _scriptBuffer height value.
-          if (transaction.extraPayload.height + options.coinbaseMaturity > currentBlockHeight) {
+          if (transactionHeight + options.coinbaseMaturity > currentBlockHeight) {
             continue;
           }
         }
+
         utxos.push(new Transaction.UnspentOutput(
           {
             txId: txid,
