@@ -1,10 +1,7 @@
 const logger = require('../../../../logger');
-const sleep = require('../../../../utils/sleep');
-
-function isAnyIntersection(arrayA, arrayB) {
-  const intersection = arrayA.filter((e) => arrayB.indexOf(e) > -1);
-  return intersection.length > 0;
-}
+const onStreamEnd = require('../handlers/onStreamEnd');
+const onStreamError = require('../handlers/onStreamError');
+const onStreamData = require('../handlers/onStreamData');
 
 /**
  *
@@ -40,87 +37,13 @@ module.exports = async function syncUpToTheGapLimit({
     throw new Error('Limited to one stream at the same time.');
   }
   self.stream = stream;
-  let reachedGapLimit = false;
+  self.hasReachedGapLimit = false;
 
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     stream
-      .on('data', async (response) => {
-        /* First check if any instant locks appeared */
-        const instantLocksReceived = this.constructor.getInstantSendLocksFromResponse(response);
-        instantLocksReceived.forEach((isLock) => {
-          this.importInstantLock(isLock);
-        });
-
-        /* Incoming transactions handling */
-        const transactionsFromResponse = this.constructor
-          .getTransactionListFromStreamResponse(response);
-        const walletTransactions = this.constructor
-          .filterWalletTransactions(transactionsFromResponse, addresses, network);
-
-        if (walletTransactions.transactions.length) {
-          // As we require height information, we fetch transaction using client.
-          const awaitingPromises = walletTransactions.transactions
-            .map((transaction) => self.handleTransactionFromStream(transaction).then(({
-              transactionResponse,
-              metadata,
-            }) => [transactionResponse.transaction, metadata]));
-
-          const transactionsWithMetadata = await Promise.all(awaitingPromises);
-
-          const addressesGeneratedCount = await self
-            .importTransactions(transactionsWithMetadata);
-
-          reachedGapLimit = reachedGapLimit || addressesGeneratedCount > 0;
-
-          if (reachedGapLimit) {
-            logger.silly('TransactionSyncStreamWorker - end stream - new addresses generated');
-            // If there are some new addresses being imported
-            // to the storage, that mean that we hit the gap limit
-            // and we need to update the bloom filter with new addresses,
-            // i.e. we need to open another stream with a bloom filter
-            // that contains new addresses.
-
-            // DO not setting null this.stream allow to know we
-            // need to reset our stream (as we pass along the error)
-            stream.cancel();
-          }
-        }
-
-        /* Incoming Merkle block handling */
-        const merkleBlockFromResponse = this.constructor
-          .getMerkleBlockFromStreamResponse(response);
-
-        if (merkleBlockFromResponse) {
-          // Reverse hashes, as they're little endian in the header
-          const transactionsInHeader = merkleBlockFromResponse.hashes.map((hashHex) => Buffer.from(hashHex, 'hex').reverse().toString('hex'));
-          const transactionsInWallet = Object.keys(self.storage.getStore().transactions);
-          const isTruePositive = isAnyIntersection(transactionsInHeader, transactionsInWallet);
-          if (isTruePositive) {
-            self.importBlockHeader(merkleBlockFromResponse.header);
-          }
-        }
-      })
-      .on('error', (err) => {
-        logger.silly('TransactionSyncStreamWorker - end stream on error');
-        reject(err);
-      })
-      .on('end', () => {
-        const endStream = () => {
-          logger.silly('TransactionSyncStreamWorker - end stream on request');
-          self.stream = null;
-          resolve(reachedGapLimit);
-        };
-
-        const tryEndStream = async () => {
-          if (Object.keys(self.pendingRequest).length !== 0) {
-            await sleep(200);
-            return tryEndStream();
-          }
-          return endStream();
-        };
-
-        tryEndStream();
-      });
+      .on('data', (data) => onStreamData(self, data, addresses, network))
+      .on('error', (error) => onStreamError(error, reject))
+      .on('end', () => onStreamEnd(self, resolve));
   });
 };
