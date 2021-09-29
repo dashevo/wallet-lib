@@ -211,6 +211,7 @@ TransactionSyncStreamWorker.prototype.setLastSyncedBlockHeight = require('./meth
 TransactionSyncStreamWorker.prototype.getLastSyncedBlockHeight = require('./methods/getLastSyncedBlockHeight');
 TransactionSyncStreamWorker.prototype.startHistoricalSync = require('./methods/startHistoricalSync');
 TransactionSyncStreamWorker.prototype.handleTransactionFromStream = require('./methods/handleTransactionFromStream');
+TransactionSyncStreamWorker.prototype.processChunks = require('./methods/processChunks');
 TransactionSyncStreamWorker.prototype.startIncomingSync = require('./methods/startIncomingSync');
 TransactionSyncStreamWorker.prototype.syncUpToTheGapLimit = require('./methods/syncUpToTheGapLimit');
 
