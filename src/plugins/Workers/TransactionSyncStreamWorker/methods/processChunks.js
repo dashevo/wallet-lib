@@ -5,7 +5,10 @@ function isAnyIntersection(arrayA, arrayB) {
   const intersection = arrayA.filter((e) => arrayB.indexOf(e) > -1);
   return intersection.length > 0;
 }
-async function processChunks(self, dataChunk, addresses, network) {
+async function processChunks(dataChunk) {
+  const self = this;
+  const addresses = this.getAddressesToSync();
+  const network = this.network;
   /* First check if any instant locks appeared */
   const instantLocksReceived = this.constructor.getInstantSendLocksFromResponse(dataChunk);
   instantLocksReceived.forEach((isLock) => {
