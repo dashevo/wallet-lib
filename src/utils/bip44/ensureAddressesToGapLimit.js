@@ -23,7 +23,6 @@ function ensureAccountAddressesToGapLimit(walletStore, walletType, accountIndex,
 
   // Ensure that all our above external paths are contiguous
   const missingIndexes = getMissingIndexes(externalAddressesPaths);
-
   // Gets missing addresses and adds them to the storage
   // Please note that getAddress adds new addresses to storage, which it probably shouldn't
   missingIndexes.forEach((index) => {
@@ -60,16 +59,13 @@ function ensureAccountAddressesToGapLimit(walletStore, walletType, accountIndex,
 
   const gapBetweenLastUsedAndLastGenerated = lastGeneratedIndex - lastUsedIndex;
   const addressToGenerate = BIP44_ADDRESS_GAP - gapBetweenLastUsedAndLastGenerated;
-
   if (addressToGenerate > 0) {
     const lastElemPath = externalAddressesPaths[externalAddressesPaths.length - 1];
     const lastElem = externalAddresses[lastElemPath];
-
-    const startingIndex = (is.def(lastElem)) ? lastElem.index + 1 : 0;
-    const lastIndex = addressToGenerate + startingIndex - 1;
-
-    if (lastIndex > startingIndex) {
-      for (let i = startingIndex; i <= lastIndex; i += 1) {
+    const lastExistingIndex = (is.def(lastElem)) ? lastElem.index : -1;
+    const lastIndexToGenerate = lastExistingIndex + addressToGenerate;
+    if (lastIndexToGenerate > lastExistingIndex) {
+      for (let i = lastExistingIndex + 1; i <= lastIndexToGenerate; i += 1) {
         getAddress(i, 'external');
         generated += 1;
         if (walletType === WALLET_TYPES.HDWALLET) {
@@ -79,7 +75,6 @@ function ensureAccountAddressesToGapLimit(walletStore, walletType, accountIndex,
     }
   }
   logger.silly(`BIP44 - ensured addresses to gap limit - generated: ${generated}`);
-
   return generated;
 }
 module.exports = ensureAccountAddressesToGapLimit;
