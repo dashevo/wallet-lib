@@ -34,7 +34,6 @@ class TransactionSyncStreamWorker extends Worker {
     this.stream = null;
     this.incomingSyncPromise = null;
     this.pendingRequest = {};
-    this.delayedRequests = {};
   }
 
   /**
