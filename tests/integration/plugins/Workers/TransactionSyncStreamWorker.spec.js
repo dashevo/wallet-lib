@@ -206,16 +206,13 @@ describe('TransactionSyncStreamWorker', function suite() {
       // the last used address
       expect(Object.keys(addressesInStorage).length).to.be.equal(40);
       // It should reconnect after the gap limit is reached
-      expect(account.transport.subscribeToTransactionsWithProofs.callCount).to.be.equal(3);
+      expect(account.transport.subscribeToTransactionsWithProofs.callCount).to.be.equal(2);
       // 20 external and 20 internal
       expect(account.transport.subscribeToTransactionsWithProofs.firstCall.args[0].length).to.be.equal(40);
       expect(account.transport.subscribeToTransactionsWithProofs.firstCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 2});
-      // 20 more of each type, since the last address is used, but the height is the same, since Merkle Block not received yet
+      // 20 more of each type, since the last address is used.
       expect(account.transport.subscribeToTransactionsWithProofs.secondCall.args[0].length).to.be.equal(80);
       expect(account.transport.subscribeToTransactionsWithProofs.secondCall.args[1]).to.be.deep.equal({ fromBlockHash: '0000025d24ebe65454bd51a61bab94095a6ad1df996be387e31495f764d8e2d9', count: 2});
-      // Block received
-      expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[0].length).to.be.equal(80);
-      expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '0000025d24ebe65454bd51a61bab94095a6ad1df996be387e31495f764d8e2d9', count: 2});
 
       expect(worker.stream).to.be.null;
       expect(transactionsInStorage.length).to.be.equal(2);
@@ -420,16 +417,13 @@ describe('TransactionSyncStreamWorker', function suite() {
       // the last used address
       expect(Object.keys(addressesInStorage).length).to.be.equal(40);
       // It should reconnect after the gap limit is reached
-      expect(account.transport.subscribeToTransactionsWithProofs.callCount).to.be.equal(3);
+      expect(account.transport.subscribeToTransactionsWithProofs.callCount).to.be.equal(2);
       // 20 external and 20 internal
       expect(account.transport.subscribeToTransactionsWithProofs.firstCall.args[0].length).to.be.equal(40);
       expect(account.transport.subscribeToTransactionsWithProofs.firstCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 0});
-      // 20 more of each type, since the last address is used, but the height is the same, since Merkle Block not received yet
+      // 20 more of each type, since the last address is used.
       expect(account.transport.subscribeToTransactionsWithProofs.secondCall.args[0].length).to.be.equal(80);
       expect(account.transport.subscribeToTransactionsWithProofs.secondCall.args[1]).to.be.deep.equal({ fromBlockHash: '0000025d24ebe65454bd51a61bab94095a6ad1df996be387e31495f764d8e2d9', count: 0});
-      // Block received
-      expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[0].length).to.be.equal(80);
-      expect(account.transport.subscribeToTransactionsWithProofs.thirdCall.args[1]).to.be.deep.equal({ fromBlockHash: '0000025d24ebe65454bd51a61bab94095a6ad1df996be387e31495f764d8e2d9', count: 0});
 
       expect(worker.stream).to.be.null;
       expect(transactionsInStorage.length).to.be.equal(2);
@@ -663,7 +657,7 @@ describe('TransactionSyncStreamWorker', function suite() {
     // the last used address
     expect(Object.keys(addressesInStorage).length).to.be.equal(40);
     // It should reconnect after the gap limit is reached
-    expect(account.transport.subscribeToTransactionsWithProofs.callCount).to.be.equal(3);
+    expect(account.transport.subscribeToTransactionsWithProofs.callCount).to.be.equal(2);
     // 20 external and 20 internal
     expect(account.transport.subscribeToTransactionsWithProofs.firstCall.args[1]).to.be.deep.equal({ fromBlockHeight: 40, count: 0});
     expect(account.transport.subscribeToTransactionsWithProofs.firstCall.args[0].length).to.be.equal(40);
