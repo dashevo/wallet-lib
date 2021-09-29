@@ -41,7 +41,6 @@ class Queue extends Emitter {
     const result = await job.fn();
     this.state.isProcessing = false;
     this.emit('processed', { result, job });
-    console.log('processed', job.id);
     return result;
   }
 

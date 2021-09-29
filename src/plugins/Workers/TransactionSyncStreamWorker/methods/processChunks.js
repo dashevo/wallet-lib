@@ -8,7 +8,7 @@ function isAnyIntersection(arrayA, arrayB) {
 async function processChunks(dataChunk) {
   const self = this;
   const addresses = this.getAddressesToSync();
-  const network = this.network;
+  const { network } = this;
   /* First check if any instant locks appeared */
   const instantLocksReceived = this.constructor.getInstantSendLocksFromResponse(dataChunk);
   instantLocksReceived.forEach((isLock) => {
@@ -31,7 +31,6 @@ async function processChunks(dataChunk) {
         }) => [transactionResponse.transaction, metadata]));
 
     const transactionsWithMetadata = await Promise.all(awaitingPromises);
-    console.log({transactionsWithMetadata});
 
     const addressesGeneratedCount = await self
       .importTransactions(transactionsWithMetadata);

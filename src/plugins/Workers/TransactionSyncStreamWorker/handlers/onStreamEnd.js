@@ -20,4 +20,3 @@ function onStreamEnd(workerInstance, resolve) {
   tryEndStream();
 }
 module.exports = onStreamEnd;
-
