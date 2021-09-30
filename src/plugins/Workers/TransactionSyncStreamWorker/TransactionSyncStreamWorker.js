@@ -166,7 +166,10 @@ class TransactionSyncStreamWorker extends Worker {
     this.syncIncomingTransactions = false;
 
     if (this.stream) {
-      this.stream.cancel();
+      // Wrapping `cancel` in `setImmediate` due to bug with double-free
+      // explained here (https://github.com/grpc/grpc-node/issues/1652)
+      // and here (https://github.com/nodejs/node/issues/38964)
+      setImmediate(() => this.stream.cancel());
       // When calling stream.cancel(), the stream will emit 'error' event with the code 'CANCELLED'.
       // There are two cases when this happens: when the gap limit is filled and syncToTheGapLimit
       // and the stream needs to be restarted with new parameters, and here,
