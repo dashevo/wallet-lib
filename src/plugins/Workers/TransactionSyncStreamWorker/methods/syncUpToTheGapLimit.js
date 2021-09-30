@@ -111,7 +111,10 @@ module.exports = async function syncUpToTheGapLimit({
             // Wrapping `cancel` in `setImmediate` due to bug with double-free
             // explained here (https://github.com/grpc/grpc-node/issues/1652)
             // and here (https://github.com/nodejs/node/issues/38964)
-            setImmediate(() => stream.cancel());
+            await new Promise((resolveCancel) => setImmediate(() => {
+              stream.cancel();
+              resolveCancel();
+            }));
           }
         }
 
