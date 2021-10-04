@@ -700,7 +700,6 @@ describe('TransactionSyncStreamWorker', function suite() {
     await expect(account.waitForInstantLock(transactions[2].hash, 1000)).to.eventually
         .be.rejectedWith('InstantLock waiting period for transaction 256d5b3bf6d8869f5cc882ae070af9b648fa0f512bfa2b6f07b35d55e160a16c timed out');
   });
-  return;
   it('should start from the height specified in `skipSynchronizationBeforeHeight` options', async function () {
     const bestBlockHeight = 42;
 
