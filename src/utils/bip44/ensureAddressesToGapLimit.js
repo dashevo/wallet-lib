@@ -1,5 +1,5 @@
 const logger = require('../../logger');
-const { BIP44_ADDRESS_GAP, WALLET_TYPES } = require('../../CONSTANTS');
+const { BIP44_ADDRESS_GAP } = require('../../CONSTANTS');
 const is = require('../is');
 
 const getMissingIndexes = require('./getMissingIndexes');
