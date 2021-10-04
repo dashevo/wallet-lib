@@ -44,13 +44,24 @@ describe('Utils - Queue', function suite() {
     queue.enqueueJob(job4);
     queue.enqueueJob(job5);
     queue.enqueueJob(job6);
-    queue.on('processed', ()=>{
-      if(processedResults.length === 6) done();
+    queue.on('processed', () => {
+      if (processedResults.length === 6) done();
     })
   });
   it('should have correctly dealt with order', function () {
     expect(processedResults.length).to.equal(6);
     expect(processedResults).to.deep.equal([{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}]);
+  });
+  it('should catch and emit the async error from jobs to queue', function (done) {
+    const asyncFnThrowing = async () => {
+      throw new Error('An error from job');
+    }
+    queue.on('error', (e)=>{
+      expect(e.message).to.equal('An error from job');
+      done()
+    })
+    const job7 = new Job(7, asyncFnThrowing);
+    queue.enqueueJob(job7);
 
   });
 });

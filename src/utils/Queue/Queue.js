@@ -48,7 +48,11 @@ class Queue extends Emitter {
     const self = this;
 
     const processOnEnqueuedEvent = async () => {
-      await self.processNext();
+      try {
+        await self.processNext();
+      } catch (e) {
+        self.emit('error', e);
+      }
     };
     const processOnProcessedEvent = async () => {
       await self.processNext();

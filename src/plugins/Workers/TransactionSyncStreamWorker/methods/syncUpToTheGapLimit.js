@@ -47,6 +47,10 @@ module.exports = async function syncUpToTheGapLimit({
 
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
+    // handler for error being thrown for job processing
+    self.chunksQueue.on('error', (error) => {
+      reject(error);
+    });
     stream
       .on('data', (data) => onStreamData(self, data))
       .on('error', (error) => onStreamError(error, reject))
