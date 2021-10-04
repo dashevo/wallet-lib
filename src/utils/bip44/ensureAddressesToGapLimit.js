@@ -53,12 +53,12 @@ function ensureAccountAddressesToGapLimit(walletStore, walletType, accountIndex,
     .sort(sortByIndex);
 
   const lastUsedIndexes = {
-    external: 0,
-    internal: 0,
+    external: -1,
+    internal: -1,
   };
   const lastGeneratedIndexes = {
-    external: 0,
-    internal: 0,
+    external: -1,
+    internal: -1,
   };
 
   // Scan already generated addresses and count how many are unused
@@ -100,6 +100,7 @@ function ensureAccountAddressesToGapLimit(walletStore, walletType, accountIndex,
     external: BIP44_ADDRESS_GAP - gapBetweenLastUsedAndLastGenerated.external,
     internal: BIP44_ADDRESS_GAP - gapBetweenLastUsedAndLastGenerated.internal,
   };
+
   if (addressesToGenerate.external > 0) {
     const lastExternalElemPath = externalAddressesPaths[externalAddressesPaths.length - 1];
     const lastExternalElem = externalAddresses[lastExternalElemPath];
