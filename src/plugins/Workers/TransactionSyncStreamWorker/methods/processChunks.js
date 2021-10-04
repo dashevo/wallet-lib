@@ -58,7 +58,13 @@ async function processChunks(dataChunk) {
 
       // DO not setting null this.stream allow to know we
       // need to reset our stream (as we pass along the error)
-      self.stream.cancel();
+      // Wrapping `cancel` in `setImmediate` due to bug with double-free
+      // explained here (https://github.com/grpc/grpc-node/issues/1652)
+      // and here (https://github.com/nodejs/node/issues/38964)
+      await new Promise((resolveCancel) => setImmediate(() => {
+        self.stream.cancel();
+        resolveCancel();
+      }));
     }
   }
 
