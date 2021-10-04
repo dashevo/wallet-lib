@@ -27,7 +27,7 @@ describe('Utils - BIP44 - ensureAddressesToGapLimit', function suite() {
 
   it('should set first set of 20 unused address in a row', function () {
     const generated = ensureAddressesToGapLimit(walletStore, walletType, accountIndex, getAddress)
-    expect(generated).to.equal(20);
+    expect(generated).to.equal(40);
     expect(Object.keys(walletStore.addresses.external))
         .to.deep.equal(["m/44'/1'/0'/0/0", "m/44'/1'/0'/0/1", "m/44'/1'/0'/0/2", "m/44'/1'/0'/0/3", "m/44'/1'/0'/0/4", "m/44'/1'/0'/0/5", "m/44'/1'/0'/0/6", "m/44'/1'/0'/0/7", "m/44'/1'/0'/0/8", "m/44'/1'/0'/0/9", "m/44'/1'/0'/0/10", "m/44'/1'/0'/0/11", "m/44'/1'/0'/0/12", "m/44'/1'/0'/0/13", "m/44'/1'/0'/0/14", "m/44'/1'/0'/0/15", "m/44'/1'/0'/0/16", "m/44'/1'/0'/0/17", "m/44'/1'/0'/0/18", "m/44'/1'/0'/0/19"]);
     expect(Object.keys(walletStore.addresses.internal))
@@ -40,7 +40,7 @@ describe('Utils - BIP44 - ensureAddressesToGapLimit', function suite() {
     }
 
     const generated = ensureAddressesToGapLimit(walletStore, walletType, accountIndex, getAddress)
-    expect(generated).to.equal(10);
+    expect(generated).to.equal(20);
     expect(Object.keys(walletStore.addresses.external))
         .to.deep.equal(["m/44'/1'/0'/0/0", "m/44'/1'/0'/0/1", "m/44'/1'/0'/0/2", "m/44'/1'/0'/0/3", "m/44'/1'/0'/0/4", "m/44'/1'/0'/0/5", "m/44'/1'/0'/0/6", "m/44'/1'/0'/0/7", "m/44'/1'/0'/0/8", "m/44'/1'/0'/0/9", "m/44'/1'/0'/0/10", "m/44'/1'/0'/0/11", "m/44'/1'/0'/0/12", "m/44'/1'/0'/0/13", "m/44'/1'/0'/0/14", "m/44'/1'/0'/0/15", "m/44'/1'/0'/0/16", "m/44'/1'/0'/0/17", "m/44'/1'/0'/0/18", "m/44'/1'/0'/0/19", "m/44'/1'/0'/0/20", "m/44'/1'/0'/0/21", "m/44'/1'/0'/0/22", "m/44'/1'/0'/0/23", "m/44'/1'/0'/0/24", "m/44'/1'/0'/0/25", "m/44'/1'/0'/0/26", "m/44'/1'/0'/0/27", "m/44'/1'/0'/0/28", "m/44'/1'/0'/0/29"]);
     expect(Object.keys(walletStore.addresses.internal))
