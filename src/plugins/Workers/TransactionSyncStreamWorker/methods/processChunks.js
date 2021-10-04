@@ -5,6 +5,7 @@ function isAnyIntersection(arrayA, arrayB) {
   const intersection = arrayA.filter((e) => arrayB.indexOf(e) > -1);
   return intersection.length > 0;
 }
+
 async function processChunks(dataChunk) {
   const self = this;
   const addresses = this.getAddressesToSync();
@@ -18,22 +19,32 @@ async function processChunks(dataChunk) {
   /* Incoming transactions handling */
   const transactionsFromResponse = this.constructor
     .getTransactionListFromStreamResponse(dataChunk);
+
   const walletTransactions = this.constructor
     .filterWalletTransactions(transactionsFromResponse, addresses, network);
 
   if (walletTransactions.transactions.length) {
-    // As we require height information, we fetch transaction using client.
-    const awaitingPromises = walletTransactions.transactions
+    // When a transaction exist, there is multiple things we need to do :
+    // 1) The transaction itself needs to be imported
+    const addressesGeneratedCount = await self
+      .importTransactions(walletTransactions.transactions);
+
+    // 2) Transaction metadata need to be fetched and imported as well.
+    //    as such event might happen in the future
+    //    As we require height information, we fetch transaction using client
+
+    const awaitingMetadataPromises = walletTransactions.transactions
       .map((transaction) => self.handleTransactionFromStream(transaction)
         .then(({
           transactionResponse,
           metadata,
         }) => [transactionResponse.transaction, metadata]));
 
-    const transactionsWithMetadata = await Promise.all(awaitingPromises);
-
-    const addressesGeneratedCount = await self
-      .importTransactions(transactionsWithMetadata);
+    Promise
+      .all(awaitingMetadataPromises)
+      .then(async (transactionsWithMetadata) => {
+        await self.importTransactions(transactionsWithMetadata);
+      });
 
     self.hasReachedGapLimit = self.hasReachedGapLimit || addressesGeneratedCount > 0;
 
@@ -65,4 +76,5 @@ async function processChunks(dataChunk) {
     }
   }
 }
+
 module.exports = processChunks;

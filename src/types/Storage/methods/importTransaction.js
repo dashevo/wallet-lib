@@ -6,6 +6,7 @@ const { FETCHED_CONFIRMED_TRANSACTION } = require('../../../EVENTS');
 const parseStringifiedTransaction = (stringified) => new Transaction(stringified);
 /**
  * This method is used to import a transaction in Store.
+ * if a transaction is already existing, we verify if the metadata needs an update as well.
  * @param {Transaction/String} transaction - A valid Transaction
  * @param {TransactionMetaData} transactionMetadata - Transaction Metadata
  * @return void
@@ -23,7 +24,10 @@ const importTransaction = function importTransaction(transaction, transactionMet
     }
   }
   const {
-    store, network, mappedAddress, mappedTransactionsHeight,
+    store,
+    network,
+    mappedAddress,
+    mappedTransactionsHeight,
   } = this;
   const { transactions, transactionsMetadata } = store;
   const { inputs, outputs } = transaction;
