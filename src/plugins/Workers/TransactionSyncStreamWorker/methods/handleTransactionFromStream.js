@@ -12,6 +12,17 @@ async function handleTransactionFromStream(transaction) {
   // eslint-disable-next-line no-await-in-loop
   const getTransactionResponse = await this.transport.getTransaction(transactionHash);
 
+  if (!getTransactionResponse) {
+    // This can happen due to propagation when one node inform us about a transaction,
+    // but the node we ask the transaction to is not aware of it.
+    logger.silly(`TransactionSyncStreamWorker - Transaction ${transactionHash} was not found`);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(self.handleTransactionFromStream(transaction));
+      }, 1000);
+    });
+  }
+
   if (!getTransactionResponse.blockHash) {
     // at this point, transaction is not yet mined, therefore we gonna retry on next block to
     // fetch this tx and subsequently its blockhash for blockheader fetching.
