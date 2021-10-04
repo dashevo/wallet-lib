@@ -171,7 +171,8 @@ class TransactionSyncStreamWorker extends Worker {
       // and here (https://github.com/nodejs/node/issues/38964)
       return new Promise((resolve) => setImmediate(() => {
         this.stream.cancel();
-        // When calling stream.cancel(), the stream will emit 'error' event with the code 'CANCELLED'.
+        // When calling stream.cancel(), the stream will emit 'error' event
+        // with the code 'CANCELLED'.
         // There are two cases when this happens: when the gap limit is filled and syncToTheGapLimit
         // and the stream needs to be restarted with new parameters, and here,
         // when stopping the worker.
