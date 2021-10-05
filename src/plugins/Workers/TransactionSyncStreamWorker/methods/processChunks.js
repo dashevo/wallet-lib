@@ -48,7 +48,7 @@ async function processChunks(dataChunk) {
 
     self.hasReachedGapLimit = self.hasReachedGapLimit || addressesGeneratedCount > 0;
 
-    if (self.hasReachedGapLimit) {
+    if (self.hasReachedGapLimit && self.stream) {
       logger.silly('TransactionSyncStreamWorker - end stream - new addresses generated');
       // If there are some new addresses being imported
       // to the storage, that mean that we hit the gap limit
