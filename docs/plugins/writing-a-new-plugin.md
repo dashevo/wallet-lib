@@ -104,5 +104,37 @@ In below example, this worker will be dependent on the methods getUTXOS to be in
       }
     });
   }
+ }
+  ```
+
+## Accessing events 
+
+From a plugin, you have the ability to listen to account's emitted events. 
+
+```js
+const { EVENT, plugins: { Worker } } = require('@dashevo/wallet-lib');
+class NewBlockWorker extends Worker {
+  constructor(options) {
+    super({
+      name: 'NewBlockWorker',
+      executeOnStart: true,
+      firstExecutionRequired: true,
+      workerIntervalTime: 60 * 1000,
+      gapLimit: 10,
+      dependencies: [
+        'storage',
+        'transport',
+        'walletId',
+        'identities',
+      ],
+      ...options,
+    });
+  }
+
+  async onStart() {
+    this.parentEvents.on(EVENT.BLOCKHEIGHT_CHANGED, ({payload: blockHeight}) => {
+      // on new blockheight do something.
+    });
+  }
 }
 ```
