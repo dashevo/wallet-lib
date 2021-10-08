@@ -1,4 +1,3 @@
-
 const CreateTransactionError = require('./CreateTransactionError');
 const CoinSelectionUnsufficientUTXOS = require('./CoinSelectionUnsufficientUTXOS');
 const InjectionErrorCannotInject = require('./InjectionErrorCannotInject');
@@ -21,6 +20,7 @@ const InvalidTransactionObject = require('./InvalidTransactionObject');
 const InvalidUTXO = require('./InvalidUTXO');
 const StorageUnableToAddTransaction = require('./StorageUnableToAddTransaction');
 const TransactionNotInStore = require('./TransactionNotInStore');
+const TransactionMetadataNotInStore = require('./TransactionMetadataNotInStore');
 const BlockHeaderNotInStore = require('./BlockHeaderNotInStore');
 
 const UnknownWorker = require('./UnknownWorker');
@@ -30,7 +30,6 @@ const ValidTransportLayerRequired = require('./ValidTransportLayerRequired');
 const WalletLibError = require('./WalletLibError');
 
 const PluginInjectionError = require('./PluginInjectionError');
-
 
 module.exports = {
   BlockHeaderNotInStore,
@@ -53,6 +52,7 @@ module.exports = {
   WorkerFailedOnExecute,
   StorageUnableToAddTransaction,
   TransactionNotInStore,
+  TransactionMetadataNotInStore,
   UnknownPlugin,
   UnknownWorker,
   ValidTransportLayerRequired,

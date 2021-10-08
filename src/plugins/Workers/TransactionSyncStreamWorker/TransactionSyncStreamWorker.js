@@ -1,7 +1,8 @@
 const {
-  Transaction, MerkleBlock,
+  Transaction, MerkleBlock, InstantLock,
 } = require('@dashevo/dashcore-lib');
 const { WALLET_TYPES } = require('../../../CONSTANTS');
+const sleep = require('../../../utils/sleep');
 
 const Worker = require('../../Worker');
 
@@ -11,11 +12,13 @@ class TransactionSyncStreamWorker extends Worker {
       name: 'TransactionSyncStreamWorker',
       executeOnStart: true,
       firstExecutionRequired: true,
+      awaitOnInjection: true,
       workerIntervalTime: 0,
       gapLimit: 10,
       dependencies: [
         'importTransactions',
         'importBlockHeader',
+        'importInstantLock',
         'storage',
         'transport',
         'walletId',
@@ -31,6 +34,8 @@ class TransactionSyncStreamWorker extends Worker {
     this.syncIncomingTransactions = false;
     this.stream = null;
     this.incomingSyncPromise = null;
+    this.pendingRequest = {};
+    this.delayedRequests = {};
   }
 
   /**
@@ -105,7 +110,33 @@ class TransactionSyncStreamWorker extends Worker {
     return walletTransactions;
   }
 
+  static getInstantSendLocksFromResponse(response) {
+    let walletTransactions = [];
+    const instantSendLockMessages = response.getInstantSendLockMessages();
+
+    if (instantSendLockMessages) {
+      walletTransactions = instantSendLockMessages
+        .getMessagesList()
+        .map((instantSendLock) => new InstantLock(Buffer.from(instantSendLock)));
+    }
+
+    return walletTransactions;
+  }
+
   async onStart() {
+    // Using sync options here to avoid
+    // situation when plugin is injected directly
+    // instead of usual injection process
+    const {
+      skipSynchronizationBeforeHeight,
+    } = (this.storage.store.syncOptions || {});
+
+    if (skipSynchronizationBeforeHeight) {
+      this.setLastSyncedBlockHeight(
+        skipSynchronizationBeforeHeight,
+      );
+    }
+
     // We first need to sync up initial historical transactions
     await this.startHistoricalSync(this.network);
   }
@@ -126,28 +157,43 @@ class TransactionSyncStreamWorker extends Worker {
   }
 
   async onStop() {
+    // Sync, will require transaction and their blockHeader to be fetched before resolving.
+    // As await onStop() is a way to wait for execution before continuing,
+    // this ensure onStop will properly let the plugin to warn about all
+    // completion of pending request.
+    if (Object.keys(this.pendingRequest).length !== 0) {
+      await sleep(200);
+      return this.onStop();
+    }
     this.syncIncomingTransactions = false;
 
-    if (this.stream) {
-      this.stream.cancel();
-      // When calling stream.cancel(), the stream will emit 'error' event with the code 'CANCELLED'.
-      // There are two cases when this happens: when the gap limit is filled and syncToTheGapLimit
-      // and the stream needs to be restarted with new parameters, and here,
-      // when stopping the worker.
-      // The code in stream worker distinguishes whether it need to reconnect or not by the fact
-      // that the old stream object is present or not. When it is set to null, it won't try to
-      // reconnect to the stream.
-      this.stream = null;
-    }
+    // Wrapping `cancel` in `setImmediate` due to bug with double-free
+    // explained here (https://github.com/grpc/grpc-node/issues/1652)
+    // and here (https://github.com/nodejs/node/issues/38964)
+    return new Promise((resolve) => setImmediate(() => {
+      if (this.stream) {
+        this.stream.cancel();
+        // When calling stream.cancel(), the stream will emit 'error' event
+        // with the code 'CANCELLED'.
+        // There are two cases when this happens: when the gap limit is filled and syncToTheGapLimit
+        // and the stream needs to be restarted with new parameters, and here,
+        // when stopping the worker.
+        // The code in stream worker distinguishes whether it need to reconnect or not by the fact
+        // that the old stream object is present or not. When it is set to null, it won't try to
+        // reconnect to the stream.
+        this.stream = null;
+      }
+      resolve(true);
+    }));
   }
 
   setLastSyncedBlockHash(hash) {
     const { walletId } = this;
     const accountsStore = this.storage.store.wallets[walletId].accounts;
 
-    const accountStore = (this.walletType === WALLET_TYPES.SINGLE_ADDRESS)
-      ? accountsStore[this.index.toString()]
-      : accountsStore[this.BIP44PATH.toString()];
+    const accountStore = ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(this.walletType))
+      ? accountsStore[this.BIP44PATH.toString()]
+      : accountsStore[this.index.toString()];
 
     accountStore.blockHash = hash;
 
@@ -158,9 +204,9 @@ class TransactionSyncStreamWorker extends Worker {
     const { walletId } = this;
     const accountsStore = this.storage.store.wallets[walletId].accounts;
 
-    const { blockHash } = (this.walletType === WALLET_TYPES.SINGLE_ADDRESS)
-      ? accountsStore[this.index.toString()]
-      : accountsStore[this.BIP44PATH.toString()];
+    const { blockHash } = ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(this.walletType))
+      ? accountsStore[this.BIP44PATH.toString()]
+      : accountsStore[this.index.toString()];
 
     return blockHash;
   }
@@ -171,6 +217,8 @@ TransactionSyncStreamWorker.prototype.getBestBlockHeightFromTransport = require(
 TransactionSyncStreamWorker.prototype.setLastSyncedBlockHeight = require('./methods/setLastSyncedBlockHeight');
 TransactionSyncStreamWorker.prototype.getLastSyncedBlockHeight = require('./methods/getLastSyncedBlockHeight');
 TransactionSyncStreamWorker.prototype.startHistoricalSync = require('./methods/startHistoricalSync');
+TransactionSyncStreamWorker.prototype.handleTransactionFromStream = require('./methods/handleTransactionFromStream');
+TransactionSyncStreamWorker.prototype.processChunks = require('./methods/processChunks');
 TransactionSyncStreamWorker.prototype.startIncomingSync = require('./methods/startIncomingSync');
 TransactionSyncStreamWorker.prototype.syncUpToTheGapLimit = require('./methods/syncUpToTheGapLimit');
 

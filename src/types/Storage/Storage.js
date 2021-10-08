@@ -6,7 +6,9 @@ const CONSTANTS = require('../../CONSTANTS');
 const initialStore = {
   wallets: {},
   transactions: {},
+  transactionsMetadata: {},
   chains: {},
+  instantLocks: {},
 };
 // eslint-disable-next-line no-underscore-dangle
 const _defaultOpts = {
@@ -37,8 +39,11 @@ class Storage extends EventEmitter {
     this.lastModified = null;
     this.network = has(opts, 'network') ? opts.network.toString() : defaultOpts.network;
 
-    // // Map an address to it's walletid/path/type schema (used by searchAddress for speedup)
+    // Map an address to it's walletid/path/type schema (used by searchAddress for speedup)
     this.mappedAddress = {};
+
+    // Map height to transaction ids to facilitate search.
+    this.mappedTransactionsHeight = {};
   }
 }
 Storage.prototype.addNewTxToAddress = require('./methods/addNewTxToAddress');
@@ -59,6 +64,7 @@ Storage.prototype.exportWallets = require('./methods/exportWallets');
 Storage.prototype.getStore = require('./methods/getStore');
 Storage.prototype.getBlockHeader = require('./methods/getBlockHeader');
 Storage.prototype.getTransaction = require('./methods/getTransaction');
+Storage.prototype.getInstantLock = require('./methods/getInstantLock');
 Storage.prototype.importAccounts = require('./methods/importAccounts');
 Storage.prototype.importAddress = require('./methods/importAddress');
 Storage.prototype.importAddresses = require('./methods/importAddresses');
@@ -67,12 +73,14 @@ Storage.prototype.importSingleAddress = require('./methods/importSingleAddress')
 Storage.prototype.importChains = require('./methods/importChains');
 Storage.prototype.importTransaction = require('./methods/importTransaction');
 Storage.prototype.importTransactions = require('./methods/importTransactions');
+Storage.prototype.importInstantLock = require('./methods/importInstantLock');
 Storage.prototype.rehydrateState = require('./methods/rehydrateState');
 Storage.prototype.saveState = require('./methods/saveState');
 Storage.prototype.searchAddress = require('./methods/searchAddress');
 Storage.prototype.searchAddressesWithTx = require('./methods/searchAddressesWithTx');
 Storage.prototype.searchBlockHeader = require('./methods/searchBlockHeader');
 Storage.prototype.searchTransaction = require('./methods/searchTransaction');
+Storage.prototype.searchTransactionMetadata = require('./methods/searchTransactionMetadata');
 Storage.prototype.searchWallet = require('./methods/searchWallet');
 Storage.prototype.updateAddress = require('./methods/updateAddress');
 Storage.prototype.updateTransaction = require('./methods/updateTransaction');

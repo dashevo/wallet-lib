@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const logger = require('../logger');
 const StandardPlugin = require('./StandardPlugin');
-const { WorkerFailedOnExecute, WorkerFailedOnStart } = require('../errors');
 
 // eslint-disable-next-line no-underscore-dangle
 const _defaultOpts = {
@@ -18,6 +17,10 @@ class Worker extends StandardPlugin {
     this.worker = null;
     this.workerPass = 0;
     this.isWorkerRunning = false;
+
+    this.awaitOnInjection = _.has(opts, 'awaitOnInjection')
+      ? opts.awaitOnInjection
+      : false;
 
     this.firstExecutionRequired = _.has(opts, 'firstExecutionRequired')
       ? opts.firstExecutionRequired
@@ -66,7 +69,11 @@ class Worker extends StandardPlugin {
 
       if (this.executeOnStart) await this.execWorker();
     } catch (e) {
-      throw new WorkerFailedOnStart(this.name, e);
+      this.emit('error', e, {
+        type: 'plugin',
+        pluginType: 'worker',
+        pluginName: this.name,
+      });
     }
   }
 
@@ -101,8 +108,11 @@ class Worker extends StandardPlugin {
         payloadResult = await this.execute();
       } catch (e) {
         await this.stopWorker(e.message);
-
-        throw new WorkerFailedOnExecute(this.name, e);
+        this.emit('error', e, {
+          type: 'plugin',
+          pluginType: 'worker',
+          pluginName: this.name,
+        });
       }
     } else {
       throw new Error(`Worker ${this.name}: Missing execute function`);

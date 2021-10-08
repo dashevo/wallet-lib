@@ -2,30 +2,66 @@ const { Transaction } = require('@dashevo/dashcore-lib');
 const { Output } = Transaction;
 const { InvalidDashcoreTransaction } = require('../../../errors');
 const { FETCHED_CONFIRMED_TRANSACTION } = require('../../../EVENTS');
+
+const parseStringifiedTransaction = (stringified) => new Transaction(stringified);
 /**
  * This method is used to import a transaction in Store.
- * @param {Transaction} transaction - A valid Transaction
+ * if a transaction is already existing, we verify if the metadata needs an update as well.
+ * @param {Transaction/String} transaction - A valid Transaction
+ * @param {TransactionMetaData} transactionMetadata - Transaction Metadata
  * @return void
  */
-const importTransaction = function importTransaction(transaction) {
-  if (!(transaction instanceof Transaction)) throw new InvalidDashcoreTransaction(transaction);
-  const { store, network, mappedAddress } = this;
-  const { transactions } = store;
+const importTransaction = function importTransaction(transaction, transactionMetadata) {
+  if (!(transaction instanceof Transaction)) {
+    try {
+      // eslint-disable-next-line no-param-reassign
+      transaction = parseStringifiedTransaction(transaction);
+      if (!transaction.hash || !transaction.inputs.length || !transaction.outputs.length) {
+        throw new InvalidDashcoreTransaction(transaction);
+      }
+    } catch (e) {
+      throw new InvalidDashcoreTransaction(transaction);
+    }
+  }
+  const {
+    store,
+    network,
+    mappedAddress,
+    mappedTransactionsHeight,
+  } = this;
+  const { transactions, transactionsMetadata } = store;
   const { inputs, outputs } = transaction;
 
   let hasUpdateStorage = false;
   let outputIndex = -1;
   const processedAddressesForTx = {};
 
+  transactions[transaction.hash] = transaction;
+  if (transactionMetadata) {
+    const { height } = transactionMetadata;
+    if (Number.isInteger(height) && height !== 0) {
+      transactionsMetadata[transaction.hash] = transactionMetadata;
+      const mappedTransactionObject = { hash: transaction.hash, ...transactionMetadata };
 
-  // If we already had this transaction locally, we won't add it again,
-  // but we still need to continue processing it as we might have new
-  // address generated (on BIP44 wallets) since the first checkup.
-  if (!transactions[transaction.hash]) {
-    transactions[transaction.hash] = transaction;
+      if (mappedTransactionsHeight[height]) {
+        // If we had this transaction locally, and it might have not been final (confirmed)
+        // We require to look if it previously existed and need replace or to add it
+        const findIndex = mappedTransactionsHeight[height]
+          .findIndex((el) => el.hash === transaction.hash);
+
+        if (findIndex >= 0) {
+          mappedTransactionsHeight[height][findIndex] = mappedTransactionObject;
+        } else {
+          mappedTransactionsHeight[height].push(mappedTransactionObject);
+        }
+      } else {
+        mappedTransactionsHeight[height] = ([mappedTransactionObject]);
+      }
+    }
   }
 
-
+  // even if we had this transaction locally, we need to
+  // process it to ensure no new address (BIP44) needs to be generated
   [...inputs, ...outputs].forEach((element) => {
     const isOutput = (element instanceof Output);
     if (isOutput) outputIndex += 1;

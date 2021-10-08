@@ -30,14 +30,19 @@ module.exports = async function startIncomingSync() {
     // In both cases, the stream needs to be restarted, unless syncIncomingTransactions is
     // set to false, which is signalling the worker not to restart stream.
     if (this.syncIncomingTransactions) {
-      logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHash}`);
+      logger.debug('TransactionSyncStreamWorker - IncomingSync - Restarted from', (lastSyncedBlockHash)
+        ? `hash: ${lastSyncedBlockHash}`
+        : `height: ${lastSyncedBlockHeight}`);
+
       await startIncomingSync.call(this);
     }
   } catch (e) {
     this.stream = null;
 
     if (GRPC_RETRY_ERRORS.includes(e.code)) {
-      logger.debug(`TransactionSyncStreamWorker - IncomingSync - Restarted from ${lastSyncedBlockHash}`);
+      logger.debug('TransactionSyncStreamWorker - IncomingSync - Restarted from', (lastSyncedBlockHash)
+        ? `hash: ${lastSyncedBlockHash}`
+        : `height: ${lastSyncedBlockHeight}`);
 
       if (this.syncIncomingTransactions) {
         await startIncomingSync.call(this);
@@ -46,6 +51,10 @@ module.exports = async function startIncomingSync() {
       return;
     }
 
-    throw e;
+    this.emit('error', e, {
+      type: 'plugin',
+      pluginType: 'worker',
+      pluginName: this.name,
+    });
   }
 };

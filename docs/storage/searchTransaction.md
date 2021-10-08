@@ -7,4 +7,4 @@ Parameters:
 |------------------------|-------------------|----------------| ----------------------------------------------------------|
 | **transactionId**      | String            | yes            | The Transaction identifier to search for                   |
 
-Returns : Object ({found, result, txid}).
+Returns : Object ({found, result, hash}).

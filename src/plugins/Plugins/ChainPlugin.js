@@ -1,6 +1,7 @@
 const logger = require('../../logger');
-const { StandardPlugin } = require('../');
+const { StandardPlugin } = require('..');
 const EVENTS = require('../../EVENTS');
+const { dashToDuffs } = require('../../utils');
 
 const defaultOpts = {
   firstExecutionRequired: true,
@@ -13,6 +14,7 @@ class ChainPlugin extends StandardPlugin {
       name: 'ChainPlugin',
       executeOnStart: defaultOpts.executeOnStart,
       firstExecutionRequired: defaultOpts.firstExecutionRequired,
+      awaitOnInjection: true,
       dependencies: [
         'storage',
         'transport',
@@ -40,10 +42,16 @@ class ChainPlugin extends StandardPlugin {
         this.parentEvents.emit(EVENTS.BLOCK, { type: EVENTS.BLOCK, payload: block });
         // We do not announce BLOCKHEADER as this is done by Storage
         await self.storage.importBlockHeader(block.header);
+      });
+      self.transport.on(EVENTS.BLOCKHEIGHT_CHANGED, async (ev) => {
+        const { payload: blockheight } = ev;
 
-        const blockHeight = await self.transport.getBestBlockHeight();
-        this.storage.store.chains[network.toString()].blockHeight = blockHeight;
-        logger.debug(`ChainPlugin - setting chain blockheight ${blockHeight}`);
+        this.parentEvents.emit(EVENTS.BLOCKHEIGHT_CHANGED, {
+          type: EVENTS.BLOCKHEIGHT_CHANGED, payload: blockheight,
+        });
+
+        this.storage.store.chains[network.toString()].blockHeight = blockheight;
+        logger.debug(`ChainPlugin - setting chain blockheight ${blockheight}`);
       });
       await self.transport.subscribeToBlocks();
     }
@@ -56,13 +64,22 @@ class ChainPlugin extends StandardPlugin {
    */
   async execStatusFetch() {
     const res = await this.fetchStatus();
+
     if (!res) {
       return false;
     }
-    const { blocks } = res;
+
+    const { chain: { blocksCount: blocks }, network: { fee: { relay } } } = res;
+
     const { network } = this.storage.store.wallets[this.walletId];
+
     logger.debug('ChainPlugin - Setting up starting blockHeight', blocks);
+
     this.storage.store.chains[network.toString()].blockHeight = blocks;
+
+    if (relay) {
+      this.storage.store.chains[network.toString()].fees.minRelay = dashToDuffs(relay);
+    }
 
     const bestBlock = await this.transport.getBlockHeaderByHeight(blocks);
     await this.storage.importBlockHeader(bestBlock);

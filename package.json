@@ -1,14 +1,11 @@
 {
   "name": "@dashevo/wallet-lib",
-  "version": "7.15.1",
+  "version": "7.21.0-dev.12",
   "description": "Light wallet library for Dash",
   "main": "src/index.js",
   "unpkg": "dist/wallet-lib.min.js",
   "scripts": {
     "build": "webpack --display-error-details",
-    "check-package": "npm run check-package:name && npm run check-package:version",
-    "check-package:name": "test $(jq -r .name package.json) = $(jq -r .name package-lock.json)",
-    "check-package:version": "test $(jq -r .version package.json) = $(jq -r .version package-lock.json)",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test:unit": "nyc mocha 'src/**/*.spec.js'",
@@ -40,16 +37,18 @@
   },
   "homepage": "https://github.com/dashevo/wallet-lib#readme",
   "dependencies": {
-    "@dashevo/dapi-client": "~0.15.0",
-    "@dashevo/dashcore-lib": "~0.18.12",
-    "@dashevo/grpc-common": "~0.3.0",
-    "cbor": "^5.0.2",
+    "@dashevo/dapi-client": "~0.21.0-dev.13",
+    "@dashevo/dashcore-lib": "~0.19.26",
+    "@dashevo/dpp": "~0.21.0-dev.8",
+    "@dashevo/grpc-common": "~0.5.4",
+    "cbor": "^7.0.5",
     "crypto-js": "^4.0.0",
     "lodash": "^4.17.19",
     "pbkdf2": "^3.1.1",
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "node-inspect-extracted": "1.0.7",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "dotenv-safe": "^8.2.0",
