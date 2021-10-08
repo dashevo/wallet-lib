@@ -1,9 +1,9 @@
-const util = require('util');
-const winston = require('winston');
 // Default winston transport requires setImmediate to work, so
 // polyfill included here. Making it work with webpack is rather tricky, so it is used as per
 // documentation: https://github.com/YuzuJS/setImmediate#usage
 require('setimmediate');
+const util = require('util');
+const winston = require('winston');
 
 const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 
