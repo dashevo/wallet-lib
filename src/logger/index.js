@@ -1,5 +1,6 @@
 const util = require('util');
 const winston = require('winston');
+const Console = require('./console');
 
 const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 
@@ -11,10 +12,10 @@ const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 //   debug    4
 //   silly    5
 
-const logger = winston.createLogger({
+const index = winston.createLogger({
   level: LOG_LEVEL,
   transports: [
-    new winston.transports.Console({
+    new Console({
       format: winston.format.combine(
         {
           transform: (info) => {
@@ -35,6 +36,6 @@ const logger = winston.createLogger({
   ],
 });
 
-logger.verbose(`Logger uses "${LOG_LEVEL}" level`, { level: LOG_LEVEL });
+index.verbose(`Logger uses "${LOG_LEVEL}" level`, { level: LOG_LEVEL });
 
-module.exports = logger;
+module.exports = index;
