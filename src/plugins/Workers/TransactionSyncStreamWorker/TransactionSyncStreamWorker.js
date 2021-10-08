@@ -170,7 +170,7 @@ class TransactionSyncStreamWorker extends Worker {
     // explained here (https://github.com/grpc/grpc-node/issues/1652)
     // and here (https://github.com/nodejs/node/issues/38964)
     return new Promise((resolve) => setImmediate(() => {
-      if (this.stream && this.stream.cancel) {
+      if (this.stream) {
         this.stream.cancel();
         // When calling stream.cancel(), the stream will emit 'error' event
         // with the code 'CANCELLED'.
