@@ -1,6 +1,9 @@
 const util = require('util');
 const winston = require('winston');
-const Console = require('./console');
+// Default winston transport requires setImmediate to work, so
+// polyfill included here. Making it work with webpack is rather tricky, so it is used as per
+// documentation: https://github.com/YuzuJS/setImmediate#usage
+require('setimmediate');
 
 const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 
@@ -15,7 +18,7 @@ const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 const logger = winston.createLogger({
   level: LOG_LEVEL,
   transports: [
-    new Console({
+    new winston.transports.Console({
       format: winston.format.combine(
         {
           transform: (info) => {
