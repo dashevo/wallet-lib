@@ -12,7 +12,7 @@ const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 //   debug    4
 //   silly    5
 
-const index = winston.createLogger({
+const logger = winston.createLogger({
   level: LOG_LEVEL,
   transports: [
     new Console({
@@ -36,6 +36,6 @@ const index = winston.createLogger({
   ],
 });
 
-index.verbose(`Logger uses "${LOG_LEVEL}" level`, { level: LOG_LEVEL });
+logger.verbose(`Logger uses "${LOG_LEVEL}" level`, { level: LOG_LEVEL });
 
-module.exports = index;
+module.exports = logger;
