@@ -1,5 +1,8 @@
 /* eslint-disable no-param-reassign */
+const GrpcError = require('@dashevo/grpc-common/lib/server/error/GrpcError');
+const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
 const logger = require('../../../../logger');
+const isBrowser = require('../../../../utils/isBrowser');
 
 function isAnyIntersection(arrayA, arrayB) {
   const intersection = arrayA.filter((e) => arrayB.indexOf(e) > -1);
@@ -50,21 +53,30 @@ async function processChunks(dataChunk) {
 
     if (self.hasReachedGapLimit && self.stream) {
       logger.silly('TransactionSyncStreamWorker - end stream - new addresses generated');
-      // If there are some new addresses being imported
-      // to the storage, that mean that we hit the gap limit
-      // and we need to update the bloom filter with new addresses,
-      // i.e. we need to open another stream with a bloom filter
-      // that contains new addresses.
 
-      // DO not setting null this.stream allow to know we
-      // need to reset our stream (as we pass along the error)
-      // Wrapping `cancel` in `setImmediate` due to bug with double-free
-      // explained here (https://github.com/grpc/grpc-node/issues/1652)
-      // and here (https://github.com/nodejs/node/issues/38964)
-      await new Promise((resolveCancel) => setImmediate(() => {
+      if (isBrowser()) {
+        // Under browser environment, grpc-web doesn't throw cancel error
+        // so we throw it by ourselves
         self.stream.cancel();
-        resolveCancel();
-      }));
+
+        throw new GrpcError(GrpcErrorCodes.CANCELLED, 'Cancelled on client');
+      } else {
+        // If there are some new addresses being imported
+        // to the storage, that mean that we hit the gap limit
+        // and we need to update the bloom filter with new addresses,
+        // i.e. we need to open another stream with a bloom filter
+        // that contains new addresses.
+
+        // DO not setting null this.stream allow to know we
+        // need to reset our stream (as we pass along the error)
+        // Wrapping `cancel` in `setImmediate` due to bug with double-free
+        // explained here (https://github.com/grpc/grpc-node/issues/1652)
+        // and here (https://github.com/nodejs/node/issues/38964)
+        await new Promise((resolveCancel) => setImmediate(() => {
+          self.stream.cancel();
+          resolveCancel();
+        }));
+      }
     }
   }
 

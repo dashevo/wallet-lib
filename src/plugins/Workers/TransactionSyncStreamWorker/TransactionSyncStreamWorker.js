@@ -1,10 +1,13 @@
 const {
   Transaction, MerkleBlock, InstantLock,
 } = require('@dashevo/dashcore-lib');
+const GrpcError = require('@dashevo/grpc-common/lib/server/error/GrpcError');
+const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
 const { WALLET_TYPES } = require('../../../CONSTANTS');
 const sleep = require('../../../utils/sleep');
 
 const Worker = require('../../Worker');
+const isBrowser = require('../../../utils/isBrowser');
 
 class TransactionSyncStreamWorker extends Worker {
   constructor(options) {
@@ -167,6 +170,19 @@ class TransactionSyncStreamWorker extends Worker {
     }
     this.syncIncomingTransactions = false;
 
+    if (isBrowser()) {
+      // Under browser environment, grpc-web doesn't throw cancel error
+      // so we throw it by ourselves
+      if (this.stream) {
+        this.stream.cancel();
+        this.stream = null;
+
+        throw new GrpcError(GrpcErrorCodes.CANCELLED, 'Cancelled on client');
+      }
+
+      return true;
+    }
+
     // Wrapping `cancel` in `setImmediate` due to bug with double-free
     // explained here (https://github.com/grpc/grpc-node/issues/1652)
     // and here (https://github.com/nodejs/node/issues/38964)
@@ -175,9 +191,9 @@ class TransactionSyncStreamWorker extends Worker {
         this.stream.cancel();
         // When calling stream.cancel(), the stream will emit 'error' event
         // with the code 'CANCELLED'.
-        // There are two cases when this happens: when the gap limit is filled and syncToTheGapLimit
-        // and the stream needs to be restarted with new parameters, and here,
-        // when stopping the worker.
+        // There are two cases when this happens: when the gap limit is filled
+        // and syncToTheGapLimit and the stream needs to be restarted with new parameters,
+        // and here, when stopping the worker.
         // The code in stream worker distinguishes whether it need to reconnect or not by the fact
         // that the old stream object is present or not. When it is set to null, it won't try to
         // reconnect to the stream.
