@@ -1,10 +1,13 @@
 const {
   Transaction, MerkleBlock, InstantLock,
 } = require('@dashevo/dashcore-lib');
+const GrpcError = require('@dashevo/grpc-common/lib/server/error/GrpcError');
+const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
 const { WALLET_TYPES } = require('../../../CONSTANTS');
 const sleep = require('../../../utils/sleep');
 
 const Worker = require('../../Worker');
+const isBrowser = require('../../../utils/isBrowser');
 
 class TransactionSyncStreamWorker extends Worker {
   constructor(options) {
@@ -166,6 +169,29 @@ class TransactionSyncStreamWorker extends Worker {
       return this.onStop();
     }
     this.syncIncomingTransactions = false;
+
+    if (isBrowser()) {
+      // Under browser environment, grpc-web doesn't call error and end events
+      // so we call it by ourselves
+      if (this.stream) {
+        return new Promise((resolve) => setImmediate(() => {
+          if (this.stream) {
+            this.stream.cancel();
+
+            const error = new GrpcError(GrpcErrorCodes.CANCELLED, 'Cancelled on client');
+            // call onError events
+            this.stream.f.forEach((func) => func(error));
+
+            // call onEnd events
+            this.stream.c.forEach((func) => func());
+
+            this.stream = null;
+          }
+
+          resolve(true);
+        }));
+      }
+    }
 
     // Wrapping `cancel` in `setImmediate` due to bug with double-free
     // explained here (https://github.com/grpc/grpc-node/issues/1652)
