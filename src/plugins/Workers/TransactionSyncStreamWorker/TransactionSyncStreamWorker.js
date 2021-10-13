@@ -1,13 +1,10 @@
 const {
   Transaction, MerkleBlock, InstantLock,
 } = require('@dashevo/dashcore-lib');
-const GrpcError = require('@dashevo/grpc-common/lib/server/error/GrpcError');
-const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
 const { WALLET_TYPES } = require('../../../CONSTANTS');
 const sleep = require('../../../utils/sleep');
 
 const Worker = require('../../Worker');
-const isBrowser = require('../../../utils/isBrowser');
 
 class TransactionSyncStreamWorker extends Worker {
   constructor(options) {
@@ -169,19 +166,6 @@ class TransactionSyncStreamWorker extends Worker {
       return this.onStop();
     }
     this.syncIncomingTransactions = false;
-
-    if (isBrowser()) {
-      // Under browser environment, grpc-web doesn't throw cancel error
-      // so we throw it by ourselves
-      if (this.stream) {
-        this.stream.cancel();
-        this.stream = null;
-
-        throw new GrpcError(GrpcErrorCodes.CANCELLED, 'Cancelled on client');
-      }
-
-      return true;
-    }
 
     // Wrapping `cancel` in `setImmediate` due to bug with double-free
     // explained here (https://github.com/grpc/grpc-node/issues/1652)
