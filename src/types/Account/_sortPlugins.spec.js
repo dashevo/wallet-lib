@@ -164,7 +164,6 @@ const userDefinedComplexPluginDependenciesPlugins = {
 
 const baseAccount = {
   walletType: WALLET_TYPES.HDWALLET,
-  allowSensitiveOperations: false
 }
 const accountOnlineWithDefaultPlugins = {
   ...baseAccount,

@@ -19,7 +19,7 @@ const initPlugin = (UnsafePlugin) => {
  * @param userUnsafePlugins
  * @returns {*[]}
  */
-const sortUserPlugins = (defaultSortedPlugins, userUnsafePlugins, allowSensitiveOperations) => {
+const sortUserPlugins = (defaultSortedPlugins, userUnsafePlugins) => {
   const sortedPlugins = [];
   const initializedSortedPlugins = [];
 
@@ -106,7 +106,7 @@ const sortUserPlugins = (defaultSortedPlugins, userUnsafePlugins, allowSensitive
     sortedPlugins.splice(
       injectionIndex,
       0,
-      [UnsafePlugin, allowSensitiveOperations, awaitOnInjection],
+      [UnsafePlugin, awaitOnInjection],
     );
   });
   initializedSortedPlugins.forEach((initializedSortedPlugin, i) => {
@@ -135,6 +135,6 @@ const sortPlugins = (account, userUnsafePlugins) => {
       }
     }
   }
-  return sortUserPlugins(plugins, userUnsafePlugins, account.allowSensitiveOperations);
+  return sortUserPlugins(plugins, userUnsafePlugins);
 };
 module.exports = sortPlugins;
