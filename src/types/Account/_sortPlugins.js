@@ -127,11 +127,11 @@ const sortPlugins = (account, userUnsafePlugins) => {
   // eslint-disable-next-line no-async-promise-executor
   if (account.injectDefaultPlugins) {
     if (!account.offlineMode) {
-      plugins.push([ChainPlugin, true, true]);
-      plugins.push([TransactionSyncStreamWorker, true, true]);
+      plugins.push([ChainPlugin, true]);
+      plugins.push([TransactionSyncStreamWorker, true]);
 
       if (account.walletType === WALLET_TYPES.HDWALLET) {
-        plugins.push([IdentitySyncWorker, true, true]);
+        plugins.push([IdentitySyncWorker, true]);
       }
     }
   }
