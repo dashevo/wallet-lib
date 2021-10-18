@@ -167,6 +167,7 @@ class TransactionSyncStreamWorker extends Worker {
    * @returns {Promise<boolean>}
    */
   async onStop(options = {}) {
+    // in case of disconnect we don't need to wait until the wallet complete the sync process
     if (options.force) {
       this.pendingRequest = {};
     }
