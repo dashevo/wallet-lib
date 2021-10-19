@@ -10,6 +10,8 @@ class AbstractTransport extends EventEmitter {
   constructor() {
     super();
 
+    this.setMaxListeners(0);
+
     this.state = {
       block: null,
       blockHeaders: null,
