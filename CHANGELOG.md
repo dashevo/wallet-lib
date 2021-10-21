@@ -1,4 +1,4 @@
-# [7.21.0](https://github.com/dashevo/wallet-lib/compare/v7.21.0-dev.16...v7.21.0) (2021-10-21)
+# [7.21.0](https://github.com/dashevo/wallet-lib/compare/v7.21.0...v7.21.0) (2021-10-21)
 
 
 ### Features
