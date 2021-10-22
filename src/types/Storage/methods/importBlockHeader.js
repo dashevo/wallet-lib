@@ -8,6 +8,8 @@ const importBlockHeader = function importBlockHeader(blockHeader, height) {
   const self = this;
   const { store, network } = this;
 
+  console.log('NETWORK123', network);
+
   const chainStore = store.chains[network];
   const { blockHeight: currentChainHeight } = store.chains[network];
 

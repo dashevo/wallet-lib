@@ -70,14 +70,18 @@ class Wallet extends EventEmitter {
     this.waitForInstantLockTimeout = _.has(opts, 'waitForInstantLockTimeout') ? opts.waitForInstantLockTimeout : defaultOptions.waitForInstantLockTimeout;
 
     // Validate network
-    const networkName = _.has(opts, 'network') ? opts.network.toString() : defaultOptions.network;
-    const network = Networks.get(networkName);
+    let networkName = defaultOptions.network;
+    if (opts.network) {
+      networkName = opts.network.toString();
 
-    if (!network) {
-      throw new Error(`Invalid network: ${network}`);
+      if (!Networks.get(networkName)) {
+        throw new Error(`Invalid network: ${networkName}`);
+      }
     }
 
-    this.network = network.toString();
+    this.network = networkName;
+
+    console.log('NETWORK', this.network);
 
     if ('mnemonic' in opts) {
       this.fromMnemonic((opts.mnemonic === null) ? generateNewMnemonic() : opts.mnemonic);
@@ -87,7 +91,7 @@ class Wallet extends EventEmitter {
       this.fromHDPrivateKey(opts.HDPrivateKey);
     } else if ('privateKey' in opts) {
       this.fromPrivateKey((opts.privateKey === null)
-        ? new PrivateKey(network).toString()
+        ? new PrivateKey(this.network).toString()
         : opts.privateKey);
     } else if ('publicKey' in opts) {
       this.fromPublicKey(opts.publicKey);
@@ -105,7 +109,7 @@ class Wallet extends EventEmitter {
     this.storage = new Storage({
       rehydrate: true,
       autosave: true,
-      network,
+      network: this.network,
     });
 
     this.storage.configure({
