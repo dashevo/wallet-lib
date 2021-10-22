@@ -129,6 +129,11 @@ class Wallet extends EventEmitter {
       this.store.syncOptions = {
         skipSynchronization: true,
       };
+
+      if (this.unsafeOptions.skipSynchronizationBeforeHeight) {
+        throw new Error('"unsafeOptions.skipSynchronizationBeforeHeight" will have no effect because wallet has been'
+          + ' created from the new mnemonic');
+      }
     } else if (this.unsafeOptions.skipSynchronizationBeforeHeight) {
       this.store.syncOptions = {
         skipSynchronizationBeforeHeight: this.unsafeOptions.skipSynchronizationBeforeHeight,
