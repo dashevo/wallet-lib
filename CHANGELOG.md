@@ -1,3 +1,130 @@
+# [7.21.0](https://github.com/dashevo/wallet-lib/compare/v7.21.0...v7.21.0) (2021-10-21)
+
+
+### Features
+
+* provide plugin dependencies sorting ([#281](https://github.com/dashevo/wallet-lib/issues/281))
+* **Keychain:** `getHardenedDIP15AccountKey`, `getDIP15ExtendedPrivateKey` ([#282](https://github.com/dashevo/wallet-lib/issues/282))
+* overridable coinbase maturity value ([#322](https://github.com/dashevo/wallet-lib/issues/322))
+* retry policy of unconfirmed transaction from stream ([#304](https://github.com/dashevo/wallet-lib/issues/304)), closes [#303](https://github.com/dashevo/wallet-lib/issues/303)
+* implement transaction metadata handling ([#291](https://github.com/dashevo/wallet-lib/issues/291), [#303](https://github.com/dashevo/wallet-lib/issues/303))
+* transaction history ([#295](https://github.com/dashevo/wallet-lib/issues/295)), closes [#303](https://github.com/dashevo/wallet-lib/issues/303)
+* **TransactionSyncWorker:** improve stream response handling ([#323](https://github.com/dashevo/wallet-lib/issues/323), [#339](https://github.com/dashevo/wallet-lib/issues/339), [#338](https://github.com/dashevo/wallet-lib/issues/338), [#336](https://github.com/dashevo/wallet-lib/issues/336))
+* prevent broadcast and throw error on transaction below min relay fee ([#305](https://github.com/dashevo/wallet-lib/issues/305))
+* provide watch-only mode for public key and address based wallet ([#290](https://github.com/dashevo/wallet-lib/issues/290))
+
+
+### Bug Fixes
+
+* logger doesn't work in the browser ([#330](https://github.com/dashevo/wallet-lib/issues/330))
+* typings fix for `waitForInstantLock` ([#289](https://github.com/dashevo/wallet-lib/issues/289))
+* correct logging of identity fetched ([#310](https://github.com/dashevo/wallet-lib/issues/310))
+* correctly announced when a plugin is initialized ([#321](https://github.com/dashevo/wallet-lib/issues/321))
+* `stream.cancel` were causing double-free and segfault ([#328](https://github.com/dashevo/wallet-lib/issues/328), [#329](https://github.com/dashevo/wallet-lib/issues/329))
+* grpc-web doesn't throw cancel error ([#332](https://github.com/dashevo/wallet-lib/issues/332))
+
+
+### Refactoring
+
+* **Keychain**: proper naming for BIP44 and DIP9 get keys methods ([#288](https://github.com/dashevo/wallet-lib/issues/288)) 
+
+
+### BREAKING CHANGES
+
+* `getHardenedBIP44Path` renamed to `getHardenedBIP44HDKey`
+* `getHardenedDIP9FeaturePath` renamed to `getHardenedDIP9FeatureHDKey`
+
+
+
+## [7.20.1](https://github.com/dashevo/wallet-lib/compare/v7.20.0...v7.20.1) (2021-07-28)
+
+
+### Bug Fixes
+
+* `InvalidResponse` error when connecting to older networks with newer client ([#284](https://github.com/dashevo/wallet-lib/issues/284))
+
+
+
+# [7.20.0](https://github.com/dashevo/wallet-lib/compare/v7.19.2...v7.20.0) (2021-07-09)
+
+
+### Features
+
+* add `waitForInstantLockTimeout` Wallet Option ([#270](https://github.com/dashevo/wallet-lib/issues/270))
+
+
+### Bug Fixes
+
+* `waitForInstantLock` timeouts stuck in event loop ([#272](https://github.com/dashevo/wallet-lib/issues/272))
+
+
+
+## [7.19.2](https://github.com/dashevo/wallet-lib/compare/v7.19.1...v7.19.2) (2021-05-28)
+
+
+### Bugfixes
+
+* platform queries with binary fields not serialized properly ([#264](https://github.com/dashevo/wallet-lib/pull/264))
+
+## [7.19.1](https://github.com/dashevo/wallet-lib/compare/v7.19.0...v7.19.1) (2021-05-20)
+
+
+### Chores
+
+* update dpp and dapi-client to 0.19.2 ([#258](https://github.com/dashevo/wallet-lib/pull/258))
+
+
+# [7.19.0](https://github.com/dashevo/wallet-lib/compare/v7.18.1...v7.19.0) (2021-05-03)
+
+
+### Features
+
+* update dpp with verifyInstantLock method ([#234](https://github.com/dashevo/wallet-lib/issues/234))
+
+
+### BREAKING CHANGES
+
+* `Account#fetchStatus` response format is changed and not compatible with the previous version
+* `Transport#getStatus` responded format is changed and not compatible with the previous version
+
+
+
+## [7.18.1](https://github.com/dashevo/wallet-lib/compare/v7.18.0...v7.18.1) (2021-04-28)
+
+
+### Bug Fixes
+
+* transaction.isConbase is not a function ([#246](https://github.com/dashevo/wallet-lib/issues/246))
+
+
+
+# [7.18.0](https://github.com/dashevo/wallet-lib/compare/v7.17.2...v7.18.0) (2021-03-03)
+
+
+### Bug Fixes
+
+* UTXO being mixed up with multiple account in parallel ([#233](https://github.com/dashevo/wallet-lib/issues/233))
+
+
+### Features
+
+* workers and plugins error handling using events ([#221](https://github.com/dashevo/wallet-lib/issues/221))
+* aligning identityIndex as defined in DIP13 as hardened ([#222](https://github.com/dashevo/wallet-lib/issues/222))
+* add `skipSynchronizationBeforeHeight` unsafe option ([#217](https://github.com/dashevo/wallet-lib/issues/217))
+
+
+### Refactoring
+
+* Identities class ([#227](https://github.com/dashevo/wallet-lib/issues/227))
+
+
+### BREAKING CHANGES
+
+* to access identities from account use `account.identities` property
+* previous identity created with DashJS / Wallet-lib would not be resolvable anymore
+
+
+
 ## [7.17.2](https://github.com/dashevo/wallet-lib/compare/v7.17.1...v7.17.2) (2020-12-30)
 
 

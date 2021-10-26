@@ -16,13 +16,14 @@ const { BLOOM_FALSE_POSITIVE_RATE } = require('../../../CONSTANTS');
  * @return {Promise<void>}
  */
 
-module.exports = async function subscribeToTransactionWithProofs(
+module.exports = async function subscribeToTransactionsWithProofs(
   addressList,
   opts = { fromBlockHeight: 1, count: 0 },
 ) {
   const { client } = this;
-  logger.silly(`DAPIClient.subscribeToTransactionWithProofs[${addressList}]`);
+  logger.silly(`DAPIClient.subscribeToTransactionWithProofs[${addressList}](len:${addressList.length})`);
 
+  if (!addressList.length) throw new Error('Unable to subscribe to transaction without addresses');
   const bloomfilter = BloomFilter.create(addressList.length, BLOOM_FALSE_POSITIVE_RATE);
 
   addressList.forEach((address) => {

@@ -6,6 +6,7 @@ const { CONFIGURED } = require('../../EVENTS');
 const initialStore = {
   wallets: {},
   transactions: {},
+  transactionsMetadata: {},
   instantLocks: {},
 };
 // eslint-disable-next-line no-underscore-dangle
@@ -39,8 +40,11 @@ class Storage extends EventEmitter {
 
     this.adapter = opts.adapter || createAdapter();
 
-    // // Map an address to it's walletid/path/type schema (used by searchAddress for speedup)
+    // Map an address to it's walletid/path/type schema (used by searchAddress for speedup)
     this.mappedAddress = {};
+
+    // Map height to transaction ids to facilitate search.
+    this.mappedTransactionsHeight = {};
 
     this.isStopped = true;
   }
@@ -86,6 +90,7 @@ Storage.prototype.searchAddress = require('./methods/searchAddress');
 Storage.prototype.searchAddressesWithTx = require('./methods/searchAddressesWithTx');
 Storage.prototype.searchBlockHeader = require('./methods/searchBlockHeader');
 Storage.prototype.searchTransaction = require('./methods/searchTransaction');
+Storage.prototype.searchTransactionMetadata = require('./methods/searchTransactionMetadata');
 Storage.prototype.searchWallet = require('./methods/searchWallet');
 Storage.prototype.updateAddress = require('./methods/updateAddress');
 Storage.prototype.updateTransaction = require('./methods/updateTransaction');

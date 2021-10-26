@@ -24,8 +24,14 @@ class KeyChain {
     } else if (has(opts, 'privateKey')) {
       this.type = 'privateKey';
       this.privateKey = opts.privateKey;
+    } else if (has(opts, 'publicKey')) {
+      this.type = 'publicKey';
+      this.publicKey = opts.publicKey;
+    } else if (has(opts, 'address')) {
+      this.type = 'address';
+      this.address = opts.address.toString();
     } else {
-      throw new Error('Expect privateKey, HDPublicKey or HDPrivateKey');
+      throw new Error('Expect privateKey, publicKey, HDPublicKey, HDPrivateKey or Address');
     }
     if (opts.network) this.network = opts.network;
     if (opts.keys) this.keys = { ...opts.keys };
@@ -34,8 +40,10 @@ class KeyChain {
 
 KeyChain.prototype.generateKeyForChild = require('./methods/generateKeyForChild');
 KeyChain.prototype.generateKeyForPath = require('./methods/generateKeyForPath');
-KeyChain.prototype.getHardenedBIP44Path = require('./methods/getHardenedBIP44Path');
-KeyChain.prototype.getHardenedDIP9FeaturePath = require('./methods/getHardenedDIP9FeaturePath');
+KeyChain.prototype.getDIP15ExtendedKey = require('./methods/getDIP15ExtendedKey');
+KeyChain.prototype.getHardenedBIP44HDKey = require('./methods/getHardenedBIP44HDKey');
+KeyChain.prototype.getHardenedDIP9FeatureHDKey = require('./methods/getHardenedDIP9FeatureHDKey');
+KeyChain.prototype.getHardenedDIP15AccountKey = require('./methods/getHardenedDIP15AccountKey');
 KeyChain.prototype.getKeyForChild = require('./methods/getKeyForChild');
 KeyChain.prototype.getKeyForPath = require('./methods/getKeyForPath');
 KeyChain.prototype.getPrivateKey = require('./methods/getPrivateKey');

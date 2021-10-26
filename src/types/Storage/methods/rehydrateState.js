@@ -1,5 +1,6 @@
 const { merge } = require('lodash');
 const { InstantLock } = require('@dashevo/dashcore-lib');
+const { hasMethod } = require('../../../utils');
 const logger = require('../../../logger');
 
 const mergeHelper = (initial = {}, additional = {}) => merge(initial, additional);
@@ -12,14 +13,16 @@ const { REHYDRATE_STATE_FAILED, REHYDRATE_STATE_SUCCESS } = require('../../../EV
 const rehydrateState = async function rehydrateState() {
   if (this.rehydrate && this.lastRehydrate === null) {
     try {
-      const transactions = (this.adapter && this.adapter.getItem)
+      const transactions = (this.adapter && hasMethod(this.adapter, 'getItem'))
         ? (await this.adapter.getItem('transactions') || this.store.transactions)
         : this.store.transactions;
-
-      const wallets = (this.adapter && this.adapter.getItem)
+      const wallets = (this.adapter && hasMethod(this.adapter, 'getItem'))
         ? (await this.adapter.getItem('wallets') || this.store.wallets)
         : this.store.wallets;
-      const instantLocks = (this.adapter && this.adapter.getItem)
+      const chains = (this.adapter && hasMethod(this.adapter, 'getItem'))
+        ? (await this.adapter.getItem('chains') || this.store.chains)
+        : this.store.chains;
+      const instantLocks = (this.adapter && hasMethod(this.adapter, 'getItem'))
         ? (await this.adapter.getItem('instantLocks') || this.store.instantLocks)
         : this.store.instantLocks;
 

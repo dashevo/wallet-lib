@@ -13,12 +13,13 @@ class IdentitySyncWorker extends Worker {
       executeOnStart: true,
       firstExecutionRequired: true,
       workerIntervalTime: 60 * 1000,
+      awaitOnInjection: true,
       gapLimit: 10,
       dependencies: [
         'storage',
         'transport',
         'walletId',
-        'getIdentityHDKeyByIndex',
+        'identities',
       ],
       ...options,
     });
@@ -47,7 +48,7 @@ class IdentitySyncWorker extends Worker {
 
       // check unused indices in the middle of list first
       if (unusedIndex) {
-        // if we go through unused indices and thay are not
+        // if we go through unused indices and they are not
         // sequential we need to reset gap count
         if (unusedIndex !== index + 1) {
           gapCount = 0;
@@ -60,7 +61,7 @@ class IdentitySyncWorker extends Worker {
         index += 1;
       }
 
-      const { privateKey } = this.getIdentityHDKeyByIndex(index, 0);
+      const { privateKey } = this.identities.getIdentityHDKeyByIndex(index, 0);
       const publicKey = privateKey.toPublicKey();
 
       // eslint-disable-next-line no-await-in-loop
@@ -94,7 +95,7 @@ class IdentitySyncWorker extends Worker {
       // it means gaps are not sequential
       gapCount = 0;
 
-      logger.silly(`IdentitySyncWorker - got ${fetchedId} at ${index}`);
+      logger.silly(`IdentitySyncWorker - got ${Identifier.from(fetchedId)} at ${index}`);
 
       // eslint-disable-next-line no-await-in-loop
       await this.storage.insertIdentityIdAtIndex(

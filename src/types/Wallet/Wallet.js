@@ -1,5 +1,6 @@
 const { PrivateKey, Networks } = require('@dashevo/dashcore-lib');
 
+const EventEmitter = require('events');
 const _ = require('lodash');
 const Storage = require('../Storage/Storage');
 const {
@@ -15,10 +16,13 @@ const defaultOptions = {
   injectDefaultPlugins: true,
   allowSensitiveOperations: false,
   unsafeOptions: {},
+  waitForInstantLockTimeout: 60000,
 };
 
 const fromMnemonic = require('./methods/fromMnemonic');
 const fromPrivateKey = require('./methods/fromPrivateKey');
+const fromPublicKey = require('./methods/fromPublicKey');
+const fromAddress = require('./methods/fromAddress');
 const fromSeed = require('./methods/fromSeed');
 const fromHDPublicKey = require('./methods/fromHDPublicKey');
 const fromHDPrivateKey = require('./methods/fromHDPrivateKey');
@@ -39,18 +43,21 @@ const createTransportFromOptions = require('../../transport/createTransportFromO
  *     - address : opts.privateKey is provided. Allow to handle a single address object.
  *     - hdwallet : opts.mnemonic or opts.seed is provided. Handle a HD Wallet with it's account.
  */
-class Wallet {
+class Wallet extends EventEmitter {
   /**
    *
    * @param opts
    */
   constructor(opts = defaultOptions) {
+    super();
     // Immediate prototype method-composition are used in order to give access in constructor.
     Object.assign(Wallet.prototype, {
       fromMnemonic,
       fromSeed,
       fromHDPrivateKey,
       fromPrivateKey,
+      fromPublicKey,
+      fromAddress,
       fromHDPublicKey,
       generateNewWalletId,
     });
@@ -61,6 +68,7 @@ class Wallet {
     this.allowSensitiveOperations = _.has(opts, 'allowSensitiveOperations') ? opts.allowSensitiveOperations : defaultOptions.allowSensitiveOperations;
     this.injectDefaultPlugins = _.has(opts, 'injectDefaultPlugins') ? opts.injectDefaultPlugins : defaultOptions.injectDefaultPlugins;
     this.unsafeOptions = _.has(opts, 'unsafeOptions') ? opts.unsafeOptions : defaultOptions.unsafeOptions;
+    this.waitForInstantLockTimeout = _.has(opts, 'waitForInstantLockTimeout') ? opts.waitForInstantLockTimeout : defaultOptions.waitForInstantLockTimeout;
 
     // Validate network
     const networkName = _.has(opts, 'network') ? opts.network.toString() : defaultOptions.network;
@@ -72,8 +80,14 @@ class Wallet {
 
     this.network = network.toString();
 
+    let createdFromNewMnemonic = false;
     if ('mnemonic' in opts) {
-      this.fromMnemonic((opts.mnemonic === null) ? generateNewMnemonic() : opts.mnemonic);
+      let { mnemonic } = opts;
+      if (mnemonic === null) {
+        mnemonic = generateNewMnemonic();
+        createdFromNewMnemonic = true;
+      }
+      this.fromMnemonic(mnemonic);
     } else if ('seed' in opts) {
       this.fromSeed(opts.seed);
     } else if ('HDPrivateKey' in opts) {
@@ -82,10 +96,15 @@ class Wallet {
       this.fromPrivateKey((opts.privateKey === null)
         ? new PrivateKey(network).toString()
         : opts.privateKey);
+    } else if ('publicKey' in opts) {
+      this.fromPublicKey(opts.publicKey);
     } else if ('HDPublicKey' in opts) {
       this.fromHDPublicKey(opts.HDPublicKey);
+    } else if ('address' in opts) {
+      this.fromAddress(opts.address);
     } else {
       this.fromMnemonic(generateNewMnemonic());
+      createdFromNewMnemonic = true;
     }
 
     // Notice : Most of the time, wallet id is deterministic
@@ -101,10 +120,20 @@ class Wallet {
 
     this.store = this.storage.store;
 
-    if (this.unsafeOptions.skipSynchronizationBeforeHeight) {
+    if (createdFromNewMnemonic) {
       // As it is pretty complicated to pass any of wallet options
       // to a specific plugin, using `store` as an options mediator
       // is easier.
+
+      this.store.syncOptions = {
+        skipSynchronization: true,
+      };
+
+      if (this.unsafeOptions.skipSynchronizationBeforeHeight) {
+        throw new Error('"unsafeOptions.skipSynchronizationBeforeHeight" will have no effect because wallet has been'
+          + ' created from the new mnemonic');
+      }
+    } else if (this.unsafeOptions.skipSynchronizationBeforeHeight) {
       this.store.syncOptions = {
         skipSynchronizationBeforeHeight: this.unsafeOptions.skipSynchronizationBeforeHeight,
       };
@@ -143,6 +172,11 @@ class Wallet {
 
     this.accounts = [];
     this.interface = opts.interface;
+
+    // Suppressed global require to avoid cyclic dependencies
+    // eslint-disable-next-line global-require
+    const Identities = require('../Identities/Identities');
+    this.identities = new Identities(this);
     this.savedBackup = false; // TODO: When true, we delete mnemonic from internals
   }
 }

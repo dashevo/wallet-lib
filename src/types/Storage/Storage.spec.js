@@ -9,7 +9,7 @@ describe('Storage - constructor', function suite() {
   this.timeout(10000);
   it('It should create a storage', () => {
     const storage = new Storage();
-    expect(storage.store).to.deep.equal({ wallets: {}, transactions: {}, instantLocks: {} });
+    expect(storage.store).to.deep.equal({ wallets: {}, transactions: {}, transactionsMetadata: {}, instantLocks: {} });
     expect(storage.getStore()).to.deep.equal(storage.store);
     expect(storage.rehydrate).to.equal(true);
     expect(storage.autosave).to.equal(true);
@@ -52,6 +52,7 @@ describe('Storage - constructor', function suite() {
     const expectedStore1 = {
       wallets: {},
       transactions: {},
+      transactionsMetadata:{},
       instantLocks: {}
     };
     expect(storage.getStore()).to.deep.equal(expectedStore1);
@@ -69,6 +70,7 @@ describe('Storage - constructor', function suite() {
         },
       },
       transactions: {},
+      transactionsMetadata: {},
       instantLocks: {},
     };
     expect(storage.getStore()).to.deep.equal(expectedStore2);

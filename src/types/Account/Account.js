@@ -4,7 +4,7 @@ const logger = require('../../logger');
 const { WALLET_TYPES } = require('../../CONSTANTS');
 const { is } = require('../../utils');
 const EVENTS = require('../../EVENTS');
-const Wallet = require('../Wallet/Wallet.js');
+const Wallet = require('../Wallet/Wallet');
 const { simpleDescendingAccumulator } = require('../../utils/coinSelections/strategies');
 
 function getNextUnusedAccountIndexForWallet(wallet) {
@@ -52,6 +52,8 @@ class Account extends EventEmitter {
     if (!_.has(wallet, 'walletId')) throw new Error('Missing walletID to create an account');
     this.walletId = wallet.walletId;
 
+    this.identities = wallet.identities;
+
     this.state = {
       isInitialized: false,
       isReady: false,
@@ -61,6 +63,8 @@ class Account extends EventEmitter {
     this.allowSensitiveOperations = _.has(opts, 'allowSensitiveOperations') ? opts.allowSensitiveOperations : defaultOptions.allowSensitiveOperations;
     this.debug = _.has(opts, 'debug') ? opts.debug : defaultOptions.debug;
     // if (this.debug) process.env.LOG_LEVEL = 'debug';
+
+    this.waitForInstantLockTimeout = wallet.waitForInstantLockTimeout;
 
     this.walletType = wallet.walletType;
     this.offlineMode = wallet.offlineMode;
@@ -73,6 +77,14 @@ class Account extends EventEmitter {
     this.transactions = {};
 
     this.label = (opts && opts.label && is.string(opts.label)) ? opts.label : null;
+
+    // Forward async error events to wallet allowing catching during initial sync
+    this.on('error', (error, errorContext) => wallet.emit('error', error, {
+      ...errorContext,
+      accountIndex: this.index,
+      network: this.network,
+      label: this.label,
+    }));
 
     // If transport is null or invalid, we won't try to fetch anything
     this.transport = wallet.transport;
@@ -99,20 +111,28 @@ class Account extends EventEmitter {
         super.emit(...args);
       };
     }
-    if ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(this.walletType)) {
-      this.storage.createAccount(
-        this.walletId,
-        this.BIP44PATH,
-        this.network,
-        this.label,
-      );
-    }
-    if (this.walletType === WALLET_TYPES.SINGLE_ADDRESS) {
-      this.storage.createSingleAddress(
-        this.walletId,
-        this.network,
-        this.label,
-      );
+    switch (this.walletType) {
+      case WALLET_TYPES.HDWALLET:
+      case WALLET_TYPES.HDPUBLIC:
+        this.storage.createAccount(
+          this.walletId,
+          this.BIP44PATH,
+          this.network,
+          this.label,
+        );
+        break;
+      case WALLET_TYPES.PRIVATEKEY:
+      case WALLET_TYPES.PUBLICKEY:
+      case WALLET_TYPES.ADDRESS:
+      case WALLET_TYPES.SINGLE_ADDRESS:
+        this.storage.createSingleAddress(
+          this.walletId,
+          this.network,
+          this.label,
+        );
+        break;
+      default:
+        throw new Error(`Invalid wallet type ${this.walletType}`);
     }
 
     this.keyChain = wallet.keyChain;
@@ -199,18 +219,25 @@ class Account extends EventEmitter {
    * @param {number} timeout - in milliseconds before throwing an error if the lock didn't arrive
    * @return {Promise<InstantLock>}
    */
-  waitForInstantLock(transactionHash, timeout = 60000) {
+  waitForInstantLock(transactionHash, timeout = this.waitForInstantLockTimeout) {
+    let rejectTimeout;
+
     return Promise.race([
       new Promise((resolve) => {
         const instantLock = this.storage.getInstantLock(transactionHash);
         if (instantLock != null) {
+          clearTimeout(rejectTimeout);
           resolve(instantLock);
           return;
         }
-        this.subscribeToTransactionInstantLock(transactionHash, resolve);
+
+        this.subscribeToTransactionInstantLock(transactionHash, (instantLockData) => {
+          clearTimeout(rejectTimeout);
+          resolve(instantLockData);
+        });
       }),
       new Promise((resolve, reject) => {
-        setTimeout(() => {
+        rejectTimeout = setTimeout(() => {
           reject(new Error(`InstantLock waiting period for transaction ${transactionHash} timed out`));
         }, timeout);
       }),
@@ -233,9 +260,6 @@ Account.prototype.getAddress = require('./methods/getAddress');
 Account.prototype.getAddresses = require('./methods/getAddresses');
 Account.prototype.getBlockHeader = require('./methods/getBlockHeader');
 Account.prototype.getConfirmedBalance = require('./methods/getConfirmedBalance');
-Account.prototype.getIdentityHDKeyById = require('./methods/getIdentityHDKeyById');
-Account.prototype.getIdentityHDKeyByIndex = require('./methods/getIdentityHDKeyByIndex');
-Account.prototype.getIdentityIds = require('./methods/getIdentityIds');
 Account.prototype.getPlugin = require('./methods/getPlugin');
 Account.prototype.getPrivateKeys = require('./methods/getPrivateKeys');
 Account.prototype.getTotalBalance = require('./methods/getTotalBalance');

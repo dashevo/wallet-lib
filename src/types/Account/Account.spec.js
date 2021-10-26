@@ -28,9 +28,11 @@ describe('Account - class', function suite() {
       getStore: () => {},
       saveState: () => {},
       stopWorker: () => {},
+      createAccount: () => {},
     };
     mocks.wallet = (new (function Wallet() {
       this.walletId = '1234567891';
+      this.walletType =  WALLET_TYPES.HDWALLET;
       this.accounts = [];
       this.network = Dashcore.Networks.testnet;
       this.storage = mockStorage;
