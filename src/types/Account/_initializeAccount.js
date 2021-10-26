@@ -1,6 +1,4 @@
 const logger = require('../../logger');
-const TransactionSyncStreamWorker = require('../../plugins/Workers/TransactionSyncStreamWorker/TransactionSyncStreamWorker');
-const IdentitySyncWorker = require('../../plugins/Workers/IdentitySyncWorker');
 const EVENTS = require('../../EVENTS');
 const { WALLET_TYPES } = require('../../CONSTANTS');
 const preparePlugins = require('./_preparePlugins');

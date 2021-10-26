@@ -1,6 +1,5 @@
 const { each, findIndex } = require('lodash');
 const TransactionSyncStreamWorker = require('../../plugins/Workers/TransactionSyncStreamWorker/TransactionSyncStreamWorker');
-const ChainPlugin = require('../../plugins/Plugins/ChainPlugin');
 const IdentitySyncWorker = require('../../plugins/Workers/IdentitySyncWorker');
 const { WALLET_TYPES } = require('../../CONSTANTS');
 
@@ -127,7 +126,6 @@ const sortPlugins = (account, userUnsafePlugins) => {
   // eslint-disable-next-line no-async-promise-executor
   if (account.injectDefaultPlugins) {
     if (!account.offlineMode) {
-      plugins.push([ChainPlugin, true, true]);
       plugins.push([TransactionSyncStreamWorker, true, true]);
 
       if (account.walletType === WALLET_TYPES.HDWALLET) {
