@@ -30,6 +30,9 @@ export declare class Wallet {
     generateNewWalletId():string;
     getAccount(accOptions?: Account.Options): Promise<Account>;
     sweepWallet(): Promise<Account>
+    dumpStorage(options?: {
+        log: boolean
+    }): string;
 }
 
 declare interface DAPIClientOptions {
