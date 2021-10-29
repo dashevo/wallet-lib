@@ -1,7 +1,7 @@
 const logger = require('../../../logger');
 
 const defaultOptions = {
-  log: true,
+  log: false,
 };
 
 /**
