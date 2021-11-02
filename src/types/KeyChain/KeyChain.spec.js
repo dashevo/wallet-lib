@@ -20,15 +20,12 @@ describe('Keychain', function suite() {
     expect(() => new KeyChain(mnemonic)).to.throw(expectedException1);
 
     keychain = new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(mnemonic, 'testnet') });
-    expect(keychain.type).to.equal('HDPrivateKey');
+    expect(keychain.rootKeyType).to.equal('HDPrivateKey');
     expect(keychain.network.toString()).to.equal('testnet');
-    expect(keychain.keys).to.deep.equal({});
 
     keychain2 = new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(mnemonic2, 'mainnet') });
   });
-  it('should get private key', () => {
-    expect(keychain.getPrivateKey().toString()).to.equal(pk);
-  });
+
   it('should generate key for full path', () => {
     const path = 'm/44\'/1\'/0\'/0/0';
     const pk2 = keychain.getKeyForPath(path);
@@ -82,23 +79,15 @@ describe('Keychain', function suite() {
     expect(pk2.toString()).to.equal(hardenedHDKey.toString());
     expect(hardenedHDKey.toString()).to.deep.equal('tprv8fBJjWoGgCpGRCbyzE9RUA59rmoN1RUijhLnXGL4VHnLxvSe523yVg4GrGzbR6TyXtdynAEh5z8UX55EXt2Cb3xjvrsx2PgTY9BHxzFVkWn');
   });
-  it('should generate key for child', () => {
+  it('should get key for child', () => {
     const keychain2 = new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(mnemonic, 'testnet') });
-    const keyForChild = keychain2.generateKeyForChild(0);
+    const keyForChild = keychain2.getKeyForPath(0);
     expect(keyForChild.toString()).to.equal(expectedKeyForChild_0);
   });
 
 
   it('should sign', () => {
 
-  });
-});
-describe('Keychain - clone', function suite() {
-  this.timeout(10000);
-  it('should clone', () => {
-    const keychain2 = new KeyChain(keychain);
-    expect(keychain2).to.deep.equal(keychain);
-    expect(keychain2.keys).to.deep.equal(keychain.keys);
   });
 });
 describe('Keychain - single privateKey', function suite() {
@@ -108,18 +97,15 @@ describe('Keychain - single privateKey', function suite() {
     const network = 'livenet';
     const pkKeyChain = new KeyChain({ privateKey, network });
     expect(pkKeyChain.network).to.equal(network);
-    expect(pkKeyChain.keys).to.deep.equal({});
-    expect(pkKeyChain.type).to.equal('privateKey');
-    expect(pkKeyChain.privateKey).to.equal(privateKey);
+    expect(pkKeyChain.rootKeyType).to.equal('privateKey');
+    expect(pkKeyChain.rootKey).to.equal(privateKey);
 
     const expectedException1 = 'Wallet is not loaded from a mnemonic or a HDPubKey, impossible to derivate keys';
-    const expectedException2 = 'Wallet is not loaded from a mnemonic or a HDPubKey, impossible to derivate child';
-    expect(() => pkKeyChain.generateKeyForPath()).to.throw(expectedException1);
-    expect(() => pkKeyChain.generateKeyForChild()).to.throw(expectedException2);
+    expect(() => pkKeyChain.getKeyForPath()).to.throw(expectedException1);
   });
   it('should get private key', () => {
     const privateKey = Dashcore.PrivateKey().toString();
     const pkKeyChain = new KeyChain({ privateKey, network: 'livenet' });
-    expect(pkKeyChain.getPrivateKey().toString()).to.equal(privateKey);
+    expect(pkKeyChain.rootKey.toString()).to.equal(privateKey);
   });
 });

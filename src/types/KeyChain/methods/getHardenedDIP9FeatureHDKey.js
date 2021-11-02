@@ -7,6 +7,6 @@ const { DIP9_LIVENET_ROOT_PATH, DIP9_TESTNET_ROOT_PATH } = require('../../../CON
  */
 function getHardenedDIP9FeatureHDKey(type = 'HDPrivateKey') {
   const pathRoot = (this.network.toString() === 'testnet') ? DIP9_TESTNET_ROOT_PATH : DIP9_LIVENET_ROOT_PATH;
-  return this.generateKeyForPath(pathRoot, type);
+  return this.getKeyForPath(pathRoot, type);
 }
 module.exports = getHardenedDIP9FeatureHDKey;

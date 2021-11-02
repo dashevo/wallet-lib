@@ -7,6 +7,6 @@ const { BIP44_TESTNET_ROOT_PATH, BIP44_LIVENET_ROOT_PATH } = require('../../../C
  */
 function getHardenedBIP44HDKey(type = 'HDPrivateKey') {
   const pathRoot = (this.network.toString() === 'testnet') ? BIP44_TESTNET_ROOT_PATH : BIP44_LIVENET_ROOT_PATH;
-  return this.generateKeyForPath(pathRoot, type);
+  return this.getKeyForPath(pathRoot, type);
 }
 module.exports = getHardenedBIP44HDKey;

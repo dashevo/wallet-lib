@@ -1,52 +1,63 @@
 const { Networks, HDPrivateKey, HDPublicKey } = require('@dashevo/dashcore-lib');
-const { has } = require('lodash');
+const { doubleSha256 } = require('../../utils/crypto');
 
-// eslint-disable-next-line no-underscore-dangle
-const _defaultOpts = {
-  network: Networks.testnet.toString(),
-  keys: {},
-};
-
-class KeyChain {
-  constructor(opts = JSON.parse(JSON.stringify(_defaultOpts))) {
-    const defaultOpts = JSON.parse(JSON.stringify(_defaultOpts));
-    this.network = defaultOpts.network;
-    this.keys = { ...defaultOpts.keys };
-
-    if (has(opts, 'HDPrivateKey')) {
-      this.type = 'HDPrivateKey';
-      this.HDPrivateKey = (typeof opts.HDPrivateKey === 'string') ? HDPrivateKey(opts.HDPrivateKey) : opts.HDPrivateKey;
-      this.network = this.HDPrivateKey.network;
-    } else if (has(opts, 'HDPublicKey')) {
-      this.type = 'HDPublicKey';
-      this.HDPublicKey = (typeof opts.HDPublicKey === 'string') ? HDPublicKey(opts.HDPublicKey) : opts.HDPublicKey;
-      this.network = this.HDPublicKey.network;
-    } else if (has(opts, 'privateKey')) {
-      this.type = 'privateKey';
-      this.privateKey = opts.privateKey;
-    } else if (has(opts, 'publicKey')) {
-      this.type = 'publicKey';
-      this.publicKey = opts.publicKey;
-    } else if (has(opts, 'address')) {
-      this.type = 'address';
-      this.address = opts.address.toString();
-    } else {
-      throw new Error('Expect privateKey, publicKey, HDPublicKey, HDPrivateKey or Address');
-    }
-    if (opts.network) this.network = opts.network;
-    if (opts.keys) this.keys = { ...opts.keys };
-  }
+function generateKeyChainId(key) {
+  const keyChainIdSuffix = doubleSha256(key.toString()).toString('hex').slice(0, 10);
+  return `kc${keyChainIdSuffix}`;
 }
 
-KeyChain.prototype.generateKeyForChild = require('./methods/generateKeyForChild');
-KeyChain.prototype.generateKeyForPath = require('./methods/generateKeyForPath');
+function fromOptions(opts) {
+  let rootKey;
+  let rootKeyType;
+
+  if (opts) {
+    if (opts.mnemonic) {
+      rootKeyType = 'HDPrivateKey';
+      rootKey = (typeof opts.mnemonic === 'string') ? HDPrivateKey(opts.HDPrivateKey) : opts.HDPrivateKey;
+    }
+    if (opts.HDPrivateKey) {
+      rootKeyType = 'HDPrivateKey';
+      rootKey = (typeof opts.HDPrivateKey === 'string') ? HDPrivateKey(opts.HDPrivateKey) : opts.HDPrivateKey;
+    } else if (opts.HDPublicKey) {
+      rootKeyType = 'HDPublicKey';
+      rootKey = (typeof opts.HDPublicKey === 'string') ? HDPublicKey(opts.HDPublicKey) : opts.HDPublicKey;
+    } else if (opts.privateKey) {
+      rootKeyType = 'privateKey';
+      rootKey = opts.privateKey;
+    } else if (opts.publicKey) {
+      rootKeyType = 'publicKey';
+      rootKey = opts.publicKey;
+    } else if (opts.address) {
+      rootKeyType = 'address';
+      rootKey = opts.address.toString();
+    }
+  }
+  return { rootKeyType, rootKey };
+}
+
+class KeyChain {
+  constructor(opts = {}) {
+    const { rootKey, rootKeyType } = fromOptions(opts);
+    if (!rootKeyType || !rootKey) throw new Error('Expect privateKey, publicKey, HDPublicKey, HDPrivateKey or Address');
+    this.keyChainId = generateKeyChainId(rootKey);
+
+    this.rootKey = rootKey;
+    this.network = rootKey.network || opts.network || Networks.testnet.toString();
+    this.rootKeyType = rootKeyType;
+    // this.chainCode = chainCode;
+
+    this.watchedKeys = new Map();
+  }
+}
+KeyChain.prototype.addKeysToWatchedKeys = require('./methods/addKeysToWatchedKeys');
+KeyChain.prototype.getWatchedAddresses = require('./methods/getWatchedAddresses');
+KeyChain.prototype.getKeyForPath = require('./methods/getKeyForPath');
+KeyChain.prototype.getWatchedKeys = require('./methods/getWatchedKeys');
+KeyChain.prototype.getWatchedPublicKeys = require('./methods/getWatchedPublicKeys');
 KeyChain.prototype.getDIP15ExtendedKey = require('./methods/getDIP15ExtendedKey');
 KeyChain.prototype.getHardenedBIP44HDKey = require('./methods/getHardenedBIP44HDKey');
 KeyChain.prototype.getHardenedDIP9FeatureHDKey = require('./methods/getHardenedDIP9FeatureHDKey');
 KeyChain.prototype.getHardenedDIP15AccountKey = require('./methods/getHardenedDIP15AccountKey');
-KeyChain.prototype.getKeyForChild = require('./methods/getKeyForChild');
-KeyChain.prototype.getKeyForPath = require('./methods/getKeyForPath');
-KeyChain.prototype.getPrivateKey = require('./methods/getPrivateKey');
 KeyChain.prototype.sign = require('./methods/sign');
 
 module.exports = KeyChain;
