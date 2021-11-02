@@ -3,6 +3,7 @@ const {
   is,
 } = require('../../../utils');
 const KeyChain = require('../../KeyChain/KeyChain');
+const KeyChainStore = require('../../KeyChainStore/KeyChainStore');
 const { WALLET_TYPES } = require('../../../CONSTANTS');
 
 /**
@@ -17,5 +18,8 @@ module.exports = function fromMnemonic(mnemonic) {
   this.walletType = WALLET_TYPES.HDWALLET;
   this.mnemonic = trimmedMnemonic; // todo : What about without this ?
   this.HDPrivateKey = mnemonicToHDPrivateKey(trimmedMnemonic, this.network, this.passphrase);
-  this.keyChain = new KeyChain({ HDPrivateKey: this.HDPrivateKey });
+
+  this.keyChainStore = new KeyChainStore();
+  const keyChain = new KeyChain({ HDPrivateKey: this.HDPrivateKey });
+  this.keyChainStore.addKeyChain(keyChain, { isWalletKeyChain: true });
 };

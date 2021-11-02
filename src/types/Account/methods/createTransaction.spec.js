@@ -62,8 +62,12 @@ describe('Account - createTransaction', function suite() {
           return [new HDPrivateKey('tprv8jG3ctd1DEVADnLP3hwS1Gfzjxf5E4WL2UutfJkhAQs7rVu2b3Ryv4WQ46mddZyMbGaSUYnY9wFeuFRAejapjoB1LGzTfM55mxMhZ1X4eGX')]
         }
       },
-      keyChain: {
-        sign: (tx, privateKeys) => tx.sign(privateKeys),
+      keyChainStore: {
+        getWalletKeyChain:() => {
+          return {
+            sign: (tx, privateKeys) => tx.sign(privateKeys),
+          }
+        }
       },
       storage: {
         searchTransaction: (txId) => {

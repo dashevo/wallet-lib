@@ -1,4 +1,3 @@
-const { PublicKey } = require('@dashevo/dashcore-lib');
 const EVENTS = require('../../../EVENTS');
 const { WALLET_TYPES } = require('../../../CONSTANTS');
 const { is } = require('../../../utils');
@@ -16,25 +15,30 @@ function generateAddress(path) {
 
   switch (this.walletType) {
     case WALLET_TYPES.ADDRESS:
-      address = this.keyChain.address;
+      address = this.keyChainStore.getWalletKeyChain().rootKey;
       break;
     case WALLET_TYPES.PUBLICKEY:
-      address = new PublicKey(this.keyChain.publicKey.toString()).toAddress(network).toString();
+      address = this.keyChainStore.getWalletKeyChain().rootKey.toAddress(network).toString();
       break;
     case WALLET_TYPES.HDWALLET:
       // eslint-disable-next-line prefer-destructuring
       index = parseInt(path.toString().split('/')[5], 10);
-      privateKey = this.keyChain.getKeyForPath(path);
+      privateKey = this.keyChainStore.getWalletKeyChain().getKeyForPath(path);
       address = privateKey.publicKey.toAddress(network).toString();
       break;
     case WALLET_TYPES.HDPUBLIC:
       index = parseInt(path.toString().split('/')[5], 10);
-      privateKey = this.keyChain.getKeyForChild(index);
+      privateKey = this.keyChainStore.getWalletKeyChain().getKeyForPath(index);
       address = privateKey.publicKey.toAddress(network).toString();
       break;
+    // TODO: DEPRECATE USAGE OF SINGLE_ADDRESS in favor or PRIVATEKEY
+    case WALLET_TYPES.PRIVATEKEY:
     case WALLET_TYPES.SINGLE_ADDRESS:
+      privateKey = this.keyChainStore.getWalletKeyChain().rootKey;
+      address = privateKey.publicKey.toAddress(network).toString();
+      break;
     default:
-      privateKey = this.keyChain.getKeyForPath(path.toString());
+      privateKey = this.keyChainStore.getWalletKeyChain().getKeyForPath(path.toString());
       address = privateKey.publicKey.toAddress(network).toString();
   }
 

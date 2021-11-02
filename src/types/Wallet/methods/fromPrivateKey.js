@@ -1,6 +1,7 @@
 const { is } = require('../../../utils');
 const KeyChain = require('../../KeyChain/KeyChain');
 const { WALLET_TYPES } = require('../../../CONSTANTS');
+const KeyChainStore = require('../../KeyChainStore/KeyChainStore');
 
 /**
  * Will set a wallet to work with a mnemonic (keychain, walletType & HDPrivateKey)
@@ -11,5 +12,8 @@ module.exports = function fromPrivateKey(privateKey) {
   this.walletType = WALLET_TYPES.PRIVATEKEY;
   this.mnemonic = null;
   this.privateKey = privateKey;
-  this.keyChain = new KeyChain({ privateKey });
+
+  const keyChain = new KeyChain({ privateKey });
+  this.keyChainStore = new KeyChainStore();
+  this.keyChainStore.addKeyChain(keyChain, { isWalletKeyChain: true });
 };

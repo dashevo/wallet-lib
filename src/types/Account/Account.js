@@ -136,7 +136,7 @@ class Account extends EventEmitter {
         throw new Error(`Invalid wallet type ${this.walletType}`);
     }
 
-    this.keyChain = wallet.keyChain;
+    this.keyChainStore = wallet.keyChainStore;
 
     this.cacheTx = (opts.cacheTx) ? opts.cacheTx : defaultOptions.cacheTx;
     this.cacheBlockHeaders = (opts.cacheBlockHeaders)
