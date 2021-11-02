@@ -25,6 +25,7 @@ class TransactionSyncStreamWorker extends Worker {
         'importBlockHeader',
         'importInstantLock',
         'storage',
+        'keyChainStore',
         'transport',
         'walletId',
         'getAddress',
