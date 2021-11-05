@@ -58,6 +58,7 @@ KeyChain.prototype.getDIP15ExtendedKey = require('./methods/getDIP15ExtendedKey'
 KeyChain.prototype.getHardenedBIP44HDKey = require('./methods/getHardenedBIP44HDKey');
 KeyChain.prototype.getHardenedDIP9FeatureHDKey = require('./methods/getHardenedDIP9FeatureHDKey');
 KeyChain.prototype.getHardenedDIP15AccountKey = require('./methods/getHardenedDIP15AccountKey');
+KeyChain.prototype.removeKeysToWatchedKeys = require('./methods/removeKeysToWatchedKeys');
 KeyChain.prototype.sign = require('./methods/sign');
 
 module.exports = KeyChain;
