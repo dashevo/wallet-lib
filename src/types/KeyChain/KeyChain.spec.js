@@ -13,7 +13,7 @@ const expectedRootDIP15AccountKey_0 = 'tprv8hRzmheQujhJN5XP2dj955nAFCKeEoSifJRWu
 const expectedRootDIP15AccountKey_1 = 'tprv8hRzmheQujhJQyCtFTuUFHxB3Ag5VLB994zhH4CfxbA41cq73HT2mpYq5M33V54oJyn6g514saxxVJB886G55eYX56J6D6x87UNNT6iQHkR';
 const expectedKeyForChild_0 = 'tprv8d4podc2Tg459CH2bwLHXj3vdJFBT2rdsk5Nr1djH7hzHdt5LRdvN6QyFwMiDy7ffRdik7fEVRKKgsHB4F18sh8xF6jFXpKq4sUgGBoSbKw';
 describe('Keychain', function suite() {
-  this.timeout(10000);
+  this.timeout(1000);
   it('should create a keychain', () => {
     const expectedException1 = 'Expect privateKey, publicKey, HDPublicKey, HDPrivateKey or Address';
     expect(() => new KeyChain()).to.throw(expectedException1);
@@ -79,15 +79,45 @@ describe('Keychain', function suite() {
     expect(pk2.toString()).to.equal(hardenedHDKey.toString());
     expect(hardenedHDKey.toString()).to.deep.equal('tprv8fBJjWoGgCpGRCbyzE9RUA59rmoN1RUijhLnXGL4VHnLxvSe523yVg4GrGzbR6TyXtdynAEh5z8UX55EXt2Cb3xjvrsx2PgTY9BHxzFVkWn');
   });
-  it('should get key for child', () => {
+  it('should get key for path', () => {
     const keychain2 = new KeyChain({ HDPrivateKey: mnemonicToHDPrivateKey(mnemonic, 'testnet') });
     const keyForChild = keychain2.getKeyForPath(0);
     expect(keyForChild.toString()).to.equal(expectedKeyForChild_0);
   });
-
-
-  it('should sign', () => {
-
+  it('should add keys to watched keys', ()=>{
+    const keys = [keychain.getKeyForPath(0), keychain.getKeyForPath(1), keychain.getKeyForPath(2)];
+     expect(keychain.addKeysToWatchedKeys(keys)).to.equal(3);
+  });
+  it('should get watched keys', function () {
+    const watchedKeys = keychain.getWatchedKeys();
+    let expectedWatchedKeys = [keychain.getKeyForPath(0), keychain.getKeyForPath(1), keychain.getKeyForPath(2)];
+    expect(watchedKeys).to.deep.equal(expectedWatchedKeys);
+  });
+  it('should get watched addresses', function () {
+    const watchedAddresses = keychain.getWatchedAddresses();
+    const expectedWatchedAddresses = [
+      'ybQDfNwiDjk8ZH5UUmHQzAMEmjbrbK5dAj',
+      'yhFX5rseJPitV45HUCaa9haeGHtLuooBaq',
+      'yhqxsmYk6jfoGWf1hJKq7d4U2cGHCgzpFU'
+    ]
+    expect(watchedAddresses).to.deep.equal(expectedWatchedAddresses);
+  });
+  it('should get watched public keys', function () {
+    const watchedPubKeys = keychain.getWatchedPublicKeys();
+    const expectedWatchedPubKeys = [
+      '03e6ab8177a7ca2699da4f83ca3c27768fb88b70ae9d6bde1cba8de88355ccf199',
+      '0246a870b65153b98e453ff08f7198d06bce2a790286f44d90929aceafafa0673f',
+      '025ad16f78f67801e52abe5b512d66e3896d4c2fa3ca3150349437a5dd13519967'
+    ]
+    expect(watchedPubKeys).to.deep.equal(expectedWatchedPubKeys)
+  });
+  it('should remove a key from watched keys', function () {
+    let watchedKeys = [keychain.getKeyForPath(0), keychain.getKeyForPath(1), keychain.getKeyForPath(2)];
+    expect(keychain.removeKeysToWatchedKeys(watchedKeys[1])).to.equal(1);
+    expect(keychain.getWatchedKeys().length).to.equal(2);
+    const updatedWatchedKeys = keychain.getWatchedKeys();
+    const expectedUpdatedWatchedKeys = [watchedKeys[0], watchedKeys[2]]
+    expect(updatedWatchedKeys).to.deep.equal(expectedUpdatedWatchedKeys);
   });
 });
 describe('Keychain - single privateKey', function suite() {
