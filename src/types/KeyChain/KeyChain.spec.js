@@ -136,6 +136,7 @@ describe('Keychain - single privateKey', function suite() {
   it('should get private key', () => {
     const privateKey = Dashcore.PrivateKey().toString();
     const pkKeyChain = new KeyChain({ privateKey, network: 'livenet' });
+    expect(pkKeyChain.getRootKey().toString()).to.equal(privateKey);
     expect(pkKeyChain.rootKey.toString()).to.equal(privateKey);
   });
 });

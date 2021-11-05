@@ -1,6 +1,14 @@
-function getWatchedAddresses() {
+function getWatchedAddresses(opts = {}) {
   const keys = this.getWatchedKeys();
-  return keys.map((key) => key.publicKey.toAddress().toString());
+
+  const mapKeyToAddress = (key) => {
+    const network = opts.network || key.network || 'testnet';
+    return key.toAddress
+      ? key.toAddress(network).toString()
+      : key.publicKey.toAddress(network).toString();
+  };
+
+  return keys.map(mapKeyToAddress);
 }
 
 module.exports = getWatchedAddresses;

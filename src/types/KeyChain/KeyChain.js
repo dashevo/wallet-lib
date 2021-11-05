@@ -50,14 +50,15 @@ class KeyChain {
   }
 }
 KeyChain.prototype.addKeysToWatchedKeys = require('./methods/addKeysToWatchedKeys');
-KeyChain.prototype.getWatchedAddresses = require('./methods/getWatchedAddresses');
 KeyChain.prototype.getKeyForPath = require('./methods/getKeyForPath');
-KeyChain.prototype.getWatchedKeys = require('./methods/getWatchedKeys');
-KeyChain.prototype.getWatchedPublicKeys = require('./methods/getWatchedPublicKeys');
 KeyChain.prototype.getDIP15ExtendedKey = require('./methods/getDIP15ExtendedKey');
 KeyChain.prototype.getHardenedBIP44HDKey = require('./methods/getHardenedBIP44HDKey');
 KeyChain.prototype.getHardenedDIP9FeatureHDKey = require('./methods/getHardenedDIP9FeatureHDKey');
 KeyChain.prototype.getHardenedDIP15AccountKey = require('./methods/getHardenedDIP15AccountKey');
+KeyChain.prototype.getRootKey = require('./methods/getRootKey');
+KeyChain.prototype.getWatchedAddresses = require('./methods/getWatchedAddresses');
+KeyChain.prototype.getWatchedKeys = require('./methods/getWatchedKeys');
+KeyChain.prototype.getWatchedPublicKeys = require('./methods/getWatchedPublicKeys');
 KeyChain.prototype.removeKeysToWatchedKeys = require('./methods/removeKeysToWatchedKeys');
 KeyChain.prototype.sign = require('./methods/sign');
 
