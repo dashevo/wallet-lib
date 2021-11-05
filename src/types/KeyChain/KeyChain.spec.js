@@ -117,7 +117,7 @@ describe('Keychain', function suite() {
     expect(keychain.getWatchedKeys().length).to.equal(2);
     const updatedWatchedKeys = keychain.getWatchedKeys();
     const expectedUpdatedWatchedKeys = [watchedKeys[0], watchedKeys[2]]
-    expect(updatedWatchedKeys).to.deep.equal(expectedUpdatedWatchedKeys);
+    expect(updatedWatchedKeys.map((key)=>key.toString())).to.deep.equal(expectedUpdatedWatchedKeys.map((key)=>key.toString()));
   });
 });
 describe('Keychain - single privateKey', function suite() {
