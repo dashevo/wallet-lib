@@ -30,7 +30,7 @@ const getTypePathFromWalletType = (walletType, addressType = 'external', index, 
  * @param {AddressType} [_type="external"] - Type of the address (external, internal, misc)
  * @return <AddressInfo>
  */
-function getAddress(index = 0, _type = 'external', addToWatchedAddress) {
+function getAddress(index = 0, _type = 'external') {
   const { type, path } = getTypePathFromWalletType(this.walletType, _type, index, this.BIP44PATH);
 
   const { wallets } = this.storage.getStore();
