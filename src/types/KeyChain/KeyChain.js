@@ -42,7 +42,7 @@ class KeyChain {
     this.keyChainId = generateKeyChainId(rootKey);
 
     this.rootKey = rootKey;
-    this.network = rootKey.network || opts.network || Networks.testnet.toString();
+    this.network = opts.network || rootKey.network || Networks.testnet.toString();
     this.rootKeyType = rootKeyType;
     // this.chainCode = chainCode;
 

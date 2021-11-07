@@ -57,22 +57,28 @@ describe('Wallet - HDPublicKey', function suite() {
     expect(wallet1.exportWallet()).to.be.equal(gatherTestnet.external.hdpubkey);
 
 
-    wallet1.getAccount().then((account)=>{
-      const unusedAddress = account.getUnusedAddress();
-      const expectedUnused = {
-        path: "m/44'/1'/0'/0/0",
-        index: 0,
-        address: 'yNJ3xxTXXBBf39VfMBbBuLH2k57uAwxBxj',
-        transactions: [],
-        balanceSat: 0,
-        unconfirmedBalanceSat: 0,
-        utxos: {},
-        fetchedLast: 0,
-        used: false,
-      };
-      expect(unusedAddress).to.deep.equal(expectedUnused);
+    // FIXME: it appears we had introduced a bug here,
+    // as it is not possible to have a HDPublicKey derivation with hardened
+    // Either our path is m/44/1/0/0/0 or it is m/0/0.
+    // We should clarify this before merging TODO
+    wallet1
+        .getAccount()
+        .then((account)=>{
+          const unusedAddress = account.getUnusedAddress();
+          const expectedUnused = {
+            path: "m/44'/1'/0'/0/0",
+            index: 0,
+            address: 'yNJ3xxTXXBBf39VfMBbBuLH2k57uAwxBxj',
+            transactions: [],
+            balanceSat: 0,
+            unconfirmedBalanceSat: 0,
+            utxos: {},
+            fetchedLast: 0,
+            used: false,
+          };
+          expect(unusedAddress).to.deep.equal(expectedUnused);
 
-      wallet1.disconnect();
-    })
+          wallet1.disconnect();
+        })
   });
 });

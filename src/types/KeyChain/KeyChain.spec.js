@@ -8,7 +8,7 @@ let keychain2;
 const mnemonic = 'during develop before curtain hazard rare job language become verb message travel';
 const mnemonic2 = 'birth kingdom trash renew flavor utility donkey gasp regular alert pave layer';
 const pk = '4226d5e2fe8cbfe6f5beb7adf5a5b08b310f6c4a67fc27826779073be6f5699e';
-
+const hdPublicKey = 'xpub661MyMwAqRbcFGB6XSWBsD725rJDUbFUpy4zWe2u22nJ2BxpoHFxtVDfKnTnvVQHohnY7AsVpRTHDv6PyPQTYu1KxFPKw29MAVXPEpz1G7V';
 const expectedRootDIP15AccountKey_0 = 'tprv8hRzmheQujhJN5XP2dj955nAFCKeEoSifJRWuutdbwWRtusdDQ426jbp75EqErUSuTxmPyxYmP1TpcF5qdxGhXLNXRLMGsRLG6NFCv1WnaQ';
 const expectedRootDIP15AccountKey_1 = 'tprv8hRzmheQujhJQyCtFTuUFHxB3Ag5VLB994zhH4CfxbA41cq73HT2mpYq5M33V54oJyn6g514saxxVJB886G55eYX56J6D6x87UNNT6iQHkR';
 const expectedKeyForChild_0 = 'tprv8d4podc2Tg459CH2bwLHXj3vdJFBT2rdsk5Nr1djH7hzHdt5LRdvN6QyFwMiDy7ffRdik7fEVRKKgsHB4F18sh8xF6jFXpKq4sUgGBoSbKw';
@@ -120,6 +120,22 @@ describe('Keychain', function suite() {
     expect(updatedWatchedKeys.map((key)=>key.toString())).to.deep.equal(expectedUpdatedWatchedKeys.map((key)=>key.toString()));
   });
 });
+describe('Keychain - HDPublicKey', function suite(){
+  let hdpubKeyChain;
+  it('should initiate from a HDPublicKey', function () {
+    hdpubKeyChain = new KeyChain({
+      HDPublicKey: new Dashcore.HDPublicKey(hdPublicKey),
+      network: 'testnet'
+    });
+    expect(hdpubKeyChain.network.toString()).to.equal('testnet');
+    expect(hdpubKeyChain.keyChainId).to.equal('kc5059442d66');
+    expect(hdpubKeyChain.getRootKey().toString()).to.equal(hdPublicKey);
+  });
+  it('should derivate', function () {
+    const key0_1 = hdpubKeyChain.getKeyForPath(1);
+    expect(key0_1.publicKey.toAddress(hdpubKeyChain.network).toString()).to.equal('yYxgMZG9f4GoS53CpoJHuHDsMnUUf1ezZv')
+  });
+})
 describe('Keychain - single privateKey', function suite() {
   this.timeout(10000);
   it('should correctly errors out when not a HDPublicKey (privateKey)', () => {
