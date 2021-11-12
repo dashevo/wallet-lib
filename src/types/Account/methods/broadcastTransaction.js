@@ -6,9 +6,11 @@ const {
   InvalidDashcoreTransaction,
 } = require('../../../errors');
 
-function impactAffectedInputs({ inputs }) {
+function impactAffectedInputs({ transaction, txid }) {
+  const { inputs, changeIndex } = transaction.toObject();
+
   const {
-    storage, walletId,
+    storage, walletId, network,
   } = this;
 
   // We iterate out input to substract their balance.
@@ -24,11 +26,36 @@ function impactAffectedInputs({ inputs }) {
         const inputUTXO = potentiallySelectedAddress.utxos[`${input.prevTxId}-${input.outputIndex}`];
         const address = storage.store.wallets[walletId].addresses[type][path];
         // Todo: This modify the balance of an address, we need a std method to do that instead.
-        address.balanceSat -= inputUTXO.satoshis;
+        if (address.unconfirmedBalanceSat > 0) {
+          address.unconfirmedBalanceSat -= inputUTXO.satoshis;
+        } else {
+          address.balanceSat -= inputUTXO.satoshis;
+        }
+
         delete address.utxos[`${input.prevTxId}-${input.outputIndex}`];
       }
     });
   });
+
+  const changeOutput = transaction.getChangeOutput();
+  if (changeOutput) {
+    const addressString = changeOutput.script.toAddress(network);
+
+    const mapped = storage.mappedAddress[addressString];
+
+    const { type, path } = mapped;
+    const address = storage.store.wallets[walletId].addresses[type][path];
+    address.utxos[`${txid}-${changeIndex}`] = new Dashcore.Transaction.UnspentOutput(
+      {
+        txId: txid,
+        vout: changeIndex,
+        script: changeOutput.script,
+        satoshis: changeOutput.satoshis,
+        address: addressString,
+      },
+    );
+    address.unconfirmedBalanceSat = changeOutput.satoshis;
+  }
 
   return true;
 }
@@ -61,7 +88,7 @@ async function broadcastTransaction(transaction, options = {}) {
     throw new Error('Transaction not signed.');
   }
 
-  const { inputs } = transaction.toObject();
+  // const { inputs } = transaction.toObject();
   const { minRelay: minRelayFeeRate } = chains[network.toString()].fees;
 
   // eslint-disable-next-line no-underscore-dangle
@@ -74,11 +101,11 @@ async function broadcastTransaction(transaction, options = {}) {
   const serializedTransaction = transaction.toString();
 
   const txid = await this.transport.sendTransaction(serializedTransaction);
-
   // We now need to impact/update our affected inputs
   // so we clear them out from UTXOset.
   impactAffectedInputs.call(this, {
-    inputs,
+    transaction,
+    txid,
   });
 
   return txid;
