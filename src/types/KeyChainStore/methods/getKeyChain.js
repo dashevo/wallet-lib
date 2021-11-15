@@ -1,5 +1,5 @@
 function getKeyChain(keyChainId) {
-  return this.chains.get(keyChainId);
+  return this.keyChains.get(keyChainId);
 }
 
 module.exports = getKeyChain;

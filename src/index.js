@@ -6,6 +6,7 @@ const Wallet = require('./types/Wallet/Wallet');
 const Account = require('./types/Account/Account');
 const Identities = require('./types/Identities/Identities');
 const KeyChain = require('./types/KeyChain/KeyChain');
+const KeyChainStore = require('./types/KeyChainStore/KeyChainStore');
 const EVENTS = require('./EVENTS');
 const CONSTANTS = require('./CONSTANTS');
 const utils = require('./utils');
@@ -16,6 +17,7 @@ module.exports = {
   Account,
   Identities,
   KeyChain,
+  KeyChainStore,
   EVENTS,
   CONSTANTS,
   utils,

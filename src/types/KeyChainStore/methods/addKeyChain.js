@@ -1,11 +1,14 @@
 function addKeyChain(keychain, opts = {}) {
-  if (this.chains.has(keychain.keyChainId)) {
+  if (this.keyChains.has(keychain.keyChainId)) {
     throw new Error('Trying to add already existing keyChain');
   }
-  this.chains.set(keychain.keyChainId, keychain);
 
-  if (opts && opts.isWalletKeyChain && !this.walletKeyChainId) {
-    this.walletKeyChainId = keychain.keyChainId;
+  this.keyChains.set(keychain.keyChainId, keychain);
+
+  if (opts) {
+    if (opts.isMasterKeyChain && !this.masterKeyChainId) {
+      this.masterKeyChainId = keychain.keyChainId;
+    }
   }
 }
 

@@ -5,6 +5,7 @@ import { Account } from "./types/Account/Account";
 import { Wallet } from "./types/Wallet/Wallet";
 import { Identities } from "./types/Identities/Identities";
 import { KeyChain } from "./types/KeyChain/KeyChain";
+import { KeyChainStore } from "./types/KeyChainStore/KeyChainStore";
 import CONSTANTS from "./CONSTANTS";
 import EVENTS from "./EVENTS";
 import utils from "./utils";
@@ -14,6 +15,7 @@ export {
     Account,
     Wallet,
     KeyChain,
+    KeyChainStore,
     Identities,
     EVENTS,
     CONSTANTS,

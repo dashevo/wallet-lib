@@ -7,23 +7,23 @@ describe('KeyChainStore', function suite() {
   let keyChainsStore;
   let hdPrivateKey = new HDPrivateKey()
   let hdPublicKey = new HDPrivateKey().hdPublicKey
-  let keyChain = new KeyChain(hdPrivateKey)
-  let keyChainPublic = new KeyChain(hdPublicKey)
-  let walletKeyChain = new KeyChain(new HDPrivateKey());
+  let keyChain = new KeyChain({HDPrivateKey: hdPrivateKey})
+  let keyChainPublic = new KeyChain({HDPublicKey: hdPublicKey})
+  let walletKeyChain = new KeyChain({HDPrivateKey:new HDPrivateKey()});
   it('should create a KeyChainStore', () => {
     keyChainsStore = new KeyChainsStore();
     expect(keyChainsStore).to.exist;
-    expect(keyChainsStore.chains).to.be.a('Map')
+    expect(keyChainsStore.keyChains).to.be.a('Map')
   });
   it('should be able to add a keyChain', function () {
     keyChainsStore.addKeyChain(keyChain)
-    expect(keyChainsStore.chains.has(keyChain.keyChainId)).to.equal(true);
+    expect(keyChainsStore.keyChains.has(keyChain.keyChainId)).to.equal(true);
     keyChainsStore.addKeyChain(keyChainPublic)
-    expect(keyChainsStore.chains.has(keyChainPublic.keyChainId)).to.equal(true);
+    expect(keyChainsStore.keyChains.has(keyChainPublic.keyChainId)).to.equal(true);
   });
-  it('should allow to specify a specific wallet keychain', function () {
-    keyChainsStore.addKeyChain(walletKeyChain, { isWalletKeyChain: true });
-    expect(keyChainsStore.chains.has(walletKeyChain.keyChainId)).to.equal(true);
+  it('should allow to specify a specific master keychain', function () {
+    keyChainsStore.addKeyChain(walletKeyChain, { isMasterKeyChain: true });
+    expect(keyChainsStore.keyChains.has(walletKeyChain.keyChainId)).to.equal(true);
   });
   it('should get all keyChains', function () {
     const keyChains = keyChainsStore.getKeyChains()
@@ -33,9 +33,15 @@ describe('KeyChainStore', function suite() {
     const requestedKeychain = keyChainsStore.getKeyChain(keyChainPublic.keyChainId);
     expect(requestedKeychain).to.equal(keyChainPublic);
   })
-  it('should get a wallet keychain', function () {
-    const requestedWalletKeyChain = keyChainsStore.getWalletKeyChain();
+  it('should get a master keychain', function () {
+    const requestedWalletKeyChain = keyChainsStore.getMasterKeyChain();
     expect(requestedWalletKeyChain).to.equal(walletKeyChain);
+  });
+  it('should make a child key chain store', function () {
+    const childKeyChainStore = keyChainsStore.makeChildKeyChainStore('m/0')
+    expect(childKeyChainStore).to.exist;
+    expect(childKeyChainStore.keyChains).to.be.a('Map')
+    expect(childKeyChainStore.getMasterKeyChain().rootKeyType).to.be.equal(HDPrivateKey.name)
   });
 });
 
