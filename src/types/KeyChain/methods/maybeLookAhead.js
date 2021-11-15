@@ -2,6 +2,7 @@ function maybeLookAhead() {
   const { lookAheadOpts } = this;
   const generatedPaths = {};
 
+  if (Object.keys(lookAheadOpts.paths).length === 0) return;
   const usedPaths = [...this.issuedPaths.entries()]
     .filter(([, el]) => el.isUsed === true)
     .map(([path]) => path);

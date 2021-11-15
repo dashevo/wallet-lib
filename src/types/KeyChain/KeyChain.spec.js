@@ -84,14 +84,19 @@ describe('Keychain', function suite() {
     const keyForChild = keychain2.getForPath(0).key;
     expect(keyForChild.toString()).to.equal(expectedKeyForChild_0);
   });
-  it('should add keys to watched keys', ()=>{
-    const keys = [keychain.getForPath(0).key, keychain.getForPath(1).key, keychain.getForPath(2).key];
-     expect(keychain.addKeysToWatchedKeys(keys)).to.equal(3);
-  });
-  it('should get watched keys', function () {
-    const watchedKeys = keychain.getWatchedKeys();
-    let expectedWatchedKeys = [keychain.getForPath(0), keychain.getForPath(1), keychain.getForPath(2)];
-    expect(watchedKeys).to.deep.equal(expectedWatchedKeys);
+  it('should mark address watched and get watched addresses', function () {
+    const key0 = keychain.getForPath(0);
+    key0.isWatched = true;
+    const key1 = keychain.getForPath(1, { isWatched: true });
+    const key2 = keychain.getForPath(2, { isWatched: true });
+
+    const watchedAddresses = keychain.getWatchedAddresses();
+    let expectedWatchedAddresses = [
+        keychain.getForPath(0).address.toString(),
+      keychain.getForPath(1).address.toString(),
+      keychain.getForPath(2).address.toString()
+    ];
+    expect(watchedAddresses).to.deep.equal(expectedWatchedAddresses);
   });
   it('should get watched addresses', function () {
     const watchedAddresses = keychain.getWatchedAddresses();
@@ -102,31 +107,31 @@ describe('Keychain', function suite() {
     ]
     expect(watchedAddresses).to.deep.equal(expectedWatchedAddresses);
   });
-  it('should get watched public keys', function () {
-    const watchedPubKeys = keychain.getWatchedPublicKeys();
-    const expectedWatchedPubKeys = [
-      '03e6ab8177a7ca2699da4f83ca3c27768fb88b70ae9d6bde1cba8de88355ccf199',
-      '0246a870b65153b98e453ff08f7198d06bce2a790286f44d90929aceafafa0673f',
-      '025ad16f78f67801e52abe5b512d66e3896d4c2fa3ca3150349437a5dd13519967'
-    ]
-    expect(watchedPubKeys).to.deep.equal(expectedWatchedPubKeys)
-  });
-  it('should remove a key from watched keys', function () {
-    let watchedKeys = [keychain.getForPath(0), keychain.getForPath(1), keychain.getForPath(2)];
-    expect(keychain.removeKeysToWatchedKeys(watchedKeys[1])).to.equal(1);
-    expect(keychain.getWatchedKeys().length).to.equal(2);
-    const updatedWatchedKeys = keychain.getWatchedKeys();
-    const expectedUpdatedWatchedKeys = [watchedKeys[0], watchedKeys[2]]
-    expect(updatedWatchedKeys.map((key)=>key.toString())).to.deep.equal(expectedUpdatedWatchedKeys.map((key)=>key.toString()));
+  // it('should get watched public keys', function () {
+  //   const watchedPubKeys = keychain.getWatchedPublicKeys();
+  //   const expectedWatchedPubKeys = [
+  //     '03e6ab8177a7ca2699da4f83ca3c27768fb88b70ae9d6bde1cba8de88355ccf199',
+  //     '0246a870b65153b98e453ff08f7198d06bce2a790286f44d90929aceafafa0673f',
+  //     '025ad16f78f67801e52abe5b512d66e3896d4c2fa3ca3150349437a5dd13519967'
+  //   ]
+  //   expect(watchedPubKeys).to.deep.equal(expectedWatchedPubKeys)
+  // });
+  it('should remove an address from watched addresses', function () {
+      const data0 = keychain.getForPath(0, { isWatched: false });
+      const data1 = keychain.getForPath(1);
+      const data2 = keychain.getForPath(2);
+      data2.isWatched = false;
+
+    expect(keychain.getWatchedAddresses().length).to.equal(1);
   });
   it('should get address for path', function (){
-    const address0_1 = keychain.getAddressForPath(1);
+    const address0_1 = keychain.getForPath(1).address;
     expect(address0_1.toString()).to.equal('yhFX5rseJPitV45HUCaa9haeGHtLuooBaq')
   })
   it('should mark address as used', function () {
-    const address0_0 = keychain.getAddressForPath(0);
+    const address0_0 = keychain.getForPath(0).address;
     keychain.markAddressAsUsed(address0_0);
-    expect(keychain.issuedAddress.get(0).isUsed).to.equal(true)
+    expect(keychain.issuedPaths.get(0).isUsed).to.equal(true)
   });
 });
 describe('Keychain - HDPublicKey', function suite(){
@@ -142,11 +147,11 @@ describe('Keychain - HDPublicKey', function suite(){
     expect(hdpubKeyChain.getRootKey().toString()).to.equal(hdPublicKey);
   });
   it('should derivate', function () {
-    const key0_1 = hdpubKeyChain.getForPath(1);
+    const key0_1 = hdpubKeyChain.getForPath(1).key;
     expect(key0_1.publicKey.toAddress(hdpubKeyChain.network).toString()).to.equal('XoL5LcBiDWcj6L7fFwytsFoX5Vz7BVXw9w')
   });
   it('should get address for path', function (){
-    const address0_1 = hdpubKeyChain.getAddressForPath(2);
+    const address0_1 = hdpubKeyChain.getForPath(2).address;
     expect(address0_1.toString()).to.equal('XwAzpxQKbgebaLiadq1c6rDeFJ4FKPUufy')
   })
 })
