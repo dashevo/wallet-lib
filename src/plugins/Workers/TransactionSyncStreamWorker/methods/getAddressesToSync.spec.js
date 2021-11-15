@@ -14,13 +14,13 @@ const keychainHDPrivate1 = new KeyChain({HDPrivateKey: hdprivateKey1});
 const keychainHDPublic1 = new KeyChain({HDPublicKey: hdpublicKey1});
 
 const keychainStorePrivateKeyWallet = new KeyChainStore();
-keychainStorePrivateKeyWallet.addKeyChain(keychainPrivate1, { isWalletKeyChain: true});
-keychainPrivate1.addKeysToWatchedKeys(keychainPrivate1.getRootKey())
+keychainStorePrivateKeyWallet.addKeyChain(keychainPrivate1, { isMasterKeyChain: true});
+keychainPrivate1.getForPath(0, { isWatched: true })
 
 const keychainStoreHDPrivateKeyWallet = new KeyChainStore();
-keychainStoreHDPrivateKeyWallet.addKeyChain(keychainHDPrivate1, { isWalletKeyChain: true});
-keychainHDPrivate1.addKeysToWatchedKeys(keychainHDPrivate1.getKeyForPath(`m/44'/1'/0/0`))
-keychainHDPrivate1.addKeysToWatchedKeys(keychainHDPrivate1.getKeyForPath(`m/44'/1'/0/1`))
+keychainStoreHDPrivateKeyWallet.addKeyChain(keychainHDPrivate1, { isMasterKeyChain: true});
+keychainHDPrivate1.getForPath(`m/0/0`, { isWatched: true })
+keychainHDPrivate1.getForPath(`m/0/1`, { isWatched: true })
 
 
 const mockedStore1 = {
@@ -146,10 +146,10 @@ const mockSelfIndex0 = {
 describe('TransactionSyncStreamWorker#getAddressesToSync', function suite() {
   it('should correctly fetch addresses to sync', async () => {
 
-    const addressesIndex0 = getAddressesToSync.call(mockSelfIndex0, { network: 'testnet'} );
+    const addressesIndex0 = getAddressesToSync.call(mockSelfIndex0);
     expect(addressesIndex0).to.deep.equal([
-        'yWRLbb7nke6NWGBCZf4GAPn1UcuSSdTr4g',
-        'yP7ZfDzfFR4FJATHcfP8XDac1mLdqbscs5'
+        'Xpkr9M3DP8RgcWw4SHUW75PYtmU1Lh5Ss2',
+        'Xp1kwhXoUVHKRKmoXt3dB4i4KhryHSYjtW'
     ])
 
     const addressesIndex2 = getAddressesToSync.call(mockSelfPrivateKeyType );

@@ -19,7 +19,7 @@ describe('Wallet - fromAddress', function suite() {
     expect(self1.mnemonic).to.equal(null);
     expect(self1.address).to.equal(cR4t6ePublicKey.toAddress().toString());
 
-    const keyChain = self1.keyChainStore.getWalletKeyChain()
+    const keyChain = self1.keyChainStore.getMasterKeyChain()
     expect(keyChain.rootKeyType).to.equal('address');
     expect(keyChain.rootKey).to.equal(cR4t6ePublicKey.toAddress().toString());
 
@@ -29,7 +29,7 @@ describe('Wallet - fromAddress', function suite() {
     expect(self2.mnemonic).to.equal(null);
     expect(self2.address).to.equal(cR4t6ePublicKey.toAddress().toString());
 
-    const keyChain2 = self2.keyChainStore.getWalletKeyChain()
+    const keyChain2 = self2.keyChainStore.getMasterKeyChain()
     expect(keyChain.rootKeyType).to.equal('address');
     expect(keyChain.rootKey).to.equal(cR4t6ePublicKey.toAddress().toString());
   });

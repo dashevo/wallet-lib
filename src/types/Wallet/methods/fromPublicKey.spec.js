@@ -18,7 +18,7 @@ describe('Wallet - fromPublicKey', function suite() {
     expect(self1.walletType).to.equal(WALLET_TYPES.PUBLICKEY);
     expect(self1.mnemonic).to.equal(null);
     expect(self1.publicKey).to.equal(cR4t6ePublicKey);
-    const keyChain = self1.keyChainStore.getWalletKeyChain()
+    const keyChain = self1.keyChainStore.getMasterKeyChain()
     expect(keyChain.rootKeyType).to.equal('publicKey');
     expect(keyChain.rootKey).to.equal(cR4t6ePublicKey);
 
@@ -27,7 +27,7 @@ describe('Wallet - fromPublicKey', function suite() {
     expect(self2.walletType).to.equal(WALLET_TYPES.PUBLICKEY);
     expect(self2.mnemonic).to.equal(null);
     expect(self2.publicKey).to.equal(cR4t6ePublicKey.toString());
-    const keyChain2 = self2.keyChainStore.getWalletKeyChain()
+    const keyChain2 = self2.keyChainStore.getMasterKeyChain()
     expect(keyChain2.rootKeyType).to.equal('publicKey');
     expect(keyChain2.rootKey).to.equal(cR4t6ePublicKey.toString());
   });

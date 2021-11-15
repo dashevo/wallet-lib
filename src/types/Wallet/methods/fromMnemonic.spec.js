@@ -21,7 +21,7 @@ describe('Wallet - fromMnemonic', function suite() {
     expect(self1.HDPrivateKey.toString()).to.equal(knifeFixture.HDRootPrivateKeyMainnet);
     expect(new Dashcore.HDPrivateKey(self1.HDPrivateKey)).to.equal(self1.HDPrivateKey);
 
-    const keyChain = self1.keyChainStore.getWalletKeyChain()
+    const keyChain = self1.keyChainStore.getMasterKeyChain()
     expect(keyChain.rootKeyType).to.equal('HDPrivateKey');
     expect(keyChain.network.name).to.equal('livenet');
     expect(keyChain.rootKey.toString()).to.equal(knifeFixture.HDRootPrivateKeyMainnet);
@@ -32,7 +32,7 @@ describe('Wallet - fromMnemonic', function suite() {
     expect(self2.walletType).to.equal(WALLET_TYPES.HDWALLET);
     expect(self2.mnemonic).to.equal(knifeFixture.mnemonic);
 
-    const keyChain2 = self2.keyChainStore.getWalletKeyChain()
+    const keyChain2 = self2.keyChainStore.getMasterKeyChain()
     expect(keyChain2.network.name).to.equal('testnet');
     expect(self2.HDPrivateKey.toString()).to.equal(knifeFixture.HDRootPrivateKeyTestnet);
     expect(new Dashcore.HDPrivateKey(self2.HDPrivateKey)).to.equal(self2.HDPrivateKey);
@@ -65,7 +65,7 @@ describe('Wallet - fromMnemonic - with passphrase', function suite() {
     expect(self1.mnemonic).to.equal(knifeFixture.mnemonic);
     expect(self1.HDPrivateKey.toString()).to.equal(knifeFixture.HDRootEncryptedPrivateKeyMainnet);
     expect(new Dashcore.HDPrivateKey(self1.HDPrivateKey)).to.equal(self1.HDPrivateKey);
-    const keyChain = self1.keyChainStore.getWalletKeyChain()
+    const keyChain = self1.keyChainStore.getMasterKeyChain()
     expect(keyChain.rootKeyType).to.equal('HDPrivateKey');
     expect(keyChain.network.name).to.equal('livenet');
     expect(keyChain.rootKey.toString()).to.equal(knifeFixture.HDRootEncryptedPrivateKeyMainnet);
@@ -82,7 +82,7 @@ describe('Wallet - fromMnemonic - with passphrase', function suite() {
     expect(self2.mnemonic).to.equal(knifeFixture.mnemonic);
     expect(self2.HDPrivateKey.toString()).to.equal(knifeFixture.HDRootEncryptedPrivateKeyTestnet);
     expect(new Dashcore.HDPrivateKey(self2.HDPrivateKey)).to.equal(self2.HDPrivateKey);
-    const keyChain2 = self2.keyChainStore.getWalletKeyChain()
+    const keyChain2 = self2.keyChainStore.getMasterKeyChain()
     expect(keyChain2.rootKeyType).to.equal('HDPrivateKey');
     expect(keyChain2.network.name).to.equal('testnet');
     expect(keyChain2.rootKey.toString()).to.equal(knifeFixture.HDRootEncryptedPrivateKeyTestnet);

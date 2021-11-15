@@ -31,7 +31,7 @@ describe('Wallet - HDPublicKey', function suite() {
     expect(mockOpts1.HDPublicKey.toString()).to.equal(gatherTestnet.external.hdpubkey);
     expect(new Dashcore.HDPublicKey(mockOpts1.HDPublicKey)).to.equal(mockOpts1.HDPublicKey);
 
-    const keyChain = mockOpts1.keyChainStore.getWalletKeyChain()
+    const keyChain = mockOpts1.keyChainStore.getMasterKeyChain()
     expect(keyChain.rootKeyType).to.equal('HDPublicKey');
     expect(keyChain.rootKey).to.deep.equal(Dashcore.HDPublicKey(gatherTestnet.external.hdpubkey));
   });
@@ -47,7 +47,7 @@ describe('Wallet - HDPublicKey', function suite() {
     expect(wallet1.accounts).to.be.deep.equal([]);
     expect(wallet1.network).to.be.deep.equal(Dashcore.Networks.testnet.toString());
 
-    const keyChain = wallet1.keyChainStore.getWalletKeyChain()
+    const keyChain = wallet1.keyChainStore.getMasterKeyChain()
     expect(keyChain.rootKeyType).to.be.deep.equal('HDPublicKey');
     expect(wallet1.passphrase).to.be.deep.equal(null);
     expect(wallet1.allowSensitiveOperations).to.be.deep.equal(false);

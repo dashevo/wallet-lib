@@ -17,7 +17,7 @@ describe('Wallet - fromHDPrivateKey', function suite() {
     expect(self1.mnemonic).to.equal(null);
     expect(self1.HDPrivateKey.toString()).to.equal(knifeFixture.HDRootPrivateKeyMainnet);
 
-    const keyChain = self1.keyChainStore.getWalletKeyChain()
+    const keyChain = self1.keyChainStore.getMasterKeyChain()
     expect(keyChain.rootKeyType).to.equal('HDPrivateKey');
     expect(keyChain.rootKey.toString()).to.equal(knifeFixture.HDRootPrivateKeyMainnet);
   });
