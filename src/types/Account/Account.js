@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const EventEmitter = require('events');
 const logger = require('../../logger');
-const { WALLET_TYPES } = require('../../CONSTANTS');
+const { WALLET_TYPES, BIP44_ADDRESS_GAP } = require('../../CONSTANTS');
 const { is } = require('../../utils');
 const EVENTS = require('../../EVENTS');
 const Wallet = require('../Wallet/Wallet');
@@ -136,7 +136,26 @@ class Account extends EventEmitter {
         throw new Error(`Invalid wallet type ${this.walletType}`);
     }
 
-    this.keyChainStore = wallet.keyChainStore;
+    let keyChainStorePath = this.index;
+    const keyChainStoreOpts = {};
+
+    if (this.walletType.includes([
+      WALLET_TYPES.HDWALLET,
+      WALLET_TYPES.HDPUBLIC,
+      WALLET_TYPES.PRIVATEKEY])
+    ) {
+      keyChainStorePath = this.BIP44PATH;
+      keyChainStoreOpts.lookAheadOpts = {
+        paths: {
+          'm/0': BIP44_ADDRESS_GAP,
+          'm/1': BIP44_ADDRESS_GAP,
+        },
+      };
+    }
+
+    this.keyChainStore = wallet
+      .keyChainStore
+      .makeChildKeyChainStore(keyChainStorePath, keyChainStoreOpts);
 
     this.cacheTx = (opts.cacheTx) ? opts.cacheTx : defaultOptions.cacheTx;
     this.cacheBlockHeaders = (opts.cacheBlockHeaders)

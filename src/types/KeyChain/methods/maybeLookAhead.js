@@ -1,8 +1,11 @@
 function maybeLookAhead() {
   const { lookAheadOpts } = this;
-  const generatedPaths = {};
+  const generatedPaths = [];
 
-  if (Object.keys(lookAheadOpts.paths).length === 0) return;
+  if (Object.keys(lookAheadOpts.paths).length === 0) {
+    return generatedPaths;
+  }
+
   const usedPaths = [...this.issuedPaths.entries()]
     .filter(([, el]) => el.isUsed === true)
     .map(([path]) => path);
@@ -26,7 +29,6 @@ function maybeLookAhead() {
     .forEach(([basePath]) => {
       lastUsedIndexes[basePath] = -1;
       lastGeneratedIndexes[basePath] = -1;
-      generatedPaths[basePath] = 0;
     });
 
   Object
@@ -72,8 +74,7 @@ function maybeLookAhead() {
             let index = lastIndex + 1;
             index <= lastIndexToGenerate;
             index += 1) {
-            generatedPaths[basePath] += 1;
-            this.getForPath(`${basePath}/${index}`, { isWatched });
+            generatedPaths.push(this.getForPath(`${basePath}/${index}`, { isWatched }));
           }
         }
       }

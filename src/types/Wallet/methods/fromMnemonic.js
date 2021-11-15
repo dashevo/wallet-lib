@@ -21,5 +21,5 @@ module.exports = function fromMnemonic(mnemonic) {
 
   this.keyChainStore = new KeyChainStore();
   const keyChain = new KeyChain({ HDPrivateKey: this.HDPrivateKey });
-  this.keyChainStore.addKeyChain(keyChain, { isWalletKeyChain: true });
+  this.keyChainStore.addKeyChain(keyChain, { isMasterKeyChain: true });
 };

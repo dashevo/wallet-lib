@@ -10,7 +10,7 @@ class Identities {
 
     this.storage = wallet.storage;
 
-    this.keyChain = wallet.keyChainStore.getWalletKeyChain();
+    this.keyChain = wallet.keyChainStore.getMasterKeyChain();
   }
 }
 

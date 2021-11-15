@@ -117,7 +117,7 @@ function createTransaction(opts = {}) {
     }
   });
   try {
-    const signedTx = this.keyChainStore.getWalletKeyChain().sign(
+    const signedTx = this.keyChainStore.getMasterKeyChain().sign(
       tx,
       transformedPrivateKeys,
       crypto.Signature.SIGHASH_ALL,

@@ -3,6 +3,8 @@ const { PrivateKey, Networks } = require('@dashevo/dashcore-lib');
 const EventEmitter = require('events');
 const _ = require('lodash');
 const Storage = require('../Storage/Storage');
+const KeyChainStore = require('../KeyChainStore/KeyChainStore');
+const KeyChain = require('../KeyChain/KeyChain');
 const {
   generateNewMnemonic,
 } = require('../../utils');
@@ -173,7 +175,6 @@ class Wallet extends EventEmitter {
 
     this.accounts = [];
     this.interface = opts.interface;
-
     // Suppressed global require to avoid cyclic dependencies
     // eslint-disable-next-line global-require
     const Identities = require('../Identities/Identities');

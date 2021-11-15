@@ -18,5 +18,5 @@ module.exports = function fromHDPrivateKey(hdPrivateKey) {
 
   const keyChain = new KeyChain({ HDPrivateKey: this.HDPrivateKey });
   this.keyChainStore = new KeyChainStore();
-  this.keyChainStore.addKeyChain(keyChain, { isWalletKeyChain: true });
+  this.keyChainStore.addKeyChain(keyChain, { isMasterKeyChain: true });
 };

@@ -1,5 +1,5 @@
-module.exports = function getAddressesToSync(opts = {}) {
+module.exports = function getAddressesToSync() {
   return this.keyChainStore.getKeyChains()
-    .map((keychain) => keychain.getWatchedAddresses(opts))
+    .map((keychain) => keychain.getWatchedAddresses())
     .reduce((pre, cur) => pre.concat(cur));
 };

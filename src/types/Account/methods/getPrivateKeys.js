@@ -18,7 +18,7 @@ function getPrivateKeys(addressList) {
     paths.forEach((path) => {
       const address = self.store.wallets[walletId].addresses[subwallet][path];
       if (addresses.includes(address.address)) {
-        const privateKey = self.keyChainStore.getWalletKeyChain().getKeyForPath(path);
+        const privateKey = self.keyChainStore.getMasterKeyChain().getForPath(path).key;
         privKeys = privKeys.concat([privateKey]);
       }
     });

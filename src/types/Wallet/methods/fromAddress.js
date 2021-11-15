@@ -14,5 +14,5 @@ module.exports = function fromAddress(address) {
 
   const keyChain = new KeyChain({ address });
   this.keyChainStore = new KeyChainStore();
-  this.keyChainStore.addKeyChain(keyChain, { isWalletKeyChain: true });
+  this.keyChainStore.addKeyChain(keyChain, { isMasterKeyChain: true });
 };

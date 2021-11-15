@@ -63,7 +63,7 @@ describe('Account - createTransaction', function suite() {
         }
       },
       keyChainStore: {
-        getWalletKeyChain:() => {
+        getMasterKeyChain:() => {
           return {
             sign: (tx, privateKeys) => tx.sign(privateKeys),
           }

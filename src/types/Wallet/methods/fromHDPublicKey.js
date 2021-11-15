@@ -17,5 +17,5 @@ module.exports = function fromHDPublicKey(_hdPublicKey) {
 
   const keyChain = new KeyChain({ HDPublicKey: this.HDPublicKey });
   this.keyChainStore = new KeyChainStore();
-  this.keyChainStore.addKeyChain(keyChain, { isWalletKeyChain: true });
+  this.keyChainStore.addKeyChain(keyChain, { isMasterKeyChain: true });
 };

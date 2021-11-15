@@ -15,5 +15,5 @@ module.exports = function fromPrivateKey(privateKey) {
 
   const keyChain = new KeyChain({ privateKey });
   this.keyChainStore = new KeyChainStore();
-  this.keyChainStore.addKeyChain(keyChain, { isWalletKeyChain: true });
+  this.keyChainStore.addKeyChain(keyChain, { isMasterKeyChain: true });
 };
