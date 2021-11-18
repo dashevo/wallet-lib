@@ -45,11 +45,11 @@ function generateAddress(path, isWatchedAddress = true) {
     case WALLET_TYPES.HDPRIVATE:
     case WALLET_TYPES.HDWALLET:
       // eslint-disable-next-line prefer-destructuring
-      index = parseInt(path.toString().split('/')[5], 10);
+      index = parseInt(path.toString().split('/')[2], 10);
       keyData = this.keyChainStore
         .getMasterKeyChain()
         .getForPath(path, { isWatched: isWatchedAddress });
-      address = keyData.address;
+      address = keyData.address.toString();
       privateKey = keyData.key;
       break;
     case WALLET_TYPES.HDPUBLIC:
@@ -59,12 +59,12 @@ function generateAddress(path, isWatchedAddress = true) {
         .getMasterKeyChain()
         .getForPath(path, { isWatched: isWatchedAddress });
       privateKey = keyData.key;
-      address = keyData.address;
+      address = keyData.address.toString();
       break;
       // TODO: DEPRECATE USAGE OF SINGLE_ADDRESS in favor or PRIVATEKEY
     case WALLET_TYPES.PRIVATEKEY:
     case WALLET_TYPES.SINGLE_ADDRESS:
-      privateKey = this.keyChainStore.getMasterKeyChain().rootKey;
+      privateKey = this.keyChainStore.getMasterKeyChain().rootKey.toString();
       address = privateKey.publicKey.toAddress(network).toString();
 
       if (isWatchedAddress) {

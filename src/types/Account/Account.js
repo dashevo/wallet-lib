@@ -139,10 +139,10 @@ class Account extends EventEmitter {
     let keyChainStorePath = this.index;
     const keyChainStoreOpts = {};
 
-    if (this.walletType.includes([
+    if ([
       WALLET_TYPES.HDWALLET,
       WALLET_TYPES.HDPUBLIC,
-      WALLET_TYPES.PRIVATEKEY])
+      WALLET_TYPES.PRIVATEKEY].includes(this.walletType)
     ) {
       keyChainStorePath = this.BIP44PATH;
       keyChainStoreOpts.lookAheadOpts = {
@@ -152,7 +152,6 @@ class Account extends EventEmitter {
         },
       };
     }
-
     this.keyChainStore = wallet
       .keyChainStore
       .makeChildKeyChainStore(keyChainStorePath, keyChainStoreOpts);

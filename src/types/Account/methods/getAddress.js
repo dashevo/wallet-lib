@@ -1,6 +1,6 @@
 const { WALLET_TYPES } = require('../../../CONSTANTS');
 
-const getTypePathFromWalletType = (walletType, addressType = 'external', index, BIP44PATH) => {
+const getTypePathFromWalletType = (walletType, addressType = 'external', accountIndex, addressIndex) => {
   let type;
   let path;
 
@@ -8,11 +8,11 @@ const getTypePathFromWalletType = (walletType, addressType = 'external', index, 
   switch (walletType) {
     case WALLET_TYPES.HDWALLET:
       type = addressType;
-      path = `${BIP44PATH}/${addressTypeIndex}/${index}`;
+      path = `m/${addressTypeIndex}/${addressIndex}`;
       break;
     case WALLET_TYPES.HDPUBLIC:
       type = 'external';
-      path = `${BIP44PATH}/${addressTypeIndex}/${index}`;
+      path = `m/${addressTypeIndex}/${addressIndex}`;
       break;
     case WALLET_TYPES.PUBLICKEY:
     case WALLET_TYPES.ADDRESS:
@@ -30,8 +30,9 @@ const getTypePathFromWalletType = (walletType, addressType = 'external', index, 
  * @param {AddressType} [_type="external"] - Type of the address (external, internal, misc)
  * @return <AddressInfo>
  */
-function getAddress(index = 0, _type = 'external') {
-  const { type, path } = getTypePathFromWalletType(this.walletType, _type, index, this.BIP44PATH);
+function getAddress(addressIndex = 0, _type = 'external') {
+  const accountIndex = this.index;
+  const { type, path } = getTypePathFromWalletType(this.walletType, _type, accountIndex, addressIndex);
 
   const { wallets } = this.storage.getStore();
   const matchingTypeAddresses = wallets[this.walletId].addresses[type];
