@@ -74,12 +74,14 @@ function maybeLookAhead() {
             let index = lastIndex + 1;
             index <= lastIndexToGenerate;
             index += 1) {
-            generatedPaths.push(this.getForPath(`${basePath}/${index}`, { isWatched }));
+            const pathData = this.getForPath(`${basePath}/${index}`, { isWatched });
+            if (pathData.hasBeenNewlyIssued) {
+              generatedPaths.push(pathData);
+            }
           }
         }
       }
     });
-
   return generatedPaths;
 }
 module.exports = maybeLookAhead;

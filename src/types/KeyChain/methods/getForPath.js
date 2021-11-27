@@ -1,12 +1,18 @@
+const logger = require('../../../logger');
+
 function getForPath(path, opts = {}) {
-  if (!['HDPrivateKey', 'HDPublicKey'].includes(this.rootKeyType)) {
-    if (path === 0 || path === '0') return this.getRootKey();
-    throw new Error('Wallet is not loaded from a mnemonic or a HDPubKey, impossible to derivate keys');
+  const stringifiedPath = path.toString();
+  logger.silly(`KeyChain.getForPath(${stringifiedPath})`);
+  const isUsed = (opts && opts.isUsed !== undefined) ? opts.isUsed : false;
+  const isWatched = (opts && opts.isWatched !== undefined) ? opts.isWatched : false;
+  const isDerivable = ['HDPrivateKey', 'HDPublicKey'].includes(this.rootKeyType);
+  if (!isDerivable && stringifiedPath !== '0') {
+    throw new Error(`Wallet is not loaded from a mnemonic or a HDPrivateKey, impossible to derivate keys for path ${stringifiedPath}`);
   }
 
   let data;
-  if (this.issuedPaths.has(path)) {
-    data = this.issuedPaths.get(path);
+  if (this.issuedPaths.has(stringifiedPath)) {
+    data = this.issuedPaths.get(stringifiedPath);
     if (opts && opts.isWatched !== undefined && data.isWatched !== opts.isWatched) {
       data.isWatched = opts.isWatched;
     }
@@ -16,20 +22,18 @@ function getForPath(path, opts = {}) {
     return data;
   }
 
-  const key = this.rootKey.derive(path);
-  const isUsed = (opts && opts.isUsed !== undefined) ? opts.isUsed : false;
-  const isWatched = (opts && opts.isWatched !== undefined) ? opts.isWatched : false;
+  const key = (isDerivable) ? this.rootKey.derive(stringifiedPath) : this.getRootKey();
 
   data = {
-    path,
+    path: stringifiedPath,
     key,
     isUsed,
     isWatched,
     address: key.publicKey.toAddress(this.network),
   };
 
-  this.issuedPaths.set(path, data);
-  return data;
+  this.issuedPaths.set(stringifiedPath, data);
+  return { hasBeenNewlyIssued: true, ...data };
 }
 
 module.exports = getForPath;

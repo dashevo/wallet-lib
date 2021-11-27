@@ -24,8 +24,8 @@ module.exports = async function getTransaction(txid) {
       transaction: new Transaction(response.getTransaction()),
       blockHash: response.getBlockHash().toString('hex'),
       height,
-      instantLocked,
-      chainLocked,
+      isInstantLocked: instantLocked,
+      isChainLocked: chainLocked,
     };
   } catch (e) {
     if (e instanceof NotFoundError) {

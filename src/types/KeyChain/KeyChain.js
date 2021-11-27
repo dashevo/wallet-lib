@@ -87,7 +87,6 @@ class KeyChain {
 
     this.issuedPaths = new Map();
 
-    this.watchedKeys = new Map();
     this.maybeLookAhead();
   }
 }
@@ -99,6 +98,7 @@ KeyChain.prototype.getHardenedDIP9FeatureHDKey = require('./methods/getHardenedD
 KeyChain.prototype.getHardenedDIP15AccountKey = require('./methods/getHardenedDIP15AccountKey');
 KeyChain.prototype.getRootKey = require('./methods/getRootKey');
 KeyChain.prototype.getWatchedAddresses = require('./methods/getWatchedAddresses');
+KeyChain.prototype.getIssuedPaths = require('./methods/getIssuedPaths');
 KeyChain.prototype.maybeLookAhead = require('./methods/maybeLookAhead');
 KeyChain.prototype.markAddressAsUsed = require('./methods/markAddressAsUsed');
 KeyChain.prototype.sign = require('./methods/sign');
