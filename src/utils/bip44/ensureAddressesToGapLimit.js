@@ -86,7 +86,6 @@ function ensureAccountAddressesToGapLimit(walletStore, walletType, accountIndex,
     gapBetweenLastUsedAndLastGenerated.internal = lastGeneratedIndexes.internal - lastUsedIndexes.internal;
     addressesToGenerate.internal = BIP44_ADDRESS_GAP - gapBetweenLastUsedAndLastGenerated.internal;
   }
-
   Object.entries(addressesToGenerate)
     .forEach(([typeToGenerate, numberToGenerate]) => {
       if (numberToGenerate > 0) {

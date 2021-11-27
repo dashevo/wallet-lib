@@ -26,7 +26,8 @@ class IdentitySyncWorker extends Worker {
   }
 
   async execute() {
-    const indexedIds = await this.storage.getIndexedIdentityIds(this.walletId);
+    const walletStore = this.storage.getWalletStore(this.walletId);
+    const indexedIds = await walletStore.getIndexedIdentityIds();
 
     // Add gaps to empty indices
     const unusedIndices = [];

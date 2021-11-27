@@ -3,7 +3,8 @@ const mockedStore = require('../../../../fixtures/sirentonight-fullstore-snapsho
 const getTotalBalance = require('./getTotalBalance');
 const getConfirmedBalance = require('./getConfirmedBalance');
 const getUnconfirmedBalance = require('./getUnconfirmedBalance');
-const calculateDuffBalance = require('../../Storage/methods/calculateDuffBalance');
+const { duffsToDash, calculateDuffBalance } = require('../../../utils');
+
 
 let mockedWallet;
 describe('Account - getTotalBalance', function suite() {

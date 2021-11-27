@@ -15,16 +15,14 @@ module.exports = async function importBlockHeader(blockHeader) {
   // knowing the following blockHeight blockheader's prevHash value
   // const previousHash = blockHeader.prevHash.reverse().toString('hex');
   const {
-    walletId, BIP44PATH, index, store, storage, walletType,
+    walletId, BIP44PATH, index, store, storage, network, walletType,
   } = this;
 
-  const localWalletStore = store.wallets[walletId];
-  const localAccountStore = ([WALLET_TYPES.HDPUBLIC, WALLET_TYPES.HDWALLET].includes(walletType))
-    ? localWalletStore.accounts[BIP44PATH.toString()]
-    : localWalletStore.accounts[index.toString()];
+  const applicationStore = storage.application;
+  const chainStore = storage.getChainStore(network);
 
-  localAccountStore.blockHash = blockHeader.id;
+  applicationStore.blockHash = blockHeader.id;
 
-  storage.importBlockHeader(blockHeader);
+  chainStore.importBlockHeader(blockHeader);
   logger.silly(`Account.importBlockHeader(${blockHeader.id})`);
 };

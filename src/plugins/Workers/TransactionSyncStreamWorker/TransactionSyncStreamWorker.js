@@ -125,7 +125,6 @@ class TransactionSyncStreamWorker extends Worker {
         .getMessagesList()
         .map((instantSendLock) => new InstantLock(Buffer.from(instantSendLock)));
     }
-
     return walletTransactions;
   }
 
@@ -136,7 +135,7 @@ class TransactionSyncStreamWorker extends Worker {
     const {
       skipSynchronizationBeforeHeight,
       skipSynchronization,
-    } = (this.storage.store.syncOptions || {});
+    } = (this.storage.application.syncOptions || {});
 
     if (skipSynchronization) {
       logger.debug('TransactionSyncStreamWorker - Wallet created from a new mnemonic. Sync from the best block height.');
@@ -239,25 +238,15 @@ class TransactionSyncStreamWorker extends Worker {
   }
 
   setLastSyncedBlockHash(hash) {
-    const { walletId } = this;
-    const accountsStore = this.storage.store.wallets[walletId].accounts;
+    const applicationStore = this.storage.application;
 
-    const accountStore = ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(this.walletType))
-      ? accountsStore[this.BIP44PATH.toString()]
-      : accountsStore[this.index.toString()];
+    applicationStore.blockHash = hash;
 
-    accountStore.blockHash = hash;
-
-    return accountStore.blockHash;
+    return applicationStore.blockHash;
   }
 
   getLastSyncedBlockHash() {
-    const { walletId } = this;
-    const accountsStore = this.storage.store.wallets[walletId].accounts;
-
-    const { blockHash } = ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(this.walletType))
-      ? accountsStore[this.BIP44PATH.toString()]
-      : accountsStore[this.index.toString()];
+    const { blockHash } = this.storage.application;
 
     return blockHash;
   }

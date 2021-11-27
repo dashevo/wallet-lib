@@ -3,6 +3,11 @@
  * @return {[Transaction]} transactions - All transaction in the store
  */
 module.exports = function getTransactions() {
-  const store = this.storage.getStore();
-  return store.transactions;
+  const chainStore = this.storage.getChainStore(this.network);
+  const transactions = [];
+  const { addresses } = this.storage.getWalletStore(this.walletId).getPathState(this.accountPath);
+  Object.values(addresses).forEach((address) => {
+    transactions.push(...chainStore.getAddress(address).transactions);
+  });
+  return transactions;
 };

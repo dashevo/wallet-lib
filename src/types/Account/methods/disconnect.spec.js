@@ -33,7 +33,6 @@ describe('Account - disconnect', function suite() {
   it('should disconnect to stream and worker', async () => {
     expect(transportConnected).to.equal(true);
     await disconnect.call(self);
-    // console.log(self, transportConnected, emitted);
     expect(transportConnected).to.equal(false);
     expect(emitted).to.deep.equal([
       'WORKER/DUMMYWORKER/STARTING',

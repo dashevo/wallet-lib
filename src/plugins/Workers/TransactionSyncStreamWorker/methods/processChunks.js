@@ -27,11 +27,12 @@ async function processChunks(dataChunk) {
     .filterWalletTransactions(transactionsFromResponse, addresses, network);
 
   if (walletTransactions.transactions.length) {
+    // Normalizing format of transaction for account.importTransactions
+    const walletTransactionWithoutMetadata = walletTransactions.transactions.map((tx) => [tx]);
     // When a transaction exist, there is multiple things we need to do :
     // 1) The transaction itself needs to be imported
     const addressesGeneratedCount = await self
-      .importTransactions(walletTransactions.transactions);
-
+      .importTransactions(walletTransactionWithoutMetadata);
     // 2) Transaction metadata need to be fetched and imported as well.
     //    as such event might happen in the future
     //    As we require height information, we fetch transaction using client
@@ -80,10 +81,10 @@ async function processChunks(dataChunk) {
         // Wrapping `cancel` in `setImmediate` due to bug with double-free
         // explained here (https://github.com/grpc/grpc-node/issues/1652)
         // and here (https://github.com/nodejs/node/issues/38964)
-        await new Promise((resolveCancel) => setImmediate(() => {
-          self.stream.cancel();
-          resolveCancel();
-        }));
+        // await new Promise((resolveCancel) => setImmediate(() => {
+        // self.stream.cancel();
+        // resolveCancel();
+        // }));
       }
     }
   }
@@ -95,7 +96,7 @@ async function processChunks(dataChunk) {
   if (merkleBlockFromResponse) {
     // Reverse hashes, as they're little endian in the header
     const transactionsInHeader = merkleBlockFromResponse.hashes.map((hashHex) => Buffer.from(hashHex, 'hex').reverse().toString('hex'));
-    const transactionsInWallet = Object.keys(self.storage.getStore().transactions);
+    const transactionsInWallet = [...self.storage.getChainStore(self.network).state.transactions.keys()];
     const isTruePositive = isAnyIntersection(transactionsInHeader, transactionsInWallet);
     if (isTruePositive) {
       self.importBlockHeader(merkleBlockFromResponse.header);

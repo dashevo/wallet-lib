@@ -6,14 +6,13 @@ const { is } = require('../../../utils');
  * Generate an address from a path and import it to the store
  * @param {string} path
  * @param {boolean} [isWatchedAddress=true] - if the address will be watched
- * @return {AddressObj} Address information
+ * @return {AddressInfo} Address information
  * */
 function generateAddress(path, isWatchedAddress = true) {
   if (is.undefOrNull(path)) throw new Error('Expected path to generate an address');
   let index = 0;
-  let privateKey;
   let address;
-  let keyData;
+  let keyPathData;
   const { network } = this;
 
   switch (this.walletType) {
@@ -46,59 +45,48 @@ function generateAddress(path, isWatchedAddress = true) {
     case WALLET_TYPES.HDWALLET:
       // eslint-disable-next-line prefer-destructuring
       index = parseInt(path.toString().split('/')[2], 10);
-      keyData = this.keyChainStore
+      keyPathData = this.keyChainStore
         .getMasterKeyChain()
         .getForPath(path, { isWatched: isWatchedAddress });
-      address = keyData.address.toString();
-      privateKey = keyData.key;
+      address = keyPathData.address.toString();
       break;
     case WALLET_TYPES.HDPUBLIC:
       index = parseInt(path.toString().split('/')[5], 10);
       // eslint-disable-next-line no-case-declarations
-      keyData = this.keyChainStore
+      keyPathData = this.keyChainStore
         .getMasterKeyChain()
         .getForPath(path, { isWatched: isWatchedAddress });
-      privateKey = keyData.key;
-      address = keyData.address.toString();
+      address = keyPathData.address.toString();
       break;
       // TODO: DEPRECATE USAGE OF SINGLE_ADDRESS in favor or PRIVATEKEY
     case WALLET_TYPES.PRIVATEKEY:
     case WALLET_TYPES.SINGLE_ADDRESS:
-      privateKey = this.keyChainStore.getMasterKeyChain().rootKey.toString();
-      address = privateKey.publicKey.toAddress(network).toString();
-
-      if (isWatchedAddress) {
-        this.keyChainStore
-          .issuedPaths.set(0, {
-            key: privateKey,
-            path: 0,
-            address,
-            isUsed: false,
-            isWatched: true,
-          });
-      }
-      break;
     default:
-      privateKey = this.keyChainStore
+      keyPathData = this.keyChainStore
         .getMasterKeyChain()
-        .getKeyForPath(path.toString(), { isWatched: isWatchedAddress }).key;
-      address = privateKey.publicKey.toAddress(network).toString();
+        .getForPath(path, { isWatched: isWatchedAddress });
+      address = keyPathData.address.toString();
+      break;
   }
 
   const addressData = {
     path: path.toString(),
     index,
     address,
-    // privateKey,
     transactions: [],
+    utxos: {},
     balanceSat: 0,
     unconfirmedBalanceSat: 0,
-    utxos: {},
-    fetchedLast: 0,
-    used: false,
   };
 
-  this.storage.importAddresses(addressData, this.walletId);
+  const accountStore = this.storage
+    .getWalletStore(this.walletId)
+    .getPathState(this.accountPath);
+
+  const chainStore = this.storage.getChainStore(this.network);
+
+  accountStore.addresses[addressData.path] = addressData.address.toString();
+  chainStore.importAddress(addressData.address.toString());
   this.emit(EVENTS.GENERATED_ADDRESS, { type: EVENTS.GENERATED_ADDRESS, payload: addressData });
   return addressData;
 }

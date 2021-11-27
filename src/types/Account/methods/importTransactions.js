@@ -8,30 +8,36 @@ const ensureAddressesToGapLimit = require('../../../utils/bip44/ensureAddressesT
  * @param transactions
  * @returns {Promise<number>}
  */
-module.exports = async function importTransactions(transactions) {
+module.exports = async function importTransactions(transactionsWithMayBeMetadata) {
   const {
-    walletType,
-    walletId,
-    index,
-    store,
     storage,
-    getAddress,
+    network,
+    walletId,
+    accountPath,
+    keyChainStore,
   } = this;
 
-  const localWalletStore = store.wallets[walletId];
+  const chainStore = storage.getChainStore(network);
+  const accountStore = storage
+    .getWalletStore(walletId)
+    .getPathState(accountPath);
 
-  storage.importTransactions(transactions);
-  logger.silly(`Account.importTransactions(len: ${transactions.length})`);
+  const masterKeyChain = keyChainStore.getMasterKeyChain();
 
-  if ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(walletType)) {
-    // After each imports, we will need to ensure we keep our gap of 20 unused addresses
-    return ensureAddressesToGapLimit(
-      localWalletStore,
-      walletType,
-      index,
-      getAddress.bind(this),
-    );
-  }
+  transactionsWithMayBeMetadata.forEach(([transaction, metadata]) => {
+    const affectedAddressesData = chainStore.importTransaction(transaction, metadata);
+    const affectedAddresses = Object.keys(affectedAddressesData);
+    logger.silly(`Account.importTransactions - Import ${transaction.hash} to chainStore. ${affectedAddresses.length} addresses affected.`);
 
+    affectedAddresses.forEach((address) => {
+      const issuedPaths = masterKeyChain.markAddressAsUsed(address);
+      logger.silly(`Account.importTransactions - newly issued paths ${issuedPaths.length}`);
+      issuedPaths.forEach((issuedPath) => {
+        accountStore.addresses[issuedPath.path] = issuedPath.address.toString();
+        chainStore.importAddress(issuedPath.address.toString());
+      });
+    });
+  });
+  logger.silly(`Account.importTransactions(len: ${transactionsWithMayBeMetadata.length})`);
   return 0;
 };

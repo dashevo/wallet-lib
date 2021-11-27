@@ -33,7 +33,6 @@ describe('Account - getUnusedAddress', function suite() {
     const unusedAddressExternal = getUnusedAddress.call(self);
     const unusedAddressInternal = getUnusedAddress.call(self, 'internal');
 
-    // console.log(mockedStore.wallets[self.walletId].addresses.internal)
     expect(unusedAddressExternal).to.be.deep.equal({
       address: 'yaVrJ5dgELFkYwv6AydDyGPAJQ5kTJXyAN',
       balanceSat: 0,
