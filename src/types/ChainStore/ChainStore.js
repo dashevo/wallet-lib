@@ -30,6 +30,8 @@ ChainStore.prototype.exportState = require('./methods/exportState');
 ChainStore.prototype.importState = require('./methods/importState');
 
 ChainStore.prototype.getAddress = require('./methods/getAddress');
+ChainStore.prototype.getAddresses = require('./methods/getAddresses');
+
 ChainStore.prototype.getBlockHeader = require('./methods/getBlockHeader');
 ChainStore.prototype.getInstantLock = require('./methods/getInstantLock');
 ChainStore.prototype.getTransaction = require('./methods/getTransaction');

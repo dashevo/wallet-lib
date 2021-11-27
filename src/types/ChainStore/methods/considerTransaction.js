@@ -1,10 +1,12 @@
 const { Transaction } = require('@dashevo/dashcore-lib');
 const { is } = require('../../../utils');
 const { FETCHED_CONFIRMED_TRANSACTION, UPDATED_ADDRESS } = require('../../../EVENTS');
+const logger = require('../../../logger');
 
 const { Output } = Transaction;
 
 function considerTransaction(transactionHash) {
+  logger.silly(`ChainStore - Considering transaction ${transactionHash}`);
   const { transaction } = this.getTransaction(transactionHash);
 
   const { inputs, outputs } = transaction;
@@ -19,7 +21,6 @@ function considerTransaction(transactionHash) {
     if (element.script) {
       const address = element.script.toAddress(this.network).toString();
       const watchedAddress = this.getAddress(address);
-
       if (watchedAddress) {
         // If the transactions has already been processed in a previous insertion,
         // we can skip the processing now, it's important to do so as we might consider
@@ -59,5 +60,6 @@ function considerTransaction(transactionHash) {
   Object.values(processedAddressesForTx).forEach((addressObject) => {
     addressObject.transactions.push(transaction.hash);
   });
+  return processedAddressesForTx;
 }
 module.exports = considerTransaction;

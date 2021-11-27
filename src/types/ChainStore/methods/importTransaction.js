@@ -13,7 +13,7 @@ function importTransaction(transaction, metadata = {}) {
       isChainLocked: metadata.isChainLocked || null,
     },
   });
-  this.considerTransaction(normalizedTransaction.hash);
+  return this.considerTransaction(normalizedTransaction.hash);
 }
 
 module.exports = importTransaction;
