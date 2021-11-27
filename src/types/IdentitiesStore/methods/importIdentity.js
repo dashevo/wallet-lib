@@ -3,11 +3,12 @@ const IdentityReplaceError = require('../../../errors/IndentityIdReplaceError');
 /**
  *
  * @param {string} walletId
- * @param {string} identityId
  * @param {number} identityIndex
+ * @param {string} identityId
  * @return void
  */
-function insertIdentityAtIndex(walletId, identityId, identityIndex) {
+function importIdentity(walletId, identityIndex, identityId) {
+  console.log(walletId, identityIndex, identityId);
   if (!this.store.wallets[walletId].identityIds) {
     this.store.wallets[walletId].identityIds = [];
   }
@@ -22,4 +23,4 @@ function insertIdentityAtIndex(walletId, identityId, identityIndex) {
   this.lastModified = Date.now();
 }
 
-module.exports = insertIdentityAtIndex;
+module.exports = importIdentity;
