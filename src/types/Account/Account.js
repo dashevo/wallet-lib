@@ -251,7 +251,8 @@ class Account extends EventEmitter {
    * @param {InstantLock} instantLock
    */
   importInstantLock(instantLock) {
-    this.storage.importInstantLock(instantLock);
+    const chainStore = this.storage.getChainStore(this.network);
+    chainStore.importInstantLock(instantLock);
     this.emit(Account.getInstantLockTopicName(instantLock.txid), instantLock);
   }
 
