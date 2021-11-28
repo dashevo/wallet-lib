@@ -64,8 +64,10 @@ describe('Wallet-lib - functional - offline Wallet', function suite() {
             });
             expect(account0.getTotalBalance()).to.equal(100070000);
             expect(account0.getUTXOS().length).to.equal(1);
-            expect(account0.getUTXOS()[0].toString()).to.equal('61e5a9ffbf505ad9e5b0a715673ec3c89d68dc9b1d1af8fd980240b8ac14c29c:0');
-            expect(account0.getUTXOS()[0]).to.deep.equal(new Transaction.UnspentOutput({"address":"yVSuCVTGpViqV8bzG3kdtofkPhSRWH8dbq","txid":"61e5a9ffbf505ad9e5b0a715673ec3c89d68dc9b1d1af8fd980240b8ac14c29c","vout":0,"scriptPubKey":"76a91464220a1c12690ec26d837b3be0a2e3588bb4b79188ac","amount":1.0007}))
+            const utxo = account0.getUTXOS()[0];
+            expect(utxo.toString()).to.equal('61e5a9ffbf505ad9e5b0a715673ec3c89d68dc9b1d1af8fd980240b8ac14c29c:0');
+            expect(utxo).to.deep.equal(new Transaction.UnspentOutput({"address":"yVSuCVTGpViqV8bzG3kdtofkPhSRWH8dbq","txid":"61e5a9ffbf505ad9e5b0a715673ec3c89d68dc9b1d1af8fd980240b8ac14c29c","vout":0,"scriptPubKey":"76a91464220a1c12690ec26d837b3be0a2e3588bb4b79188ac","amount":1.0007}))
+            expect(account0.getPrivateKeys([utxo.address.toString()])[0].toString()).to.equal('tprv8k5Lf2T5uY7BZVxCvssWR9txCj5rEvT19Nd291gfuDJf1wnibAB9GTRzke7FvwKnpXBYiYWvjthnnCWPFUvJbsN3StwcL63EnJNcMSmorfC')
         });
         it('should have issued new addresses', function () {
             const externalAddressesSet = account0.getAddresses();
@@ -78,6 +80,13 @@ describe('Wallet-lib - functional - offline Wallet', function suite() {
                 'm/0/15', 'm/0/16', 'm/0/17',
                 'm/0/18', 'm/0/19', 'm/0/20'
             ])
+        });
+        it('should be able to create and sign transaction', function () {
+            const tx = account0.createTransaction({
+                recipient: 'yVSuCVTGpViqV8bzG3kdtofkPhSRWH8dbq',
+                satoshis: 100000
+            })
+            expect(tx.isFullySigned()).to.equal(true);
         });
     });
 });

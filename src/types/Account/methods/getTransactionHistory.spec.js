@@ -3,11 +3,6 @@ const {Transaction, BlockHeader} = require('@dashevo/dashcore-lib');
 const {WALLET_TYPES} = require('../../../CONSTANTS');
 const getTransactions = require('./getTransactions');
 const getTransactionHistory = require('./getTransactionHistory');
-const searchTransaction = require('../../Storage/methods/searchTransaction');
-const getTransaction = require('../../Storage/methods/getTransaction');
-const getBlockHeader = require('../../Storage/methods/getBlockHeader');
-const searchBlockHeader = require('../../Storage/methods/searchBlockHeader');
-const searchAddress = require('../../Storage/methods/searchAddress');
 const mockedStoreHDWallet = require('../../../../fixtures/duringdevelop-fullstore-snapshot-1548538361');
 const mockedStoreSingleAddress = require('../../../../fixtures/da07-fullstore-snapshot-1548533266');
 

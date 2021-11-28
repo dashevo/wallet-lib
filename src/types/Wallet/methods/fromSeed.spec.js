@@ -28,7 +28,7 @@ describe('Wallet - fromSeed', function suite() {
       network: 'mainnet',
 
     };
-    fromSeed.call(self2, knifeFixture.seed);
+    fromSeed.call(self2, knifeFixture.seed, self2.network);
     expect(self2.walletType).to.equal(WALLET_TYPES.HDWALLET);
     expect(self2.mnemonic).to.equal(null);
     expect(self2.HDPrivateKey.toString()).to.equal(knifeFixture.HDRootPrivateKeyMainnet);

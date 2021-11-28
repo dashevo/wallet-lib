@@ -1,8 +1,6 @@
 const { expect } = require('chai');
 const mockedStore = require('../../../../fixtures/sirentonight-fullstore-snapshot-1562711703');
 const getTransaction = require('./getTransaction');
-const searchTransaction = require('../../Storage/methods/searchTransaction');
-const searchTransactionMetadata = require('../../Storage/methods/searchTransactionMetadata');
 
 let mockedWallet;
 let fetchTransactionInfoCalledNb = 0;
@@ -13,8 +11,6 @@ describe('Account - getTransaction', function suite() {
       store: mockedStore,
       getStore: () => mockedStore,
       mappedAddress: {},
-      searchTransaction,
-      searchTransactionMetadata,
       importTransactions: () => null,
     };
     const walletId = Object.keys(mockedStore.wallets)[0];
