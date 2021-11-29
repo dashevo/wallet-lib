@@ -272,10 +272,10 @@ class Account extends EventEmitter {
    */
   waitForInstantLock(transactionHash, timeout = this.waitForInstantLockTimeout) {
     let rejectTimeout;
-
+    const chainStore = this.storage.getChainStore(this.network);
     return Promise.race([
       new Promise((resolve) => {
-        const instantLock = this.storage.getInstantLock(transactionHash);
+        const instantLock = chainStore.getInstantLock(transactionHash);
         if (instantLock != null) {
           clearTimeout(rejectTimeout);
           resolve(instantLock);

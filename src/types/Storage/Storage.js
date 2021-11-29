@@ -20,5 +20,7 @@ Storage.prototype.createChainStore = require('./methods/createChainStore');
 Storage.prototype.createWalletStore = require('./methods/createWalletStore');
 Storage.prototype.getChainStore = require('./methods/getChainStore');
 Storage.prototype.getWalletStore = require('./methods/getWalletStore');
+Storage.prototype.rehydrateState = require('./methods/rehydrateState');
+Storage.prototype.saveState = require('./methods/saveState');
 
 module.exports = Storage;

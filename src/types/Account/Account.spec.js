@@ -7,6 +7,10 @@ const { WALLET_TYPES } = require('../../CONSTANTS');
 const { Account, EVENTS } = require('../../index');
 const EventEmitter = require('events');
 const inMem = require('../../adapters/InMem');
+const Storage = require('../Storage/Storage');
+const {mock} = require("sinon");
+const KeyChainStore = require("../KeyChainStore/KeyChainStore");
+const KeyChain = require("../KeyChain/KeyChain");
 const blockHeader = new Dashcore.BlockHeader.fromObject({
   hash: '00000ac3a0c9df709260e41290d6902e5a4a073099f11fe8c1ce80aadc4bb331',
   version: 2,
@@ -29,7 +33,7 @@ describe('Account - class', function suite() {
     const mockStorage = {
       on: emitter.on,
       emit: emitter.emit,
-      store: {},
+      storage: new Storage(),
       getStore: () => {},
       saveState: () => {},
       stopWorker: () => {},
@@ -43,8 +47,13 @@ describe('Account - class', function suite() {
       this.walletType =  WALLET_TYPES.HDWALLET;
       this.accounts = [];
       this.network = Dashcore.Networks.testnet;
-      this.storage = mockStorage;
+      this.storage = new Storage();
     })());
+    mocks.wallet.storage.application.network = mocks.wallet.network;
+    mocks.wallet.storage.createWalletStore(mocks.wallet.walletId);
+    mocks.wallet.storage.createChainStore(mocks.wallet.network);
+    mocks.wallet.keyChainStore = new KeyChainStore()
+    mocks.wallet.keyChainStore.addKeyChain(new KeyChain({mnemonic: fluidMnemonic.mnemonic}), { isMasterKeyChain: true })
   });
   it('should be specify on missing params', () => {
     const expectedException1 = 'Expected wallet to be passed as param';
@@ -96,7 +105,7 @@ describe('Account - class', function suite() {
       await account.on(EVENTS.BLOCKHEADER, ()=>{
         done();
       });
-      account.storage.importBlockHeader(blockHeader);
+      account.storage.getChainStore(account.network).importBlockHeader(blockHeader);
     })
 
   });

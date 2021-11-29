@@ -75,7 +75,7 @@ function impactAffectedInputs({ transaction }) {
  */
 async function broadcastTransaction(transaction, options = {}) {
   const { network, storage } = this;
-  // if (!this.transport) throw new ValidTransportLayerRequired('broadcast');
+  if (!this.transport) throw new ValidTransportLayerRequired('broadcast');
 
   // We still support having in rawtransaction, if this is the case
   // we first need to reform our object

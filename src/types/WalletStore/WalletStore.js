@@ -34,7 +34,7 @@ class WalletStore {
     return this.state.identities.get(identityIndex);
   }
 
-  insertIdentityAtIndex(identityId, identityIndex) {
+  insertIdentityIdAtIndex(identityId, identityIndex) {
     const existingId = this.getIdentityIdByIndex(identityIndex);
 
     if (Boolean(existingId) && existingId !== identityId) {

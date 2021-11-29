@@ -81,7 +81,6 @@ const CONSTANTS = {
     ],
     UNSAFE_PROPERTIES: [
       'storage',
-      'keyChain',
       'identities',
     ],
     SAFE_PROPERTIES: [
