@@ -181,7 +181,9 @@ class Account extends EventEmitter {
 
     // This forces keychainStore to set to issued key what is already its masterkey
     if ([WALLET_TYPES.PUBLICKEY, WALLET_TYPES.PRIVATEKEY].includes(this.walletType)) {
-      this.keyChainStore.getMasterKeyChain().getForPath('0');
+      this.keyChainStore
+        .getMasterKeyChain()
+        .getForPath('0', { isWatched: true });
     }
 
     this.cacheTx = (opts.cacheTx) ? opts.cacheTx : defaultOptions.cacheTx;

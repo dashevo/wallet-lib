@@ -26,7 +26,10 @@ async function _initializeAccount(account, userUnsafePlugins) {
 
   const chainStore = account.storage.getChainStore(account.network);
 
-  const issuedPaths = account.keyChainStore.getMasterKeyChain().getIssuedPaths();
+  const issuedPaths = account.keyChainStore
+    .getMasterKeyChain()
+    .getIssuedPaths();
+
   issuedPaths.forEach((issuedPath) => {
     accountStore.addresses[issuedPath.path] = issuedPath.address.toString();
     chainStore.importAddress(issuedPath.address.toString());
