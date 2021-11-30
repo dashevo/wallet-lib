@@ -5,7 +5,6 @@ require('setimmediate');
 const Account = require('./types/Account/Account');
 const ChainStore = require('./types/ChainStore/ChainStore');
 const Identities = require('./types/Identities/Identities');
-const IdentitiesStore = require('./types/IdentitiesStore/IdentitiesStore');
 const KeyChain = require('./types/KeyChain/KeyChain');
 const KeyChainStore = require('./types/KeyChainStore/KeyChainStore');
 const Storage = require('./types/Storage/Storage');
@@ -20,7 +19,6 @@ module.exports = {
   Account,
   ChainStore,
   Identities,
-  IdentitiesStore,
   KeyChain,
   KeyChainStore,
   Storage,
