@@ -36,7 +36,6 @@ describe('Account - class', function suite() {
       storage: new Storage(),
       getStore: () => {},
       saveState: () => {},
-      stopWorker: () => {},
       createAccount: () => {},
       importBlockHeader: (blockheader)=>{
         mockStorage.emit(EVENTS.BLOCKHEADER, {type: EVENTS.BLOCKHEADER, payload:blockheader});
