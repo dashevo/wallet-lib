@@ -4,12 +4,8 @@ const getUnusedAddress = require('./getUnusedAddress');
 const getAddress = require('./getAddress');
 const generateAddress = require('./generateAddress');
 const KeyChain = require('../../KeyChain/KeyChain');
-
-// const mockedStore = require('../../../../fixtures/duringdevelop-fullstore-snapshot-1548538361');
-const walletStoreMock = require('../../../../fixtures/wallets/c922713eac.json');
-const chainStoreMock = require('../../../../fixtures/chains/for_wallet_c922713eac.json');
 const KeyChainStore = require("../../KeyChainStore/KeyChainStore");
-const Storage = require("../../Storage/Storage");
+const mockAccountWithStorage = require("../../../test/mocks/mockAccountWithStorage");
 
 const HDRootKeyMockedStore = 'tprv8gpcZgdXPzdXKBjSzieMyfwr6KidKucLiiA9VbCLCx1spyJNd38a5KdjtVuc9bVUNpFM2LdFCrYSyUXHx1RCTdr6qQen1HTECwAZ1p8yqiB';
 
@@ -18,22 +14,9 @@ describe('Account - getUnusedAddress', function suite() {
   let mockedAccount;
 
   before(() => {
-    const { walletId } = walletStoreMock;
-
-    mockedAccount = {
-      emit: (_) => (_),
-      walletId,
-      index: 0,
-      storage: new Storage(),
-      accountPath: "m/44'/1'/0'",
-      network: "testnet",
+    mockedAccount = mockAccountWithStorage({
       keyChainStore: new KeyChainStore()
-    };
-
-    mockedAccount.storage.createWalletStore(walletId)
-    mockedAccount.storage.createChainStore("testnet")
-    mockedAccount.storage.getWalletStore(walletId).importState(walletStoreMock)
-    mockedAccount.storage.getChainStore("testnet").importState(chainStoreMock)
+    })
 
     const keyChain = new KeyChain({
       type: 'HDPrivateKey',

@@ -1,32 +1,16 @@
 const { expect } = require('chai');
-const walletStoreMock = require('../../../../fixtures/wallets/c922713eac.json');
-const chainStoreMock = require('../../../../fixtures/chains/for_wallet_c922713eac.json');
 const getTotalBalance = require('./getTotalBalance');
 const getConfirmedBalance = require('./getConfirmedBalance');
 const getUnconfirmedBalance = require('./getUnconfirmedBalance');
-const Storage = require("../../Storage/Storage");
-
+const mockAccountWithStorage = require("../../../test/mocks/mockAccountWithStorage");
 
 let mockedAccount;
 describe('Account - getTotalBalance', function suite() {
   this.timeout(10000);
   before(() => {
-    const { walletId } = walletStoreMock;
-
-    mockedAccount = {
-      walletId,
-      index: 0,
-      storage: new Storage(),
-      accountPath: "m/44'/1'/0'",
-      network: "testnet"
-    };
-
-    mockedAccount.storage.createWalletStore(walletId)
-    mockedAccount.storage.createChainStore("testnet")
-    mockedAccount.storage.getWalletStore(walletId).importState(walletStoreMock)
-    mockedAccount.storage.getChainStore("testnet").importState(chainStoreMock)
+    mockedAccount = mockAccountWithStorage()
   });
-  it('should correctly get the balance',  () => {
+  it('should correctly get the balance',() => {
     const balance = getTotalBalance.call(mockedAccount);
     expect(balance).to.equal(224108673);
   });
