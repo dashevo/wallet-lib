@@ -1,3 +1,5 @@
+const { cloneDeep } = require('lodash');
+
 function exportState() {
   const { walletId } = this;
   const { mnemonic, paths, identities } = this.state;
@@ -6,8 +8,8 @@ function exportState() {
     walletId,
     state: {
       mnemonic,
-      paths: Object.fromEntries(paths),
-      identities: Object.fromEntries(identities),
+      paths: cloneDeep(Object.fromEntries(paths)),
+      identities: cloneDeep(Object.fromEntries(identities)),
     },
   };
 }
