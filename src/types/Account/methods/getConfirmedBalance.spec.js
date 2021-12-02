@@ -1,43 +1,36 @@
 const { expect } = require('chai');
-const mockedStore = require('../../../../fixtures/sirentonight-fullstore-snapshot-1562711703');
 const getTotalBalance = require('./getTotalBalance');
 const getConfirmedBalance = require('./getConfirmedBalance');
 const getUnconfirmedBalance = require('./getUnconfirmedBalance');
-const { duffsToDash, calculateDuffBalance } = require('../../../utils');
+const mockAccountWithStorage = require("../../../test/mocks/mockAccountWithStorage");
 
 
-let mockedWallet;
+let mockedAccount;
 describe('Account - getTotalBalance', function suite() {
   this.timeout(10000);
   before(() => {
-    const storageHDW = {
-      store: mockedStore,
-      calculateDuffBalance,
-      getStore: () => mockedStore,
-      mappedAddress: {},
-    };
-    const walletId = Object.keys(mockedStore.wallets)[0];
-    mockedWallet = {
-      walletId,
-      index: 0,
-      storage: storageHDW,
-    };
+    mockedAccount = mockAccountWithStorage()
   });
-  it('should correctly get the balance', async () => {
-    const balance = await getTotalBalance.call(mockedWallet);
-    expect(balance).to.equal(184499999506);
-  });
-  it('should correctly get the balance confirmed only', async () => {
-    const balance = await getConfirmedBalance.call(mockedWallet);
-    expect(balance).to.equal(184499999506);
-  });
-  it('should correctly get the balance dash value instead of duff', async () => {
-    const balanceTotalDash = await getTotalBalance.call(mockedWallet, false);
-    const balanceUnconfDash = await getUnconfirmedBalance.call(mockedWallet, false);
-    const balanceConfDash = await getConfirmedBalance.call(mockedWallet, false);
 
-    expect(balanceTotalDash).to.equal(1844.99999506);
+  it('should correctly get the balance', () => {
+    const balance = getTotalBalance.call(mockedAccount);
+    expect(balance).to.equal(224108673);
+  });
+
+  it('should correctly get the balance confirmed only', () => {
+    const balance = getConfirmedBalance.call(mockedAccount);
+    expect(balance).to.equal(224108673);
+  });
+
+  // TODO: file looks like a complete duplicate of the getTotalBalance.spec.js
+  // Should we actually mock and test confirmed balance?
+  it('should correctly get the balance dash value instead of duff', () => {
+    const balanceTotalDash = getTotalBalance.call(mockedAccount, false);
+    const balanceUnconfDash = getUnconfirmedBalance.call(mockedAccount, false);
+    const balanceConfDash = getConfirmedBalance.call(mockedAccount, false);
+
+    expect(balanceTotalDash).to.equal(2.24108673);
     expect(balanceUnconfDash).to.equal(0);
-    expect(balanceConfDash).to.equal(1844.99999506);
+    expect(balanceConfDash).to.equal(2.24108673);
   });
 });
