@@ -7,13 +7,13 @@ const getUnconfirmedBalance = require('./getUnconfirmedBalance');
 const Storage = require("../../Storage/Storage");
 
 
-let mockedWallet;
+let mockedAccount;
 describe('Account - getTotalBalance', function suite() {
   this.timeout(10000);
   before(() => {
     const { walletId } = walletStoreMock;
 
-    mockedWallet = {
+    mockedAccount = {
       walletId,
       index: 0,
       storage: new Storage(),
@@ -21,23 +21,23 @@ describe('Account - getTotalBalance', function suite() {
       network: "testnet"
     };
 
-    mockedWallet.storage.createWalletStore(walletId)
-    mockedWallet.storage.createChainStore("testnet")
-    mockedWallet.storage.getWalletStore(walletId).importState(walletStoreMock)
-    mockedWallet.storage.getChainStore("testnet").importState(chainStoreMock)
+    mockedAccount.storage.createWalletStore(walletId)
+    mockedAccount.storage.createChainStore("testnet")
+    mockedAccount.storage.getWalletStore(walletId).importState(walletStoreMock)
+    mockedAccount.storage.getChainStore("testnet").importState(chainStoreMock)
   });
   it('should correctly get the balance',  () => {
-    const balance = getTotalBalance.call(mockedWallet);
+    const balance = getTotalBalance.call(mockedAccount);
     expect(balance).to.equal(224108673);
   });
   it('should correctly get the balance confirmed only',  () => {
-    const balance = getConfirmedBalance.call(mockedWallet);
+    const balance = getConfirmedBalance.call(mockedAccount);
     expect(balance).to.equal(224108673);
   });
   it('should correctly get the balance dash value instead of duff',  () => {
-    const balanceTotalDash = getTotalBalance.call(mockedWallet, false);
-    const balanceUnconfDash = getUnconfirmedBalance.call(mockedWallet, false);
-    const balanceConfDash = getConfirmedBalance.call(mockedWallet, false);
+    const balanceTotalDash = getTotalBalance.call(mockedAccount, false);
+    const balanceUnconfDash = getUnconfirmedBalance.call(mockedAccount, false);
+    const balanceConfDash = getConfirmedBalance.call(mockedAccount, false);
 
     expect(balanceTotalDash).to.equal(2.24108673);
     expect(balanceUnconfDash).to.equal(0);

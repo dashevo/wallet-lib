@@ -11,17 +11,16 @@ const chainStoreMock = require('../../../../fixtures/chains/for_wallet_c922713ea
 const KeyChainStore = require("../../KeyChainStore/KeyChainStore");
 const Storage = require("../../Storage/Storage");
 
-// const HDRootKeyMockedStore = 'tprv8ZgxMBicQKsPfEan1JB7NF4STbvnjGvP9318CN7FPGZp5nsUTBqmerxtDVpsJjFufyfkTgoe6QfHcDhMqjN3ZoFKtb8SnXFeubNjQreZSq6';
-const HDRootKeyMockedStore = 'tprv8ZgxMBicQKsPedfdHYgWfJFn2Nu1p7Vr7AnsXRX9pAQsj83QmEv6S27Fd66o7opsMJsc1G8xMmAWXevKPAA7FSbziZ9cHyJoGpHXyDykR8g';
+const HDRootKeyMockedStore = 'tprv8gpcZgdXPzdXKBjSzieMyfwr6KidKucLiiA9VbCLCx1spyJNd38a5KdjtVuc9bVUNpFM2LdFCrYSyUXHx1RCTdr6qQen1HTECwAZ1p8yqiB';
 
 describe('Account - getUnusedAddress', function suite() {
   this.timeout(10000);
-  let mockedWallet;
+  let mockedAccount;
 
   before(() => {
     const { walletId } = walletStoreMock;
 
-    mockedWallet = {
+    mockedAccount = {
       emit: (_) => (_),
       walletId,
       index: 0,
@@ -31,10 +30,10 @@ describe('Account - getUnusedAddress', function suite() {
       keyChainStore: new KeyChainStore()
     };
 
-    mockedWallet.storage.createWalletStore(walletId)
-    mockedWallet.storage.createChainStore("testnet")
-    mockedWallet.storage.getWalletStore(walletId).importState(walletStoreMock)
-    mockedWallet.storage.getChainStore("testnet").importState(chainStoreMock)
+    mockedAccount.storage.createWalletStore(walletId)
+    mockedAccount.storage.createChainStore("testnet")
+    mockedAccount.storage.getWalletStore(walletId).importState(walletStoreMock)
+    mockedAccount.storage.getChainStore("testnet").importState(chainStoreMock)
 
     const keyChain = new KeyChain({
       type: 'HDPrivateKey',
@@ -47,40 +46,26 @@ describe('Account - getUnusedAddress', function suite() {
       }
     });
 
-    mockedWallet.keyChainStore.addKeyChain(keyChain, { isMasterKeyChain: true });
+    mockedAccount.keyChainStore.addKeyChain(keyChain, { isMasterKeyChain: true });
 
-
-    mockedWallet.getAddress = getAddress.bind(mockedWallet);
-    mockedWallet.generateAddress = generateAddress.bind(mockedWallet);
+    mockedAccount.getAddress = getAddress.bind(mockedAccount);
+    mockedAccount.generateAddress = generateAddress.bind(mockedAccount);
   })
 
   it('should get the proper unused address', () => {
-    // const unusedAddressExternal = getUnusedAddress.call(mockedWallet);
-    const unusedAddressInternal = getUnusedAddress.call(mockedWallet, 'internal');
+    const unusedAddressExternal = getUnusedAddress.call(mockedAccount);
+    const unusedAddressInternal = getUnusedAddress.call(mockedAccount, 'internal');
 
-    console.log(unusedAddressInternal)
+    expect(unusedAddressExternal).to.be.deep.equal({
+      address: 'ycuRYGdNudwRxKNDQBqHDW7aGbJU6uqhXo',
+      index: 1,
+      path: 'm/0/1'
+    });
 
-    // ybPPRHGDK6HUjAapixJaHjpFrBP7p1eNHX
-
-    // expect(unusedAddressExternal).to.be.deep.equal({
-    //   address: 'yaVrJ5dgELFkYwv6AydDyGPAJQ5kTJXyAN',
-    //   balanceSat: 0,
-    //   fetchedLast: 1548538385006,
-    //   path: 'm/44\'/1\'/0\'/0/5',
-    //   transactions: [],
-    //   unconfirmedBalanceSat: 0,
-    //   utxos: {},
-    //   used: false,
-    // });
-    // expect(unusedAddressInternal).to.be.deep.equal({
-    //   address: 'yaZFt1VnAbi72mtyjDNV4AwTECqdg5Bv95',
-    //   balanceSat: 0,
-    //   fetchedLast: 1548538385164,
-    //   path: 'm/44\'/1\'/0\'/1/8',
-    //   transactions: [],
-    //   unconfirmedBalanceSat: 0,
-    //   utxos: {},
-    //   used: false,
-    // });
+    expect(unusedAddressInternal).to.be.deep.equal({
+      address: 'ybPPRHGDK6HUjAapixJaHjpFrBP7p1eNHX',
+      path: 'm/1/40',
+      index: 40
+    });
   });
 });
