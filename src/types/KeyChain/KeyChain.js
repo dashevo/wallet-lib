@@ -93,6 +93,7 @@ class KeyChain {
 KeyChain.prototype.getForPath = require('./methods/getForPath');
 KeyChain.prototype.getForAddress = require('./methods/getForAddress');
 KeyChain.prototype.getDIP15ExtendedKey = require('./methods/getDIP15ExtendedKey');
+KeyChain.prototype.getFirstUnusedAddress = require('./methods/getFirstUnusedAddress');
 KeyChain.prototype.getHardenedBIP44HDKey = require('./methods/getHardenedBIP44HDKey');
 KeyChain.prototype.getHardenedDIP9FeatureHDKey = require('./methods/getHardenedDIP9FeatureHDKey');
 KeyChain.prototype.getHardenedDIP15AccountKey = require('./methods/getHardenedDIP15AccountKey');

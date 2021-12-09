@@ -58,7 +58,7 @@ export declare class Account {
     getAddresses(_type: AddressType): [AddressObj];
     getBlockHeader(identifier: string|number):Promise<BlockHeader>
     getConfirmedBalance(displayDuffs?: boolean): number;
-    getPlugin(name: string): Object;
+    getPlugin(name: string): any;
     getPrivateKeys(addressList: [PublicAddress]): [PrivateKey];
     getTotalBalance(displayDuffs?: boolean): number;
     getTransaction(txid: transactionId): Transaction;

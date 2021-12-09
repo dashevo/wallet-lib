@@ -6,10 +6,13 @@ function markAddressAsUsed(address) {
   const searchResult = [...this.issuedPaths.entries()]
     .find(([, el]) => el.address.toString() === address.toString());
 
-  const [, addressData] = searchResult;
+  if (searchResult) {
+    const [, addressData] = searchResult;
 
-  addressData.isUsed = true;
+    addressData.isUsed = true;
 
-  return this.maybeLookAhead();
+    return this.maybeLookAhead();
+  }
+
 }
 module.exports = markAddressAsUsed;

@@ -66,7 +66,7 @@ describe('Wallet - HDPublicKey', function suite() {
         .then((account)=>{
           const unusedAddress = account.getUnusedAddress();
           const expectedUnused = {
-            path: "m/44'/1'/0'/0/0",
+            path: "m/0/0",
             index: 0,
             address: 'yNJ3xxTXXBBf39VfMBbBuLH2k57uAwxBxj',
             transactions: [],

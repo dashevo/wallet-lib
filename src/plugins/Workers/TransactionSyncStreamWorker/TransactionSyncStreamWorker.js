@@ -50,12 +50,11 @@ class TransactionSyncStreamWorker extends Worker {
    * @param {string[]} addressList
    * @param {string} network
    */
-  static filterWalletTransactions(transactions, addressList, network) {
+  static filterAddressesTransactions(transactions, addressList, network) {
     const spentOutputs = [];
     const unspentOutputs = [];
     const filteredTransactions = transactions.filter((tx) => {
       let isWalletTransaction = false;
-
       tx.inputs.forEach((input) => {
         if (input.script) {
           const addr = input.script.toAddress(network).toString();
@@ -139,7 +138,7 @@ class TransactionSyncStreamWorker extends Worker {
 
     if (skipSynchronization) {
       logger.debug('TransactionSyncStreamWorker - Wallet created from a new mnemonic. Sync from the best block height.');
-      const bestBlockHeight = this.storage.store.chains[this.network.toString()].blockHeight;
+      const bestBlockHeight = this.storage.getChainStore(this.network.toString()).blockHeight;
       this.setLastSyncedBlockHeight(bestBlockHeight);
       return;
     }

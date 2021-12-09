@@ -9,11 +9,15 @@ describe('Wallet#getIdentityHDKeyById', function suite() {
   this.timeout(10000);
   before(() => {
     expectedKeyMock = "123";
+    const walletStoreMock = {
+        getIndexedIdentityIds: () => mockedStore.wallets[Object.keys(mockedStore.wallets)].identityIds
+    }
+
     const storageMock = {
       store: mockedStore,
       getStore: () => mockedStore,
       mappedAddress: {},
-      getIndexedIdentityIds: () => mockedStore.wallets[Object.keys(mockedStore.wallets)].identityIds,
+      getWalletStore:  () => walletStoreMock,
     };
     const walletId = Object.keys(mockedStore.wallets)[0];
     walletMock = {

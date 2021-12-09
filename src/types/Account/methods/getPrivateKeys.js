@@ -16,7 +16,9 @@ function getPrivateKeys(addressList) {
 
   addresses.forEach((address) => {
     const addressData = keyChain.getForAddress(address);
-    privKeys.push(addressData.key);
+    if (addressData) {
+      privKeys.push(addressData.key);
+    }
   });
 
   return privKeys;

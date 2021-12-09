@@ -7,6 +7,8 @@ const { mnemonic } = require('../../../../fixtures/wallets/mnemonics/during-deve
 const FixtureTransport = require('../../../transport/FixtureTransport/FixtureTransport');
 
 const getUTXOS = require('./getUTXOS');
+const getPrivateKeys = require('./getPrivateKeys');
+const getUnusedAddress = require('./getUnusedAddress');
 const { simpleDescendingAccumulator } = require('../../../utils/coinSelections/strategies');
 
 const addressesFixtures = require('../../../../fixtures/addresses.json');
@@ -14,18 +16,17 @@ const fixtureUTXOS = require('../../../transport/FixtureTransport/data/utxos/yQ1
 const validStore = require('../../../../fixtures/walletStore').valid.orange.store;
 
 const craftedGenerousMinerStrategy = require('../../../../fixtures/strategies/craftedGenerousMinerStrategy');
+const mockAccountWithStorage = require("../../../test/mocks/mockAccountWithStorage");
 
 describe('Account - createTransaction', function suite() {
   this.timeout(10000);
   let mockWallet;
 
   it('sould warn on missing inputs', function () {
-    const self = {
-      store: validStore,
-      walletId: 'a3771aaf93',
-      getUTXOS,
-      network: 'testnet'
-    };
+    const self = mockAccountWithStorage()
+    self.getUTXOS = getUTXOS;
+    self.getUnusedAddress = getUnusedAddress;
+    self.getPrivateKeys = getPrivateKeys;
 
     const mockOpts1 = {};
     const mockOpts2 = {
