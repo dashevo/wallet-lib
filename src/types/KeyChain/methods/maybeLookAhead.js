@@ -43,10 +43,6 @@ function maybeLookAhead() {
         const addressData = this.issuedPaths.get(path);
 
         const currentIndex = parseInt(path.split('/').splice(-1), 10);
-        if (prevIndex !== undefined && prevIndex !== currentIndex - 1) {
-          // FIXME: May be we should generate ?
-          throw new Error('Addresses are expected to be contiguous');
-        }
 
         if (addressData.isUsed) {
           lastUsedIndexes[basePath] = currentIndex;

@@ -10,7 +10,9 @@ class Storage extends EventEmitter {
     super();
     this.wallets = new Map();
     this.chains = new Map();
-    this.application = {};
+    this.application = {
+      blockHeight: 0,
+    };
   }
 }
 

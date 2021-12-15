@@ -30,14 +30,20 @@ const determineType = (inputsDetection, outputsDetection) => {
   return type;
 };
 
-function categorizeTransactions(transactionsWithMetadata, accountStore, accountIndex, walletType, network = 'testnet') {
+function categorizeTransactions(
+  transactionsWithMetadata,
+  walletStore,
+  accountIndex,
+  walletType,
+  network,
+) {
   const categorizedTransactions = [];
 
   const {
-    externalAddressList,
-    internalAddressList,
-    otherAccountAddressList,
-  } = classifyAddresses(accountStore.addresses, accountIndex, walletType);
+    externalAddressesList,
+    internalAddressesList,
+    otherAccountAddressesList,
+  } = classifyAddresses(walletStore, accountIndex, walletType, network);
 
   each(transactionsWithMetadata, (transactionWithMetadata) => {
     const [transaction, metadata] = transactionWithMetadata;
@@ -57,9 +63,9 @@ function categorizeTransactions(transactionsWithMetadata, accountStore, accountI
       const { satoshis, script } = vout;
       const address = script.toAddress(network).toString();
       if (address) {
-        if (internalAddressList.includes(address)) outputsHasChangeAddress = true;
-        if (externalAddressList.includes(address)) outputsHasExternalAddress = true;
-        if (otherAccountAddressList.includes(address)) outputsHasOtherAccountAddress = true;
+        if (internalAddressesList.includes(address)) outputsHasChangeAddress = true;
+        if (externalAddressesList.includes(address)) outputsHasExternalAddress = true;
+        if (otherAccountAddressesList.includes(address)) outputsHasOtherAccountAddress = true;
         to.push({
           address,
           satoshis,
@@ -72,9 +78,9 @@ function categorizeTransactions(transactionsWithMetadata, accountStore, accountI
       const { script } = vin;
       const address = script.toAddress(network).toString();
       if (address) {
-        if (internalAddressList.includes(address)) inputsHasChangeAddress = true;
-        if (externalAddressList.includes(address)) inputsHasExternalAddress = true;
-        if (otherAccountAddressList.includes(address)) inputsHasOtherAccountAddress = true;
+        if (internalAddressesList.includes(address)) inputsHasChangeAddress = true;
+        if (externalAddressesList.includes(address)) inputsHasExternalAddress = true;
+        if (otherAccountAddressesList.includes(address)) inputsHasOtherAccountAddress = true;
         from.push({
           address,
         });

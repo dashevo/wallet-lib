@@ -4,10 +4,16 @@
  */
 module.exports = function getTransactions() {
   const chainStore = this.storage.getChainStore(this.network);
+  const walletStore = this.storage.getWalletStore(this.walletId);
   const transactions = [];
-  const { addresses } = this.storage.getWalletStore(this.walletId).getPathState(this.accountPath);
+  const { addresses } = walletStore.getPathState(this.accountPath);
+
   Object.values(addresses).forEach((address) => {
-    transactions.push(...chainStore.getAddress(address).transactions);
+    const transactionIds = chainStore.getAddress(address).transactions;
+    transactionIds.forEach((transactionId) => {
+      const tx = chainStore.getTransaction(transactionId);
+      transactions.push([tx.transaction, tx.metadata]);
+    });
   });
   return transactions;
 };

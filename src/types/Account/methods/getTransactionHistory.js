@@ -1,8 +1,6 @@
 const { each } = require('lodash');
 const {
-  filterTransactions,
   categorizeTransactions,
-  extendTransactionsWithMetadata,
   // calculateTransactionFees,
 } = require('../../../utils');
 
@@ -24,78 +22,49 @@ function getTransactionHistory() {
     network,
   } = this;
 
-  const transactions = this.getTransactions();
+  const transactionsWithMetadata = this.getTransactions();
 
+  const walletStore = storage.getWalletStore(walletId);
   const chainStore = storage.getChainStore(network);
-  const { blockHeaders } = chainStore;
+  const { blockHeaders } = chainStore.state;
 
-  // const { wallets: walletStore, transactionsMetadata } = store;
+  const categorizedTransactions = categorizeTransactions(transactionsWithMetadata, walletStore, accountIndex, walletType, network);
+  const sortedCategorizedTransactions = categorizedTransactions.sort(sortByHeightDescending);
 
-  // const accountStore = walletStore[walletId];
+  each(sortedCategorizedTransactions, (categorizedTransaction) => {
+    const {
+      transaction,
+      from,
+      to,
+      type,
+      isChainLocked,
+      isInstantLocked,
+    } = categorizedTransaction;
+    const blockHash = categorizedTransaction.blockHash !== '' ? categorizedTransaction.blockHash : null;
+    // To get time of block, let's find the blockheader.
+    const blockHeader = blockHeaders.get(blockHash);
+    // If it's unconfirmed, we won't have a blockHeader nor it's time.
+    const time = blockHeader ? blockHeader.time : -1;
 
-  // In store, not all transaction are specific to this account, we filter our transactions.
-  // const filteredTransactions = filterTransactions(
-  //   accountStore,
-  //   walletType,
-  //   accountIndex,
-  //   transactions,
-  // );
-  // const filteredTransactionsWithMetadata = extendTransactionsWithMetadata(
-  //   filteredTransactions,
-  //   transactionsMetadata,
-  // );
+    const normalizedTransactionHistory = {
+    // Would require knowing the vout of this vin to determinate inputAmount.
+    // This information could be fetched, but the necessity vs the cost is questionable.
+    //   fees: calculateTransactionFees(categorizedTransaction.transaction),
+      from,
+      to,
+      type,
+      time,
+      txId: transaction.hash,
+      blockHash,
+      isChainLocked,
+      isInstantLocked,
+    };
 
-  const transactionsWithMetadata = [];
-  transactions.forEach((transactionId) => {
-    console.log(chainStore.getTransaction(transactionId));
+    transactionHistory.push(normalizedTransactionHistory);
   });
 
-  // const categorizedTransactions = categorizeTransactions(
-  // transactionsWithMetadata,
-  // accountStore,
-  // accountIndex,
-  // walletType,
-  // network,
-  // );
-  //
-  // const sortedCategorizedTransactions = categorizedTransactions.sort(sortByHeightDescending);
-  //
-  // each(sortedCategorizedTransactions, (categorizedTransaction) => {
-  //   const {
-  //     transaction,
-  //     from,
-  //     to,
-  //     type,
-  //     isChainLocked,
-  //     isInstantLocked,
-  //   } = categorizedTransaction;
-  //
-  //   const blockHash = categorizedTransaction.blockHash !== '' ? categorizedTransaction.blockHash : null;
-  //
-  //   To get time of block, let's find the blockheader.
-  // const blockHeader = blockHeaders[blockHash];
-  //
-  // If it's unconfirmed, we won't have a blockHeader nor it's time.
-  // const time = blockHeader ? blockHeader.time : -1;
-
-  // const normalizedTransactionHistory = {
-  // Would require knowing the vout of this vin to determinate inputAmount.
-  // This information could be fetched, but the necessity vs the cost is questionable.
-  // fees: calculateTransactionFees(categorizedTransaction.transaction),
-  // from,
-  // to,
-  // type,
-  // time,
-  // txId: transaction.hash,
-  // blockHash,
-  // isChainLocked,
-  // isInstantLocked,
-  // };
-
-  // transactionHistory.push(normalizedTransactionHistory);
-  // });
   // Sort by decreasing time.
-  // return transactionHistory.sort(sortbyTimeDescending);
+  return transactionHistory.sort(sortbyTimeDescending);
 }
 
 module.exports = getTransactionHistory;
