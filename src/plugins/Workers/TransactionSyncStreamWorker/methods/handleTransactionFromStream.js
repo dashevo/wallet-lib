@@ -7,7 +7,6 @@ async function handleTransactionFromStream(transaction) {
   // eslint-disable-next-line no-restricted-syntax
   // eslint-disable-next-line no-underscore-dangle
   const transactionHash = transaction.hash;
-
   this.pendingRequest[transactionHash] = { isProcessing: true, type: 'transaction' };
   // eslint-disable-next-line no-await-in-loop
   const getTransactionResponse = await this.transport.getTransaction(transactionHash);
@@ -62,8 +61,8 @@ async function handleTransactionFromStream(transaction) {
   const metadata = {
     blockHash: getTransactionResponse.blockHash,
     height: getTransactionResponse.height,
-    instantLocked: getTransactionResponse.instantLocked,
-    chainLocked: getTransactionResponse.chainLocked,
+    instantLocked: getTransactionResponse.isInstantLocked,
+    chainLocked: getTransactionResponse.isChainLocked,
   };
 
   delete this.pendingRequest[transactionHash];

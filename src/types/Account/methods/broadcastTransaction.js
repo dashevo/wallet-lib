@@ -6,29 +6,62 @@ const {
   InvalidDashcoreTransaction,
 } = require('../../../errors');
 
-function impactAffectedInputs({ inputs }) {
+function impactAffectedInputs({ transaction }) {
   const {
-    storage, walletId,
+    storage, network,
   } = this;
 
+  const { inputs, changeIndex } = transaction.toObject();
+  const txid = transaction.hash;
+
+  const addresses = storage.getChainStore(network).getAddresses();
   // We iterate out input to substract their balance.
   inputs.forEach((input) => {
-    const potentiallySelectedAddresses = storage.searchAddressesWithTx(input.prevTxId);
-    // Fixme : If you want this check, you will need to modify fixtures of our tests.
-    // if (!potentiallySelectedAddresses.found) {
-    //   throw new Error('Input is not part of that Wallet.');
-    // }
-    potentiallySelectedAddresses.results.forEach((potentiallySelectedAddress) => {
-      const { type, path } = potentiallySelectedAddress;
-      if (potentiallySelectedAddress.utxos[`${input.prevTxId}-${input.outputIndex}`]) {
-        const inputUTXO = potentiallySelectedAddress.utxos[`${input.prevTxId}-${input.outputIndex}`];
-        const address = storage.store.wallets[walletId].addresses[type][path];
+    const potentiallySelectedAddresses = [...addresses]
+      .reduce((acc, [address, { transactions }]) => {
+        if (transactions.includes(input.prevTxId)) acc.push(address);
+        return acc;
+      }, []);
+
+    potentiallySelectedAddresses.forEach((potentiallySelectedAddress) => {
+      // console.log(addresses.get(pot));
+      const addressData = addresses.get(potentiallySelectedAddress);
+      if (addressData.utxos[`${input.prevTxId}-${input.outputIndex}`]) {
+        const inputUTXO = addressData.utxos[`${input.prevTxId}-${input.outputIndex}`];
+        // const address = storage.store.wallets[walletId].addresses[type][path];
         // Todo: This modify the balance of an address, we need a std method to do that instead.
-        address.balanceSat -= inputUTXO.satoshis;
-        delete address.utxos[`${input.prevTxId}-${input.outputIndex}`];
+        addressData.balanceSat -= inputUTXO.satoshis;
+        delete addressData.utxos[`${input.prevTxId}-${input.outputIndex}`];
       }
     });
   });
+
+  const changeOutput = transaction.getChangeOutput();
+  if (changeOutput) {
+    const addressString = changeOutput.script.toAddress(network).toString();
+
+    const address = addresses.get(addressString);
+    const utxoKey = `${txid}-${changeIndex}`;
+
+    /**
+     * In some cases, `Storage#importTransaction` function gets called before the
+     * `impactAffectedInputs`and this utxo being written as a confirmed one.
+     * Skip creation of the unconfirmed UTXOs for such cases.
+     */
+    if (!address.utxos[utxoKey]) {
+      address.utxos[utxoKey] = new Dashcore.Transaction.UnspentOutput(
+        {
+          txId: txid,
+          vout: changeIndex,
+          script: changeOutput.script,
+          satoshis: changeOutput.satoshis,
+          address: addressString,
+        },
+      );
+      address.unconfirmedBalanceSat = changeOutput.satoshis;
+      address.used = true;
+    }
+  }
 
   return true;
 }
@@ -42,7 +75,6 @@ function impactAffectedInputs({ inputs }) {
  */
 async function broadcastTransaction(transaction, options = {}) {
   const { network, storage } = this;
-  const { chains } = storage.getStore();
   if (!this.transport) throw new ValidTransportLayerRequired('broadcast');
 
   // We still support having in rawtransaction, if this is the case
@@ -61,8 +93,7 @@ async function broadcastTransaction(transaction, options = {}) {
     throw new Error('Transaction not signed.');
   }
 
-  const { inputs } = transaction.toObject();
-  const { minRelay: minRelayFeeRate } = chains[network.toString()].fees;
+  const { minRelay: minRelayFeeRate } = storage.getChainStore(network).state.fees;
 
   // eslint-disable-next-line no-underscore-dangle
   const estimateKbSize = transaction._estimateSize() / 1000;
@@ -78,9 +109,8 @@ async function broadcastTransaction(transaction, options = {}) {
   // We now need to impact/update our affected inputs
   // so we clear them out from UTXOset.
   impactAffectedInputs.call(this, {
-    inputs,
+    transaction,
   });
-
   return txid;
 }
 

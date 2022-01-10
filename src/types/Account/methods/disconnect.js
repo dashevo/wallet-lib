@@ -20,7 +20,6 @@ module.exports = async function disconnect() {
   }
   if (this.storage) {
     await this.storage.saveState();
-    await this.storage.stopWorker();
   }
   if (this.removeAllListeners) this.removeAllListeners();
   if (this.storage.removeAllListeners) this.storage.removeAllListeners();

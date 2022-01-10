@@ -91,13 +91,13 @@ export declare type broadcastTransactionOpts<T extends object = object> = T & {
 export declare type AddressInfo<T extends AddressObj = AddressObj> = T & {
     path: string;
     address: string;
-    balanceSat: number;
     index: number;
-    fetchedLast:number;
+    transaction: [object];
+    balanceSat: number;
     unconfirmedBalanceSat: number;
-    transaction: object;
-    used:boolean;
     utxos:[object]
+    fetchedLast:number;
+    used:boolean;
 }
 
 export declare type Network = "livenet" | "testnet" | "evonet" | "regtest" | "local" | "devnet" | "mainnet";

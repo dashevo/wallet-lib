@@ -25,6 +25,7 @@ class TransactionSyncStreamWorker extends Worker {
         'importBlockHeader',
         'importInstantLock',
         'storage',
+        'keyChainStore',
         'transport',
         'walletId',
         'getAddress',
@@ -49,12 +50,11 @@ class TransactionSyncStreamWorker extends Worker {
    * @param {string[]} addressList
    * @param {string} network
    */
-  static filterWalletTransactions(transactions, addressList, network) {
+  static filterAddressesTransactions(transactions, addressList, network) {
     const spentOutputs = [];
     const unspentOutputs = [];
     const filteredTransactions = transactions.filter((tx) => {
       let isWalletTransaction = false;
-
       tx.inputs.forEach((input) => {
         if (input.script) {
           const addr = input.script.toAddress(network).toString();
@@ -124,7 +124,6 @@ class TransactionSyncStreamWorker extends Worker {
         .getMessagesList()
         .map((instantSendLock) => new InstantLock(Buffer.from(instantSendLock)));
     }
-
     return walletTransactions;
   }
 
@@ -135,11 +134,11 @@ class TransactionSyncStreamWorker extends Worker {
     const {
       skipSynchronizationBeforeHeight,
       skipSynchronization,
-    } = (this.storage.store.syncOptions || {});
+    } = (this.storage.application.syncOptions || {});
 
     if (skipSynchronization) {
       logger.debug('TransactionSyncStreamWorker - Wallet created from a new mnemonic. Sync from the best block height.');
-      const bestBlockHeight = this.storage.store.chains[this.network.toString()].blockHeight;
+      const bestBlockHeight = this.storage.getChainStore(this.network.toString()).blockHeight;
       this.setLastSyncedBlockHeight(bestBlockHeight);
       return;
     }
@@ -238,25 +237,15 @@ class TransactionSyncStreamWorker extends Worker {
   }
 
   setLastSyncedBlockHash(hash) {
-    const { walletId } = this;
-    const accountsStore = this.storage.store.wallets[walletId].accounts;
+    const applicationStore = this.storage.application;
 
-    const accountStore = ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(this.walletType))
-      ? accountsStore[this.BIP44PATH.toString()]
-      : accountsStore[this.index.toString()];
+    applicationStore.blockHash = hash;
 
-    accountStore.blockHash = hash;
-
-    return accountStore.blockHash;
+    return applicationStore.blockHash;
   }
 
   getLastSyncedBlockHash() {
-    const { walletId } = this;
-    const accountsStore = this.storage.store.wallets[walletId].accounts;
-
-    const { blockHash } = ([WALLET_TYPES.HDWALLET, WALLET_TYPES.HDPUBLIC].includes(this.walletType))
-      ? accountsStore[this.BIP44PATH.toString()]
-      : accountsStore[this.index.toString()];
+    const { blockHash } = this.storage.application;
 
     return blockHash;
   }

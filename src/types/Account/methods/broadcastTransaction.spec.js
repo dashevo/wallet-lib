@@ -4,7 +4,7 @@ const broadcastTransaction = require('./broadcastTransaction');
 const validRawTxs = require('../../../../fixtures/rawtx').valid;
 const invalidRawTxs = require('../../../../fixtures/rawtx').invalid;
 const expectThrowsAsync = require('../../../utils/expectThrowsAsync');
-
+const ChainStore = require('../../ChainStore/ChainStore');
 const { PrivateKey } = Dashcore;
 
 describe('Account - broadcastTransaction', function suite() {
@@ -14,12 +14,14 @@ describe('Account - broadcastTransaction', function suite() {
   let keysToSign;
   let oneToOneTx;
   let fee;
+  // const storage = new Storage();
+  // storage.createChainStore('testnet')
+  // storage.getChainStore('testnet').state.fees.minRelay = 888;
+  const chainStore = new ChainStore('testnet');
+  chainStore.state.fees.minRelay = 888;
+  chainStore.importAddress('yTBXsrcGw74yMUsK34fBKAWJx3RNCq97Aq');
   const storage = {
-    getStore: ()=>({
-      chains:{
-          "testnet": { fees: { minRelay: 888 }}
-      }
-    })
+    getChainStore:()=> chainStore
   }
   beforeEach(() => {
     utxos = [
@@ -87,11 +89,7 @@ describe('Account - broadcastTransaction', function suite() {
         sendTransaction: () => sendCalled = +1,
       },
       network: 'testnet',
-      storage: {
-        getStore: storage.getStore,
-        searchAddress: () => { searchCalled = +1; return { found: false }; },
-        searchAddressesWithTx: () => { searchCalled = +1; return { results: [] }; },
-      },
+      storage
     };
 
     const tx = oneToOneTx;
@@ -109,11 +107,7 @@ describe('Account - broadcastTransaction', function suite() {
         sendTransaction: () => sendCalled = +1,
       },
       network: 'testnet',
-      storage: {
-        getStore: storage.getStore,
-        searchAddress: () => { searchCalled = +1; return { found: false }; },
-        searchAddressesWithTx: (affectedTxId) => { searchCalled = +1; return { results: [] }; },
-      },
+      storage
     };
 
     return broadcastTransaction
@@ -132,11 +126,7 @@ describe('Account - broadcastTransaction', function suite() {
         sendTransaction: () => sendCalled = +1,
       },
       network: 'testnet',
-      storage: {
-        getStore: storage.getStore,
-        searchAddress: () => { searchCalled = +1; return { found: false }; },
-        searchAddressesWithTx: () => { searchCalled = +1; return { results: [] }; },
-      },
+      storage
     };
 
     const tx = oneToOneTx;
@@ -151,11 +141,7 @@ describe('Account - broadcastTransaction', function suite() {
         sendTransaction: () => sendCalled = +1,
       },
       network: 'testnet',
-      storage: {
-        getStore: storage.getStore,
-        searchAddress: () => { searchCalled = +1; return { found: false }; },
-        searchAddressesWithTx: () => { searchCalled = +1; return { results: [] }; },
-      },
+      storage
     };
 
     const tx = oneToOneTx;
