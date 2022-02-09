@@ -1,7 +1,7 @@
 const { Transaction } = require('@dashevo/dashcore-lib');
 const { Output } = Transaction;
 const { InvalidDashcoreTransaction } = require('../../../errors');
-const { FETCHED_CONFIRMED_TRANSACTION } = require('../../../EVENTS');
+const { FETCHED_UNCONFIRMED_TRANSACTION, FETCHED_CONFIRMED_TRANSACTION } = require('../../../EVENTS');
 
 const parseStringifiedTransaction = (stringified) => new Transaction(stringified);
 /**
@@ -51,6 +51,7 @@ const importTransaction = function importTransaction(transaction, transactionMet
 
         if (findIndex >= 0) {
           mappedTransactionsHeight[height][findIndex] = mappedTransactionObject;
+          hasUpdateStorage = true;
         } else {
           mappedTransactionsHeight[height].push(mappedTransactionObject);
         }
@@ -114,10 +115,15 @@ const importTransaction = function importTransaction(transaction, transactionMet
     addressObject.transactions.push(transaction.hash);
   });
 
+  // Announce only confirmed transaction imported that are our.
   if (hasUpdateStorage) {
     this.lastModified = +new Date();
-    // Announce only confirmed transaction imported that are our.
-    this.announce(FETCHED_CONFIRMED_TRANSACTION, { transaction });
+
+    if (!transaction.isChainLocked && !transaction.isInstantLocked) {
+      this.announce(FETCHED_UNCONFIRMED_TRANSACTION, { transaction });
+    } else {
+      this.announce(FETCHED_CONFIRMED_TRANSACTION, { transaction });
+    }
   }
 };
 module.exports = importTransaction;
