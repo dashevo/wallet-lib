@@ -1,13 +1,12 @@
 const EventEmitter = require('events');
 const { cloneDeep, has } = require('lodash');
-
+const createAdapter = require('../../adapters/createAdapter');
 const CONSTANTS = require('../../CONSTANTS');
-
+const { CONFIGURED } = require('../../EVENTS');
 const initialStore = {
   wallets: {},
   transactions: {},
   transactionsMetadata: {},
-  chains: {},
   instantLocks: {},
 };
 // eslint-disable-next-line no-underscore-dangle
@@ -39,25 +38,38 @@ class Storage extends EventEmitter {
     this.lastModified = null;
     this.network = has(opts, 'network') ? opts.network.toString() : defaultOpts.network;
 
+    this.adapter = opts.adapter || createAdapter();
+
     // Map an address to it's walletid/path/type schema (used by searchAddress for speedup)
     this.mappedAddress = {};
 
     // Map height to transaction ids to facilitate search.
     this.mappedTransactionsHeight = {};
+
+    this.isStopped = true;
+  }
+
+  async prepare() {
+    if (this.rehydrate) {
+      await this.rehydrateState();
+    }
+
+    if (this.autosave) {
+      this.startWorker();
+    }
+
+    this.emit(CONFIGURED, { type: CONFIGURED, payload: null });
   }
 }
 Storage.prototype.addNewTxToAddress = require('./methods/addNewTxToAddress');
 Storage.prototype.announce = require('./methods/announce');
 Storage.prototype.calculateDuffBalance = require('./methods/calculateDuffBalance');
 Storage.prototype.clearAll = require('./methods/clearAll');
-Storage.prototype.configure = require('./methods/configure');
 Storage.prototype.createAccount = require('./methods/createAccount');
-Storage.prototype.createChain = require('./methods/createChain');
 Storage.prototype.createSingleAddress = require('./methods/createSingleAddress');
 Storage.prototype.createWallet = require('./methods/createWallet');
 
 Storage.prototype.exportAccounts = require('./methods/exportAccounts');
-Storage.prototype.exportChains = require('./methods/exportChains');
 Storage.prototype.exportTransactions = require('./methods/exportTransactions');
 Storage.prototype.exportWallets = require('./methods/exportWallets');
 
@@ -68,9 +80,7 @@ Storage.prototype.getInstantLock = require('./methods/getInstantLock');
 Storage.prototype.importAccounts = require('./methods/importAccounts');
 Storage.prototype.importAddress = require('./methods/importAddress');
 Storage.prototype.importAddresses = require('./methods/importAddresses');
-Storage.prototype.importBlockHeader = require('./methods/importBlockHeader');
 Storage.prototype.importSingleAddress = require('./methods/importSingleAddress');
-Storage.prototype.importChains = require('./methods/importChains');
 Storage.prototype.importTransaction = require('./methods/importTransaction');
 Storage.prototype.importTransactions = require('./methods/importTransactions');
 Storage.prototype.importInstantLock = require('./methods/importInstantLock');

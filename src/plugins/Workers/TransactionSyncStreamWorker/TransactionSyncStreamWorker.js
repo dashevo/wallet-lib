@@ -22,7 +22,6 @@ class TransactionSyncStreamWorker extends Worker {
       gapLimit: 10,
       dependencies: [
         'importTransactions',
-        'importBlockHeader',
         'importInstantLock',
         'storage',
         'transport',
@@ -264,7 +263,9 @@ class TransactionSyncStreamWorker extends Worker {
 
 TransactionSyncStreamWorker.prototype.getAddressesToSync = require('./methods/getAddressesToSync');
 TransactionSyncStreamWorker.prototype.getBestBlockHeightFromTransport = require('./methods/getBestBlockHeight');
+TransactionSyncStreamWorker.prototype.setLastSyncedBlockHash = require('./methods/setLastSyncedBlockHash');
 TransactionSyncStreamWorker.prototype.setLastSyncedBlockHeight = require('./methods/setLastSyncedBlockHeight');
+TransactionSyncStreamWorker.prototype.getLastSyncedBlockHash = require('./methods/getLastSyncedBlockHash');
 TransactionSyncStreamWorker.prototype.getLastSyncedBlockHeight = require('./methods/getLastSyncedBlockHeight');
 TransactionSyncStreamWorker.prototype.startHistoricalSync = require('./methods/startHistoricalSync');
 TransactionSyncStreamWorker.prototype.handleTransactionFromStream = require('./methods/handleTransactionFromStream');

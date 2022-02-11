@@ -9,7 +9,8 @@
               "m/44'/1'/0'": {
                 "label": null,
                 "path": "m/44'/1'/0'",
-                "network": "testnet"
+                "network": "testnet",
+                "blockHeight": 0
               }
             },
             "network":"testnet",

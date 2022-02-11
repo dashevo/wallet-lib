@@ -16,5 +16,6 @@ module.exports = function setLastSyncedBlockHeight(blockHeight) {
 
   accountStore.blockHeight = blockHeight;
 
+  this.storage.store.lastModified = +new Date();
   return accountStore.blockHeight;
 };

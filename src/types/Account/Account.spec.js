@@ -1,12 +1,8 @@
 const { expect } = require('chai');
 const Dashcore = require('@dashevo/dashcore-lib');
-const knifeMnemonic = require('../../../fixtures/knifeeasily');
-const fluidMnemonic = require('../../../fixtures/fluidDepth');
-const cR4t6ePrivateKey = require('../../../fixtures/cR4t6e_pk');
-const { WALLET_TYPES } = require('../../CONSTANTS');
 const { Account, EVENTS } = require('../../index');
 const EventEmitter = require('events');
-const inMem = require('../../adapters/InMem');
+const InMemoryAdapter = require('../../adapters/InMemoryAdapter/InMemoryAdapter');
 const blockHeader = new Dashcore.BlockHeader.fromObject({
   hash: '00000ac3a0c9df709260e41290d6902e5a4a073099f11fe8c1ce80aadc4bb331',
   version: 2,
@@ -17,10 +13,9 @@ const blockHeader = new Dashcore.BlockHeader.fromObject({
   nonce: 312363
 });
 const mocks = {
-  adapter: inMem,
+  adapter: new InMemoryAdapter(),
   offlineMode: true,
 };
-
 
 describe('Account - class', function suite() {
   this.timeout(10000);
@@ -34,9 +29,6 @@ describe('Account - class', function suite() {
       saveState: () => {},
       stopWorker: () => {},
       createAccount: () => {},
-      importBlockHeader: (blockheader)=>{
-        mockStorage.emit(EVENTS.BLOCKHEADER, {type: EVENTS.BLOCKHEADER, payload:blockheader});
-      }
     };
     mocks.wallet = (new (function Wallet() {
       this.walletId = '1234567891';
@@ -92,12 +84,9 @@ describe('Account - class', function suite() {
   it('should forward events', function (done) {
     const mockWallet = mocks.wallet;
     const account = new Account(mockWallet, { injectDefaultPlugins: false });
-    account.init(mockWallet).then(async ()=>{
-      await account.on(EVENTS.BLOCKHEADER, ()=>{
-        done();
-      });
-      account.storage.importBlockHeader(blockHeader);
-    })
-
+    account.on(EVENTS.STARTED, ()=>{
+      done();
+    });
+    account.init(mockWallet);
   });
 });

@@ -1,9 +1,8 @@
 /**
- * Allow to clear the working interval (worker).
+ * Allow to stop the Storage executor (worker).
  * @return {boolean}
  */
 module.exports = function stopWorker() {
-  clearInterval(this.interval);
-  this.interval = null;
+  this.isStopped = true;
   return true;
 };

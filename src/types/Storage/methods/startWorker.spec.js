@@ -16,15 +16,9 @@ describe('Storage - startWorker', function suite() {
       autosaveIntervalTime: defaultIntervalValue,
     };
     startWorker.call(self);
-    if (process.browser){
-      this.skip('doesn\'t work in browser')
-      // Need to clear to not hang-on forever
-      clearInterval(self.interval);
-      return;
-    }
-    expect(self.interval.constructor.name).to.be.equal('Timeout');
-    expect(self.interval._repeat).to.be.equal(defaultIntervalValue); // Timeout are null btw
-    clearInterval(self.interval);
+    expect(self.isStopped).to.be.equal(false);
+    expect(self.autosaveIntervalTime).to.be.equal(defaultIntervalValue);
+    self.isStopped = true;
   });
   it('should work', async () => new Promise((res) => {
     let saved = 0;
@@ -39,9 +33,8 @@ describe('Storage - startWorker', function suite() {
     };
     startWorker.call(self);
     simulateChangeEvery.call(self, 200);
-
     setTimeout(() => {
-      clearInterval(self.interval);
+      self.isStopped = true;
       testInterval = clearInterval(testInterval);
 
       expect(saved < 11).to.be.equal(true);

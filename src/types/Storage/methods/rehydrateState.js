@@ -1,6 +1,7 @@
 const { merge } = require('lodash');
 const { InstantLock } = require('@dashevo/dashcore-lib');
 const { hasMethod } = require('../../../utils');
+const logger = require('../../../logger');
 
 const mergeHelper = (initial = {}, additional = {}) => merge(initial, additional);
 const { REHYDRATE_STATE_FAILED, REHYDRATE_STATE_SUCCESS } = require('../../../EVENTS');
@@ -18,9 +19,6 @@ const rehydrateState = async function rehydrateState() {
       const wallets = (this.adapter && hasMethod(this.adapter, 'getItem'))
         ? (await this.adapter.getItem('wallets') || this.store.wallets)
         : this.store.wallets;
-      const chains = (this.adapter && hasMethod(this.adapter, 'getItem'))
-        ? (await this.adapter.getItem('chains') || this.store.chains)
-        : this.store.chains;
       const instantLocks = (this.adapter && hasMethod(this.adapter, 'getItem'))
         ? (await this.adapter.getItem('instantLocks') || this.store.instantLocks)
         : this.store.instantLocks;
@@ -35,9 +33,9 @@ const rehydrateState = async function rehydrateState() {
 
       this.store.transactions = mergeHelper(this.store.transactions, transactions);
       this.store.wallets = mergeHelper(this.store.wallets, wallets);
-      this.store.chains = mergeHelper(this.store.chains, chains);
       this.store.instantLocks = mergeHelper(this.store.instantLocks, instantLocks);
       this.lastRehydrate = +new Date();
+      logger.debug('Storage: rehydrated state.');
       this.emit(REHYDRATE_STATE_SUCCESS, { type: REHYDRATE_STATE_SUCCESS, payload: null });
     } catch (e) {
       this.emit(REHYDRATE_STATE_FAILED, { type: REHYDRATE_STATE_FAILED, payload: e });

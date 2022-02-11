@@ -34,10 +34,11 @@ describe('Storage - importAccounts', async function suite() {
           done();
       });
     });
+    wallet.storage.prepare();
   });
   it('should import an account', (done) => {
     const wallet = new Wallet({ offlineMode: true });
-    wallet.storage.on('CONFIGURED', () => {
+    wallet.storage.prepare().then(() => {
       wallet.getAccount().then((acc)=>{
         let called = 0;
 
@@ -56,7 +57,7 @@ describe('Storage - importAccounts', async function suite() {
           wallet.disconnect();
           acc.disconnect();
           done();
-        }, 50);
+        }, 150);
       })
     });
   });

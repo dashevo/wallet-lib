@@ -6,6 +6,11 @@ const { Transaction } = Dashcore;
 const mockedStoreEmpty = {
   wallets: {
     123456789: {
+      accounts:{
+        "m/44'/1'/0'":{
+          blockHeight: 0,
+        }
+      },
       addresses: {},
     },
   },
@@ -19,6 +24,11 @@ const mockedStoreEmpty = {
 const mockedStore2 = {
   wallets: {
     123456789: {
+      accounts:{
+        "m/44'/1'/0'":{
+          blockHeight: 10000,
+        }
+      },
       addresses: {
         external: {
           "m/44'/1'/0'/0/0": {
@@ -141,6 +151,7 @@ describe('Account - getUTXOS', function suite() {
       getStore: mockedStoreEmpty,
       walletId: '123456789',
       network: 'testnet',
+      index: 0,
       walletType: 'hdwallet',
       BIP44PATH: "m/44'/1'/0'"
     });
@@ -151,6 +162,7 @@ describe('Account - getUTXOS', function suite() {
       getStore: mockedStore2,
       walletId: '123456789',
       network: 'testnet',
+      index: 0,
       walletType: 'hdwallet',
       BIP44PATH: "m/44'/1'/0'"
     });

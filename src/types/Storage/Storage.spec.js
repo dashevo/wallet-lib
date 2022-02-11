@@ -9,7 +9,7 @@ describe('Storage - constructor', function suite() {
   this.timeout(10000);
   it('It should create a storage', () => {
     const storage = new Storage();
-    expect(storage.store).to.deep.equal({ wallets: {}, transactions: {}, transactionsMetadata: {}, chains: {}, instantLocks: {} });
+    expect(storage.store).to.deep.equal({ wallets: {}, transactions: {}, transactionsMetadata: {}, instantLocks: {} });
     expect(storage.getStore()).to.deep.equal(storage.store);
     expect(storage.rehydrate).to.equal(true);
     expect(storage.autosave).to.equal(true);
@@ -22,9 +22,9 @@ describe('Storage - constructor', function suite() {
     const storage = new Storage();
     let configuredEvent = false;
     storage.on(CONFIGURED, () => configuredEvent = true);
-    await storage.configure();
     expect(storage.adapter).to.exist;
-    expect(storage.adapter.constructor.name).to.equal('InMem');
+    expect(storage.adapter.constructor.name).to.equal('InMemoryAdapter');
+    await storage.prepare();
     expect(configuredEvent).to.equal(true);
     storage.stopWorker();
   });
@@ -34,10 +34,10 @@ describe('Storage - constructor', function suite() {
       this.skip('LocalForage is a valid adapter on browser')
       return;
     }
-    const expectedException1 = 'Invalid Storage Adapter : No available storage method found.';
+    const expectedException1 = 'No available storage method found.';
     const storageOpts1 = { adapter: localForage };
-    const storage = new Storage();
-    return storage.configure(storageOpts1).then(
+    const storage = new Storage(storageOpts1);
+    return storage.prepare().then(
       () => Promise.reject(new Error('Expected method to reject.')),
       (err) => expect(err).to.be.a('Error').with.property('message', expectedException1),
     ).then(() => {
@@ -46,25 +46,13 @@ describe('Storage - constructor', function suite() {
   });
   it('should work on usage', async () => {
     const storage = new Storage();
-    await storage.configure();
-    await storage.createChain(Dashcore.Networks.testnet);
+    await storage.prepare();
 
     const defaultWalletId = 'squawk7700';
     const expectedStore1 = {
       wallets: {},
       transactions: {},
       transactionsMetadata:{},
-      chains: {
-        testnet: {
-          name: 'testnet',
-          blockHeight: -1,
-          blockHeaders: {},
-          mappedBlockHeaderHeights: {},
-          fees: {
-            minRelay: -1
-          }
-        },
-      },
       instantLocks: {}
     };
     expect(storage.getStore()).to.deep.equal(expectedStore1);
@@ -83,17 +71,6 @@ describe('Storage - constructor', function suite() {
       },
       transactions: {},
       transactionsMetadata: {},
-      chains: {
-        testnet: {
-          name: 'testnet',
-          blockHeight: -1,
-          blockHeaders: {},
-          mappedBlockHeaderHeights: {},
-          fees: {
-            minRelay: -1
-          }
-        },
-      },
       instantLocks: {},
     };
     expect(storage.getStore()).to.deep.equal(expectedStore2);

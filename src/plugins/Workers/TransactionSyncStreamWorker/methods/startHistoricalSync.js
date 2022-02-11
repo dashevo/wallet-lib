@@ -60,6 +60,10 @@ module.exports = async function startHistoricalSync(network) {
     });
   }
 
+  const header = await this.transport.getBlockHeaderByHeight(bestBlockHeight);
+  const { hash } = header;
+
+  this.setLastSyncedBlockHash(hash);
   this.setLastSyncedBlockHeight(bestBlockHeight);
 
   logger.debug(`TransactionSyncStreamWorker - HistoricalSync - Synchronized ${count} in ${+new Date() - start}ms`);

@@ -6,12 +6,12 @@ const fluidMnemonic = require('../../../fixtures/fluidDepth');
 const cR4t6ePrivateKey = require('../../../fixtures/cR4t6e_pk');
 const { WALLET_TYPES } = require('../../CONSTANTS');
 const { Wallet } = require('../../index');
-const inMem = require('../../adapters/InMem');
+const InMemoryAdapter = require('../../adapters/InMemoryAdapter/InMemoryAdapter');
 const fromHDPublicKey = require('./methods/fromHDPublicKey');
 const gatherSail = require('../../../fixtures/gathersail');
 
 const mocks = {
-  adapter: inMem,
+  adapter: new InMemoryAdapter(),
   offlineMode: true,
 };
 describe('Wallet - class', function suite() {
@@ -35,12 +35,8 @@ describe('Wallet - class', function suite() {
     expect(Dashcore.Mnemonic(wallet2.mnemonic).toString()).to.be.equal(wallet2.mnemonic);
     expect(wallet2.mnemonic).to.be.not.equal(wallet1.mnemonic);
     expect(wallet2.network).to.be.deep.equal(Dashcore.Networks.testnet.toString());
-    wallet1.storage.on('CONFIGURED', () => {
-      wallet1.disconnect();
-    });
-    wallet2.storage.on('CONFIGURED', () => {
-      wallet2.disconnect();
-    });
+    wallet1.disconnect();
+    wallet2.disconnect();
   });
   it('should create a wallet with mnemonic', () => {
     const wallet1 = new Wallet({ mnemonic: knifeMnemonic.mnemonic, ...mocks });
